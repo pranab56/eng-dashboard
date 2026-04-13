@@ -13,6 +13,7 @@ import CancelButton from '@/components/buttons/CancelButton'
 import SubmitButton from '@/components/buttons/SubmitButton'
 import BackButton from '@/components/buttons/BackButton'
 import TextareaField from '@/components/form/TextareaField'
+import { matchTypeOptions, publishStatusOptions } from '@/constants/selectData'
 
 // Form Validation Schema
 const videoSchema = z.object({
@@ -59,13 +60,6 @@ const CreateVideos = () => {
     })
   }, [setHeaders])
 
-  const languageSelectOptions = [
-    { label: "English (US)", value: "English (US)" },
-    { label: "Bengali", value: "Bengali" },
-    { label: "Spanish", value: "Spanish" },
-  ]
-
-
   const onSubmit = async (data: videoFormValues) => {
     console.log("submitting")
     try {
@@ -93,7 +87,7 @@ const CreateVideos = () => {
             <div className="space-y-8">
               {/* App Name Input */}
               <InputField name="videoTitle" title="Video Title" placeholder="e.g. Manchester Derby - High Intensity Highlights" register={register} error={errors.videoTitle} />
-              <SelectField name="category" label="Content Category" control={control} error={errors.category} options={languageSelectOptions} />
+              <SelectField name="category" label="Content Category" control={control} error={errors.category} options={matchTypeOptions} />
 
               <TextareaField name="description" title="Description" placeholder="Brief summary of the broadcast content..." register={register} error={errors.description} />
 
@@ -136,7 +130,7 @@ const CreateVideos = () => {
 
             <div className="space-y-8">
               {/* App Name Input */}
-              <SelectField name="pubStatus" label="Publishing Status" control={control} error={errors.pubStatus} options={languageSelectOptions} />
+              <SelectField name="pubStatus" label="Publishing Status" control={control} error={errors.pubStatus} options={publishStatusOptions} />
               <InputField name="pubDate" type='date' title="Publish Date" placeholder="Enter a compelling headline" register={register} error={errors.pubDate} />
               <InputField name="pubTime" type='time' title="Publish Time" placeholder="Enter a compelling headline" register={register} error={errors.pubTime} />
 

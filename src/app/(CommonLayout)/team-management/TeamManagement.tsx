@@ -6,10 +6,13 @@ import CustomTable from '@/components/table/CustomTable'
 import { TTeam } from '@/types/columnTypes';
 import { useHeaders } from '@/hooks/useHeaders';
 import { useEffect } from 'react';
-import TableHeader from '@/components/cui/TableHeader';
 import CustomPagination from '@/components/cui/CustomPagination';
 import GeneralStateCard from '@/components/cui/GeneralStateCard';
 import { teamColumns } from '@/tableColumns/teamColumns';
+import TableTitle from '@/components/titles/TableTitle';
+import ExportButton from '@/components/buttons/ExportButton';
+import CreateButton from '@/components/buttons/CreateButton';
+import Link from 'next/link';
 
 
 
@@ -162,9 +165,15 @@ const TeamManagement = () => {
       </>
       <div className=" bg-white rounded-md py-4 flex flex-col min-h-[600px]">
         <div className='flex-1'>
-          <>
-            <TableHeader payload={tableHeaderPayload} />
-          </>
+          <div className="flex items-center justify-between px-6 py-1">
+            <TableTitle payload={{ title: tableHeaderPayload.title }} />
+            <div className='flex gap-2'>
+              <ExportButton url={tableHeaderPayload.url || ""} />
+              <Link href="/team-management/add-team">
+                <CreateButton text="Add Team" />
+              </Link>
+            </div>
+          </div>
           <div className="pt-4">
             <CustomTable<TTeam> columns={teamColumns} data={tableDatas} />
           </div>

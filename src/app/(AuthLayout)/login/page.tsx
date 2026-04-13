@@ -66,7 +66,7 @@ const Login = () => {
   return (
     <>
 
-      <div className="flex items-center justify-center py-8">
+      <div className="flex items-center justify-center py-8 bg-gray-800">
         {logo && <Image src={logo} width={200} height={30} alt="dashboard" className="w-[200px] h-[68px]" />}
       </div>
       <Form {...form}>
@@ -118,7 +118,7 @@ const Login = () => {
 
 
           {/* Submit Button */}
-          <Button variant="violetBtn" type="submit" size="xl" className="w-full">
+          <Button variant="blackBtn" type="submit" size="xl" className="w-full">
             Sign In
           </Button>
 

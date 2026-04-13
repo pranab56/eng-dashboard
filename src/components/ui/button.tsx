@@ -19,7 +19,7 @@ const buttonVariants = cva(
         paginationButtonActive: "bg-[#EABB00] text-white shadow-xs rounded-md cursor-pointer transition-colors duration-300",
         paginationGhostButton: "bg-white rounded-md hover:text-gray-500 hover:bg-transparent text-gray-700",
         paginationGhostButtonDisable: "bg-white rounded-md text-gray-500 hover:bg-transparent",
-        violetBtn: "bg-[#EABB00] hover:bg-[#EABB00] text-white rounded-md cursor-pointer transition-colors duration-300 h-12",
+        blackBtn: "bg-black hover:bg-gray-800 text-white rounded-md cursor-pointer transition-colors duration-300 h-12",
       },
       size: {
         default: "h-9 px-4 py-2 has-[>svg]:px-3",

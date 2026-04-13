@@ -50,7 +50,7 @@ const VerifyOtp = () => {
 
   return (
     <>
-      <h2 className="text-2xl md:text-3xl xl:text-4xl font-bold text-white pb-12">Verify OTP</h2>
+      <h2 className="text-2xl md:text-3xl xl:text-4xl font-bold text-gray-800 pb-12">Verify OTP</h2>
 
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
@@ -79,7 +79,7 @@ const VerifyOtp = () => {
           />
 
           {/* Submit Button */}
-          <Button variant="violetBtn" type="submit" size="xl" className="w-full max-w-[450px]">
+          <Button variant="blackBtn" type="submit" size="xl" className="w-full max-w-[450px]">
             Submit
           </Button>
 

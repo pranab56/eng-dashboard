@@ -13,6 +13,7 @@ import CancelButton from '@/components/buttons/CancelButton'
 import SubmitButton from '@/components/buttons/SubmitButton'
 import BackButton from '@/components/buttons/BackButton'
 import TextareaField from '@/components/form/TextareaField'
+import { newsTypeOptions, publishStatusOptions } from '@/constants/selectData'
 
 // Form Validation Schema
 const newsSchema = z.object({
@@ -56,13 +57,6 @@ const CreateNews = () => {
     })
   }, [setHeaders])
 
-  const languageSelectOptions = [
-    { label: "English (US)", value: "English (US)" },
-    { label: "Bengali", value: "Bengali" },
-    { label: "Spanish", value: "Spanish" },
-  ]
-
-
   const onSubmit = async (data: newsFormValues) => {
     console.log("submitting")
     try {
@@ -90,7 +84,7 @@ const CreateNews = () => {
             <div className="space-y-8">
               {/* App Name Input */}
               <InputField name="newsTitle" title="News Title" placeholder="Enter a compelling headline" register={register} error={errors.newsTitle} />
-              <SelectField name="category" label="Category" control={control} error={errors.category} options={languageSelectOptions} />
+              <SelectField name="category" label="Category" control={control} error={errors.category} options={newsTypeOptions} />
 
               <TextareaField name="description" title="Description" placeholder="Brief summary of the broadcast content..." register={register} error={errors.description} />
 
@@ -124,7 +118,7 @@ const CreateNews = () => {
 
             <div className="space-y-8">
               {/* App Name Input */}
-              <SelectField name="pubStatus" label="Publishing Status" control={control} error={errors.pubStatus} options={languageSelectOptions} />
+              <SelectField name="pubStatus" label="Publishing Status" control={control} error={errors.pubStatus} options={publishStatusOptions} />
               <InputField name="pubDate" type='date' title="Publish Date" placeholder="Enter a compelling headline" register={register} error={errors.pubDate} />
               <InputField name="pubTime" type='time' title="Publish Time" placeholder="Enter a compelling headline" register={register} error={errors.pubTime} />
 

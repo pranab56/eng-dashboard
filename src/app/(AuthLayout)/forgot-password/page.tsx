@@ -73,7 +73,7 @@ const ForgotPassword = () => {
           />
 
           {/* Submit Button */}
-          <Button variant="violetBtn" type="submit" size="xl" className="w-full">
+          <Button variant="blackBtn" type="submit" size="xl" className="w-full">
             Send Reset Code
           </Button>
 

@@ -10,6 +10,10 @@ import {
   SettingsIcon,
   TableIcon,
   NewsIcon,
+  Terms,
+  Privacy,
+  Subscribe,
+  Reward
 } from "@/assets/assets";
 
 export type TMenuItem = {
@@ -83,13 +87,13 @@ export const sidebarData: TMenuItem[] = [
   },
   {
     id: 81,
-    icon: NotificationsIcon,
+    icon: Subscribe,
     title: "Subscribe Plan",
     label: "/subscribe-plan",
   },
   {
     id: 82,
-    icon: NotificationsIcon,
+    icon: Reward,
     title: "Rewards/Redemption",
     label: "/rewards-redemption",
   },
@@ -98,5 +102,17 @@ export const sidebarData: TMenuItem[] = [
     icon: SettingsIcon,
     title: "Settings",
     label: "/settings",
+  },
+  {
+    id: 9,
+    icon: Terms,
+    title: "Terms & Condition",
+    label: "/terms-and-condition",
+  },
+  {
+    id: 9,
+    icon: Privacy,
+    title: "Privacy Policy",
+    label: "/privacy-policy",
   },
 ];

@@ -13,6 +13,7 @@ import { selectStatusValues } from '@/constants/selectData';
 import CreateButton from '@/components/buttons/CreateButton';
 import CustomDate from '@/components/selects/CustomDate';
 import CustomPagination from '@/components/cui/CustomPagination';
+import Link from 'next/link';
 
 
 
@@ -103,7 +104,9 @@ const MatchManagement = () => {
           <CustomSelect selectValues={selectStatusValues} selectType="status" />
         </div>
         {/* Right Side: Action Button */}
-        <CreateButton text="Create Match" />
+        <Link href="/match-management/create-match">
+          <CreateButton text="Add Match" />
+        </Link>
       </div>
       <div className=" bg-white rounded-md py-4 flex flex-col min-h-[600px]">
         <div className='flex-1'>

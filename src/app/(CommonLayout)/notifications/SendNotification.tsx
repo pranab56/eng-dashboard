@@ -12,6 +12,7 @@ import CancelButton from '@/components/buttons/CancelButton'
 import SubmitButton from '@/components/buttons/SubmitButton'
 import TextareaField from '@/components/form/TextareaField'
 import { closeCustomModal } from '@/components/modals/CustomModal'
+import { alertTypeOptions } from '@/constants/selectData'
 
 // Form Validation Schema
 const rewardsSchema = z.object({
@@ -47,12 +48,6 @@ const SendNotification = () => {
     })
   }, [setHeaders])
 
-  const languageSelectOptions = [
-    { label: "English (US)", value: "English (US)" },
-    { label: "Bengali", value: "Bengali" },
-    { label: "Spanish", value: "Spanish" },
-  ]
-
 
   const onSubmit = async (data: RewardsFormValues) => {
     try {
@@ -74,7 +69,7 @@ const SendNotification = () => {
         {/* App Name Input */}
         <InputField name="notificationTitle" title="Title" placeholder="Enter notification title ..." register={register} error={errors.notificationTitle} />
         <TextareaField name="notificationDescription" title="Description" placeholder="Type your description here ..." register={register} error={errors.notificationDescription} />
-        <SelectField name="notificationType" label="Notification Type" control={control} error={errors.notificationType} options={languageSelectOptions} />
+        <SelectField name="notificationType" label="Notification Type" control={control} error={errors.notificationType} options={alertTypeOptions} />
 
       </div>
 

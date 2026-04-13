@@ -2,6 +2,7 @@ import { ColumnDef } from "@tanstack/react-table"
 import { FiEye } from "react-icons/fi";
 import { TMatch } from "@/types/columnTypes";
 import Image from "next/image";
+import Link from "next/link";
 
 const statusStyle = (status: string): string => {
   switch (status) {
@@ -64,9 +65,11 @@ export const matchColumns: ColumnDef<TMatch>[] = [
     header: () => <div className="">Action</div>,
     cell: () => (
       <div className="flex items-center gap-2">
-        <button className="flex items-center justify-center h-9 w-9 rounded-sm bg-[#F3F3F3]  transition-colors duration-300 cursor-pointer">
-          <FiEye  className="size-5 font-bold text-gray-800 transition-colors duration-300" />
-        </button>
+        <Link href="/match-management/create-match">
+          <button className="flex items-center justify-center h-9 w-9 rounded-sm bg-[#F3F3F3]  transition-colors duration-300 cursor-pointer">
+            <FiEye className="size-5 font-bold text-gray-800 transition-colors duration-300" />
+          </button>
+        </Link>
       </div>
     ),
   }
