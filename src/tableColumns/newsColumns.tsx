@@ -4,16 +4,16 @@ import { HiOutlineTrash } from "react-icons/hi";
 import { TNews } from "@/types/columnTypes";
 import Image from "next/image";
 
-const statusStyle = (status: string): string => {
-  switch (status) {
-    case "Active":
-      return "bg-green-100 text-green-500";
-    case "Published":
-      return "bg-blue-100 text-blue-500";
-    default:
-      return "bg-gray-500";
-  }
-};
+// const statusStyle = (status: string): string => {
+//   switch (status) {
+//     case "Active":
+//       return "bg-green-100 text-green-500";
+//     case "Published":
+//       return "bg-blue-100 text-blue-500";
+//     default:
+//       return "bg-gray-500";
+//   }
+// };
 
 export const newsColumns: ColumnDef<TNews>[] = [
   {
