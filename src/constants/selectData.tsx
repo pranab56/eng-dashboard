@@ -69,8 +69,8 @@ export const matchTypeOptions = [
 ];
 
 export const publishStatusOptions = [
-  { label: "Drafting", value: "Drafting" },
-  { label: "Published", value: "Published" },
+  { label: "Drafting", value: "draft" },
+  { label: "Published", value: "publish" },
 ];
 
 export const newsTypeOptions = [

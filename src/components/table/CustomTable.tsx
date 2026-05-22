@@ -15,16 +15,17 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table"
+} from "@/components/ui/table";
 
-
+import { Loader } from "lucide-react"
 
 interface CustomTableProps<TData> {
   data: TData[];
   columns: ColumnDef<TData>[];
+  isLoading?: boolean;
 }
 
-function CustomTable<TData>({ data, columns }: CustomTableProps<TData>) {
+function CustomTable<TData>({ data, columns, isLoading }: CustomTableProps<TData>) {
 
   const table = useReactTable({
     data,
@@ -49,7 +50,7 @@ function CustomTable<TData>({ data, columns }: CustomTableProps<TData>) {
                   return (
                     <TableHead
                       key={header.id}
-                      className="bg-[#fefaeb] text-[#6B6B6B] h-14"
+                      className="bg-[#fefaeb] text-[#6B6B6B] h-12"
                     >
                       {header.isPlaceholder
                         ? null
@@ -64,7 +65,19 @@ function CustomTable<TData>({ data, columns }: CustomTableProps<TData>) {
             ))}
           </TableHeader>
           <TableBody className="">
-            {table.getRowModel().rows?.length ? (
+            {isLoading ? (
+              <TableRow>
+                <TableCell
+                  colSpan={columns.length}
+                  className="h-24 text-center"
+                >
+                  <div className="flex items-center justify-center gap-2">
+                    <Loader className="w-5 h-5 animate-spin" />
+                    <span>Loading...</span>
+                  </div>
+                </TableCell>
+              </TableRow>
+            ) : table.getRowModel().rows?.length ? (
               table.getRowModel().rows.map((row) => (
                 <TableRow
                   key={row.id}

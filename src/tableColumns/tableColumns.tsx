@@ -1,58 +1,68 @@
 import { ColumnDef } from "@tanstack/react-table"
-import { TTable } from "@/types/columnTypes";
 import Image from "next/image";
 
-export const tableColumns: ColumnDef<TTable>[] = [
+export const tableColumns: ColumnDef<any>[] = [
   {
-    accessorKey: "rating",
+    id: "rank",
     header: () => <div className="">#</div>,
     cell: ({ row }) => (
-      <div className="font-semibold">{row.getValue("rating")}</div>
+      <div className="font-semibold">{row.index + 1}</div>
     ),
   },
   {
     accessorKey: "team",
     header: () => <div className="">Team</div>,
-    cell: ({ row }) => (
-      <div className="flex items-center gap-2">
-        <Image src={row.original.logo} alt="profilePic" width={400} height={400} className="w-10 h-10 rounded-full border-2 border-white" />
-        <span className="font-semibold">{row.getValue("team")}</span>
-      </div>
-    ),
+    cell: ({ row }) => {
+      const team = row.original.team;
+      return (
+        <div className="flex items-center gap-2">
+          {team?.teamLogo ? (
+            <Image src={team.teamLogo} alt="logo" width={100} height={100} className="w-10 h-10 rounded-full border border-gray-100 object-cover" />
+          ) : (
+            <div className="w-10 h-10 rounded-full bg-gray-200 border border-gray-100 flex items-center justify-center text-[10px]">No Logo</div>
+          )}
+          <div className="flex flex-col">
+            <span className="font-bold text-gray-900 leading-none">{team?.teamName}</span>
+            <span className="text-[10px] text-gray-400 font-semibold uppercase">{team?.shortName}</span>
+          </div>
+        </div>
+      );
+    },
   },
   {
     accessorKey: "played",
     header: () => <div className="">P</div>,
-    cell: ({ row }) => (
-        <div className="text-gray-500">{row.getValue("played")}</div>
-    ),
+    cell: ({ row }) => <div className="font-medium">{row.getValue("played")}</div>,
   },
   {
-    accessorKey: "won",
+    accessorKey: "win",
     header: () => <div className="">W</div>,
-    cell: ({ row }) => (
-        <div className="text-gray-500">{row.getValue("played")}</div>
-    ),
+    cell: ({ row }) => <div className="text-gray-600">{row.getValue("win")}</div>,
   },
   {
-    accessorKey: "drawn",
+    accessorKey: "draw",
     header: () => <div className="">D</div>,
-    cell: ({ row }) => (
-        <div className="text-gray-500">{row.getValue("drawn")}</div>
-    ),
+    cell: ({ row }) => <div className="text-gray-600">{row.getValue("draw")}</div>,
   },
   {
-    accessorKey: "lost",
+    accessorKey: "loss",
     header: () => <div className="">L</div>,
+    cell: ({ row }) => <div className="text-gray-600">{row.getValue("loss")}</div>,
+  },
+  {
+    accessorKey: "goalDifference",
+    header: () => <div className="">GD</div>,
     cell: ({ row }) => (
-        <div className="text-gray-500">{row.getValue("lost")}</div>
+      <div className={`font-medium ${Number(row.getValue("goalDifference")) >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+        {Number(row.getValue("goalDifference")) > 0 ? `+${row.getValue("goalDifference")}` : row.getValue("goalDifference")}
+      </div>
     ),
   },
   {
     accessorKey: "points",
     header: () => <div className="">PTS</div>,
     cell: ({ row }) => (
-        <div className="text-gray-500">{row.getValue("points")}</div>
+        <div className="font-bold text-gray-900">{row.getValue("points")}</div>
     ),
   },
 ]

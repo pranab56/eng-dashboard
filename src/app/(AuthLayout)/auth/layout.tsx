@@ -1,8 +1,5 @@
 import { Toaster } from "sonner";
 
-
-
-
 export default function AuthLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
     <div className="bg-white h-screen flex items-center justify-center">

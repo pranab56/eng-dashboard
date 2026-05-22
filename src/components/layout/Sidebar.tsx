@@ -1,7 +1,6 @@
 "use client"
 
 
-import { deleteCookie } from 'cookies-next/client'
 import Image from 'next/image'
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
@@ -11,9 +10,14 @@ import { sidebarData, TMenuItem } from '@/constants/sidebarData'
 import { logo } from '@/assets/assets'
 import { MdLogout } from "react-icons/md";
 
+import { logout } from '@/features/auth/authSlice';
+import { useDispatch } from 'react-redux';
+import { removeAuthCookie } from '../../app/actions/auth';
+
 const Sidebar = () => {
   const router = useRouter();
   const pathname = usePathname();
+  const dispatch = useDispatch();
 
   const isActive = (url: string) => {
     if (url === "/") return pathname === "/";
@@ -21,14 +25,15 @@ const Sidebar = () => {
   };
 
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
     toast.loading("Logging out...", {
       id: "logout",
     });
 
-    deleteCookie('accessToken');
+    await removeAuthCookie();
+    dispatch(logout());
     toast.success('Logged out successfully', { id: 'logout' });
-    router.push('/login');
+    router.push('/auth/login');
   }
 
   return (

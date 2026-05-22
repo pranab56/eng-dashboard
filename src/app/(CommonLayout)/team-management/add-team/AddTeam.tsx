@@ -1,165 +1,187 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client"
-import React, { useEffect } from 'react'
-import { useHeaders } from '@/hooks/useHeaders'
-import { useForm } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
-import * as z from 'zod'
-import { toast } from 'sonner'
+import BackButton from '@/components/buttons/BackButton'
+import ImageUploadField, { ImageChildrenComponent } from '@/components/form/ImageUploadField'
 import InputField from '@/components/form/InputField'
 import SelectField from '@/components/form/SelectField'
-import ImageUploadField, { ImageChildrenComponent } from '@/components/form/ImageUploadField'
-import CancelButton from '@/components/buttons/CancelButton'
-import SubmitButton from '@/components/buttons/SubmitButton'
-import BackButton from '@/components/buttons/BackButton'
+import { useHeaders } from '@/hooks/useHeaders'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { useEffect } from 'react'
+import { useForm } from 'react-hook-form'
+import * as z from 'zod'
+
+import { useCreateTeamMutation, useGetSingleTeamQuery, useUpdateTeamMutation } from '@/features/teamManagement/teamApi'
+import { baseURL } from '@/utils/BaseURL'
+import { useRouter, useSearchParams } from 'next/navigation'
+import toast from 'react-hot-toast'
+import SubmitButton from '../../../../components/buttons/SubmitButton'
 
 // Form Validation Schema
 const addTeamSchema = z.object({
   logo: z.any().optional(),
-  teamName: z.string().min(2).max(50),
-  shortName: z.string().min(2).max(50),
-  season: z.string().min(2).max(50),
-  teamType: z.string().min(2).max(50),
-  stadiumName: z.string().min(2).max(50),
-  city: z.string().min(2).max(50),
-  country: z.string().min(2).max(50),
-  managerName: z.string().min(2).max(50),
-  managerRole: z.string().min(2).max(50),
+  teamName: z.string().min(1, "Team Name is required"),
+  shortName: z.string().min(1, "Short Name is required"),
+  teamType: z.string().min(1, "Team Type is required"),
+  stadiumName: z.string().min(1, "Stadium Name is required"),
+  city: z.string().min(1, "City is required"),
+  country: z.string().min(1, "Country is required"),
 });
 
 type AddTeamFormValues = z.infer<typeof addTeamSchema>
 
+const teamTypeOptions = [
+  { label: "Football", value: "Football" },
+  { label: "Cricket", value: "Cricket" },
+]
+
+
 const AddTeam = () => {
   const { setHeaders } = useHeaders()
+  const router = useRouter()
+  const searchParams = useSearchParams()
+  const teamId = searchParams.get("id")
+  const isEditMode = !!teamId
+
+  const [createTeam, { isLoading: isCreating }] = useCreateTeamMutation()
+  const [updateTeam, { isLoading: isUpdating }] = useUpdateTeamMutation()
+  const { data: teamData, isFetching } = useGetSingleTeamQuery(teamId, { skip: !isEditMode })
 
   const {
     register,
     handleSubmit,
     control,
     reset,
-    formState: { errors, isSubmitting }
+    formState: { errors }
   } = useForm<AddTeamFormValues>({
     resolver: zodResolver(addTeamSchema),
     defaultValues: {
       teamName: "",
       shortName: "",
-      season: "",
-      teamType: "",
+      teamType: "Football",
       stadiumName: "",
       city: "",
       country: "",
-      managerName: "",
-      managerRole: "",
     }
   })
 
   useEffect(() => {
     setHeaders({
-      title: "Create Reward",
-      des: "Design a new incentive for your enterprise loyalty ecosystem."
+      title: isEditMode ? "Update Team" : "Add New Team",
+      des: isEditMode ? "Modify existing squad details and brand identity." : "Register a new team into the league management system."
     })
-  }, [setHeaders])
+  }, [setHeaders, isEditMode])
 
-  const languageSelectOptions = [
-    { label: "English (US)", value: "English (US)" },
-    { label: "Bengali", value: "Bengali" },
-    { label: "Spanish", value: "Spanish" },
-  ]
+  useEffect(() => {
+    if (teamData?.data) {
+      const team = teamData.data;
+      reset({
+        teamName: team.teamName,
+        shortName: team.shortName,
+        teamType: team.teamType,
+        stadiumName: team.stadiumName,
+        city: team.city,
+        country: team.country,
+        logo: team.teamLogo ? `${baseURL}${team.teamLogo}` : undefined,
+      });
+    }
+  }, [teamData, reset])
 
 
   const onSubmit = async (data: AddTeamFormValues) => {
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1500))
-      console.log('Form Data:', data)
-      toast.success("Reward created successfully")
+      const formData = new FormData();
+
+      const jsonData = {
+        teamName: data.teamName,
+        shortName: data.shortName,
+        teamType: data.teamType,
+        stadiumName: data.stadiumName,
+        city: data.city,
+        country: data.country
+      };
+
+      formData.append("data", JSON.stringify(jsonData));
+
+      if (data.logo instanceof File) {
+        formData.append("image", data.logo);
+      }
+
+      if (isEditMode) {
+        const res = await updateTeam({ id: teamId, data: formData }).unwrap();
+        if (res.success) {
+          toast.success(res.message || "Team updated successfully");
+          router.push("/team-management");
+        }
+      } else {
+        const res = await createTeam(formData).unwrap();
+        if (res.success) {
+          toast.success(res.message || "Team created successfully");
+          router.push("/team-management");
+        }
+      }
     } catch (error: any) {
-      toast.error("Failed to create reward", error.message)
+      toast.error(error?.data?.message || `Failed to ${isEditMode ? 'update' : 'create'} team`);
     }
+  }
+
+  if (isEditMode && isFetching) {
+    return <div className="flex items-center justify-center min-h-[400px]">Loading team data...</div>
   }
 
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="max-w-6xl mx-auto py-10 px-6 space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
-      <>
+    <form onSubmit={handleSubmit(onSubmit)} className=" py-5 px-6 space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
+      <div className='flex items-center justify-between'>
         <BackButton />
-      </>
+
+        <div className="">
+          <SubmitButton isSubmitting={isCreating || isUpdating} title={isEditMode ? "Update Team" : "Create Team"} />
+        </div>
+      </div>
       <div className='w-full flex gap-4'>
         <div className='flex-1 space-y-4'>
-          {/* Application Identity Card */}
-          <section className="bg-white rounded-xl p-8 md:p-10 border border-gray-50 shadow-xl shadow-gray-200/50">
-            <h2 className="text-2xl font-bold text-gray-900 mb-8">General Details</h2>
+          {/* General Details Card */}
+          <section className="bg-white rounded-xl p-8 md:p-10 border border-gray-50 shadow-xl shadow-gray-200/50 text-gray-800">
+            <h2 className="text-2xl font-medium text-gray-900 mb-8">General Details</h2>
 
             <div className="space-y-8">
-              {/* App Name Input */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                {/* Language Select */}
-
                 <InputField name="teamName" type="string" title="Team Name" placeholder="e.g. Manchester Kings" register={register} error={errors.teamName} />
-
                 <InputField name="shortName" type="string" title="Short Name" placeholder="MKFC" register={register} error={errors.shortName} />
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-8"></div>
               </div>
-              {/* App Name Input */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                {/* Language Select */}
-                <SelectField name="season" label="Season" control={control} error={errors.season} options={languageSelectOptions} />
-
-                <SelectField name="teamType" label="Team Type" control={control} error={errors.teamType} options={languageSelectOptions} />
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-8"></div>
+                <SelectField name="teamType" label="Team Type" control={control} error={errors.teamType} options={teamTypeOptions} />
               </div>
             </div>
           </section>
 
-          {/* Application Identity Card */}
-          <section className="bg-white rounded-xl p-8 md:p-10 border border-gray-50 shadow-xl shadow-gray-200/50">
-            <h2 className="text-2xl font-bold text-gray-900 mb-8">Location</h2>
+          {/* Location Details Card */}
+          <section className="bg-white rounded-xl p-8 md:p-10 border border-gray-50 shadow-xl shadow-gray-200/50 text-gray-800">
+            <h2 className="text-2xl font-medium text-gray-900 mb-8">Location & Stadium</h2>
 
             <div className="space-y-8">
-              {/* App Name Input */}
-              <SelectField name="stadiumName" label="Stadium Name" control={control} error={errors.stadiumName} options={languageSelectOptions} />
+              <InputField name="stadiumName" title="Stadium Name" placeholder="Enter stadium name" register={register} error={errors.stadiumName} />
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                {/* Language Select */}
-                <SelectField name="city" label="City" control={control} error={errors.city} options={languageSelectOptions} />
-
+                <InputField name="city" title="City" placeholder="Enter city" register={register} error={errors.city} />
                 <InputField name="country" type="string" title="Country" placeholder="Enter country" register={register} error={errors.country} />
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-8"></div>
               </div>
             </div>
           </section>
 
           {/* Form Actions */}
-          <div className="bg-white rounded-xl p-5 border border-gray-50 shadow-lg shadow-gray-200/30 flex items-center justify-end space-x-5">
-            <CancelButton onClick={reset} title="Reset" />
-            <SubmitButton isSubmitting={isSubmitting} title="Save" />
-          </div>
+
         </div>
 
-        {/* Right Side */}
+        {/* Right Side - Media */}
         <div className='basis-[30%] space-y-4'>
-          {/* Regional Preferences Card */}
-          <section className="bg-white rounded-xl p-8 md:p-10 border border-gray-50 shadow-xl shadow-gray-200/50">
-            <h2 className="text-2xl font-bold text-gray-900 mb-8">Reward Media</h2>
-
+          <section className="bg-white rounded-xl p-8 md:p-10 border border-gray-50 shadow-xl shadow-gray-200/50 text-gray-800">
+            <h2 className="text-2xl font-medium text-gray-900 mb-8">Team Brand</h2>
 
             {/* Logo Upload */}
             <div className="w-full">
-              <ImageUploadField name="logo" label="Reward Image" control={control} error={errors.logo as any}>
+              <ImageUploadField name="logo" label="Team Logo" control={control} error={errors.logo as any}>
                 <ImageChildrenComponent maxSizeMB={5} />
               </ImageUploadField>
-            </div>
-          </section>
-          <section className="bg-white rounded-xl p-8 md:p-10 border border-gray-50 shadow-xl shadow-gray-200/50">
-            <h2 className="text-2xl font-bold text-gray-900 mb-8">General Details</h2>
-
-            <div className="space-y-8">
-              {/* App Name Input */}
-              <div className="grid grid-cols-1 gap-4">
-                {/* Language Select */}
-                <SelectField name="managerName" label="Manager Name" control={control} error={errors.managerName} options={languageSelectOptions} />
-
-                <SelectField name="managerRole" label="Role" control={control} error={errors.managerRole} options={languageSelectOptions} />
-              </div>
             </div>
           </section>
         </div>
@@ -168,4 +190,4 @@ const AddTeam = () => {
   )
 }
 
-export default AddTeam
+export default AddTeam;

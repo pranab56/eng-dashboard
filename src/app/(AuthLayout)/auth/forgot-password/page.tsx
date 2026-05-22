@@ -14,8 +14,11 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { Loader } from 'lucide-react';
+import Link from 'next/link';
 import { useRouter } from "next/navigation";
-import { toast } from "sonner";
+import toast from 'react-hot-toast';
+import { useForgotEmailMutation } from '../../../../features/auth/authApi';
 
 // Schema
 const contactUsFormSchema = z
@@ -34,6 +37,7 @@ const defaultValues: Partial<ContactUsFormValues> = {
 
 const ForgotPassword = () => {
   const router = useRouter();
+  const [forgotPassword, { isLoading }] = useForgotEmailMutation();
 
   const form = useForm<ContactUsFormValues>({
     resolver: zodResolver(contactUsFormSchema),
@@ -41,13 +45,20 @@ const ForgotPassword = () => {
     mode: "onChange",
   });
 
-  function onSubmit(data: ContactUsFormValues) {
-    const payload = {
-      email: data.email
-    };
-    toast.success("Email sent successfully!");
-    console.log("Submitted Data:", payload);
-    router.push("/verify-otp");
+  async function onSubmit(data: ContactUsFormValues) {
+    try {
+      const res = await forgotPassword({ email: data.email }).unwrap();
+      if (res.success) {
+        toast.success(res.message);
+        router.push(`/auth/verify-otp?email=${data.email}`)
+      }
+    } catch (error: unknown) {
+      const err = error as { message?: string };
+      console.error("Reset error:", err?.message);
+      toast.error(err?.message || "Something went wrong");
+    }
+
+
   }
 
 
@@ -74,8 +85,14 @@ const ForgotPassword = () => {
 
           {/* Submit Button */}
           <Button variant="blackBtn" type="submit" size="xl" className="w-full">
-            Send Reset Code
+            {isLoading && <Loader className='w-5 h-5 animate-spin' />} Send Reset Code
           </Button>
+
+          <div className="relative -top-2 flex justify-center text-sm items-center">
+            <Link href="/auth/login" className="text-gray-700 hover:text-gray-500 font-semibold">
+              Back to Login
+            </Link>
+          </div>
 
         </form>
       </Form>

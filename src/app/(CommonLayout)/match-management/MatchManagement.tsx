@@ -2,89 +2,66 @@
 "use client"
 
 
-import CustomTable from '@/components/table/CustomTable'
-import { TMatch } from '@/types/columnTypes';
-import { useHeaders } from '@/hooks/useHeaders';
-import { useEffect } from 'react';
-import { matchColumns } from '@/tableColumns/matchColumns';
-import TableHeader from '@/components/cui/TableHeader';
-import CustomSelect from '@/components/selects/CustomSelect';
-import { selectStatusValues } from '@/constants/selectData';
 import CreateButton from '@/components/buttons/CreateButton';
-import CustomDate from '@/components/selects/CustomDate';
 import CustomPagination from '@/components/cui/CustomPagination';
+import TableHeader from '@/components/cui/TableHeader';
+import CustomTable from '@/components/table/CustomTable';
+import { useDeleteMatchMutation, useGetAllMatchQuery } from '@/features/match/matchApi';
+import { useHeaders } from '@/hooks/useHeaders';
+import { getMatchColumns } from '@/tableColumns/matchColumns';
 import Link from 'next/link';
+import { useSearchParams } from 'next/navigation';
+import { useEffect, useState } from 'react';
+import { toast } from 'sonner';
+import DeleteConfirmModal from './DeleteConfirmModal';
+import MatchViewModal from './MatchViewModal';
 
-
-
-
-const matchDatas: TMatch[] = [
-  {
-    id: 1,
-    team_a_logo: "https://res.cloudinary.com/dbq7y6byo/image/upload/v1775562641/ENG/team_a_eqfrsy.png",
-    team_b_logo: "https://res.cloudinary.com/dbq7y6byo/image/upload/v1775562640/ENG/team_b_yiavwk.png",
-    teams_matchup: "London Lions Vs Dhaka Lions",
-    venue: "London Fc Football Club Team",
-    date: "03/04/2025",
-    time: "Kick-off: 16:30 pm",
-    score: "2 - 1",
-    status: "Completed"
-  },
-  {
-    id: 2,
-    team_a_logo: "https://res.cloudinary.com/dbq7y6byo/image/upload/v1775562641/ENG/team_a_eqfrsy.png",
-    team_b_logo: "https://res.cloudinary.com/dbq7y6byo/image/upload/v1775562640/ENG/team_b_yiavwk.png",
-    teams_matchup: "London Lions Vs Dhaka Lions",
-    venue: "London Fc Football Club Team",
-    date: "03/04/2025",
-    time: "Kick-Wait: 16:30 pm",
-    score: "0 - 0",
-    status: "Scheduled"
-  },
-  {
-    id: 3,
-    team_a_logo: "https://res.cloudinary.com/dbq7y6byo/image/upload/v1775562641/ENG/team_a_eqfrsy.png",
-    team_b_logo: "https://res.cloudinary.com/dbq7y6byo/image/upload/v1775562640/ENG/team_b_yiavwk.png",
-    teams_matchup: "London Lions Vs Dhaka Lions",
-    venue: "London Fc Football Club Team",
-    date: "03/04/2025",
-    time: "Kick-off: 16:30 pm",
-    score: "2 - 1",
-    status: "Completed"
-  },
-  {
-    id: 4,
-    team_a_logo: "https://res.cloudinary.com/dbq7y6byo/image/upload/v1775562641/ENG/team_a_eqfrsy.png",
-    team_b_logo: "https://res.cloudinary.com/dbq7y6byo/image/upload/v1775562640/ENG/team_b_yiavwk.png",
-    teams_matchup: "London Lions Vs Dhaka Lions",
-    venue: "London Fc Football Club Team",
-    date: "03/04/2025",
-    time: "Kick-off: 16:30 pm",
-    score: "2 - 1",
-    status: "Completed"
-  },
-  {
-    id: 5,
-    team_a_logo: "https://res.cloudinary.com/dbq7y6byo/image/upload/v1775562641/ENG/team_a_eqfrsy.png",
-    team_b_logo: "https://res.cloudinary.com/dbq7y6byo/image/upload/v1775562640/ENG/team_b_yiavwk.png",
-    teams_matchup: "London Lions Vs Dhaka Lions",
-    venue: "London Fc Football Club Team",
-    date: "03/04/2025",
-    time: "Kick: 16:30 pm",
-    score: "2 - 1",
-    status: "On Going"
-  }
-];
 
 const MatchManagement = () => {
 
   const { setHeaders } = useHeaders();
+  const searchParams = useSearchParams();
+  const page = searchParams.get("matchPage") || "1";
+
+  const { data: matchData, isLoading } = useGetAllMatchQuery(page);
+  const [deleteMatch, { isLoading: isDeleting }] = useDeleteMatchMutation();
+
+  const [selectedMatch, setSelectedMatch] = useState<any>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
+
   useEffect(() => {
     setHeaders({
       title: "Matches",
       des: "Manage live broadcasts, schedules, and historical match data."
     })
   }, [])
+
+  const handleView = (match: any) => {
+    setSelectedMatch(match);
+    setIsModalOpen(true);
+  };
+
+  const handleDelete = (id: string) => {
+    setDeletingId(id);
+    setIsDeleteModalOpen(true);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!deletingId) return;
+    try {
+      const res = await deleteMatch(deletingId).unwrap();
+      if (res.success) {
+        toast.success(res.message || "Match deleted successfully");
+        setIsDeleteModalOpen(false);
+        setDeletingId(null);
+      }
+    } catch (error: any) {
+      toast.error(error?.data?.message || "Failed to delete match");
+    }
+  };
 
   const tableHeaderPayload = {
     title: "Matches Registry",
@@ -94,16 +71,8 @@ const MatchManagement = () => {
 
 
   return (
-    <div className='pt-10 px-8 space-y-4'>
-      <div className="flex flex-wrap items-center justify-between gap-4 p-4 bg-white rounded-lg shadow-sm border border-gray-100">
-        {/* Left Side: Filters */}
-        <div className="flex items-center gap-3">
-          {/* Date Picker Input */}
-          <CustomDate selectType="date1" />
-          {/* Status Dropdown */}
-          <CustomSelect selectValues={selectStatusValues} selectType="status" />
-        </div>
-        {/* Right Side: Action Button */}
+    <div className=' px-8 space-y-4'>
+      <div className="flex flex-wrap items-center justify-end gap-4 p-4">
         <Link href="/match-management/create-match">
           <CreateButton text="Add Match" />
         </Link>
@@ -113,14 +82,29 @@ const MatchManagement = () => {
           <>
             <TableHeader payload={tableHeaderPayload} />
           </>
+
           <div className="pt-4">
-            <CustomTable<TMatch> columns={matchColumns} data={matchDatas} />
+            <CustomTable<any> columns={getMatchColumns(handleView, handleDelete)} data={matchData?.data || []} isLoading={isLoading} />
           </div>
         </div>
+
         <div className='pt-8 px-4'>
-          <CustomPagination TOTAL_PAGES={15} qryName="userPage" />
+          <CustomPagination TOTAL_PAGES={matchData?.pagination?.totalPage || 1} qryName="matchPage" />
         </div>
       </div>
+
+      <MatchViewModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        match={selectedMatch}
+      />
+
+      <DeleteConfirmModal
+        isOpen={isDeleteModalOpen}
+        onClose={() => setIsDeleteModalOpen(false)}
+        onConfirm={handleConfirmDelete}
+        isLoading={isDeleting}
+      />
     </div>
   )
 }

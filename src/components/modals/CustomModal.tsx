@@ -11,21 +11,25 @@ import {
 } from "@/components/ui/dialog"
 
 interface CustomModalProps {
-  trigger: React.ReactNode;
+  trigger?: React.ReactNode;
   title?: string;
   children: React.ReactNode;
-  className?: string
+  className?: string;
+  isOpen?: boolean;
+  setIsOpen?: (open: boolean) => void;
 }
 
 export function CustomModal({
   trigger,
   title = "Filter Options",
   children,
-  className
+  className,
+  isOpen,
+  setIsOpen
 }: CustomModalProps) {
 
   return (
-    <Dialog >
+    <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
         {trigger}
       </DialogTrigger>

@@ -3,9 +3,11 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
-import { toast } from "sonner"
+
 // import { setCookie } from "cookies-next/client";
 
+
+import { logo } from "@/assets/assets";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -16,12 +18,16 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import Link from "next/link";
-import { Eye, EyeOff } from "lucide-react";
-import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useLoginMutation } from "@/features/auth/authApi";
+import { setAuthenticated } from '@/features/auth/authSlice';
+import { Eye, EyeOff, Loader } from "lucide-react";
 import Image from "next/image";
-import { logo } from "@/assets/assets";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
+import toast from 'react-hot-toast';
+import { useDispatch } from 'react-redux';
+import { setAuthCookie } from '../../../actions/auth';
 
 // Schema
 const contactUsFormSchema = z
@@ -45,6 +51,10 @@ const defaultValues: Partial<ContactUsFormValues> = {
 const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
   const router = useRouter();
+  const dispatch = useDispatch();
+
+
+  const [login, { isLoading }] = useLoginMutation();
 
   const form = useForm<ContactUsFormValues>({
     resolver: zodResolver(contactUsFormSchema),
@@ -57,9 +67,17 @@ const Login = () => {
       email: data.email,
       password: data.password
     }
-    console.log("Submitted Data:", payload);
-    toast.success("Login successful!");
-    router.push("/");
+
+    try {
+      const res = await login(payload).unwrap();
+      toast.success(res.message);
+      dispatch(setAuthenticated(res.data.accessToken));
+      await setAuthCookie(res.data.accessToken);
+      router.push('/');
+    } catch (error: any) {
+      console.log(error);
+      toast.error(error.data.message)
+    }
   }
 
 
@@ -119,11 +137,11 @@ const Login = () => {
 
           {/* Submit Button */}
           <Button variant="blackBtn" type="submit" size="xl" className="w-full">
-            Sign In
+            {isLoading && <Loader className='w-5 h-5 animate-spin' />} Sign In
           </Button>
 
           <div className="relative -top-2 flex justify-end items-center">
-            <Link href="/forgot-password" className="text-gray-700 hover:text-gray-200 font-semibold">
+            <Link href="/auth/forgot-password" className="text-gray-700 hover:text-gray-500 font-semibold">
               Forgot Password
             </Link>
           </div>

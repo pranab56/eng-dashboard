@@ -3,16 +3,24 @@ import { FiEye } from "react-icons/fi";
 import { TPlayer } from "@/types/columnTypes";
 import Image from "next/image";
 
-export const playerColumns: ColumnDef<TPlayer>[] = [
+export const getPlayerColumns = (onView: (player: TPlayer) => void): ColumnDef<TPlayer>[] => [
   {
     accessorKey: "name",
     header: () => <div className="">Name</div>,
     cell: ({ row }) => (
-      <div className="flex gap-2">
-        <Image src={row.original.image} alt="profilePic" width={400} height={400} className="w-10 h-10 rounded-full border-2 border-white" />
-        <p className="flex flex-col flex-start items-start ">
-          <span className="font-semibold">{row.getValue("name")}</span>
-          <span className=" text-gray-500">ID: {row.original.id}</span>
+      <div className="flex items-center gap-3">
+        <div className="w-10 h-10 rounded-full border-2 border-white overflow-hidden bg-gray-100 flex items-center justify-center">
+          {row.original.profile ? (
+            <Image src={row.original.profile} alt="profilePic" width={40} height={40} className="w-full h-full object-cover" />
+          ) : (
+            <span className="text-xs text-gray-400 font-bold uppercase">
+              {row.original.firstName?.[0] || 'P'}
+              {row.original.lastName?.[0] || ''}
+            </span>
+          )}
+        </div>
+        <p className="flex flex-col items-start ">
+          <span className="font-semibold">{row.original.firstName} {row.original.lastName}</span>
         </p>
       </div>
     ),
@@ -23,8 +31,11 @@ export const playerColumns: ColumnDef<TPlayer>[] = [
     cell: ({ row }) => (
       <div>
         <div className="flex items-center gap-2">
-          <Image src={row.original.logo} alt="profilePic" width={400} height={400} className="w-10 h-10 rounded-full border-2 border-white" />
-          <span>{row.getValue("team")}</span>
+          {row.original.teamLogo && (
+            <Image src={row.original.teamLogo} alt="teamLogo" width={32} height={32} className="w-8 h-8 rounded-full border border-gray-100" />
+          )}
+          <span className="font-medium text-gray-700">{row.original.teamName || "N/A"}</span>
+          {row.original.shortName && <span className="text-xs text-gray-400">({row.original.shortName})</span>}
         </div>
       </div>
     ),
@@ -33,25 +44,21 @@ export const playerColumns: ColumnDef<TPlayer>[] = [
     accessorKey: "position",
     header: () => <div className="">Position</div>,
     cell: ({ row }) => (
-      <div className={`px-2 py-1 rounded-md`}>{row.getValue("position")}</div>
-    ),
-  },
-  {
-    accessorKey: "goals",
-    header: () => <div className="">Goals</div>,
-    cell: ({ row }) => (
-      <div className="inline-block px-2 py-1 rounded-md">{row.getValue("goals")}</div>
+      <div className={`px-2 py-1 rounded-md text-gray-600 font-medium`}>{row.original.position || "Undesignated"}</div>
     ),
   },
   {
     id: "action",
     header: () => <div className="">Action</div>,
-    cell: () => (
+    cell: ({ row }) => (
       <div className="flex items-center gap-2">
-        <button className="flex items-center justify-center h-9 w-9 rounded-sm bg-[#F3F3F3]  transition-colors duration-300 cursor-pointer">
-          <FiEye className="size-5 font-bold text-gray-800 transition-colors duration-300" />
+        <button
+          onClick={() => onView(row.original)}
+          className="flex items-center justify-center h-9 w-9 rounded-sm bg-[#F3F3F3] hover:bg-gray-200 transition-colors duration-300 cursor-pointer"
+        >
+          <FiEye className="size-5 text-gray-800" />
         </button>
       </div>
     ),
   }
-]
+]

@@ -1,55 +1,40 @@
-import { ColumnDef } from "@tanstack/react-table"
 import { TNotification } from "@/types/columnTypes";
-import { TfiReload } from "react-icons/tfi";
-import { PiUsersThreeLight } from "react-icons/pi";
-
-const switchNotificationType = (type: string) => {
-  switch (type) {
-    case "Transfer Alert":
-      return <span className="bg-blue-100 inline-block p-2 rounded-sm">
-        <PiUsersThreeLight className="text-blue-500" size={20} />
-      </span>;
-    case "Feature":
-      return <span className="bg-green-100 inline-block p-2 rounded-sm">
-        <TfiReload className="text-green-500" size={20} />
-      </span>;
-    default:
-      return <span className="bg-gray-100 inline-block p-2 rounded-sm">
-        <TfiReload className="text-gray-500" size={20} />
-      </span>;
-  }
-}
+import { ColumnDef } from "@tanstack/react-table";
+import dayjs from "dayjs";
+import { Bell } from "lucide-react";
 
 export const notificationColumns: ColumnDef<TNotification>[] = [
   {
     accessorKey: "title",
     header: () => <div className="">Notification</div>,
     cell: ({ row }) => (
-      <div>
-        <div className="flex gap-2">
-          <p>
-            {switchNotificationType(row.getValue("type"))}
-          </p>
-          <p className="flex flex-col flex-start items-start ">
-            <span className="font-semibold">{row.getValue("title")}</span>
-            <span className="text-[12px] text-gray-400">{row.original.subtitle}</span>
-          </p>
+      <div className="flex gap-3">
+        <div className="p-2 bg-blue-50 rounded-lg text-blue-500">
+          <Bell className="w-5 h-5" />
+        </div>
+        <div className="flex flex-col">
+          <span className="font-bold text-gray-900 leading-tight">{row.original.title}</span>
         </div>
       </div>
     ),
   },
   {
-    accessorKey: "type",
-    header: () => <div className="">Type</div>,
+    accessorKey: "message",
+    header: () => <div className="">Message</div>,
     cell: ({ row }) => (
-      <div className="">{row.getValue("type")}</div>
+      <div className="flex flex-col">
+        <span className="font-medium text-gray-700">{row.original.message || "N/A"}</span>
+        <span className="text-[10px] text-gray-400 uppercase font-bold">{row.original.user?.email}</span>
+      </div>
     ),
   },
   {
-    accessorKey: "date",
+    accessorKey: "createdAt",
     header: () => <div className="">Date</div>,
     cell: ({ row }) => (
-      <div className="">{row.getValue("date")}</div>
+      <div className="text-gray-500 text-sm">
+        {dayjs(row.original.createdAt).format("MMM DD, YYYY • HH:mm")}
+      </div>
     ),
   }
 ]

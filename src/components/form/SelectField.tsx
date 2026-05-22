@@ -33,7 +33,7 @@ const SelectField = ({
           name={name}
           control={control}
           render={({ field }) => (
-            <Select onValueChange={field.onChange} value={field.value}>
+            <Select key={field.value} onValueChange={field.onChange} value={field.value}>
               <SelectTrigger
                 size="lg"
                 className={`w-full h-20 py-3 bg-gray-100 ${error ? "border-red-400" : ""

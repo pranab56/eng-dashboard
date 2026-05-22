@@ -7,6 +7,14 @@ export type TUser = {
   status: string
 }
 
+export type TUserManagement = {
+  _id: string;
+  userName: string;
+  role: string;
+  profile: string;
+  verified: boolean;
+}
+
 export type MatchStatus = "Completed" | "Scheduled" | "On Going";
 
 export type TMatch = {
@@ -44,14 +52,14 @@ export type TTeam = {
 }
 
 export type TPlayer = {
-  id: number;
-  image: string;
-  name: string;
-  logo: string;
-  team: string;
-  position: string;
-  status?: string;
-  goals: number;
+  firstName: string;
+  lastName: string;
+  profile: string | null;
+  position: string | null;
+  teamName: string | null;
+  shortName: string | null;
+  teamLogo: string | null;
+  goals?: number; // keeping goals as optional if it's still needed somewhere
 }
 
 export type TTransfer = {
@@ -65,12 +73,17 @@ export type TTransfer = {
 }
 
 export type TEngtv = {
-  id: number;
-  name: string;
-  role: string;
-  image: string;
-  duration: string;
+  _id: string;
+  title: string;
+  category: string;
+  description: string;
+  videoUrl: string;
+  thumbnail: string;
+  createdBy: string;
   status: string;
+  publishDateTime: string;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export type TNews = {
@@ -83,11 +96,14 @@ export type TNews = {
 }
 
 export type TNotification = {
-  id: number;
+  _id: string;
   title: string;
-  subtitle: string;
-  type: string;
-  date: string;
+  message: string;
+  createdAt: string;
+  user: {
+    userName: string;
+    email: string;
+  };
 }
 
 export type TReward = {

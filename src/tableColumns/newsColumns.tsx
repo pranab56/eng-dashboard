@@ -1,64 +1,72 @@
-import { ColumnDef } from "@tanstack/react-table"
-import { FiEye } from "react-icons/fi";
-import { HiOutlineTrash } from "react-icons/hi";
-import { TNews } from "@/types/columnTypes";
+import { ColumnDef } from "@tanstack/react-table";
+import dayjs from "dayjs";
 import Image from "next/image";
+import Link from "next/link";
+import { FiEdit, FiEye, FiTrash2 } from "react-icons/fi";
+import { baseURL } from '../utils/BaseURL';
 
-// const statusStyle = (status: string): string => {
-//   switch (status) {
-//     case "Active":
-//       return "bg-green-100 text-green-500";
-//     case "Published":
-//       return "bg-blue-100 text-blue-500";
-//     default:
-//       return "bg-gray-500";
-//   }
-// };
-
-export const newsColumns: ColumnDef<TNews>[] = [
+export const getNewsColumns = (onView: (news: any) => void, onDelete: (id: string) => void): ColumnDef<any>[] => [
   {
     accessorKey: "title",
-    header: () => <div className="">Title</div>,
+    header: () => <div className="">Article Title</div>,
     cell: ({ row }) => (
-      <div className="flex gap-2">
-        <Image src={row.original.image} alt="profilePic" width={400} height={400} className="w-10 h-10 rounded-md border-2 border-white" />
-        <p className="flex flex-col flex-start items-start ">
-          <span className="font-semibold">{row.getValue("title")}</span>
-        </p>
+      <div className="flex items-center gap-3">
+        {row.original.image ? (
+          <Image src={baseURL + row.original.image} alt="news cover" width={100} height={100} className="w-12 h-12 rounded-xl border border-gray-100 object-cover" />
+        ) : (
+          <div className="w-12 h-12 rounded-xl bg-gray-50 border border-gray-100 flex items-center justify-center text-[10px] font-black text-gray-300">VOID</div>
+        )}
+        <div className="flex flex-col max-w-[280px]">
+          <span className="font-bold text-gray-900 leading-tight line-clamp-1">{row.getValue("title")}</span>
+          <span className="text-[10px] text-gray-400 font-bold uppercase tracking-widest mt-0.5">{row.original.category}</span>
+        </div>
       </div>
     ),
   },
   {
-    accessorKey: "category",
-    header: () => <div className="">Category</div>,
-    cell: ({ row }) => (
-      <div className={`px-4 py-1 rounded-full bg-gray-100 inline-block `}>{row.getValue("category")}</div>
-    ),
-  },
-  {
-    accessorKey: "author",
-    header: () => <div className="">Author</div>,
-    cell: ({ row }) => (
-      <div className={`px-2 py-1 rounded-md`}>{row.getValue("author")}</div>
-    ),
-  },
-  {
-    accessorKey: "publishDate",
+    accessorKey: "publishDateTime",
     header: () => <div className="">Publish Date</div>,
     cell: ({ row }) => (
-      <div className={`px-2 py-1 rounded-md`}>{row.getValue("publishDate")}</div>
+      <div className="flex flex-col">
+        <span className="text-sm font-bold text-gray-900">{dayjs(row.getValue("publishDateTime")).format("DD MMM, YYYY")}</span>
+        <span className="text-[10px] text-gray-400 font-bold uppercase tracking-tighter">{dayjs(row.getValue("publishDateTime")).format("hh:mm A")}</span>
+      </div>
     ),
+  },
+  {
+    accessorKey: "status",
+    header: () => <div className="">Status</div>,
+    cell: ({ row }) => {
+      const status = row.getValue("status") as string;
+      return (
+        <div className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest border inline-block ${status === 'publish' ? 'bg-green-50 text-green-600 border-green-100' : 'bg-orange-50 text-orange-600 border-orange-100'
+          }`}>
+          {status}
+        </div>
+      );
+    },
   },
   {
     id: "action",
     header: () => <div className="">Action</div>,
-    cell: () => (
+    cell: ({ row }) => (
       <div className="flex items-center gap-2">
-        <button className="flex items-center justify-center h-9 w-9 rounded-sm bg-[#F3F3F3]  transition-colors duration-300 cursor-pointer">
-          <FiEye className="size-5 font-bold text-gray-800 transition-colors duration-300" />
+        <button
+          onClick={() => onView(row.original)}
+          className="flex items-center justify-center h-9 w-9 rounded-sm bg-[#F3F3F3] hover:bg-gray-200 transition-colors duration-300 cursor-pointer text-gray-800"
+        >
+          <FiEye className="size-5 font-bold" />
         </button>
-        <button className="flex items-center justify-center h-9 w-9 rounded-sm bg-red-100  transition-colors duration-300 cursor-pointer">
-          <HiOutlineTrash className="size-5 font-bold text-red-800 transition-colors duration-300" />
+        <Link href={`/news-management/create-news?id=${row.original._id}`}>
+          <button className="flex items-center justify-center h-9 w-9 rounded-sm bg-[#F3F3F3] hover:bg-gray-200 transition-colors duration-300 cursor-pointer text-gray-800">
+            <FiEdit className="size-5 font-bold" />
+          </button>
+        </Link>
+        <button
+          onClick={() => onDelete(row.original._id)}
+          className="flex items-center justify-center h-9 w-9 rounded-sm bg-[#F3F3F3] hover:bg-red-50 hover:text-red-600 transition-colors duration-300 cursor-pointer"
+        >
+          <FiTrash2 className="size-5 font-bold" />
         </button>
       </div>
     ),

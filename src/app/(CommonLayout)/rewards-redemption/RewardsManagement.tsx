@@ -1,71 +1,79 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 "use client"
 
-
 import CustomTable from '@/components/table/CustomTable'
-import { TReward } from '@/types/columnTypes';
 import { useHeaders } from '@/hooks/useHeaders';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import TableHeader from '@/components/cui/TableHeader';
 import CustomPagination from '@/components/cui/CustomPagination';
-import CustomSelect from '@/components/selects/CustomSelect';
-import { selectPositionValues, selectTeamValues } from '@/constants/selectData';
 import CreateButton from '@/components/buttons/CreateButton';
-import { rewardsColumns } from '@/tableColumns/rewardsColumns';
+import { getRewardsColumns } from '@/tableColumns/rewardsColumns';
 import GeneralStateCard from '@/components/cui/GeneralStateCard';
 import Link from 'next/link';
+import { useDeleteRewordMutation, useGetAllRewordQuery } from '@/features/rewordProduct/rewordApi';
+import { useSearchParams } from 'next/navigation';
+import RewardViewModal from './RewardViewModal';
+import DeleteConfirmModal from '../match-management/DeleteConfirmModal';
+import { toast } from 'sonner';
 
-const rewards: TReward[] = [
-  {
-    id: 1,
-    rewardName: "ENG WRIST BAND",
-    image: "https://res.cloudinary.com/dbq7y6byo/image/upload/v1775562641/ENG/team_a_eqfrsy.png",
-    type: "Band",
-    pointsRequired: "5 pts",
-    status: "Active",
-    usage: 320
-  },
-  {
-    id: 2,
-    rewardName: "FREE COFFEE",
-    image: "https://res.cloudinary.com/dbq7y6byo/image/upload/v1775562641/ENG/team_a_eqfrsy.png",
-    type: "Coffee",
-    pointsRequired: "20 pts",
-    status: "Inactive",
-    usage: 84
-  }
-];
-
-const items = [
-  {
-    title: "Active Players",
-    value: 30453,
-    id: "home1",
-  },
-  {
-    title: "Total Matches",
-    value: 10045,
-    id: "home2",
-  },
-  {
-    title: "Teams Count",
-    value: 200,
-    id: "home3",
-  }
-];
 
 const RewardsManagement = () => {
 
   const { setHeaders } = useHeaders();
+  const searchParams = useSearchParams();
+  const page = searchParams.get("rewardPage") || "1";
+
+  const { data: rewardData, isLoading } = useGetAllRewordQuery(page);
+  const [deleteReward, { isLoading: isDeleting }] = useDeleteRewordMutation();
+
+  const [selectedReward, setSelectedReward] = useState<any>(null);
+  const [isViewModalOpen, setIsViewModalOpen] = useState(false);
+
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
+
   useEffect(() => {
     setHeaders({
-      title: "Dashboard Overview",
-      des: "Welcome back, Alexander! Here's an update on your luxury estate portfolio."
+      title: "Rewards Redemption",
+      des: "Manage the digital inventory of redeemable boutique items and partner rewards."
     })
   }, [])
 
+  const handleView = (reward: any) => {
+    setSelectedReward(reward);
+    setIsViewModalOpen(true);
+  };
+
+  const handleDelete = (id: string) => {
+    setDeletingId(id);
+    setIsDeleteModalOpen(true);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!deletingId) return;
+    try {
+      const res = await deleteReward(deletingId).unwrap();
+      if (res.success) {
+        toast.success(res.message || "Reward deleted successfully");
+        setIsDeleteModalOpen(false);
+        setDeletingId(null);
+      }
+    } catch (error: any) {
+      toast.error(error?.data?.message || "Failed to delete reward");
+    }
+  };
+
+  const items = [
+    {
+      title: "Active Rewards",
+      value: rewardData?.pagination?.total || 0,
+      id: "home1",
+      description: "Available items"
+    }
+  ];
+
   const tableHeaderPayload = {
-    title: "Point Table List",
+    title: "Rewards Inventory",
     url: "https://example.com/export-users"
   }
 
@@ -75,33 +83,41 @@ const RewardsManagement = () => {
       <>
         <GeneralStateCard items={items} className='grid-cols-3' />
       </>
-      <div className="flex flex-wrap items-center justify-between gap-4 p-4 bg-white rounded-lg shadow-sm border border-gray-100">
-        {/* Left Side: Filters */}
-        <div className="flex items-center gap-3">
-          {/* Status Dropdown */}
-          <CustomSelect selectValues={selectTeamValues} selectType="teamName" />
-          <CustomSelect selectValues={selectPositionValues} selectType="playerPosition" />
-        </div>
-        {/* Right Side: Action Button */}
+      <div className="flex flex-wrap items-center justify-end gap-4 p-4">
         <Link href="/rewards-redemption/create-reward">
           <CreateButton text="Create Reward" />
         </Link>
       </div>
-      <div className=" bg-white rounded-md py-4 flex flex-col min-h-[600px]">
+      <div className=" bg-white rounded-md py-4 flex flex-col">
         <div className='flex-1'>
           <>
             <TableHeader payload={tableHeaderPayload} />
           </>
-          <div className="pt-4">
-            <CustomTable<TReward> columns={rewardsColumns} data={rewards} />
+          <div className="pt-2">
+            <CustomTable<any> columns={getRewardsColumns(handleView, handleDelete)} data={rewardData?.data || []} isLoading={isLoading} />
           </div>
         </div>
         <div className='pt-8 px-4'>
-          <CustomPagination TOTAL_PAGES={15} qryName="userPage" />
+          <CustomPagination TOTAL_PAGES={rewardData?.pagination?.totalPage || 1} qryName="rewardPage" />
         </div>
       </div>
+
+      <RewardViewModal 
+        isOpen={isViewModalOpen} 
+        onClose={() => setIsViewModalOpen(false)} 
+        reward={selectedReward} 
+      />
+
+      <DeleteConfirmModal 
+        isOpen={isDeleteModalOpen} 
+        onClose={() => setIsDeleteModalOpen(false)} 
+        onConfirm={handleConfirmDelete}
+        isLoading={isDeleting}
+        title="Confirm Reward Deletion"
+        description="Are you sure you want to delete this reward item? This will remove it from the mobile catalog."
+      />
     </div>
   )
 }
 
-export default RewardsManagement
+export default RewardsManagement;

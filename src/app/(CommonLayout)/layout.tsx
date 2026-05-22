@@ -1,7 +1,7 @@
-import Sidebar from "@/components/layout/Sidebar";
 import Header from "@/components/layout/Header";
-import { Toaster } from "@/components/ui/sonner"
+import Sidebar from "@/components/layout/Sidebar";
 import { HeadersProvider } from "@/hooks/useHeaders";
+import { Toaster } from "react-hot-toast";
 
 export default function RootLayout({
   children,
