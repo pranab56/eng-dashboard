@@ -1,13 +1,13 @@
 "use client"
-import React from 'react';
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import Image from 'next/image';
 import dayjs from 'dayjs';
+import Image from 'next/image';
+import { baseURL } from '../../../utils/BaseURL';
 
 interface MatchViewModalProps {
   match: any;
@@ -37,9 +37,9 @@ const MatchViewModal = ({ match, isOpen, onClose }: MatchViewModalProps) => {
             <div className="flex flex-col items-center flex-1 text-center">
               <div className="w-24 h-24 bg-white rounded-3xl shadow-sm p-4 flex items-center justify-center mb-4 transition-transform hover:scale-105 duration-300">
                 {match.homeTeam?.teamLogo ? (
-                  <Image src={match.homeTeam.teamLogo} alt="home" width={100} height={100} className="object-contain" />
+                  <Image src={baseURL + match.homeTeam.teamLogo} alt="home" width={100} height={100} className="object-contain" />
                 ) : (
-                   <div className="text-gray-300 text-xs text-center">No Logo</div>
+                  <div className="text-gray-300 text-xs text-center">No Logo</div>
                 )}
               </div>
               <h3 className="font-bold text-gray-900 text-lg leading-tight">{match.homeTeam?.teamName}</h3>
@@ -60,10 +60,10 @@ const MatchViewModal = ({ match, isOpen, onClose }: MatchViewModalProps) => {
             {/* Away Team */}
             <div className="flex flex-col items-center flex-1 text-center">
               <div className="w-24 h-24 bg-white rounded-3xl shadow-sm p-4 flex items-center justify-center mb-4 transition-transform hover:scale-105 duration-300">
-                 {match.awayTeam?.teamLogo ? (
-                  <Image src={match.awayTeam.teamLogo} alt="away" width={100} height={100} className="object-contain" />
+                {match.awayTeam?.teamLogo ? (
+                  <Image src={baseURL + match.awayTeam.teamLogo} alt="away" width={100} height={100} className="object-contain" />
                 ) : (
-                   <div className="text-gray-300 text-xs text-center">No Logo</div>
+                  <div className="text-gray-300 text-xs text-center">No Logo</div>
                 )}
               </div>
               <h3 className="font-bold text-gray-900 text-lg leading-tight">{match.awayTeam?.teamName}</h3>
@@ -91,12 +91,12 @@ const MatchViewModal = ({ match, isOpen, onClose }: MatchViewModalProps) => {
               <span className="text-gray-800 font-bold">{match.durationMinutes} Minutes</span>
             </div>
           </div>
-          
+
           {match.notes && (
-             <div className="bg-orange-50 border border-orange-100 p-6 rounded-2xl">
-               <span className="text-xs font-bold text-orange-400 uppercase tracking-widest mb-2 block">Match Notes</span>
-               <p className="text-gray-700 text-sm leading-relaxed italic">"{match.notes}"</p>
-             </div>
+            <div className="bg-orange-50 border border-orange-100 p-6 rounded-2xl">
+              <span className="text-xs font-bold text-orange-400 uppercase tracking-widest mb-2 block">Match Notes</span>
+              <p className="text-gray-700 text-sm leading-relaxed italic">"{match.notes}"</p>
+            </div>
           )}
         </div>
       </DialogContent>

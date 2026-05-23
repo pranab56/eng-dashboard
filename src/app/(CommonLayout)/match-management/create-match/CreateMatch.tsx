@@ -7,9 +7,7 @@ import InputField from '@/components/form/InputField'
 import SelectField from '@/components/form/SelectField'
 import { durationOptions } from '@/constants/selectData'
 import { useCreateMatchMutation, useGetSingleMatchQuery, useUpdateMatchMutation } from '@/features/match/matchApi'
-import { useGetAllLeagueQuery } from '@/features/leagueManagement/leagueApi'
 import { useGetRefereeQuery } from '@/features/referee/refereeApi'
-import { useGetAllTeamQuery } from '@/features/teamManagement/teamApi'
 import { useHeaders } from '@/hooks/useHeaders'
 import { zodResolver } from '@hookform/resolvers/zod'
 import dayjs from 'dayjs'
@@ -18,6 +16,7 @@ import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import * as z from 'zod'
+import { useGetAllLeagueTeamQuery } from '../../../../features/leagueTeam/leagueTeamApi'
 import { TeamCard } from './MatchupSelector'
 
 // Form Validation Schema
@@ -51,14 +50,18 @@ const CreateMatch = () => {
   const [createMatch, { isLoading: isCreating }] = useCreateMatchMutation();
   const [updateMatch, { isLoading: isUpdating }] = useUpdateMatchMutation();
   const { data: matchData, isFetching } = useGetSingleMatchQuery(matchId, { skip: !isEditMode });
-  const { data: leagueData } = useGetAllLeagueQuery(undefined);
-  const { data: refereeData } = useGetRefereeQuery(undefined);
-  const { data: teamData } = useGetAllTeamQuery(undefined);
 
-  // Build option lists from API data
-  const leagueOptions = (leagueData?.data || []).map((l: any) => ({
-    label: `${l.leagueName} (${l.season})`,
-    value: l._id,
+  // Single source of truth: league-team API
+  const { data: leagueTeamData } = useGetAllLeagueTeamQuery(1);
+  const { data: refereeData } = useGetRefereeQuery(undefined);
+
+  // All entries: [{ league: {...}, teams: [...] }]
+  const leagueTeamList: any[] = leagueTeamData?.data || [];
+
+  // Build league options for the dropdown
+  const leagueOptions = leagueTeamList.map((item: any) => ({
+    label: `${item.league.leagueName} (${item.league.season})`,
+    value: item.league._id,
   }));
 
   const refereeOptions = (refereeData?.data || []).map((r: any) => ({
@@ -66,26 +69,12 @@ const CreateMatch = () => {
     value: r._id,
   }));
 
-  const teamsList: Team[] = (teamData?.data || []).map((t: any) => ({
-    value: t._id,
-    name: t.teamName,
-    logo: t.teamLogo || null,
-  }));
-
-  // Auto-initialize home/away team once API data loads (create mode only)
-  useEffect(() => {
-    if (!isEditMode && teamsList.length >= 2 && !homeTeam && !awayTeam) {
-      setHomeTeam(teamsList[0]);
-      setAwayTeam(teamsList[1]);
-    }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [teamData]);
-
   const {
     register,
     handleSubmit,
     control,
     reset,
+    watch,
     formState: { errors }
   } = useForm<CreateMatchFormValues>({
     resolver: zodResolver(createMatchSchema),
@@ -93,11 +82,39 @@ const CreateMatch = () => {
       venueName: "",
       league: "",
       referee: "",
-      durationMinutes: "90",
+      durationMinutes: "90 Minutes",
       date: "",
       time: "",
     }
   })
+
+  // Watch the selected league value
+  const selectedLeagueId = watch("league");
+
+  // Derive teams for the selected league
+  const selectedLeagueEntry = leagueTeamList.find(
+    (item: any) => item.league._id === selectedLeagueId
+  );
+  const teamsList: Team[] = (selectedLeagueEntry?.teams || []).map((t: any) => ({
+    value: t._id,
+    name: t.teamName,
+    logo: t.teamLogo || null,
+  }));
+
+  // Reset home/away whenever the league changes
+  useEffect(() => {
+    setHomeTeam(null);
+    setAwayTeam(null);
+  }, [selectedLeagueId]);
+
+  // Auto-pick first two teams in create mode once teams load
+  useEffect(() => {
+    if (!isEditMode && teamsList.length >= 2 && !homeTeam && !awayTeam) {
+      setHomeTeam(teamsList[0]);
+      setAwayTeam(teamsList[1]);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedLeagueId, leagueTeamData]);
 
   useEffect(() => {
     setHeaders({
@@ -106,6 +123,7 @@ const CreateMatch = () => {
     })
   }, [setHeaders, isEditMode])
 
+  // Populate form in edit mode
   useEffect(() => {
     if (matchData?.data) {
       const match = matchData.data;
@@ -115,7 +133,7 @@ const CreateMatch = () => {
         venueName: match.venueName,
         league: typeof match.league === 'string' ? match.league : match.league?._id,
         referee: typeof match.referee === 'string' ? match.referee : match.referee?._id,
-        durationMinutes: match.durationMinutes.toString(),
+        durationMinutes: `${match.durationMinutes} Minutes`,
         date: date.format("YYYY-MM-DD"),
         time: date.format("HH:mm"),
       });
@@ -138,30 +156,27 @@ const CreateMatch = () => {
   }, [matchData, reset])
 
 
-  const onSubmit = async (data: CreateMatchFormValues) => {
-    // Validate teams are selected
+  const onSubmit = async (formData: CreateMatchFormValues) => {
     if (!homeTeam || !awayTeam) {
       toast.error("Please select both home and away teams");
       return;
     }
-
-    // Validate teams are different
     if (homeTeam.value === awayTeam.value) {
       toast.error("Home team and away team cannot be the same!");
       return;
     }
 
     try {
-      const matchDate = `${data.date}T${data.time}:00Z`;
+      const matchDate = `${formData.date}T${formData.time}:00Z`;
 
       const payload = {
-        league: data.league,
+        league: formData.league,
         homeTeam: homeTeam.value,
         awayTeam: awayTeam.value,
         matchDate,
-        durationMinutes: parseInt(data.durationMinutes),
-        venueName: data.venueName,
-        referee: data.referee,
+        durationMinutes: parseInt(formData.durationMinutes),  // "90 Minutes" → 90
+        venueName: formData.venueName,
+        referee: formData.referee,
       };
 
       if (isEditMode) {
@@ -186,7 +201,7 @@ const CreateMatch = () => {
     return <div className="flex items-center justify-center min-h-[400px]">Loading match data...</div>
   }
 
-  // Teams filtered to prevent same-team selection
+  // Filtered lists to prevent same-team selection
   const homeTeamOptions = teamsList.filter(t => t.value !== awayTeam?.value);
   const awayTeamOptions = teamsList.filter(t => t.value !== homeTeam?.value);
 
@@ -197,12 +212,14 @@ const CreateMatch = () => {
       </>
       <div className='w-full flex gap-4'>
         <div className='flex-1 space-y-4'>
+
           {/* Match Settings Card */}
           <section className="bg-white rounded-xl p-8 md:p-10 border border-gray-50 shadow-xl shadow-gray-200/50">
             <h2 className="text-2xl font-bold text-gray-900 mb-8">Match Setting</h2>
 
             <div className="space-y-8">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                {/* League dropdown — scrollable when > 10 items */}
                 <SelectField
                   name="league"
                   label="League"
@@ -210,6 +227,7 @@ const CreateMatch = () => {
                   error={errors.league}
                   options={leagueOptions}
                   placeholder="Select league"
+                  scrollable
                 />
                 <SelectField
                   name="referee"
@@ -224,38 +242,61 @@ const CreateMatch = () => {
             </div>
           </section>
 
-          {/* Teams Selection Card */}
+          {/* Matchup Selection Card */}
           <section className="bg-white rounded-xl p-8 md:p-10 border border-gray-50 shadow-xl shadow-gray-200/50">
             <h2 className="text-2xl font-bold text-gray-900 mb-2">Matchup Selection</h2>
             <p className="text-sm text-gray-400 mb-8">Home and away teams must be different.</p>
 
-            <div className="flex items-center justify-center gap-8 p-8 bg-white rounded-2xl max-w-4xl mx-auto">
-
-              {/* Home Team Card */}
-              <TeamCard
-                teams={homeTeamOptions}
-                label="TEAM A (HOME)"
-                selectedTeam={homeTeam}
-                onSelect={setHomeTeam}
-              />
-
-              {/* VS Badge */}
-              <div className="z-10 -my-4 md:my-0 md:-mx-6 flex-shrink-0">
-                <div className="w-16 h-16 bg-black text-white rounded-full flex items-center justify-center text-xl font-bold border-4 border-white shadow-lg">
-                  VS
+            {/* No league selected yet */}
+            {!selectedLeagueId ? (
+              <div className="flex flex-col items-center justify-center py-16 gap-3 text-center">
+                <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center">
+                  <span className="text-3xl">🏆</span>
                 </div>
+                <p className="text-gray-500 font-semibold">Select a league above to view available teams</p>
+                <p className="text-gray-400 text-sm">Teams are filtered based on the selected league</p>
               </div>
+            ) : teamsList.length < 2 ? (
+              /* League has fewer than 2 teams */
+              <div className="flex flex-col items-center justify-center py-16 gap-3 text-center">
+                <div className="w-16 h-16 bg-amber-100 rounded-full flex items-center justify-center">
+                  <span className="text-3xl">⚠️</span>
+                </div>
+                <p className="text-amber-600 font-semibold">
+                  This league has {teamsList.length === 0 ? 'no' : 'only 1'} team assigned.
+                </p>
+                <p className="text-gray-400 text-sm">Add at least 2 teams to this league to create a match.</p>
+              </div>
+            ) : (
+              /* Show team selector */
+              <div className="flex items-center justify-center gap-8 p-8 bg-white rounded-2xl max-w-4xl mx-auto">
 
-              {/* Away Team Card */}
-              <TeamCard
-                teams={awayTeamOptions}
-                label="TEAM B (AWAY)"
-                selectedTeam={awayTeam}
-                onSelect={setAwayTeam}
-              />
-            </div>
+                {/* Home Team */}
+                <TeamCard
+                  teams={homeTeamOptions}
+                  label="TEAM A (HOME)"
+                  selectedTeam={homeTeam}
+                  onSelect={setHomeTeam}
+                />
 
-            {/* Same team warning */}
+                {/* VS Badge */}
+                <div className="z-10 flex-shrink-0">
+                  <div className="w-16 h-16 bg-black text-white rounded-full flex items-center justify-center text-xl font-bold border-4 border-white shadow-lg">
+                    VS
+                  </div>
+                </div>
+
+                {/* Away Team */}
+                <TeamCard
+                  teams={awayTeamOptions}
+                  label="TEAM B (AWAY)"
+                  selectedTeam={awayTeam}
+                  onSelect={setAwayTeam}
+                />
+              </div>
+            )}
+
+            {/* Same-team warning */}
             {homeTeam && awayTeam && homeTeam.value === awayTeam.value && (
               <p className="text-center text-red-500 text-sm font-semibold mt-4">
                 ⚠️ Home and away teams cannot be the same!

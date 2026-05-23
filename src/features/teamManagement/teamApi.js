@@ -22,10 +22,14 @@ export const teamApi = baseApi.injectEndpoints({
     }),
 
     getAllTeam: builder.query({
-      query: (pageNumber) => ({
-        url: `/team?page=${pageNumber}`,
-        method: "GET",
-      }),
+      query: (params) => {
+        const page = params?.page || 1;
+        const limit = params?.limit || 10;
+        return {
+          url: `/team?page=${page}&limit=${limit}`,
+          method: "GET",
+        };
+      },
       providesTags: ["team"]
     }),
 

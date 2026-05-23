@@ -1,8 +1,9 @@
-import { ColumnDef } from "@tanstack/react-table"
-import { FiEye, FiEdit, FiTrash2 } from "react-icons/fi";
+import { ColumnDef } from "@tanstack/react-table";
+import dayjs from "dayjs";
 import Image from "next/image";
 import Link from "next/link";
-import dayjs from "dayjs";
+import { FiEdit, FiEye, FiTrash2 } from "react-icons/fi";
+import { baseURL } from '../utils/BaseURL';
 
 const statusStyle = (status: string): string => {
   switch (status?.toLowerCase()) {
@@ -28,12 +29,12 @@ export const getMatchColumns = (onView: (match: any) => void, onDelete: (id: str
           <div className="flex gap-2">
             <div className="flex items-center">
               {match.homeTeam?.teamLogo ? (
-                <Image src={match.homeTeam.teamLogo} alt="home" width={100} height={100} className="w-10 h-10 rounded-full border-2 border-white object-cover" />
+                <Image src={baseURL + match.homeTeam.teamLogo} alt="home" width={100} height={100} className="w-10 h-10 rounded-full border-2 border-white object-cover" />
               ) : (
                 <div className="w-10 h-10 rounded-full border-2 border-white bg-gray-200 flex items-center justify-center text-[10px]">Home</div>
               )}
               {match.awayTeam?.teamLogo ? (
-                <Image src={match.awayTeam.teamLogo} alt="away" width={100} height={100} className="w-10 h-10 rounded-full relative -left-3 border-2 border-white object-cover" />
+                <Image src={baseURL + match.awayTeam.teamLogo} alt="away" width={100} height={100} className="w-10 h-10 rounded-full relative -left-3 border-2 border-white object-cover" />
               ) : (
                 <div className="w-10 h-10 rounded-full relative -left-3 border-2 border-white bg-gray-200 flex items-center justify-center text-[10px]">Away</div>
               )}
@@ -83,7 +84,7 @@ export const getMatchColumns = (onView: (match: any) => void, onDelete: (id: str
     header: () => <div className="">Action</div>,
     cell: ({ row }) => (
       <div className="flex items-center gap-2">
-        <button 
+        <button
           onClick={() => onView(row.original)}
           className="flex items-center justify-center h-9 w-9 rounded-sm bg-[#F3F3F3] hover:bg-gray-200 transition-colors duration-300 cursor-pointer"
         >
@@ -94,7 +95,7 @@ export const getMatchColumns = (onView: (match: any) => void, onDelete: (id: str
             <FiEdit className="size-5 font-bold text-gray-800" />
           </button>
         </Link>
-        <button 
+        <button
           onClick={() => onDelete(row.original._id)}
           className="flex items-center justify-center h-9 w-9 rounded-sm bg-[#F3F3F3] hover:bg-red-50 hover:text-red-600 transition-colors duration-300 cursor-pointer"
         >
@@ -103,4 +104,4 @@ export const getMatchColumns = (onView: (match: any) => void, onDelete: (id: str
       </div>
     ),
   }
-]
+]

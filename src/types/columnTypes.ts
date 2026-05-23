@@ -63,13 +63,23 @@ export type TPlayer = {
 }
 
 export type TTransfer = {
-  id: number;
-  image: string;
-  name: string;
-  f_logo: string;
-  f_team: string;
-  t_logo: string;
-  t_team: string;
+  id: string;
+  playerFirstName: string;
+  playerLastName: string;
+  playerEmail: string;
+  playerProfile: string;
+  fromTeamName: string;
+  toTeamName: string;
+  requestedByFirstName: string;
+  requestedByLastName: string;
+  requestedByEmail: string;
+  approvedByFirstName: string | null;
+  approvedByLastName: string | null;
+  transferType: string;
+  status: 'PENDING' | 'APPROVED' | 'REJECTED';
+  rejectReason: string | null;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export type TEngtv = {

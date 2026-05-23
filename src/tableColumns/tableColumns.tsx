@@ -1,5 +1,6 @@
-import { ColumnDef } from "@tanstack/react-table"
+import { ColumnDef } from "@tanstack/react-table";
 import Image from "next/image";
+import { baseURL } from '../utils/BaseURL';
 
 export const tableColumns: ColumnDef<any>[] = [
   {
@@ -17,7 +18,7 @@ export const tableColumns: ColumnDef<any>[] = [
       return (
         <div className="flex items-center gap-2">
           {team?.teamLogo ? (
-            <Image src={team.teamLogo} alt="logo" width={100} height={100} className="w-10 h-10 rounded-full border border-gray-100 object-cover" />
+            <Image src={baseURL + team.teamLogo} alt="logo" width={100} height={100} className="w-10 h-10 rounded-full border border-gray-100 object-cover" />
           ) : (
             <div className="w-10 h-10 rounded-full bg-gray-200 border border-gray-100 flex items-center justify-center text-[10px]">No Logo</div>
           )}
@@ -62,7 +63,7 @@ export const tableColumns: ColumnDef<any>[] = [
     accessorKey: "points",
     header: () => <div className="">PTS</div>,
     cell: ({ row }) => (
-        <div className="font-bold text-gray-900">{row.getValue("points")}</div>
+      <div className="font-bold text-gray-900">{row.getValue("points")}</div>
     ),
   },
 ]

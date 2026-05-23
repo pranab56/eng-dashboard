@@ -14,6 +14,7 @@ type SelectFieldProps = {
   control: Control<any>;
   options: Option[];
   error?: FieldError;
+  scrollable?: boolean;
 };
 
 const SelectField = ({
@@ -23,6 +24,7 @@ const SelectField = ({
   control,
   options,
   error,
+  scrollable = false,
 }: SelectFieldProps) => {
   return (
     <div className="space-y-3">
@@ -42,7 +44,7 @@ const SelectField = ({
                 <SelectValue placeholder={placeholder} />
               </SelectTrigger>
 
-              <SelectContent>
+              <SelectContent className={scrollable ? "max-h-[280px] overflow-y-auto" : ""}>
                 <SelectGroup>
                   {options.map((option) => (
                     <SelectItem key={option.value} value={option.value}>
