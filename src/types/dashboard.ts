@@ -67,6 +67,19 @@ export interface NewsRecord {
   publishDateTime?: string | null;
 }
 
+export interface EventRecord {
+  _id: string;
+  title: string;
+  description: string;
+  image: string | null;
+  location: string;
+  eventDate: string;
+  publishDateTime: string;
+  status: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
 export interface RewardRecord {
   _id: string;
   brand: string;
