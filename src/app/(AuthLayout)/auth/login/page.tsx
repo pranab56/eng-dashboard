@@ -27,6 +27,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import toast from 'react-hot-toast';
 import { useDispatch } from 'react-redux';
+import { getErrorMessage } from '@/utils/getErrorMessage';
 import { setAuthCookie } from '../../../actions/auth';
 
 // Schema
@@ -74,9 +75,9 @@ const Login = () => {
       dispatch(setAuthenticated(res.data.accessToken));
       await setAuthCookie(res.data.accessToken);
       router.push('/');
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.log(error);
-      toast.error(error.data.message)
+      toast.error(getErrorMessage(error, "Login failed"))
     }
   }
 

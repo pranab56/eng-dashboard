@@ -1,21 +1,22 @@
-/* eslint-disable react-hooks/exhaustive-deps */
 "use client"
 
 
-import CustomTable from '@/components/table/CustomTable'
-import { useHeaders } from '@/hooks/useHeaders';
-import { useEffect, useState } from 'react';
+import CreateButton from '@/components/buttons/CreateButton';
 import CustomPagination from '@/components/cui/CustomPagination';
 import GeneralStateCard from '@/components/cui/GeneralStateCard';
-import { getTeamColumns } from '@/tableColumns/teamColumns';
+import CustomTable from '@/components/table/CustomTable';
 import TableTitle from '@/components/titles/TableTitle';
-import CreateButton from '@/components/buttons/CreateButton';
-import Link from 'next/link';
 import { useDeleteTeamMutation, useGetAllTeamQuery } from '@/features/teamManagement/teamApi';
+import { useHeaders } from '@/hooks/useHeaders';
+import { getTeamColumns } from '@/tableColumns/teamColumns';
+import { TeamRecord } from '@/types/dashboard';
+import { getErrorMessage } from '@/utils/getErrorMessage';
+import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
-import TeamViewModal from './TeamViewModal';
-import DeleteConfirmModal from '../match-management/DeleteConfirmModal';
+import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
+import DeleteConfirmModal from '../match-management/DeleteConfirmModal';
+import TeamViewModal from './TeamViewModal';
 
 
 const TeamManagement = () => {
@@ -23,11 +24,11 @@ const TeamManagement = () => {
   const { setHeaders } = useHeaders();
   const searchParams = useSearchParams();
   const page = searchParams.get("teamPage") || "1";
-  
+
   const { data: teamData, isLoading } = useGetAllTeamQuery(page);
   const [deleteTeam, { isLoading: isDeleting }] = useDeleteTeamMutation();
 
-  const [selectedTeam, setSelectedTeam] = useState<any>(null);
+  const [selectedTeam, setSelectedTeam] = useState<TeamRecord | null>(null);
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
 
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
@@ -38,9 +39,9 @@ const TeamManagement = () => {
       title: "Teams",
       des: "Manage and monitor registered squads and team identities."
     })
-  }, [])
+  }, [setHeaders])
 
-  const handleView = (team: any) => {
+  const handleView = (team: TeamRecord) => {
     setSelectedTeam(team);
     setIsViewModalOpen(true);
   };
@@ -59,8 +60,8 @@ const TeamManagement = () => {
         setIsDeleteModalOpen(false);
         setDeletingId(null);
       }
-    } catch (error: any) {
-      toast.error(error?.data?.message || "Failed to delete team");
+    } catch (error: unknown) {
+      toast.error(getErrorMessage(error, "Failed to delete team"));
     }
   };
 
@@ -90,7 +91,7 @@ const TeamManagement = () => {
             </div>
           </div>
           <div className="pt-4">
-            <CustomTable<any> columns={getTeamColumns(handleView, handleDelete)} data={teamData?.data || []} isLoading={isLoading} />
+            <CustomTable<TeamRecord> columns={getTeamColumns(handleView, handleDelete)} data={teamData?.data || []} isLoading={isLoading} />
           </div>
         </div>
         <div className='pt-8 px-4'>
@@ -98,15 +99,15 @@ const TeamManagement = () => {
         </div>
       </div>
 
-      <TeamViewModal 
-        isOpen={isViewModalOpen} 
-        onClose={() => setIsViewModalOpen(false)} 
-        team={selectedTeam} 
+      <TeamViewModal
+        isOpen={isViewModalOpen}
+        onClose={() => setIsViewModalOpen(false)}
+        team={selectedTeam}
       />
 
-      <DeleteConfirmModal 
-        isOpen={isDeleteModalOpen} 
-        onClose={() => setIsDeleteModalOpen(false)} 
+      <DeleteConfirmModal
+        isOpen={isDeleteModalOpen}
+        onClose={() => setIsDeleteModalOpen(false)}
         onConfirm={handleConfirmDelete}
         isLoading={isDeleting}
         title="Confirm Team Deletion"

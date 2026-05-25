@@ -7,10 +7,11 @@ import {
 } from "@/components/ui/dialog";
 import dayjs from 'dayjs';
 import Image from 'next/image';
+import { MatchRecord } from "@/types/dashboard";
 import { baseURL } from '../../../utils/BaseURL';
 
 interface MatchViewModalProps {
-  match: any;
+  match: MatchRecord | null;
   isOpen: boolean;
   onClose: () => void;
 }
@@ -95,7 +96,7 @@ const MatchViewModal = ({ match, isOpen, onClose }: MatchViewModalProps) => {
           {match.notes && (
             <div className="bg-orange-50 border border-orange-100 p-6 rounded-2xl">
               <span className="text-xs font-bold text-orange-400 uppercase tracking-widest mb-2 block">Match Notes</span>
-              <p className="text-gray-700 text-sm leading-relaxed italic">"{match.notes}"</p>
+              <p className="text-gray-700 text-sm leading-relaxed italic">&quot;{match.notes}&quot;</p>
             </div>
           )}
         </div>

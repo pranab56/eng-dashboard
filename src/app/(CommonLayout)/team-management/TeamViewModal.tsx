@@ -1,16 +1,16 @@
 "use client"
-import React from 'react';
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import Image from 'next/image';
 import dayjs from 'dayjs';
+import Image from 'next/image';
+import { TeamRecord } from "@/types/dashboard";
 
 interface TeamViewModalProps {
-  team: any;
+  team: TeamRecord | null;
   isOpen: boolean;
   onClose: () => void;
 }
@@ -58,33 +58,33 @@ const TeamViewModal = ({ team, isOpen, onClose }: TeamViewModalProps) => {
 
           {/* Sizing Section */}
           <div className="flex gap-6">
-             <div className="flex-1 bg-gradient-to-br from-indigo-50 to-blue-50 border border-blue-100 rounded-3xl p-8 flex items-center justify-between group hover:from-white hover:to-white transition-all duration-500">
-                <div className='space-y-1'>
-                  <span className="text-blue-600 font-black text-[11px] uppercase tracking-widest">Total Squad Strength</span>
-                  <h4 className='text-3xl font-black text-indigo-900'>{team.totalMembers || 0} <span className='text-sm font-bold text-indigo-400 ml-1'>Players</span></h4>
-                </div>
-                <div className='w-16 h-16 bg-blue-100 rounded-2xl flex items-center justify-center text-blue-600 font-black text-2xl group-hover:rotate-12 transition-transform duration-500'>
-                  {team.teamType?.[0] || 'T'}
-                </div>
-             </div>
+            <div className="flex-1 bg-gradient-to-br from-indigo-50 to-blue-50 border border-blue-100 rounded-3xl p-8 flex items-center justify-between group hover:from-white hover:to-white transition-all duration-500">
+              <div className='space-y-1'>
+                <span className="text-blue-600 font-black text-[11px] uppercase tracking-widest">Total Squad Strength</span>
+                <h4 className='text-3xl font-black text-indigo-900'>{team.totalMembers || 0} <span className='text-sm font-bold text-indigo-400 ml-1'>Players</span></h4>
+              </div>
+              <div className='w-16 h-16 bg-blue-100 rounded-2xl flex items-center justify-center text-blue-600 font-black text-2xl group-hover:rotate-12 transition-transform duration-500'>
+                {team.teamType?.[0] || 'T'}
+              </div>
+            </div>
           </div>
 
           {/* Type & Identity Footer */}
           <div className="flex items-center justify-between p-6 bg-gray-900 rounded-3xl text-white shadow-2xl shadow-indigo-900/20">
-             <div className='flex items-center gap-4'>
-                <div className='w-10 h-10 rounded-full bg-blue-500 flex items-center justify-center font-black'>
-                   #
-                </div>
-                <div>
-                   <p className="text-[10px] text-white/40 font-black uppercase tracking-widest">Team Type</p>
-                   <p className="font-bold text-sm">{team.teamType || "N/A"}</p>
-                </div>
-             </div>
-             <div className='h-8 w-px bg-white/20 mx-4'></div>
-             <div className='flex-1 text-right'>
-                <p className="text-[10px] text-white/40 font-black uppercase tracking-widest">Team ID</p>
-                <p className="font-mono text-[11px] text-blue-300">{team._id}</p>
-             </div>
+            <div className='flex items-center gap-4'>
+              <div className='w-10 h-10 rounded-full bg-blue-500 flex items-center justify-center font-black'>
+                #
+              </div>
+              <div>
+                <p className="text-[10px] text-white/40 font-black uppercase tracking-widest">Team Type</p>
+                <p className="font-bold text-sm">{team.teamType || "N/A"}</p>
+              </div>
+            </div>
+            <div className='h-8 w-px bg-white/20 mx-4'></div>
+            <div className='flex-1 text-right'>
+              <p className="text-[10px] text-white/40 font-black uppercase tracking-widest">Team ID</p>
+              <p className="font-mono text-[11px] text-blue-300">{team._id}</p>
+            </div>
           </div>
         </div>
       </DialogContent>

@@ -1,4 +1,3 @@
-/* eslint-disable react-hooks/exhaustive-deps */
 "use client"
 
 import CreateButton from '@/components/buttons/CreateButton';
@@ -8,6 +7,8 @@ import CustomTable from '@/components/table/CustomTable';
 import { useDeleteLeagueMutation, useGetAllLeagueQuery } from '@/features/leagueManagement/leagueApi';
 import { useHeaders } from '@/hooks/useHeaders';
 import { getLeagueColumns } from '@/tableColumns/leagueColumns';
+import { LeagueRecord } from '@/types/dashboard';
+import { getErrorMessage } from '@/utils/getErrorMessage';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
@@ -23,7 +24,7 @@ const LeagueManagement = () => {
   const { data: leagueData, isLoading } = useGetAllLeagueQuery(page);
   const [deleteLeague, { isLoading: isDeleting }] = useDeleteLeagueMutation();
 
-  const [selectedLeague, setSelectedLeague] = useState<any>(null);
+  const [selectedLeague, setSelectedLeague] = useState<LeagueRecord | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
@@ -34,9 +35,9 @@ const LeagueManagement = () => {
       title: "Leagues",
       des: "Manage league seasons, schedules, and competition records.",
     });
-  }, []);
+  }, [setHeaders]);
 
-  const handleView = (league: any) => {
+  const handleView = (league: LeagueRecord) => {
     setSelectedLeague(league);
     setIsModalOpen(true);
   };
@@ -55,8 +56,8 @@ const LeagueManagement = () => {
         setIsDeleteModalOpen(false);
         setDeletingId(null);
       }
-    } catch (error: any) {
-      toast.error(error?.data?.message || "Failed to delete league");
+    } catch (error: unknown) {
+      toast.error(getErrorMessage(error, "Failed to delete league"));
     }
   };
 
@@ -78,7 +79,7 @@ const LeagueManagement = () => {
         <div className="flex-1">
           <TableHeader payload={tableHeaderPayload} />
           <div className="pt-4">
-            <CustomTable<any>
+            <CustomTable<LeagueRecord>
               columns={getLeagueColumns(handleView, handleDelete)}
               data={leagueData?.data || []}
               isLoading={isLoading}

@@ -1,16 +1,14 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client"
 import SubmitButton from '@/components/buttons/SubmitButton'
 import InputField from '@/components/form/InputField'
 import TextareaField from '@/components/form/TextareaField'
 import { closeCustomModal } from '@/components/modals/CustomModal'
-import { useHeaders } from '@/hooks/useHeaders'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { useCreateNotificationMutation } from '@/features/notification/notificationApi'
 import { toast } from 'react-hot-toast'
 import * as z from 'zod'
+import { getErrorMessage } from '@/utils/getErrorMessage'
 
 // Form Validation Schema
 const rewardsSchema = z.object({
@@ -42,8 +40,8 @@ const SendNotification = () => {
         toast.success(res.message || "Notification sent successfully");
         closeCustomModal();
       }
-    } catch (error: any) {
-      toast.error(error?.data?.message || "Failed to send notification");
+    } catch (error: unknown) {
+      toast.error(getErrorMessage(error, "Failed to send notification"));
     }
   }
 

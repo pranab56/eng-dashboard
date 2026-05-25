@@ -1,5 +1,7 @@
 "use client"
 import { useCreatePrivacyMutation, useGetPrivacyQuery } from '@/features/privacy/privacyApi';
+import { PrivacyRecord } from '@/types/dashboard';
+import { getErrorMessage } from '@/utils/getErrorMessage';
 import { Loader } from 'lucide-react';
 import dynamic from 'next/dynamic';
 import { useEffect, useState } from 'react';
@@ -33,7 +35,7 @@ const PrivacyPolicy = () => {
 
   useEffect(() => {
     if (privacyData?.data) {
-      setContent(privacyData.data.content || "");
+      setContent((privacyData.data as PrivacyRecord).content || "");
     }
   }, [privacyData]);
 
@@ -48,8 +50,8 @@ const PrivacyPolicy = () => {
       if (res.success) {
         toast.success(res.message || "Privacy policy updated successfully");
       }
-    } catch (error: any) {
-      toast.error(error?.data?.message || "Failed to update privacy policy");
+    } catch (error: unknown) {
+      toast.error(getErrorMessage(error, "Failed to update privacy policy"));
     }
   };
 

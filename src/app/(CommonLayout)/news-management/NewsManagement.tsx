@@ -1,4 +1,3 @@
-/* eslint-disable react-hooks/exhaustive-deps */
 "use client"
 
 import CreateButton from '@/components/buttons/CreateButton';
@@ -8,6 +7,8 @@ import CustomTable from '@/components/table/CustomTable';
 import { useDeleteNewsMutation, useGetAllNewsQuery } from '@/features/news/newsApi';
 import { useHeaders } from '@/hooks/useHeaders';
 import { getNewsColumns } from '@/tableColumns/newsColumns';
+import { NewsRecord } from '@/types/dashboard';
+import { getErrorMessage } from '@/utils/getErrorMessage';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
@@ -25,7 +26,7 @@ const NewsManagement = () => {
   const { data: newsData, isLoading } = useGetAllNewsQuery(page);
   const [deleteNews, { isLoading: isDeleting }] = useDeleteNewsMutation();
 
-  const [selectedNews, setSelectedNews] = useState<any>(null);
+  const [selectedNews, setSelectedNews] = useState<NewsRecord | null>(null);
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
 
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
@@ -36,9 +37,9 @@ const NewsManagement = () => {
       title: "News Management",
       des: "Distribute official club updates and press releases across the digital network."
     })
-  }, [])
+  }, [setHeaders])
 
-  const handleView = (news: any) => {
+  const handleView = (news: NewsRecord) => {
     setSelectedNews(news);
     setIsViewModalOpen(true);
   };
@@ -57,8 +58,8 @@ const NewsManagement = () => {
         setIsDeleteModalOpen(false);
         setDeletingId(null);
       }
-    } catch (error: any) {
-      toast.error(error?.data?.message || "Failed to delete news article");
+    } catch (error: unknown) {
+      toast.error(getErrorMessage(error, "Failed to delete news article"));
     }
   };
 
@@ -81,7 +82,7 @@ const NewsManagement = () => {
             <TableHeader payload={tableHeaderPayload} />
           </>
           <div className="pt-4">
-            <CustomTable<any> columns={getNewsColumns(handleView, handleDelete)} data={newsData?.data || []} isLoading={isLoading} />
+            <CustomTable<NewsRecord> columns={getNewsColumns(handleView, handleDelete)} data={newsData?.data || []} isLoading={isLoading} />
           </div>
         </div>
         <div className='pt-8 px-4'>

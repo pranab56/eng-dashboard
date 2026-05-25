@@ -17,6 +17,7 @@ import { Loader } from "lucide-react";
 import Link from 'next/link';
 import { useRouter, useSearchParams } from "next/navigation";
 import toast from 'react-hot-toast';
+import { getErrorMessage } from '@/utils/getErrorMessage';
 import { useResendOTPMutation, useVerifyEmailMutation } from '../../../../features/auth/authApi';
 
 
@@ -70,8 +71,8 @@ const VerifyOtp = () => {
       if (res.success) {
         toast.success(res.message || "OTP resent successfully");
       }
-    } catch (error: any) {
-      toast.error(error?.data?.message || "Failed to resend OTP");
+    } catch (error: unknown) {
+      toast.error(getErrorMessage(error, "Failed to resend OTP"));
     }
   };
 
@@ -112,7 +113,7 @@ const VerifyOtp = () => {
           </Button>
 
           <div className="flex justify-center text-sm items-center gap-1">
-            <span className="text-gray-600">Didn't receive the code?</span>
+            <span className="text-gray-600">Didn&apos;t receive the code?</span>
             <button
               type="button"
               onClick={handleResendOTP}

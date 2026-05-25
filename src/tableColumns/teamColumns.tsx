@@ -2,9 +2,13 @@ import { ColumnDef } from "@tanstack/react-table";
 import Image from "next/image";
 import Link from "next/link";
 import { FiEdit, FiEye, FiTrash2 } from "react-icons/fi";
+import { TeamRecord } from "@/types/dashboard";
 import { baseURL } from '../utils/BaseURL';
 
-export const getTeamColumns = (onView: (team: any) => void, onDelete: (id: string) => void): ColumnDef<any>[] => [
+export const getTeamColumns = (
+  onView: (team: TeamRecord) => void,
+  onDelete: (id: string) => void
+): ColumnDef<TeamRecord>[] => [
   {
     accessorKey: "teamName",
     header: () => <div className="">Team Identity</div>,

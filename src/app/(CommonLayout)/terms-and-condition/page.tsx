@@ -1,5 +1,7 @@
 "use client"
 import { useCreateTermsMutation, useGetTermsQuery } from '@/features/terms/termsApi';
+import { PrivacyRecord } from '@/types/dashboard';
+import { getErrorMessage } from '@/utils/getErrorMessage';
 import { Loader } from 'lucide-react';
 import dynamic from 'next/dynamic';
 import { useEffect, useState } from 'react';
@@ -34,7 +36,7 @@ const TermsCondition = () => {
 
   useEffect(() => {
     if (termsData?.data) {
-      setContent(termsData.data.content || "");
+      setContent((termsData.data as PrivacyRecord).content || "");
     }
   }, [termsData]);
 
@@ -49,8 +51,8 @@ const TermsCondition = () => {
       if (res.success) {
         toast.success(res.message || "Terms updated successfully");
       }
-    } catch (error: any) {
-      toast.error(error?.data?.message || "Failed to update terms");
+    } catch (error: unknown) {
+      toast.error(getErrorMessage(error, "Failed to update terms"));
     }
   };
 

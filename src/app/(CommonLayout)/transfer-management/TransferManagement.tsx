@@ -49,7 +49,7 @@ const TransferManagement = () => {
       await approveTransfer({ id: selectedTransfer.id }).unwrap();
       toast.success("Transfer approved successfully");
       setIsApproveModalOpen(false);
-    } catch (error) {
+    } catch {
       toast.error("Failed to approve transfer");
     }
   };
@@ -60,7 +60,7 @@ const TransferManagement = () => {
       await rejectTransfer({ id: selectedTransfer.id }).unwrap();
       toast.success("Transfer rejected successfully");
       setIsRejectModalOpen(false);
-    } catch (error) {
+    } catch {
       toast.error("Failed to reject transfer");
     }
   };

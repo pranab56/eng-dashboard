@@ -1,4 +1,3 @@
-/* eslint-disable react-hooks/exhaustive-deps */
 "use client"
 
 import CreateButton from '@/components/buttons/CreateButton';
@@ -11,6 +10,7 @@ import { useDeleteVideoMutation, useGetAllVideoQuery } from '@/features/engTVMan
 import { useHeaders } from '@/hooks/useHeaders';
 import { getEngtvColumns } from '@/tableColumns/engtvColumns';
 import { TEngtv } from '@/types/columnTypes';
+import { getErrorMessage } from '@/utils/getErrorMessage';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
@@ -50,8 +50,8 @@ const EngtvManagement = () => {
       toast.success("Video deleted successfully");
       setIsDeleteModalOpen(false);
       setDeletingId(null);
-    } catch (error: any) {
-      toast.error(error?.data?.message || "Failed to delete video");
+    } catch (error: unknown) {
+      toast.error(getErrorMessage(error, "Failed to delete video"));
     }
   };
 

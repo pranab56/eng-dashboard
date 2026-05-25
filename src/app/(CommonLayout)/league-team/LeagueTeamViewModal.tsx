@@ -8,12 +8,11 @@ import {
 import dayjs from "dayjs";
 import { Calendar, Globe, MapPin, Shield, Trash2, Trophy } from "lucide-react";
 import Image from "next/image";
+import { LeagueTeamEntry } from "@/types/dashboard";
 import { baseURL } from '../../../utils/BaseURL';
 
-const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || "";
-
 interface LeagueTeamViewModalProps {
-  data: { league: any; teams: any[] } | null;
+  data: LeagueTeamEntry | null;
   isOpen: boolean;
   onClose: () => void;
   onDeleteTeam?: (leagueId: string, teamId: string) => void;

@@ -1,20 +1,21 @@
-/* eslint-disable react-hooks/exhaustive-deps */
 "use client"
 
-import CustomTable from '@/components/table/CustomTable'
-import { useHeaders } from '@/hooks/useHeaders';
-import { useEffect, useState } from 'react';
-import TableHeader from '@/components/cui/TableHeader';
-import CustomPagination from '@/components/cui/CustomPagination';
 import CreateButton from '@/components/buttons/CreateButton';
-import { getRewardsColumns } from '@/tableColumns/rewardsColumns';
+import CustomPagination from '@/components/cui/CustomPagination';
 import GeneralStateCard from '@/components/cui/GeneralStateCard';
-import Link from 'next/link';
+import TableHeader from '@/components/cui/TableHeader';
+import CustomTable from '@/components/table/CustomTable';
 import { useDeleteRewordMutation, useGetAllRewordQuery } from '@/features/rewordProduct/rewordApi';
+import { useHeaders } from '@/hooks/useHeaders';
+import { getRewardsColumns } from '@/tableColumns/rewardsColumns';
+import { RewardRecord } from '@/types/dashboard';
+import { getErrorMessage } from '@/utils/getErrorMessage';
+import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
-import RewardViewModal from './RewardViewModal';
-import DeleteConfirmModal from '../match-management/DeleteConfirmModal';
+import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
+import DeleteConfirmModal from '../match-management/DeleteConfirmModal';
+import RewardViewModal from './RewardViewModal';
 
 
 const RewardsManagement = () => {
@@ -26,7 +27,7 @@ const RewardsManagement = () => {
   const { data: rewardData, isLoading } = useGetAllRewordQuery(page);
   const [deleteReward, { isLoading: isDeleting }] = useDeleteRewordMutation();
 
-  const [selectedReward, setSelectedReward] = useState<any>(null);
+  const [selectedReward, setSelectedReward] = useState<RewardRecord | null>(null);
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
 
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
@@ -37,9 +38,9 @@ const RewardsManagement = () => {
       title: "Rewards Redemption",
       des: "Manage the digital inventory of redeemable boutique items and partner rewards."
     })
-  }, [])
+  }, [setHeaders])
 
-  const handleView = (reward: any) => {
+  const handleView = (reward: RewardRecord) => {
     setSelectedReward(reward);
     setIsViewModalOpen(true);
   };
@@ -58,8 +59,8 @@ const RewardsManagement = () => {
         setIsDeleteModalOpen(false);
         setDeletingId(null);
       }
-    } catch (error: any) {
-      toast.error(error?.data?.message || "Failed to delete reward");
+    } catch (error: unknown) {
+      toast.error(getErrorMessage(error, "Failed to delete reward"));
     }
   };
 
@@ -94,7 +95,7 @@ const RewardsManagement = () => {
             <TableHeader payload={tableHeaderPayload} />
           </>
           <div className="pt-2">
-            <CustomTable<any> columns={getRewardsColumns(handleView, handleDelete)} data={rewardData?.data || []} isLoading={isLoading} />
+            <CustomTable<RewardRecord> columns={getRewardsColumns(handleView, handleDelete)} data={rewardData?.data || []} isLoading={isLoading} />
           </div>
         </div>
         <div className='pt-8 px-4'>
@@ -102,15 +103,15 @@ const RewardsManagement = () => {
         </div>
       </div>
 
-      <RewardViewModal 
-        isOpen={isViewModalOpen} 
-        onClose={() => setIsViewModalOpen(false)} 
-        reward={selectedReward} 
+      <RewardViewModal
+        isOpen={isViewModalOpen}
+        onClose={() => setIsViewModalOpen(false)}
+        reward={selectedReward}
       />
 
-      <DeleteConfirmModal 
-        isOpen={isDeleteModalOpen} 
-        onClose={() => setIsDeleteModalOpen(false)} 
+      <DeleteConfirmModal
+        isOpen={isDeleteModalOpen}
+        onClose={() => setIsDeleteModalOpen(false)}
         onConfirm={handleConfirmDelete}
         isLoading={isDeleting}
         title="Confirm Reward Deletion"

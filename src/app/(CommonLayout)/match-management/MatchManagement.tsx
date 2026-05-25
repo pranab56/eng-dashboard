@@ -1,4 +1,3 @@
-/* eslint-disable react-hooks/exhaustive-deps */
 "use client"
 
 
@@ -9,6 +8,8 @@ import CustomTable from '@/components/table/CustomTable';
 import { useDeleteMatchMutation, useGetAllMatchQuery } from '@/features/match/matchApi';
 import { useHeaders } from '@/hooks/useHeaders';
 import { getMatchColumns } from '@/tableColumns/matchColumns';
+import { MatchRecord } from '@/types/dashboard';
+import { getErrorMessage } from '@/utils/getErrorMessage';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
@@ -26,7 +27,7 @@ const MatchManagement = () => {
   const { data: matchData, isLoading } = useGetAllMatchQuery(page);
   const [deleteMatch, { isLoading: isDeleting }] = useDeleteMatchMutation();
 
-  const [selectedMatch, setSelectedMatch] = useState<any>(null);
+  const [selectedMatch, setSelectedMatch] = useState<MatchRecord | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
@@ -37,9 +38,9 @@ const MatchManagement = () => {
       title: "Matches",
       des: "Manage live broadcasts, schedules, and historical match data."
     })
-  }, [])
+  }, [setHeaders])
 
-  const handleView = (match: any) => {
+  const handleView = (match: MatchRecord) => {
     setSelectedMatch(match);
     setIsModalOpen(true);
   };
@@ -58,8 +59,8 @@ const MatchManagement = () => {
         setIsDeleteModalOpen(false);
         setDeletingId(null);
       }
-    } catch (error: any) {
-      toast.error(error?.data?.message || "Failed to delete match");
+    } catch (error: unknown) {
+      toast.error(getErrorMessage(error, "Failed to delete match"));
     }
   };
 
@@ -84,7 +85,7 @@ const MatchManagement = () => {
           </>
 
           <div className="pt-4">
-            <CustomTable<any> columns={getMatchColumns(handleView, handleDelete)} data={matchData?.data || []} isLoading={isLoading} />
+            <CustomTable<MatchRecord> columns={getMatchColumns(handleView, handleDelete)} data={matchData?.data || []} isLoading={isLoading} />
           </div>
         </div>
 

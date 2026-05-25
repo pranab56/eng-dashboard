@@ -1,4 +1,3 @@
-/* eslint-disable react-hooks/exhaustive-deps */
 "use client"
 
 import TableHeader from '@/components/cui/TableHeader';
@@ -12,14 +11,18 @@ import {
 import { useGetAllTableQuery } from '@/features/tableManagement/tableApi';
 import { useHeaders } from '@/hooks/useHeaders';
 import { tableColumns } from '@/tableColumns/tableColumns';
+import { LeagueTeamEntry, TableStanding } from '@/types/dashboard';
 import { ChevronDown, Trophy } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
 const TableManagement = () => {
   const { setHeaders } = useHeaders();
   const { data: tableData, isLoading } = useGetAllTableQuery({});
 
-  const allEntries: any[] = tableData?.data || [];
+  const allEntries = useMemo<LeagueTeamEntry[]>(
+    () => tableData?.data || [],
+    [tableData?.data]
+  );
 
   const [selectedLeagueId, setSelectedLeagueId] = useState<string>("");
 
@@ -27,20 +30,18 @@ const TableManagement = () => {
     if (allEntries.length > 0 && !selectedLeagueId) {
       setSelectedLeagueId(allEntries[0].league._id);
     }
-  }, [allEntries]);
+  }, [allEntries, selectedLeagueId]);
 
   useEffect(() => {
     setHeaders({
       title: "Table Management",
       des: "View and manage the league standings and team performance metrics."
     })
-  }, [])
+  }, [setHeaders])
 
   // Find selected league
   const selectedLeague = allEntries.find(entry => entry.league._id === selectedLeagueId);
-  const standings: any[] = selectedLeague?.standings || [];
-
-  console.log(standings)
+  const standings: TableStanding[] = selectedLeague?.standings || [];
 
   // Compute stats
   const totalTeams = standings.length;
@@ -139,7 +140,7 @@ const TableManagement = () => {
                 <p className="text-gray-400 text-sm">Matches need to be played first to generate standings.</p>
               </div>
             ) : (
-              <CustomTable<any>
+              <CustomTable<TableStanding>
                 columns={tableColumns}
                 data={standings}
                 isLoading={isLoading}

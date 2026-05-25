@@ -3,6 +3,7 @@ import dayjs from "dayjs";
 import Image from "next/image";
 import Link from "next/link";
 import { FiEdit, FiEye, FiTrash2 } from "react-icons/fi";
+import { MatchRecord } from "@/types/dashboard";
 import { baseURL } from '../utils/BaseURL';
 
 const statusStyle = (status: string): string => {
@@ -18,7 +19,10 @@ const statusStyle = (status: string): string => {
   }
 };
 
-export const getMatchColumns = (onView: (match: any) => void, onDelete: (id: string) => void): ColumnDef<any>[] => [
+export const getMatchColumns = (
+  onView: (match: MatchRecord) => void,
+  onDelete: (id: string) => void
+): ColumnDef<MatchRecord>[] => [
   {
     accessorKey: "homeTeam",
     header: () => <div className="">Teams & Matchup</div>,

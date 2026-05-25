@@ -3,9 +3,13 @@ import dayjs from "dayjs";
 import Image from "next/image";
 import Link from "next/link";
 import { FiEdit, FiEye, FiTrash2 } from "react-icons/fi";
+import { NewsRecord } from "@/types/dashboard";
 import { baseURL } from '../utils/BaseURL';
 
-export const getNewsColumns = (onView: (news: any) => void, onDelete: (id: string) => void): ColumnDef<any>[] => [
+export const getNewsColumns = (
+  onView: (news: NewsRecord) => void,
+  onDelete: (id: string) => void
+): ColumnDef<NewsRecord>[] => [
   {
     accessorKey: "title",
     header: () => <div className="">Article Title</div>,

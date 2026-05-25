@@ -3,15 +3,14 @@ import dayjs from "dayjs";
 import { Trophy } from "lucide-react";
 import Image from "next/image";
 import { FiEye, FiTrash2 } from "react-icons/fi";
+import { LeagueTeamEntry, TeamRecord } from "@/types/dashboard";
 import { baseURL } from '../utils/BaseURL';
-
-const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || "";
 
 // Row shape: { league: {...}, teams: [...] }
 export const getLeagueTeamColumns = (
-  onView: (data: { league: any; teams: any[] }) => void,
+  onView: (data: LeagueTeamEntry) => void,
   onDelete: (leagueId: string) => void
-): ColumnDef<any>[] => [
+): ColumnDef<LeagueTeamEntry>[] => [
     {
       accessorKey: "leagueName",
       header: () => <div>League</div>,
@@ -38,7 +37,7 @@ export const getLeagueTeamColumns = (
       accessorKey: "teams",
       header: () => <div>Teams</div>,
       cell: ({ row }) => {
-        const teams: any[] = row.original.teams || [];
+        const teams: TeamRecord[] = row.original.teams || [];
         const visibleTeams = teams.slice(0, 5);
         const remaining = teams.length - visibleTeams.length;
 

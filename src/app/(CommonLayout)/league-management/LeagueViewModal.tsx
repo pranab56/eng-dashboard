@@ -7,9 +7,10 @@ import {
 } from "@/components/ui/dialog";
 import dayjs from "dayjs";
 import { CalendarDays, Trophy } from "lucide-react";
+import { LeagueRecord } from "@/types/dashboard";
 
 interface LeagueViewModalProps {
-  league: any;
+  league: LeagueRecord | null;
   isOpen: boolean;
   onClose: () => void;
 }

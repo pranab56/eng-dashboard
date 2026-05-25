@@ -2,9 +2,13 @@ import { ColumnDef } from "@tanstack/react-table";
 import Image from "next/image";
 import Link from "next/link";
 import { FiEdit, FiEye, FiTrash2 } from "react-icons/fi";
+import { RewardRecord } from "@/types/dashboard";
 import { baseURL } from '../utils/BaseURL';
 
-export const getRewardsColumns = (onView: (reward: any) => void, onDelete: (id: string) => void): ColumnDef<any>[] => [
+export const getRewardsColumns = (
+  onView: (reward: RewardRecord) => void,
+  onDelete: (id: string) => void
+): ColumnDef<RewardRecord>[] => [
   {
     accessorKey: "brand",
     header: () => <div className="">Reward Details</div>,

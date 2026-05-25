@@ -5,29 +5,18 @@ import Image from "next/image";
 import { CustomModal } from "@/components/modals/CustomModal";
 import PlayerDetails from "@/app/(CommonLayout)/team-management/single-team/PlayerDetails";
 
-const statusStyle = (status: string): string => {
-  switch (status) {
-    case "Amateur":
-      return "bg-yellow-100 text-yellow-500";
-    case "Semi Pro":
-      return "bg-blue-100 text-blue-500";
-    case "Professional":
-      return "bg-green-100 text-green-500";
-    default:
-      return "bg-gray-500";
-  }
-};
+
 
 export const singleTeamColumns: ColumnDef<TPlayer>[] = [
   {
-    accessorKey: "name",
+    id: "player",
     header: () => <div className="">Name</div>,
     cell: ({ row }) => (
       <div className="flex gap-2">
-        <Image src={row.original.image} alt="profilePic" width={400} height={400} className="w-10 h-10 rounded-full border-2 border-white" />
+        <Image src={row.original.profile ?? ""} alt="profilePic" width={400} height={400} className="w-10 h-10 rounded-full border-2 border-white" />
         <p className="flex flex-col flex-start items-start ">
-          <span className="font-semibold">{row.getValue("name")}</span>
-          <span className=" text-gray-500">ID: {row.original.id}</span>
+          <span className="font-semibold">{row.original.firstName} {row.original.lastName}</span>
+          <span className=" text-gray-500">ID: {row.original.shortName}</span>
         </p>
       </div>
     ),
@@ -40,10 +29,22 @@ export const singleTeamColumns: ColumnDef<TPlayer>[] = [
     ),
   },
   {
-    accessorKey: "status",
-    header: () => <div className="">Contact Status</div>,
+    accessorKey: "teamName",
+    header: () => <div className="">Team</div>,
     cell: ({ row }) => (
-      <div className={`inline-block px-2 py-1 rounded-md ${statusStyle(row.getValue("status"))}`}>{row.getValue("status")}</div>
+      <div className="flex items-center gap-2">
+        {row.original.teamLogo && (
+          <Image src={row.original.teamLogo} alt="team logo" width={24} height={24} className="w-6 h-6 rounded-full" />
+        )}
+        <span>{row.getValue("teamName")}</span>
+      </div>
+    ),
+  },
+  {
+    accessorKey: "goals",
+    header: () => <div className="">Goals</div>,
+    cell: ({ row }) => (
+      <div className={`inline-block px-2 py-1 rounded-md bg-green-100 text-green-600 font-semibold`}>{row.getValue("goals") ?? 0}</div>
     ),
   },
   {

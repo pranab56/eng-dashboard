@@ -7,12 +7,13 @@ import {
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import Image from 'next/image';
+import { NewsRecord } from "@/types/dashboard";
 import { baseURL } from '../../../utils/BaseURL';
 
 dayjs.extend(relativeTime);
 
 interface NewsViewModalProps {
-  news: any;
+  news: NewsRecord | null;
   isOpen: boolean;
   onClose: () => void;
 }

@@ -1,4 +1,3 @@
-/* eslint-disable react-hooks/exhaustive-deps */
 "use client"
 
 import CreateButton from '@/components/buttons/CreateButton';
@@ -8,6 +7,8 @@ import CustomTable from '@/components/table/CustomTable';
 import { useDeleteLeagueEntryMutation, useDeleteLeagueTeamMutation, useGetAllLeagueTeamQuery } from '@/features/leagueTeam/leagueTeamApi';
 import { useHeaders } from '@/hooks/useHeaders';
 import { getLeagueTeamColumns } from '@/tableColumns/leagueTeamColumns';
+import { LeagueTeamEntry } from '@/types/dashboard';
+import { getErrorMessage } from '@/utils/getErrorMessage';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
@@ -25,7 +26,7 @@ const LeagueTeamManagement = () => {
   const [deleteLeagueEntry, { isLoading: isDeletingEntry }] = useDeleteLeagueEntryMutation();
 
   // View modal: holds { league, teams[] } for the selected row
-  const [viewData, setViewData] = useState<{ league: any; teams: any[] } | null>(null);
+  const [viewData, setViewData] = useState<LeagueTeamEntry | null>(null);
 
   // Delete modal state — handles both per-team and per-league deletes
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
@@ -37,10 +38,10 @@ const LeagueTeamManagement = () => {
       title: "League Teams",
       des: "Manage the association between leagues and teams.",
     });
-  }, []);
+  }, [setHeaders]);
 
   // ── Handlers ──────────────────────────────────────────────────────
-  const handleView = (row: { league: any; teams: any[] }) => {
+  const handleView = (row: LeagueTeamEntry) => {
     setViewData(row);
   };
 
@@ -103,8 +104,8 @@ const LeagueTeamManagement = () => {
           setDeletingParams(null);
         }
       }
-    } catch (error: any) {
-      toast.error(error?.data?.message || "Failed to delete");
+    } catch (error: unknown) {
+      toast.error(getErrorMessage(error, "Failed to delete"));
     }
   };
 
@@ -115,7 +116,7 @@ const LeagueTeamManagement = () => {
   };
 
   // API returns [{ league, teams[] }] — use directly as table rows
-  const tableData: any[] = leagueTeamData?.data || [];
+  const tableData: LeagueTeamEntry[] = leagueTeamData?.data || [];
 
   return (
     <div className="px-8 pt-10 space-y-4">
@@ -129,7 +130,7 @@ const LeagueTeamManagement = () => {
         <div className="flex-1 text-left">
           <TableHeader payload={tableHeaderPayload} />
           <div className="pt-4 px-4 overflow-hidden">
-            <CustomTable<any>
+            <CustomTable<LeagueTeamEntry>
               columns={getLeagueTeamColumns(handleView, handleDeleteLeagueEntry)}
               data={tableData}
               isLoading={isLoading}

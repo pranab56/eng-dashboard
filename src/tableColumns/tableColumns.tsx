@@ -1,8 +1,9 @@
 import { ColumnDef } from "@tanstack/react-table";
 import Image from "next/image";
+import { TableStanding } from "@/types/dashboard";
 import { baseURL } from '../utils/BaseURL';
 
-export const tableColumns: ColumnDef<any>[] = [
+export const tableColumns: ColumnDef<TableStanding>[] = [
   {
     id: "rank",
     header: () => <div className="">#</div>,

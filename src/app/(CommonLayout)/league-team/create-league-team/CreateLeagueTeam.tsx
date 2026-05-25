@@ -1,9 +1,7 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client"
 import BackButton from '@/components/buttons/BackButton'
 import CancelButton from '@/components/buttons/CancelButton'
 import SubmitButton from '@/components/buttons/SubmitButton'
-import SelectField from '@/components/form/SelectField'
 import ComboboxField from '@/components/form/ComboboxField'
 import { useGetAllLeagueQuery } from '@/features/leagueManagement/leagueApi'
 import { useGetAllTeamQuery } from '@/features/teamManagement/teamApi'
@@ -19,6 +17,8 @@ import Image from 'next/image'
 import { baseURL } from '@/utils/BaseURL'
 import { cn } from '@/lib/utils'
 import { Check } from 'lucide-react'
+import { LeagueRecord, SelectOption, TeamRecord } from '@/types/dashboard'
+import { getErrorMessage } from '@/utils/getErrorMessage'
 
 // Form Validation Schema
 const createLeagueTeamSchema = z.object({
@@ -37,12 +37,12 @@ const CreateLeagueTeam = () => {
   const { data: teamData } = useGetAllTeamQuery({ page: 1, limit: 1000 });
 
   // Build option lists from API data
-  const leagueOptions = (leagueData?.data || []).map((l: any) => ({
+  const leagueOptions: SelectOption[] = (leagueData?.data as LeagueRecord[] || []).map((l) => ({
     label: `${l.leagueName} (${l.season})`,
     value: l._id,
   }));
 
-  const teamsList = teamData?.data || [];
+  const teamsList: TeamRecord[] = teamData?.data || [];
 
   const {
     handleSubmit,
@@ -88,8 +88,8 @@ const CreateLeagueTeam = () => {
         toast.success(res.message || "League teams associated successfully")
         router.push("/league-team")
       }
-    } catch (error: any) {
-      toast.error(error?.data?.message || "Failed to associate teams with league")
+    } catch (error: unknown) {
+      toast.error(getErrorMessage(error, "Failed to associate teams with league"))
     }
   }
 
@@ -127,7 +127,7 @@ const CreateLeagueTeam = () => {
             </div>
 
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
-              {teamsList.map((team: any) => {
+              {teamsList.map((team) => {
                 const isSelected = selectedTeams.includes(team._id);
                 return (
                   <div

@@ -1,4 +1,3 @@
-/* eslint-disable react-hooks/exhaustive-deps */
 "use client"
 
 import CustomPagination from '@/components/cui/CustomPagination';
@@ -9,6 +8,7 @@ import { useDeleteUserMutation, useGetUserQuery, useUpdateStatusMutation } from 
 import { useHeaders } from '@/hooks/useHeaders';
 import { getUsersColumns } from '@/tableColumns/usersColumns';
 import { TUserManagement } from '@/types/columnTypes';
+import { getErrorMessage } from '@/utils/getErrorMessage';
 import { useSearchParams } from 'next/navigation';
 import { useEffect } from 'react';
 import toast from 'react-hot-toast';
@@ -34,8 +34,8 @@ const UserManagement = () => {
     try {
       await toggleStatus({ id }).unwrap();
       toast.success("User status updated");
-    } catch (error: any) {
-      toast.error(error?.data?.message || "Failed to update status");
+    } catch (error: unknown) {
+      toast.error(getErrorMessage(error, "Failed to update status"));
     }
   };
 
@@ -44,8 +44,8 @@ const UserManagement = () => {
       try {
         await deleteUser({ id }).unwrap();
         toast.success("User deleted successfully");
-      } catch (error: any) {
-        toast.error(error?.data?.message || "Failed to delete user");
+      } catch (error: unknown) {
+        toast.error(getErrorMessage(error, "Failed to delete user"));
       }
     }
   };
@@ -59,19 +59,19 @@ const UserManagement = () => {
     },
     {
       title: "Active Players",
-      value: userData?.data?.filter((u: any) => u.role === 'PLAYER').length || 0,
+      value: userData?.data?.filter((u: TUserManagement) => u.role === 'PLAYER').length || 0,
       description: "Currently active players",
       id: "users2",
     },
     {
       title: "Verified Users",
-      value: userData?.data?.filter((u: any) => u.verified).length || 0,
+      value: userData?.data?.filter((u: TUserManagement) => u.verified).length || 0,
       description: "Users with verified status",
       id: "users3",
     },
     {
       title: "Pending Users",
-      value: userData?.data?.filter((u: any) => !u.verified).length || 0,
+      value: userData?.data?.filter((u: TUserManagement) => !u.verified).length || 0,
       description: "Users awaiting verification",
       id: "users4",
     },
