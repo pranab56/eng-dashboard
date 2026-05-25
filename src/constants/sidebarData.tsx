@@ -15,6 +15,7 @@ import {
   TransferIcon,
   UserManagementIcon
 } from "@/assets/assets";
+import { MdEmojiEvents, MdEvent } from "react-icons/md";
 
 export type TMenuItem = {
   id: number;
@@ -39,7 +40,7 @@ export const sidebarData: TMenuItem[] = [
   },
   {
     id: 3,
-    icon: MatchIcon,
+    icon: MdEmojiEvents,
     title: "League Management",
     label: "/league-management",
   },
@@ -89,7 +90,7 @@ export const sidebarData: TMenuItem[] = [
 
   {
     id: 11,
-    icon: NewsIcon,
+    icon: MdEvent,
     title: "Event Management",
     label: "/event-management",
   },
