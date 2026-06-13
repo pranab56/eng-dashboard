@@ -48,6 +48,16 @@ export const getTeamColumns = (onView: (team: any) => void, onDelete: (id: strin
     ),
   },
   {
+    accessorKey: "coin",
+    header: () => <div className="">Coin</div>,
+    cell: ({ row }) => (
+      <div className="flex items-center gap-1">
+        <span className="font-bold text-yellow-500">🪙</span>
+        <span className="font-semibold text-gray-700">{(row.original.coin ?? 0).toLocaleString()}</span>
+      </div>
+    ),
+  },
+  {
     id: "action",
     header: () => <div className="">Action</div>,
     cell: ({ row }) => (

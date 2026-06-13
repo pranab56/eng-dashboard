@@ -1,6 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 "use client"
 
+
 import TableHeader from '@/components/cui/TableHeader';
 import CustomTable from '@/components/table/CustomTable';
 import {
@@ -34,13 +35,11 @@ const TableManagement = () => {
       title: "Table Management",
       des: "View and manage the league standings and team performance metrics."
     })
-  }, [])
+  }, []);
 
   // Find selected league
   const selectedLeague = allEntries.find(entry => entry.league._id === selectedLeagueId);
   const standings: any[] = selectedLeague?.standings || [];
-
-  console.log(standings)
 
   // Compute stats
   const totalTeams = standings.length;
@@ -63,8 +62,9 @@ const TableManagement = () => {
   const getSelectedLeagueSeason = () => {
     const league = allEntries.find(entry => entry.league._id === selectedLeagueId);
     return league?.league.season || "";
-  }
+  };
 
+  
   return (
     <div className='pt-10 px-8 space-y-4'>
 

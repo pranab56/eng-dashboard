@@ -25,7 +25,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import toast from 'react-hot-toast';
+import { toast } from 'sonner';
 import { useDispatch } from 'react-redux';
 import { setAuthCookie } from '../../../actions/auth';
 
@@ -75,8 +75,8 @@ const Login = () => {
       await setAuthCookie(res.data.accessToken);
       router.push('/');
     } catch (error: any) {
-      console.log(error);
-      toast.error(error.data.message)
+      console.log(error?.data?.message);
+      toast.error(error?.data?.message)
     }
   }
 
