@@ -1,6 +1,5 @@
 import { ColumnDef } from "@tanstack/react-table"
 import { FiEye } from "react-icons/fi";
-import { TPlayer } from "@/types/columnTypes";
 import Image from "next/image";
 import { CustomModal } from "@/components/modals/CustomModal";
 import PlayerDetails from "@/app/(CommonLayout)/team-management/single-team/PlayerDetails";
@@ -18,7 +17,8 @@ const statusStyle = (status: string): string => {
   }
 };
 
-export const singleTeamColumns: ColumnDef<TPlayer>[] = [
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export const singleTeamColumns: ColumnDef<any>[] = [
   {
     accessorKey: "name",
     header: () => <div className="">Name</div>,

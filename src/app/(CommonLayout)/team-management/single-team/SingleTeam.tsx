@@ -3,7 +3,6 @@
 
 
 import CustomTable from '@/components/table/CustomTable'
-import { TPlayer } from '@/types/columnTypes';
 import { useHeaders } from '@/hooks/useHeaders';
 import { useEffect } from 'react';
 import TableHeader from '@/components/cui/TableHeader';
@@ -28,7 +27,8 @@ const items = [
   }
 ];
 
-const tableDatas: TPlayer[] = [
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const tableDatas: any[] = [
   {
     id: 1,
     image: "https://res.cloudinary.com/dbq7y6byo/image/upload/v1775630362/ENG/player1_m3knp4.png",
@@ -148,7 +148,7 @@ const SingleTeam = () => {
             <TableHeader payload={tableHeaderPayload} />
           </>
           <div className="pt-4">
-            <CustomTable<TPlayer> columns={singleTeamColumns} data={tableDatas} />
+            <CustomTable columns={singleTeamColumns} data={tableDatas} />
           </div>
         </div>
         <div className='pt-8 px-4'>

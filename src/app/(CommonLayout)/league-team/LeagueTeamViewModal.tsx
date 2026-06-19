@@ -10,8 +10,6 @@ import { Calendar, Globe, MapPin, Shield, Trash2, Trophy } from "lucide-react";
 import Image from "next/image";
 import { baseURL } from '../../../utils/BaseURL';
 
-const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || "";
-
 interface LeagueTeamViewModalProps {
   data: { league: any; teams: any[] } | null;
   isOpen: boolean;

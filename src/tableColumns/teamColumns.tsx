@@ -38,6 +38,24 @@ export const getTeamColumns = (onView: (team: any) => void, onDelete: (id: strin
     ),
   },
   {
+    accessorKey: "managers",
+    header: () => <div className="">Manager</div>,
+    cell: ({ row }) => {
+      const manager = row.original.managers;
+      if (!manager) return <span className="text-xs text-gray-400">Unassigned</span>;
+      return (
+        <div className="flex items-center gap-2">
+          {manager.profile ? (
+            <Image src={manager.profile} alt="manager" width={36} height={36} className="w-9 h-9 rounded-full object-cover border border-gray-100" />
+          ) : (
+            <div className="w-9 h-9 rounded-full bg-gray-100 flex items-center justify-center text-[10px] font-bold text-gray-400">MGR</div>
+          )}
+          <span className="font-semibold text-gray-700 text-sm">{manager.firstName} {manager.lastName}</span>
+        </div>
+      );
+    },
+  },
+  {
     accessorKey: "city",
     header: () => <div className="">Location</div>,
     cell: ({ row }) => (

@@ -3,7 +3,6 @@
 import BackButton from '@/components/buttons/BackButton'
 import CancelButton from '@/components/buttons/CancelButton'
 import SubmitButton from '@/components/buttons/SubmitButton'
-import SelectField from '@/components/form/SelectField'
 import ComboboxField from '@/components/form/ComboboxField'
 import { useGetAllLeagueQuery } from '@/features/leagueManagement/leagueApi'
 import { useGetAllTeamQuery } from '@/features/teamManagement/teamApi'

@@ -11,6 +11,7 @@ import { useForm } from 'react-hook-form'
 import * as z from 'zod'
 
 import { useCreateTeamMutation, useGetSingleTeamQuery, useUpdateTeamMutation } from '@/features/teamManagement/teamApi'
+import { useAssignTeamManagerMutation, useGetAllManagerTeamQuery } from '@/features/managerTeam/managerTeamApi'
 import { baseURL } from '@/utils/BaseURL'
 import { useRouter, useSearchParams } from 'next/navigation'
 import toast from 'react-hot-toast'
@@ -22,6 +23,7 @@ const addTeamSchema = z.object({
   teamName: z.string().min(1, "Team Name is required"),
   shortName: z.string().min(1, "Short Name is required"),
   teamType: z.string().min(1, "Team Type is required"),
+  manager: z.string().min(1, "Manager is required"),
   stadiumName: z.string().min(1, "Stadium Name is required"),
   city: z.string().min(1, "City is required"),
   country: z.string().min(1, "Country is required"),
@@ -44,13 +46,21 @@ const AddTeam = () => {
 
   const [createTeam, { isLoading: isCreating }] = useCreateTeamMutation()
   const [updateTeam, { isLoading: isUpdating }] = useUpdateTeamMutation()
+  const [assignTeamManager, { isLoading: isAssigning }] = useAssignTeamManagerMutation()
   const { data: teamData, isFetching } = useGetSingleTeamQuery(teamId, { skip: !isEditMode })
+  const { data: managersData } = useGetAllManagerTeamQuery(undefined)
+
+  const managerOptions = (managersData?.data ?? []).map((m: any) => ({
+    label: `${m.firstName} ${m.lastName}`,
+    value: m._id,
+  }))
 
   const {
     register,
     handleSubmit,
     control,
     reset,
+    setValue,
     formState: { errors }
   } = useForm<AddTeamFormValues>({
     resolver: zodResolver(addTeamSchema),
@@ -58,6 +68,7 @@ const AddTeam = () => {
       teamName: "",
       shortName: "",
       teamType: "Football",
+      manager: "",
       stadiumName: "",
       city: "",
       country: "",
@@ -78,6 +89,7 @@ const AddTeam = () => {
         teamName: team.teamName,
         shortName: team.shortName,
         teamType: team.teamType,
+        manager: team.managers?.[0]?.manager?._id || "",
         stadiumName: team.stadiumName,
         city: team.city,
         country: team.country,
@@ -85,6 +97,13 @@ const AddTeam = () => {
       });
     }
   }, [teamData, reset])
+
+  // Re-set manager after options load to ensure Radix Select renders the correct label
+  useEffect(() => {
+    if (isEditMode && teamData?.data && managersData?.data) {
+      setValue("manager", teamData.data.managers?.[0]?.manager?._id || "");
+    }
+  }, [isEditMode, teamData, managersData, setValue])
 
 
   const onSubmit = async (data: AddTeamFormValues) => {
@@ -109,12 +128,14 @@ const AddTeam = () => {
       if (isEditMode) {
         const res = await updateTeam({ id: teamId, data: formData }).unwrap();
         if (res.success) {
+          await assignTeamManager({ manager: data.manager, team: teamId }).unwrap();
           toast.success(res.message || "Team updated successfully");
           router.push("/team-management");
         }
       } else {
         const res = await createTeam(formData).unwrap();
         if (res.success) {
+          await assignTeamManager({ manager: data.manager, team: res.data._id }).unwrap();
           toast.success(res.message || "Team created successfully");
           router.push("/team-management");
         }
@@ -135,7 +156,7 @@ const AddTeam = () => {
         <BackButton />
 
         <div className="">
-          <SubmitButton isSubmitting={isCreating || isUpdating} title={isEditMode ? "Update Team" : "Create Team"} />
+          <SubmitButton isSubmitting={isCreating || isUpdating || isAssigning} title={isEditMode ? "Update Team" : "Create Team"} />
         </div>
       </div>
       <div className='w-full flex gap-4'>
@@ -151,6 +172,7 @@ const AddTeam = () => {
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                 <SelectField name="teamType" label="Team Type" control={control} error={errors.teamType} options={teamTypeOptions} />
+                <SelectField name="manager" label="Manager" placeholder="Select a manager" control={control} error={errors.manager} options={managerOptions} scrollable />
               </div>
             </div>
           </section>

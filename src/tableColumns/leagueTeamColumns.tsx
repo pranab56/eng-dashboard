@@ -5,8 +5,6 @@ import Image from "next/image";
 import { FiEye, FiTrash2 } from "react-icons/fi";
 import { baseURL } from '../utils/BaseURL';
 
-const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || "";
-
 // Row shape: { league: {...}, teams: [...] }
 export const getLeagueTeamColumns = (
   onView: (data: { league: any; teams: any[] }) => void,
