@@ -144,15 +144,14 @@ const CreateVideos = () => {
   if (isFetchingSingle) return <div className="p-10 text-center">Loading video data...</div>
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="w-full max-w-6xl mx-auto py-10 px-6 space-y-8">
+    <form onSubmit={handleSubmit(onSubmit)} className="w-full py-10 px-6 space-y-8">
       <div className='flex items-center justify-between'>
         <BackButton />
-        <SubmitButton isSubmitting={isSubmitting} title={id ? "Update Video" : "Save Video"} />
       </div>
       <div className='w-full flex gap-4 flex-col lg:flex-row'>
-        <div className='basis-full space-y-8'>
+        <div className='basis-full space-y-8 flex w-full items-start justify-between gap-10'>
           {/* Application Identity Card */}
-          <section className="bg-white rounded-xl p-8 md:p-10 border border-gray-50 shadow-xl shadow-gray-200/50">
+          <section className="bg-white rounded-xl p-8 md:p-10 h-full w-8/12 border border-gray-50 shadow-xl shadow-gray-200/50">
             <h2 className="text-2xl font-bold text-gray-900 mb-8">Basic Information</h2>
 
             <div className="space-y-8">
@@ -166,7 +165,7 @@ const CreateVideos = () => {
           </section>
 
           {/* Regional Preferences Card */}
-          <section className="bg-white rounded-xl p-8 md:p-10 border border-gray-50 shadow-xl shadow-gray-200/50 space-y-4">
+          <section className="bg-white rounded-xl p-8 md:p-10 w-4/12 h-full border border-gray-50 shadow-xl shadow-gray-200/50 space-y-4">
             <h2 className="text-2xl font-bold text-gray-900">Thumbnail & Media</h2>
 
             <div className="space-y-6">
@@ -204,6 +203,9 @@ const CreateVideos = () => {
             </div>
           </section>
         </div>
+      </div>
+      <div className='w-full flex justify-end'>
+        <SubmitButton isSubmitting={isSubmitting} title={id ? "Update Video" : "Save Video"} />
       </div>
     </form>
   )

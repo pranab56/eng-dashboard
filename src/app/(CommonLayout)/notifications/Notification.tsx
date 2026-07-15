@@ -7,7 +7,7 @@ import CustomPagination from '@/components/cui/CustomPagination';
 import TableHeader from '@/components/cui/TableHeader';
 import { CustomModal } from '@/components/modals/CustomModal';
 import CustomTable from '@/components/table/CustomTable';
-import { useGetNotificationsQuery } from '@/features/notification/notificationApi';
+import { useGetAllNotificationsQuery, useReadNotificationMutation } from '@/features/notification/notificationApi';
 import { useHeaders } from '@/hooks/useHeaders';
 import { notificationColumns } from '@/tableColumns/notificationColumns';
 import { TNotification } from '@/types/columnTypes';
@@ -21,7 +21,12 @@ const Notification = () => {
   const page = searchParams.get('page') || '1';
 
   const { setHeaders } = useHeaders();
-  const { data: notificationData, isLoading } = useGetNotificationsQuery(page);
+  const { data: notificationData, isLoading } = useGetAllNotificationsQuery(page);
+  const [readNotification] = useReadNotificationMutation();
+
+  useEffect(() => {
+    readNotification(undefined);
+  }, [readNotification]);
 
   useEffect(() => {
     setHeaders({

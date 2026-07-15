@@ -1,6 +1,5 @@
 import { baseApi } from "../../utils/apiBaseQuery";
 
-
 export const notificationApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
     createNotification: builder.mutation({
@@ -12,19 +11,36 @@ export const notificationApi = baseApi.injectEndpoints({
       invalidatesTags: ["notification"]
     }),
 
-    getNotifications: builder.query({
+    getAllNotifications: builder.query({
       query: (page) => ({
-        url: `/push-notification?page=${page}`,
+        url: page ? `/notification?page=${page}` : "/notification",
         method: "GET",
       }),
       providesTags: ["notification"]
     }),
 
+    notificationUnReadCount: builder.query({
+      query: () => ({
+        url: "/notification/unread-count",
+        method: "GET",
+      }),
+      providesTags: ["notification"]
+    }),
+
+    readNotification: builder.mutation({
+      query: () => ({
+        url: "/notification/read-all",
+        method: "PATCH",
+      }),
+      invalidatesTags: ["notification"]
+    }),
   }),
 });
 
 // Export hooks
 export const {
   useCreateNotificationMutation,
-  useGetNotificationsQuery,
+  useGetAllNotificationsQuery,
+  useNotificationUnReadCountQuery,
+  useReadNotificationMutation,
 } = notificationApi;

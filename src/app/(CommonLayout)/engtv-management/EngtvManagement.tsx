@@ -24,6 +24,8 @@ const EngtvManagement = () => {
   const page = searchParams.get('userPage') || '1';
 
   const { data: videoData, isLoading } = useGetAllVideoQuery(page);
+  console.log("video data", videoData)
+
   const [deleteVideo, { isLoading: isDeleting }] = useDeleteVideoMutation();
 
   const [selectedVideo, setSelectedVideo] = useState<TEngtv | null>(null);

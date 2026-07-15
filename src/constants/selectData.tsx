@@ -63,9 +63,12 @@ export const seasonOptions = [
 ];
 
 export const matchTypeOptions = [
-  { label: "Full Match", value: "Full Match" },
-  { label: "Shot Video", value: "Shot Video" },
-  { label: "Highlights", value: "Highlights" },
+  { label: "Goals Of The Week", value: "goals_of_the_week" },
+  { label: "League Highlights", value: "league_highlights" },
+  { label: "Save Of The Week", value: "save_of_the_week" },
+  { label: "Ref Cam", value: "ref_cam" },
+  { label: "Coach Cam", value: "coach_cam" },
+  { label: "Eng SLN Binge", value: "eng_sln_binge" },
 ];
 
 export const publishStatusOptions = [

@@ -210,7 +210,7 @@ export default function ProfilePage() {
               />
               <Button
                 onClick={() => fileInputRef.current?.click()}
-                className="bg-[#1D68D5] hover:bg-[#1A5BBF] text-white rounded-xl px-8 h-11 font-semibold transition-all shadow-md shadow-blue-200"
+                className=" cursor-pointer bg-yellow-600 text-white rounded-xl px-8 h-11 font-semibold transition-all shadow-md shadow-blue-200"
               >
                 Change Avatar
               </Button>
@@ -316,7 +316,7 @@ export default function ProfilePage() {
 
         {/* Info Sidebar */}
         <div className="space-y-6">
-          <Card className="border border-indigo-100 bg-gradient-to-br from-[#1D68D5] to-[#1A5BBF] rounded-2xl overflow-hidden text-white shadow-lg shadow-blue-100">
+          <Card className="border border-indigo-100 bg-yellow-600 rounded-2xl overflow-hidden text-white shadow-lg shadow-blue-100">
             <CardContent className="p-8 space-y-6">
               <div className="inline-flex p-3 bg-white/10 rounded-2xl">
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" /></svg>
@@ -326,7 +326,7 @@ export default function ProfilePage() {
               <div className="pt-2">
                 <Button
                   onClick={handleSubmit}
-                  className="w-full bg-white text-[#1D68D5] cursor-pointer hover:bg-white/90 rounded-xl h-11 font-medium transition-all shadow-sm"
+                  className="w-full bg-white text-black cursor-pointer hover:bg-white/90 rounded-xl h-11 font-medium transition-all shadow-sm"
                 >
                   Save All Changes
                 </Button>
