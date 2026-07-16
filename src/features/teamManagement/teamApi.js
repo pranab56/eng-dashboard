@@ -50,6 +50,23 @@ export const teamApi = baseApi.injectEndpoints({
       invalidatesTags: ["team"]
     }),
 
+    updateBudgetAndEconomay: builder.mutation({
+      query: ({ data }) => ({
+        url: `/coin-budget/club-economy`,
+        method: "POST",
+        body: data,
+      }),
+      invalidatesTags: ["team"]
+    }),
+
+    getBudgetAndEconomay: builder.query({
+      query: () => ({
+        url: `/coin-budget/club-economy`,
+        method: "GET",
+      }),
+      providesTags: ["team"]
+    }),
+
 
   }),
 });
@@ -61,4 +78,6 @@ export const {
   useGetAllTeamQuery,
   useGetSingleTeamQuery,
   useDeleteTeamMutation,
+  useUpdateBudgetAndEconomayMutation,
+  useGetBudgetAndEconomayQuery,
 } = teamApi;

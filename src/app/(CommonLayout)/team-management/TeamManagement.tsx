@@ -1,21 +1,20 @@
-/* eslint-disable react-hooks/exhaustive-deps */
 "use client"
 
 
-import CustomTable from '@/components/table/CustomTable'
-import { useHeaders } from '@/hooks/useHeaders';
-import { useEffect, useState } from 'react';
+import CreateButton from '@/components/buttons/CreateButton';
 import CustomPagination from '@/components/cui/CustomPagination';
 import GeneralStateCard from '@/components/cui/GeneralStateCard';
-import { getTeamColumns } from '@/tableColumns/teamColumns';
+import CustomTable from '@/components/table/CustomTable';
 import TableTitle from '@/components/titles/TableTitle';
-import CreateButton from '@/components/buttons/CreateButton';
-import Link from 'next/link';
 import { useDeleteTeamMutation, useGetAllTeamQuery } from '@/features/teamManagement/teamApi';
+import { useHeaders } from '@/hooks/useHeaders';
+import { getTeamColumns } from '@/tableColumns/teamColumns';
+import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
-import TeamViewModal from './TeamViewModal';
-import DeleteConfirmModal from '../match-management/DeleteConfirmModal';
+import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
+import DeleteConfirmModal from '../match-management/DeleteConfirmModal';
+import TeamViewModal from './TeamViewModal';
 
 
 const TeamManagement = () => {
@@ -23,7 +22,7 @@ const TeamManagement = () => {
   const { setHeaders } = useHeaders();
   const searchParams = useSearchParams();
   const page = searchParams.get("teamPage") || "1";
-  
+
   const { data: teamData, isLoading } = useGetAllTeamQuery(page);
   const [deleteTeam, { isLoading: isDeleting }] = useDeleteTeamMutation();
 
@@ -38,7 +37,7 @@ const TeamManagement = () => {
       title: "Teams",
       des: "Manage and monitor registered squads and team identities."
     })
-  }, [])
+  }, [setHeaders])
 
   const handleView = (team: any) => {
     setSelectedTeam(team);
@@ -76,9 +75,15 @@ const TeamManagement = () => {
 
   return (
     <div className='pt-10 px-8 space-y-4'>
-      <>
-        <GeneralStateCard items={items} className='grid-cols-4' />
-      </>
+      <div className='flex items-end'>
+        <div className='w-full'>
+          <GeneralStateCard items={items} className='grid-cols-4' />
+        </div>
+        <Link href="/team-management/budget_economay" className='w-3/12'>
+          <CreateButton text="Edit Club Budget & Economay" className='py-4' />
+        </Link>
+      </div>
+
       <div className=" bg-white rounded-md py-4 flex flex-col ">
         <div className='flex-1'>
           <div className="flex items-center justify-between px-6 py-1">
@@ -98,15 +103,15 @@ const TeamManagement = () => {
         </div>
       </div>
 
-      <TeamViewModal 
-        isOpen={isViewModalOpen} 
-        onClose={() => setIsViewModalOpen(false)} 
-        team={selectedTeam} 
+      <TeamViewModal
+        isOpen={isViewModalOpen}
+        onClose={() => setIsViewModalOpen(false)}
+        team={selectedTeam}
       />
 
-      <DeleteConfirmModal 
-        isOpen={isDeleteModalOpen} 
-        onClose={() => setIsDeleteModalOpen(false)} 
+      <DeleteConfirmModal
+        isOpen={isDeleteModalOpen}
+        onClose={() => setIsDeleteModalOpen(false)}
         onConfirm={handleConfirmDelete}
         isLoading={isDeleting}
         title="Confirm Team Deletion"

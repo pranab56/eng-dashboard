@@ -11,7 +11,9 @@ import { TPlayer } from '@/types/columnTypes';
 import { useEffect, useState } from 'react';
 
 import { useGetAllPlayerQuery } from '@/features/player/playerApi';
+import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
+import CreateButton from '../../../components/buttons/CreateButton';
 import PlayerViewModal from './PlayerViewModal';
 
 const PlayerManagement = () => {
@@ -57,8 +59,13 @@ const PlayerManagement = () => {
 
   return (
     <div className='pt-10 px-8 space-y-6'>
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-        <GeneralStateCard items={summaryItems} className="col-span-1" />
+      <div className="flex items-end">
+        <div className='w-full'>
+          <GeneralStateCard items={summaryItems} className="grid-cols-4" />
+        </div>
+        <Link href="/player-management/player-economy" className='w-2/12'>
+          <CreateButton text="View Player Economy" className='py-4' />
+        </Link>
       </div>
 
       <div className=" bg-white rounded-xl shadow-sm border border-gray-100 py-4 flex flex-col">

@@ -10,10 +10,32 @@ export const playerApi = baseApi.injectEndpoints({
       }),
       providesTags: ["player"]
     }),
+
+    createPlayerEconomy: builder.mutation({
+      query: (data) => ({
+        url: `/coin-budget/player-economy`,
+        method: "POST",
+        body: data,
+      }),
+      invalidatesTags: ["player"]
+    }),
+
+    getPlayerEconomy: builder.query({
+      query: () => ({
+        url: `/coin-budget/player-economy`,
+        method: "GET",
+      }),
+      providesTags: ["player"]
+    }),
+
+
+
   }),
 });
 
 // Export hooks
 export const {
   useGetAllPlayerQuery,
+  useCreatePlayerEconomyMutation,
+  useGetPlayerEconomyQuery,
 } = playerApi;
