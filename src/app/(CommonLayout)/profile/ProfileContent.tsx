@@ -116,7 +116,6 @@ export default function ProfilePage() {
       toast.error("Please fill in all required fields correctly.");
       return;
     }
-
     const toastId = toast.loading("Processing your request...");
     try {
       const isPasswordChanging = !!(formData.currentPassword && formData.newPassword);
@@ -254,8 +253,10 @@ export default function ProfilePage() {
               </div>
             </CardContent>
           </Card>
-
           {/* Account Security */}
+
+
+
           <Card className="border border-gray-100 shadow-sm bg-white rounded-2xl overflow-hidden">
             <div className="px-8 py-5 border-b border-gray-50 bg-gray-50/50">
               <h2 className="text-lg font-medium text-gray-900">Security & Password</h2>
@@ -271,7 +272,7 @@ export default function ProfilePage() {
                   placeholder="••••••••"
                   className={cn(
                     "h-12 bg-white border border-gray-200 rounded-xl focus-visible:ring-2 focus-visible:ring-[#1D68D5]/20 focus-visible:border-[#1D68D5] px-5 transition-all",
-                    errors.currentPassword && "border-red-500 focus-visible:border-red-500"
+                    errors.currentPassword && "border-red-500 focus-visible:border  -red-500"
                   )}
                 />
                 {errors.currentPassword && <p className="text-xs font-medium text-red-500 mt-1 ml-1">{errors.currentPassword}</p>}

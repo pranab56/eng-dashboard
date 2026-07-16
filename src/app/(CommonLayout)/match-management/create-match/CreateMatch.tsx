@@ -421,10 +421,12 @@ const CreateMatch = () => {
     }
   }
 
+
   if (isEditMode && isFetching) {
     return <div className="flex items-center justify-center min-h-[400px]">Loading match data...</div>
   }
 
+  
   // Filtered lists to prevent same-team selection
   const homeTeamOptions = teamsList.filter(t => t.value !== awayTeam?.value);
   const awayTeamOptions = teamsList.filter(t => t.value !== homeTeam?.value);
@@ -733,9 +735,6 @@ const CreateMatch = () => {
             </section>
           )}
         </div>
-
-        {/* Right Side Schedule */}
-
       </div>
     </form>
   )
