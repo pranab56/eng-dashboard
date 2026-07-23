@@ -2,6 +2,7 @@ import { ColumnDef } from "@tanstack/react-table"
 import { FiEye } from "react-icons/fi";
 import { TPlayer } from "@/types/columnTypes";
 import Image from "next/image";
+import { baseURL } from "@/utils/BaseURL";
 
 export const getPlayerColumns = (onView: (player: TPlayer) => void): ColumnDef<TPlayer>[] => [
   {
@@ -32,7 +33,7 @@ export const getPlayerColumns = (onView: (player: TPlayer) => void): ColumnDef<T
       <div>
         <div className="flex items-center gap-2">
           {row.original.teamLogo && (
-            <Image src={row.original.teamLogo} alt="teamLogo" width={32} height={32} className="w-8 h-8 rounded-full border border-gray-100" />
+            <Image src={baseURL + row.original.teamLogo} alt="teamLogo" width={32} height={32} className="w-8 h-8 rounded-full border border-gray-100" />
           )}
           <span className="font-medium text-gray-700">{row.original.teamName || "N/A"}</span>
           {row.original.shortName && <span className="text-xs text-gray-400">({row.original.shortName})</span>}
@@ -61,4 +62,4 @@ export const getPlayerColumns = (onView: (player: TPlayer) => void): ColumnDef<T
       </div>
     ),
   }
-]
+]
