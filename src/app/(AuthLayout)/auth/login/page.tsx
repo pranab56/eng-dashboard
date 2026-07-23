@@ -70,10 +70,10 @@ const Login = () => {
 
     try {
       const res = await login(payload).unwrap();
-      toast.success(res.message);
+      toast.success(res.message || "Login successful");
       dispatch(setAuthenticated(res.data.accessToken));
       await setAuthCookie(res.data.accessToken);
-      router.push('/');
+      window.location.replace('/');
     } catch (error: any) {
       console.log(error?.data?.message);
       toast.error(error?.data?.message)

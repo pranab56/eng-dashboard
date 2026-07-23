@@ -17,5 +17,5 @@ export const baseApi = createApi({
     },
   }),
   endpoints: () => ({}),
-  tagTypes: ["table", "match", "team", "reword", "profile", "news", "terms", "privacy", "league", "referee", "leagueTeam", "manager-team" , "notification"],
+  tagTypes: ["table", "match", "team", "reword", "profile", "news", "terms", "privacy", "league", "referee", "leagueTeam", "manager-team", "notification", "overview", "player", "transfer", "video", "user", "event", "package"],
 });

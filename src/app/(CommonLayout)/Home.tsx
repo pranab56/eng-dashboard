@@ -9,6 +9,7 @@ import { PiUserCheck, PiUserGear, PiUserPlus, PiUsersThree } from "react-icons/p
 import { RiTeamLine } from "react-icons/ri";
 
 
+import { Loader2 } from 'lucide-react';
 import {
   Bar,
   BarChart,
@@ -22,7 +23,6 @@ import {
   XAxis,
   YAxis
 } from "recharts";
-import { Skeleton } from '../../components/ui/skeleton';
 
 const Home = () => {
   const { setHeaders } = useHeaders();
@@ -35,21 +35,13 @@ const Home = () => {
     })
   }, [setHeaders]);
 
-  if (isLoading) {
-    return (
-      <div className="pt-10 px-8 space-y-10 pb-10">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {[...Array(7)].map((_, i) => (
-            <Skeleton key={i} className="h-32 w-full rounded-2xl bg-gray-100" />
-          ))}
-        </div>
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          <Skeleton className="h-[450px] w-full rounded-2xl bg-gray-100" />
-          <Skeleton className="h-[450px] w-full rounded-2xl bg-gray-100" />
-        </div>
-      </div>
-    );
-  }
+  // if (isLoading) {
+  //   return (
+  //     <div className="flex justify-center items-center h-[calc(100vh-160px)]">
+  //       <Loader2 className="w-10 h-10 animate-spin text-black" />
+  //     </div>
+  //   );
+  // }
 
   const stats = overviewData?.data || {};
 

@@ -71,9 +71,8 @@ function CustomTable<TData>({ data, columns, isLoading }: CustomTableProps<TData
                   colSpan={columns.length}
                   className="h-24 text-center"
                 >
-                  <div className="flex items-center justify-center gap-2">
-                    <Loader className="w-5 h-5 animate-spin" />
-                    <span>Loading...</span>
+                  <div className="flex items-center justify-center">
+                    <Loader className="w-6 h-6 animate-spin text-gray-700" />
                   </div>
                 </TableCell>
               </TableRow>
