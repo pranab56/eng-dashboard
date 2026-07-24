@@ -6,7 +6,7 @@ import CustomPagination from '@/components/cui/CustomPagination';
 import GeneralStateCard from '@/components/cui/GeneralStateCard';
 import CustomTable from '@/components/table/CustomTable';
 import TableTitle from '@/components/titles/TableTitle';
-import { useDeleteTeamMutation, useGetAllTeamQuery } from '@/features/teamManagement/teamApi';
+import { useDeleteTeamMutation, useGetAllTeamQuery, useUpdateTeamCoinBudgetMutation } from '@/features/teamManagement/teamApi';
 import { useHeaders } from '@/hooks/useHeaders';
 import { getTeamColumns } from '@/tableColumns/teamColumns';
 import Link from 'next/link';
@@ -15,6 +15,7 @@ import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 import DeleteConfirmModal from '../match-management/DeleteConfirmModal';
 import TeamViewModal from './TeamViewModal';
+import { UpdateCoinModal } from '@/components/modals/UpdateCoinModal';
 
 
 const TeamManagement = () => {
@@ -25,12 +26,16 @@ const TeamManagement = () => {
 
   const { data: teamData, isLoading } = useGetAllTeamQuery(page);
   const [deleteTeam, { isLoading: isDeleting }] = useDeleteTeamMutation();
+  const [updateTeamCoinBudget, { isLoading: isUpdatingCoin }] = useUpdateTeamCoinBudgetMutation();
 
   const [selectedTeam, setSelectedTeam] = useState<any>(null);
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
 
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [deletingId, setDeletingId] = useState<string | null>(null);
+
+  const [coinTargetTeam, setCoinTargetTeam] = useState<any | null>(null);
+  const [isCoinModalOpen, setIsCoinModalOpen] = useState(false);
 
   useEffect(() => {
     setHeaders({
@@ -47,6 +52,29 @@ const TeamManagement = () => {
   const handleDelete = (id: string) => {
     setDeletingId(id);
     setIsDeleteModalOpen(true);
+  };
+
+  const handleEditCoin = (team: any) => {
+    setCoinTargetTeam(team);
+    setIsCoinModalOpen(true);
+  };
+
+  const handleConfirmUpdateCoin = async (coinValue: number) => {
+    if (!coinTargetTeam?._id) {
+      toast.error("Team ID not found");
+      return;
+    }
+    try {
+      await updateTeamCoinBudget({
+        id: coinTargetTeam._id,
+        data: { coin: coinValue },
+      }).unwrap();
+      toast.success("Team coin updated successfully");
+      setIsCoinModalOpen(false);
+      setCoinTargetTeam(null);
+    } catch (error: any) {
+      toast.error(error?.data?.message || "Failed to update team coin");
+    }
   };
 
   const handleConfirmDelete = async () => {
@@ -95,7 +123,7 @@ const TeamManagement = () => {
             </div>
           </div>
           <div className="pt-4">
-            <CustomTable<any> columns={getTeamColumns(handleView, handleDelete)} data={teamData?.data || []} isLoading={isLoading} />
+            <CustomTable<any> columns={getTeamColumns(handleView, handleDelete, handleEditCoin)} data={teamData?.data || []} isLoading={isLoading} />
           </div>
         </div>
         <div className='pt-8 px-4'>
@@ -116,6 +144,19 @@ const TeamManagement = () => {
         isLoading={isDeleting}
         title="Confirm Team Deletion"
         description="Are you sure you want to delete this team? All associated squad data will be removed."
+      />
+
+      <UpdateCoinModal
+        isOpen={isCoinModalOpen}
+        onClose={() => {
+          setIsCoinModalOpen(false);
+          setCoinTargetTeam(null);
+        }}
+        onConfirm={handleConfirmUpdateCoin}
+        title="Update Team Coin"
+        entityName={coinTargetTeam?.teamName}
+        initialValue={coinTargetTeam?.coin ?? 0}
+        isLoading={isUpdatingCoin}
       />
     </div>
   )

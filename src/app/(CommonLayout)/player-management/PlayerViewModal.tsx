@@ -91,8 +91,10 @@ const PlayerViewModal = ({ player, isOpen, onClose }: PlayerViewModalProps) => {
               <span className="text-gray-900 font-bold text-sm">{player.position || 'N/A'}</span>
             </div>
             <div className="bg-gray-50 border border-gray-100 p-5 rounded-2xl flex flex-col items-center text-center transition-all hover:border-emerald-200 hover:bg-white hover:shadow-xl hover:shadow-emerald-500/5 duration-300">
-              <span className="text-[10px] font-black text-emerald-500 uppercase tracking-[0.2em] mb-2">Goals</span>
-              <span className="text-gray-900 font-bold text-2xl">{player.goals ?? '—'}</span>
+              <span className="text-[10px] font-black text-emerald-500 uppercase tracking-[0.2em] mb-2">ENG Coin</span>
+              <span className="text-gray-900 font-bold text-2xl flex items-center gap-1">
+                🪙 {((player.engCoine ?? player.engCoin ?? player.coin) ?? 0).toLocaleString()}
+              </span>
             </div>
           </div>
 

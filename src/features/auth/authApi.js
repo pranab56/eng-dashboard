@@ -51,6 +51,18 @@ export const authApi = baseApi.injectEndpoints({
       }),
     }),
 
+    refreshToken: builder.mutation({
+      query: (refreshToken) => ({
+        url: "/auth/refresh-token",
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${refreshToken}`,
+          refreshToken: refreshToken,
+        },
+        body: { refreshToken },
+      }),
+    }),
+
   }),
 });
 
@@ -61,4 +73,5 @@ export const {
   useVerifyEmailMutation,
   useResendOTPMutation,
   useResetPasswordMutation,
+  useRefreshTokenMutation,
 } = authApi;

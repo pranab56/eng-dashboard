@@ -29,6 +29,15 @@ export const playerApi = baseApi.injectEndpoints({
     }),
 
 
+    updateEngCoinBudget: builder.mutation({
+      query: ({ id, data }) => ({
+        url: `/user/${id}/economy`,
+        method: "PATCH",
+        body: data,
+      }),
+      invalidatesTags: ["player"]
+    }),
+
 
   }),
 });
@@ -38,4 +47,5 @@ export const {
   useGetAllPlayerQuery,
   useCreatePlayerEconomyMutation,
   useGetPlayerEconomyQuery,
+  useUpdateEngCoinBudgetMutation,
 } = playerApi;

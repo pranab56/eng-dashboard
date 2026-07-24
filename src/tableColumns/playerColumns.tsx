@@ -1,10 +1,13 @@
 import { ColumnDef } from "@tanstack/react-table"
-import { FiEye } from "react-icons/fi";
+import { FiEdit2, FiEye } from "react-icons/fi";
 import { TPlayer } from "@/types/columnTypes";
 import Image from "next/image";
 import { baseURL } from "@/utils/BaseURL";
 
-export const getPlayerColumns = (onView: (player: TPlayer) => void): ColumnDef<TPlayer>[] => [
+export const getPlayerColumns = (
+  onView: (player: TPlayer) => void,
+  onEditCoin?: (player: TPlayer) => void
+): ColumnDef<TPlayer>[] => [
   {
     accessorKey: "name",
     header: () => <div className="">Name</div>,
@@ -47,6 +50,25 @@ export const getPlayerColumns = (onView: (player: TPlayer) => void): ColumnDef<T
     cell: ({ row }) => (
       <div className={`px-2 py-1 rounded-md text-gray-600 font-medium`}>{row.original.position || "Undesignated"}</div>
     ),
+  },
+  {
+    accessorKey: "engCoine",
+    header: () => <div className="">Coin</div>,
+    cell: ({ row }) => {
+      const coinVal = row.original.engCoine ?? row.original.engCoin ?? row.original.coin ?? 0;
+      return (
+        <button
+          type="button"
+          onClick={() => onEditCoin?.(row.original)}
+          className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-amber-50 hover:bg-amber-100 border border-amber-200/80 transition-all cursor-pointer group"
+          title="Click to update coin"
+        >
+          <span className="font-bold text-yellow-500 text-sm group-hover:scale-110 transition-transform">🪙</span>
+          <span className="font-bold text-amber-900 text-sm">{coinVal.toLocaleString()}</span>
+          <FiEdit2 className="w-3.5 h-3.5 text-amber-600 opacity-60 group-hover:opacity-100 transition-opacity ml-0.5" />
+        </button>
+      );
+    },
   },
   {
     id: "action",

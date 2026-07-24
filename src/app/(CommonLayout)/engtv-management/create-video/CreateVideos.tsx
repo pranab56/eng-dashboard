@@ -6,7 +6,12 @@ import InputField from '@/components/form/InputField'
 import SelectField from '@/components/form/SelectField'
 import TextareaField from '@/components/form/TextareaField'
 import { matchTypeOptions, publishStatusOptions } from '@/constants/selectData'
-import { useCreateVideoMutation, useGetSingleVideoQuery, useUpdateVideoMutation } from '@/features/engTVManagement/engApi'
+import {
+  useCreateVideoMutation,
+  useGetSingleVideoQuery,
+  useLazyFrontEndVideoQuery,
+  useUpdateVideoMutation,
+} from '@/features/engTVManagement/engApi'
 import { useHeaders } from '@/hooks/useHeaders'
 import { baseURL } from '@/utils/BaseURL'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -39,6 +44,7 @@ const CreateVideos = () => {
   const router = useRouter()
 
   const { data: singleVideoData, isLoading: isFetchingSingle } = useGetSingleVideoQuery(id, { skip: !id })
+  const [fetchPresignedUrl] = useLazyFrontEndVideoQuery()
   const [createVideo] = useCreateVideoMutation()
   const [updateVideo] = useUpdateVideoMutation()
 
@@ -95,7 +101,7 @@ const CreateVideos = () => {
         pubStatus: video.status, // Matches 'draft' or 'publish'
         pubDate: pubDate,
         pubTime: pubTime,
-        logo: video.thumbnail ? baseURL + video.thumbnail : ''
+        logo: video.thumbnail ? (video.thumbnail.startsWith('http') ? video.thumbnail : baseURL + video.thumbnail) : ''
       })
     }
   }, [singleVideoData, reset])
@@ -106,38 +112,86 @@ const CreateVideos = () => {
       return;
     }
 
-    const formData = new FormData()
+    let finalVideoUrl = singleVideoData?.data?.videoUrl || "";
 
-    const videoPayload = {
+    // 1. If a new video file is selected, handle S3 presigned URL upload
+    if (data.video?.[0] instanceof File) {
+      const videoFile = data.video[0];
+      const toastId = toast.loading("Uploading video file...");
+
+      try {
+        // Step A: Get presigned upload URL from backend
+        const presignedRes = await fetchPresignedUrl({
+          fileName: videoFile.name,
+          contentType: videoFile.type || "video/mp4",
+        }).unwrap();
+
+        const uploadUrl = presignedRes?.data?.uploadUrl;
+        const videoUrl = presignedRes?.data?.videoUrl;
+
+        if (!uploadUrl || !videoUrl) {
+          throw new Error("Failed to generate upload URL");
+        }
+
+        // Step B: Upload file directly to S3 via PUT request
+        const uploadRes = await fetch(uploadUrl, {
+          method: "PUT",
+          headers: {
+            "Content-Type": videoFile.type || "video/mp4",
+          },
+          body: videoFile,
+        });
+
+        if (!uploadRes.ok) {
+          throw new Error(`Video upload to S3 failed (${uploadRes.status})`);
+        }
+
+        finalVideoUrl = videoUrl;
+        toast.success("Video file uploaded successfully", { id: toastId });
+      } catch (err: any) {
+        toast.error(err?.message || "Failed to upload video file", { id: toastId });
+        return;
+      }
+    }
+
+    // Step C: Prepare video JSON payload
+    const videoPayload: Record<string, any> = {
       title: data.videoTitle,
       category: data.category,
       description: data.description,
+      videoUrl: finalVideoUrl,
       status: data.pubStatus,
-      publishDateTime: (data.pubDate && data.pubTime) ? `${data.pubDate}T${data.pubTime}:00.000Z` : null
-    }
+    };
 
-    formData.append('data', JSON.stringify(videoPayload))
-
-
-    if (data.video?.[0]) {
-      formData.append('video', data.video[0])
-    }
-
-    if (data.logo instanceof File) {
-      formData.append('image', data.logo)
+    if (data.pubDate && data.pubTime) {
+      videoPayload.publishDateTime = `${data.pubDate}T${data.pubTime}:00.000Z`;
     }
 
     try {
-      if (id) {
-        await updateVideo({ id, data: formData }).unwrap()
-        toast.success("Video updated successfully")
+      if (data.logo instanceof File) {
+        const formData = new FormData();
+        formData.append("data", JSON.stringify(videoPayload));
+        formData.append("image", data.logo);
+
+        if (id) {
+          await updateVideo({ id, data: formData }).unwrap();
+          toast.success("Video updated successfully");
+        } else {
+          await createVideo(formData).unwrap();
+          toast.success("Video created successfully");
+        }
       } else {
-        await createVideo(formData).unwrap()
-        toast.success("Video created successfully")
+        if (id) {
+          await updateVideo({ id, data: videoPayload }).unwrap();
+          toast.success("Video updated successfully");
+        } else {
+          await createVideo(videoPayload).unwrap();
+          toast.success("Video created successfully");
+        }
       }
-      router.push('/engtv-management')
+      router.push('/engtv-management');
     } catch (error: any) {
-      toast.error(error?.data?.message || "Failed to save video")
+      toast.error(error?.data?.message || "Failed to save video");
     }
   }
 
@@ -174,7 +228,12 @@ const CreateVideos = () => {
                 <div className="w-full bg-black rounded-2xl overflow-hidden aspect-video border border-gray-100 shadow-inner group relative">
                   <video
                     key={localVideoPreview || singleVideoData?.data?.videoUrl}
-                    src={localVideoPreview || (baseURL + singleVideoData?.data?.videoUrl)}
+                    src={
+                      localVideoPreview ||
+                      (singleVideoData?.data?.videoUrl?.startsWith('http')
+                        ? singleVideoData.data.videoUrl
+                        : baseURL + singleVideoData?.data?.videoUrl)
+                    }
                     controls
                     className="w-full h-full object-contain"
                   />

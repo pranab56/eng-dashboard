@@ -3,6 +3,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
 import { getToken } from "./getToken";
+import { getRefreshToken, setAuthCookie } from "../app/actions/auth";
 
 export interface FetchResponse {
   success: boolean;
@@ -17,8 +18,6 @@ export interface FetchResponse {
   error?: string | null;
 }
 
-// export type tagsType = "Admin" | "Entrepreneur" | "Investor" | "User";
-
 type HttpMethod = "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
 
 interface FetchOptions {
@@ -28,6 +27,7 @@ interface FetchOptions {
   token?: string;
   headers?: Record<string, string>;
   cache?: RequestCache;
+  isRetry?: boolean;
 }
 
 export const myFetch = async (
@@ -39,6 +39,7 @@ export const myFetch = async (
     token,
     headers = {},
     cache = "no-cache",
+    isRetry = false,
   }: FetchOptions = {}
 ): Promise<FetchResponse> => {
   const accessToken = token || (await getToken());
@@ -61,6 +62,49 @@ export const myFetch = async (
       ...(tags && { next: { tags } }),
       ...(!(method === "GET") ? { cache: "no-store" } : { cache: cache }),
     });
+
+    // If 401 Unauthorized and not already retrying, try to refresh token
+    if ((response.status === 401 || response.status === 403) && !isRetry && !url.includes("refresh-token")) {
+      const refreshToken = await getRefreshToken();
+      if (refreshToken) {
+        const refreshRes = await fetch(`${process.env.BASE_URL}/auth/refresh-token`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${refreshToken}`,
+            refreshToken: refreshToken,
+          },
+          body: JSON.stringify({ refreshToken }),
+          cache: "no-store",
+        });
+
+        if (refreshRes.ok) {
+          const refreshData = await refreshRes.json();
+          const newAccessToken =
+            refreshData?.data?.accessToken ||
+            refreshData?.data?.token ||
+            refreshData?.accessToken ||
+            refreshData?.token;
+          const newRefreshToken =
+            refreshData?.data?.refreshToken ||
+            refreshData?.refreshToken ||
+            refreshToken;
+
+          if (newAccessToken) {
+            await setAuthCookie(newAccessToken, newRefreshToken);
+            return myFetch(url, {
+              method,
+              body,
+              tags,
+              token: newAccessToken,
+              headers,
+              cache,
+              isRetry: true,
+            });
+          }
+        }
+      }
+    }
 
     const data = await response.json();
 

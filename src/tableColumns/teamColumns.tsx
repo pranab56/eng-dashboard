@@ -1,10 +1,14 @@
 import { ColumnDef } from "@tanstack/react-table";
 import Image from "next/image";
 import Link from "next/link";
-import { FiEdit, FiEye, FiTrash2 } from "react-icons/fi";
+import { FiEdit, FiEdit2, FiEye, FiTrash2 } from "react-icons/fi";
 import { baseURL } from '../utils/BaseURL';
 
-export const getTeamColumns = (onView: (team: any) => void, onDelete: (id: string) => void): ColumnDef<any>[] => [
+export const getTeamColumns = (
+  onView: (team: any) => void,
+  onDelete: (id: string) => void,
+  onEditCoin?: (team: any) => void
+): ColumnDef<any>[] => [
   {
     accessorKey: "teamName",
     header: () => <div className="">Team Identity</div>,
@@ -69,10 +73,16 @@ export const getTeamColumns = (onView: (team: any) => void, onDelete: (id: strin
     accessorKey: "coin",
     header: () => <div className="">Coin</div>,
     cell: ({ row }) => (
-      <div className="flex items-center gap-1">
-        <span className="font-bold text-yellow-500">🪙</span>
-        <span className="font-semibold text-gray-700">{(row.original.coin ?? 0).toLocaleString()}</span>
-      </div>
+      <button
+        type="button"
+        onClick={() => onEditCoin?.(row.original)}
+        className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-amber-50 hover:bg-amber-100 border border-amber-200/80 transition-all cursor-pointer group"
+        title="Click to update coin"
+      >
+        <span className="font-bold text-yellow-500 text-sm group-hover:scale-110 transition-transform">🪙</span>
+        <span className="font-bold text-amber-900 text-sm">{(row.original.coin ?? 0).toLocaleString()}</span>
+        <FiEdit2 className="w-3.5 h-3.5 text-amber-600 opacity-60 group-hover:opacity-100 transition-opacity ml-0.5" />
+      </button>
     ),
   },
   {

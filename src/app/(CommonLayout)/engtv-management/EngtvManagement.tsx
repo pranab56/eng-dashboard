@@ -120,7 +120,22 @@ const EngtvManagement = () => {
           <div className="space-y-4 pb-4">
             <div className="aspect-video bg-black rounded-lg overflow-hidden">
               {selectedVideo.videoUrl && (
-                <video src={baseURL + selectedVideo.videoUrl} controls className="w-full h-full" />
+                <video
+                  src={
+                    selectedVideo.videoUrl.startsWith('http')
+                      ? selectedVideo.videoUrl
+                      : baseURL + selectedVideo.videoUrl
+                  }
+                  poster={
+                    selectedVideo.thumbnail
+                      ? selectedVideo.thumbnail.startsWith('http')
+                        ? selectedVideo.thumbnail
+                        : baseURL + selectedVideo.thumbnail
+                      : undefined
+                  }
+                  controls
+                  className="w-full h-full object-contain"
+                />
               )}
             </div>
             <div className="flex justify-between items-start">

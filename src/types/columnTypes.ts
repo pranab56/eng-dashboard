@@ -52,6 +52,7 @@ export type TTeam = {
 }
 
 export type TPlayer = {
+  _id?: string;
   firstName: string;
   lastName: string;
   profile: string | null;
@@ -59,7 +60,11 @@ export type TPlayer = {
   teamName: string | null;
   shortName: string | null;
   teamLogo: string | null;
-  goals?: number; // keeping goals as optional if it's still needed somewhere
+  engCoine?: number;
+  engCoin?: number;
+  coin?: number;
+  marketValue?: number;
+  goals?: number;
 }
 
 export type TTransfer = {

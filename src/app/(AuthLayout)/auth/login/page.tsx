@@ -71,8 +71,10 @@ const Login = () => {
     try {
       const res = await login(payload).unwrap();
       toast.success(res.message || "Login successful");
-      dispatch(setAuthenticated(res.data.accessToken));
-      await setAuthCookie(res.data.accessToken);
+      const accessToken = res?.data?.accessToken;
+      const refreshToken = res?.data?.refreshToken;
+      dispatch(setAuthenticated({ accessToken, refreshToken }));
+      await setAuthCookie(accessToken, refreshToken);
       window.location.replace('/');
     } catch (error: any) {
       console.log(error?.data?.message);

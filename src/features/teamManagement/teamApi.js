@@ -68,6 +68,16 @@ export const teamApi = baseApi.injectEndpoints({
     }),
 
 
+    updateTeamCoinBudget: builder.mutation({
+      query: ({ id, data }) => ({
+        url: `/team/${id}/economy`,
+        method: "PATCH",
+        body: data,
+      }),
+      invalidatesTags: ["team"]
+    }),
+
+
   }),
 });
 
@@ -80,4 +90,5 @@ export const {
   useDeleteTeamMutation,
   useUpdateBudgetAndEconomayMutation,
   useGetBudgetAndEconomayQuery,
+  useUpdateTeamCoinBudgetMutation,
 } = teamApi;

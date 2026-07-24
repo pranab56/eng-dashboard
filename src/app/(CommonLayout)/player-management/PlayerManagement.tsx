@@ -10,11 +10,13 @@ import { getPlayerColumns } from '@/tableColumns/playerColumns';
 import { TPlayer } from '@/types/columnTypes';
 import { useEffect, useState } from 'react';
 
-import { useGetAllPlayerQuery } from '@/features/player/playerApi';
+import { useGetAllPlayerQuery, useUpdateEngCoinBudgetMutation } from '@/features/player/playerApi';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
+import { toast } from 'sonner';
 import CreateButton from '../../../components/buttons/CreateButton';
 import PlayerViewModal from './PlayerViewModal';
+import { UpdateCoinModal } from '@/components/modals/UpdateCoinModal';
 
 const PlayerManagement = () => {
   const { setHeaders } = useHeaders();
@@ -24,9 +26,13 @@ const PlayerManagement = () => {
   const { data: playerData, isLoading } = useGetAllPlayerQuery({
     pageNumber: Number(pageNumber)
   });
+  const [updateEngCoinBudget, { isLoading: isUpdatingCoin }] = useUpdateEngCoinBudgetMutation();
 
   const [selectedPlayer, setSelectedPlayer] = useState<TPlayer | null>(null);
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
+
+  const [coinTargetPlayer, setCoinTargetPlayer] = useState<TPlayer | null>(null);
+  const [isCoinModalOpen, setIsCoinModalOpen] = useState(false);
 
   useEffect(() => {
     setHeaders({
@@ -38,6 +44,29 @@ const PlayerManagement = () => {
   const handleView = (player: TPlayer) => {
     setSelectedPlayer(player);
     setIsViewModalOpen(true);
+  };
+
+  const handleEditCoin = (player: TPlayer) => {
+    setCoinTargetPlayer(player);
+    setIsCoinModalOpen(true);
+  };
+
+  const handleConfirmUpdateCoin = async (coinValue: number) => {
+    if (!coinTargetPlayer?._id) {
+      toast.error("Player ID not found");
+      return;
+    }
+    try {
+      await updateEngCoinBudget({
+        id: coinTargetPlayer._id,
+        data: { engCoine: coinValue },
+      }).unwrap();
+      toast.success("Player coin updated successfully");
+      setIsCoinModalOpen(false);
+      setCoinTargetPlayer(null);
+    } catch (error: any) {
+      toast.error(error?.data?.message || "Failed to update player coin");
+    }
   };
 
   const tableHeaderPayload = {
@@ -75,7 +104,7 @@ const PlayerManagement = () => {
           </>
           <div className="pt-4">
             <CustomTable<TPlayer>
-              columns={getPlayerColumns(handleView)}
+              columns={getPlayerColumns(handleView, handleEditCoin)}
               data={players}
               isLoading={isLoading}
             />
@@ -93,6 +122,19 @@ const PlayerManagement = () => {
         isOpen={isViewModalOpen}
         onClose={() => setIsViewModalOpen(false)}
         player={selectedPlayer}
+      />
+
+      <UpdateCoinModal
+        isOpen={isCoinModalOpen}
+        onClose={() => {
+          setIsCoinModalOpen(false);
+          setCoinTargetPlayer(null);
+        }}
+        onConfirm={handleConfirmUpdateCoin}
+        title="Update Player ENG Coin"
+        entityName={coinTargetPlayer ? `${coinTargetPlayer.firstName} ${coinTargetPlayer.lastName}` : undefined}
+        initialValue={coinTargetPlayer?.engCoine ?? coinTargetPlayer?.engCoin ?? coinTargetPlayer?.coin ?? 0}
+        isLoading={isUpdatingCoin}
       />
     </div>
   )

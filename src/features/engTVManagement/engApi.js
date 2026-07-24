@@ -47,6 +47,27 @@ export const engApi = baseApi.injectEndpoints({
       invalidatesTags: ["video"]
     }),
 
+    frontEndVideo: builder.query({
+      query: (params) => {
+        const fileName = params?.fileName || "";
+        const contentType = params?.contentType || "";
+        return {
+          url: `/video/presigned-url?fileName=${encodeURIComponent(fileName)}&contentType=${encodeURIComponent(contentType)}`,
+          method: "GET",
+        };
+      },
+      providesTags: ["video"]
+    }),
+
+    updateVideoFile: builder.mutation({
+      query: ({ data, url, contentType }) => ({
+        url: `${url}`,
+        method: "PUT",
+        headers: contentType ? { "Content-Type": contentType } : {},
+        body: data,
+      }),
+      invalidatesTags: ["video"]
+    }),
 
   }),
 });
@@ -58,4 +79,7 @@ export const {
   useGetAllVideoQuery,
   useGetSingleVideoQuery,
   useDeleteVideoMutation,
+  useFrontEndVideoQuery,
+  useLazyFrontEndVideoQuery,
+  useUpdateVideoFileMutation,
 } = engApi;

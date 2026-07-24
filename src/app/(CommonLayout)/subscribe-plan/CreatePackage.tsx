@@ -95,7 +95,7 @@ const CreatePackage = ({ initialData, onSuccess }: CreatePackageProps) => {
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 py-4">
       <InputField name="title" title="Plan Title" placeholder="e.g. Premium Plan" register={register} error={errors.title} />
       <InputField name="description" title="Description" placeholder="Best subscription package" register={register} error={errors.description} />
-      
+
       <div className="grid grid-cols-2 gap-4">
         <SelectField name="userType" label="User Type" control={control} options={userTypeOptions} error={errors.userType} />
         <SelectField name="paymentType" label="Payment Type" control={control} options={paymentTypeOptions} error={errors.paymentType} />
@@ -107,7 +107,7 @@ const CreatePackage = ({ initialData, onSuccess }: CreatePackageProps) => {
       </div>
 
       <div className="grid grid-cols-2 gap-4">
-        <InputField name="credit" title="Credits" type="number" register={register} error={errors.credit} registerOptions={{ valueAsNumber: true }} />
+        <InputField name="credit" title="Eng Coins" type="number" register={register} error={errors.credit} registerOptions={{ valueAsNumber: true }} />
         <InputField name="loginLimit" title="Login Limit" type="number" register={register} error={errors.loginLimit} registerOptions={{ valueAsNumber: true }} />
       </div>
 

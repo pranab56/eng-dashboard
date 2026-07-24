@@ -38,6 +38,7 @@ const LogoutConfirmModal = ({
             <div className="space-y-2">
               <DialogTitle className="text-2xl font-bold text-gray-900 leading-tight">
                 Confirm Logout
+
               </DialogTitle>
               <DialogDescription className="text-gray-500 text-sm leading-relaxed px-4">
                 Are you sure you want to log out of your account?
