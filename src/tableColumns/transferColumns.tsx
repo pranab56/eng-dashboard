@@ -3,7 +3,7 @@ import { TTransfer } from "@/types/columnTypes";
 import Image from "next/image";
 import { IoIosCheckboxOutline } from "react-icons/io";
 import { MdCancelPresentation } from "react-icons/md";
-import { baseURL } from "@/utils/BaseURL";
+import { formatImagePath } from "@/utils/formatImagePath";
 import { cn } from "@/lib/utils";
 
 interface TransferColumnsProps {
@@ -18,7 +18,7 @@ export const getTransferColumns = ({ onApprove, onReject }: TransferColumnsProps
     cell: ({ row }) => (
       <div className="flex gap-2">
         <Image 
-          src={row.original.playerProfile.startsWith('http') ? row.original.playerProfile : `${baseURL}${row.original.playerProfile}`} 
+          src={formatImagePath(row.original.playerProfile)} 
           alt="player" 
           width={40} 
           height={40} 

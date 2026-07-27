@@ -3,7 +3,7 @@ import dayjs from "dayjs";
 import Image from "next/image";
 import Link from "next/link";
 import { FiEdit, FiEye, FiTrash2 } from "react-icons/fi";
-import { baseURL } from '../utils/BaseURL';
+import { formatImagePath } from '../utils/formatImagePath';
 
 const statusStyle = (status: string): string => {
   switch (status?.toLowerCase()) {
@@ -29,12 +29,12 @@ export const getMatchColumns = (onView: (match: any) => void, onDelete: (id: str
           <div className="flex gap-2">
             <div className="flex items-center">
               {match.homeTeam?.teamLogo ? (
-                <Image src={baseURL + match.homeTeam.teamLogo} alt="home" width={100} height={100} className="w-10 h-10 rounded-full border-2 border-white object-cover" />
+                <Image src={formatImagePath(match.homeTeam.teamLogo)} alt="home" width={100} height={100} className="w-10 h-10 rounded-full border-2 border-white object-cover" />
               ) : (
                 <div className="w-10 h-10 rounded-full border-2 border-white bg-gray-200 flex items-center justify-center text-[10px]">Home</div>
               )}
               {match.awayTeam?.teamLogo ? (
-                <Image src={baseURL + match.awayTeam.teamLogo} alt="away" width={100} height={100} className="w-10 h-10 rounded-full relative -left-3 border-2 border-white object-cover" />
+                <Image src={formatImagePath(match.awayTeam.teamLogo)} alt="away" width={100} height={100} className="w-10 h-10 rounded-full relative -left-3 border-2 border-white object-cover" />
               ) : (
                 <div className="w-10 h-10 rounded-full relative -left-3 border-2 border-white bg-gray-200 flex items-center justify-center text-[10px]">Away</div>
               )}

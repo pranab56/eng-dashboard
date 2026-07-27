@@ -3,7 +3,7 @@ import dayjs from "dayjs";
 import { Trophy } from "lucide-react";
 import Image from "next/image";
 import { FiEye, FiTrash2 } from "react-icons/fi";
-import { baseURL } from '../utils/BaseURL';
+import { formatImagePath } from '../utils/formatImagePath';
 
 // Row shape: { league: {...}, teams: [...] }
 export const getLeagueTeamColumns = (
@@ -53,7 +53,7 @@ export const getLeagueTeamColumns = (
                 >
                   {team.teamLogo ? (
                     <Image
-                      src={baseURL + team.teamLogo}
+                      src={formatImagePath(team.teamLogo)}
                       alt={team.teamName || "team"}
                       width={32}
                       height={32}

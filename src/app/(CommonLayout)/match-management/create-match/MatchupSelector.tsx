@@ -1,6 +1,6 @@
 import { ChevronDown } from 'lucide-react';
 import Image from 'next/image';
-import { baseURL } from '../../../../utils/BaseURL';
+import { formatImagePath } from '../../../../utils/formatImagePath';
 import { Team } from './CreateMatch';
 
 // Sub-component for the Individual Team Selection
@@ -23,7 +23,7 @@ export const TeamCard = ({
       <div className="bg-white p-2 rounded-3xl shadow-sm mb-8 w-40 h-40 flex items-center justify-center relative overflow-hidden">
         {selectedTeam?.logo ? (
           <Image
-            src={baseURL + selectedTeam.logo}
+            src={formatImagePath(selectedTeam.logo)}
             alt={selectedTeam.name}
             width={120}
             height={120}

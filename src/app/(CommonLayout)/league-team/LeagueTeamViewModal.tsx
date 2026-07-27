@@ -8,7 +8,7 @@ import {
 import dayjs from "dayjs";
 import { Calendar, Globe, MapPin, Shield, Trash2, Trophy } from "lucide-react";
 import Image from "next/image";
-import { baseURL } from '../../../utils/BaseURL';
+import { formatImagePath } from '../../../utils/formatImagePath';
 
 interface LeagueTeamViewModalProps {
   data: { league: any; teams: any[] } | null;
@@ -101,7 +101,7 @@ const LeagueTeamViewModal = ({
                   <div className="w-12 h-12 rounded-xl bg-white border border-gray-100 shadow-sm flex items-center justify-center flex-shrink-0 overflow-hidden">
                     {team.teamLogo ? (
                       <Image
-                        src={baseURL + team.teamLogo}
+                        src={formatImagePath(team.teamLogo)}
                         alt={team.teamName || "team"}
                         width={44}
                         height={44}

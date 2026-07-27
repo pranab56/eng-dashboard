@@ -5,7 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { FiEdit, FiEye } from "react-icons/fi";
 import { HiOutlineTrash } from "react-icons/hi";
-import { baseURL } from '../utils/BaseURL';
+import { formatImagePath } from '../utils/formatImagePath';
 
 const statusStyle = (status: string): string => {
   switch (status?.toLowerCase()) {
@@ -25,7 +25,7 @@ export const getEngtvColumns = (onView: (video: TEngtv) => void, onDelete: (id: 
     cell: ({ row }) => (
       <div className="flex gap-2">
         {row.original.thumbnail ? (
-          <Image src={baseURL + row.original.thumbnail} alt="thumbnail" width={40} height={40} className="w-10 h-10 rounded-md border border-gray-200 object-cover" />
+          <Image src={formatImagePath(row.original.thumbnail)} alt="thumbnail" width={40} height={40} className="w-10 h-10 rounded-md border border-gray-200 object-cover" />
         ) : (
           <div className="w-10 h-10 rounded-md bg-gray-200 flex items-center justify-center text-[10px]">No Image</div>
         )}

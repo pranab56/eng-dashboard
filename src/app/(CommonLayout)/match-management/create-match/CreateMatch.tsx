@@ -7,6 +7,7 @@ import SelectField from '@/components/form/SelectField'
 import { useCreateMatchMutation, useGetSingleMatchQuery, useUpdateMatchMutation } from '@/features/match/matchApi'
 import { useGetRefereeQuery } from '@/features/referee/refereeApi'
 import { useHeaders } from '@/hooks/useHeaders'
+import { formatImagePath } from '@/utils/formatImagePath'
 import { zodResolver } from '@hookform/resolvers/zod'
 import dayjs from 'dayjs'
 import { Calendar, Clock, Loader2, MapPin, Pencil, Trash2 } from 'lucide-react'
@@ -91,6 +92,7 @@ const CreateMatch = () => {
 
   const [tempMatches, setTempMatches] = useState<TempMatch[]>([]);
   const [editingTempId, setEditingTempId] = useState<string | null>(null);
+  const [isHydrated, setIsHydrated] = useState(false);
 
   // Load from localStorage on mount
   useEffect(() => {
@@ -98,20 +100,37 @@ const CreateMatch = () => {
       const stored = localStorage.getItem("temp_matches");
       if (stored) {
         try {
-          setTempMatches(JSON.parse(stored));
+          const parsed = JSON.parse(stored);
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            setTempMatches(parsed);
+            const lastMatch = parsed[parsed.length - 1];
+            if (lastMatch?.display && !isEditMode) {
+              reset({
+                venue: lastMatch.display.venue || "",
+                pitch: lastMatch.display.pitch || "",
+                league: lastMatch.payload.league || "",
+                referee: lastMatch.payload.referee || "",
+                durationMinutes: lastMatch.display.durationMinutes || "90 Minutes",
+                date: lastMatch.display.date || "",
+                time: lastMatch.display.time || "",
+              });
+            }
+          }
         } catch (e) {
           console.error("Failed to parse stored matches", e);
         }
       }
+      setIsHydrated(true);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Save to localStorage when tempMatches changes
+  // Save to localStorage only after hydration to avoid overwriting on mount
   useEffect(() => {
-    if (typeof window !== "undefined") {
+    if (isHydrated && typeof window !== "undefined") {
       localStorage.setItem("temp_matches", JSON.stringify(tempMatches));
     }
-  }, [tempMatches]);
+  }, [tempMatches, isHydrated]);
 
   const [createMatch, { isLoading: isCreating }] = useCreateMatchMutation();
   const [updateMatch, { isLoading: isUpdating }] = useUpdateMatchMutation();
@@ -252,6 +271,17 @@ const CreateMatch = () => {
 
 
   const handleCancelOrReset = () => {
+    setHomeTeam(null);
+    setAwayTeam(null);
+    if (editingTempId) {
+      setEditingTempId(null);
+      toast.info("Edit cancelled");
+    } else {
+      toast.info("Team selections cleared");
+    }
+  };
+
+  const handleFullReset = () => {
     reset({
       venue: "",
       pitch: "",
@@ -265,8 +295,8 @@ const CreateMatch = () => {
     setAwayTeam(null);
     if (editingTempId) {
       setEditingTempId(null);
-      toast.info("Edit cancelled");
     }
+    toast.info("All form fields cleared");
   };
 
   const handleEditTempMatch = (match: TempMatch) => {
@@ -302,15 +332,6 @@ const CreateMatch = () => {
     setTempMatches(prev => prev.filter(m => m.id !== id));
     if (editingTempId === id) {
       setEditingTempId(null);
-      reset({
-        venue: "",
-        pitch: "",
-        league: "",
-        referee: "",
-        durationMinutes: "90 Minutes",
-        date: "",
-        time: "",
-      });
       setHomeTeam(null);
       setAwayTeam(null);
     }
@@ -374,9 +395,9 @@ const CreateMatch = () => {
         const display = {
           leagueName: leagueLabel,
           homeTeamName: homeTeam.name,
-          homeTeamLogo: homeTeam.logo,
+          homeTeamLogo: formatImagePath(homeTeam.logo),
           awayTeamName: awayTeam.name,
-          awayTeamLogo: awayTeam.logo,
+          awayTeamLogo: formatImagePath(awayTeam.logo),
           refereeName: refereeLabel,
           date: formData.date,
           time: formData.time,
@@ -400,18 +421,18 @@ const CreateMatch = () => {
             display
           };
           setTempMatches(prev => [...prev, newMatch]);
-          toast.success("Match added to queue");
+          toast.success("Match added to queue (common settings retained for next match)");
         }
 
-        // Reset form fields
+        // Retain common match form parameters and reset only team selections for the next match
         reset({
-          venue: "",
-          pitch: "",
-          league: "",
-          referee: "",
-          durationMinutes: "90 Minutes",
-          date: "",
-          time: "",
+          venue: formData.venue,
+          pitch: formData.pitch,
+          league: formData.league,
+          referee: formData.referee,
+          durationMinutes: formData.durationMinutes,
+          date: formData.date,
+          time: formData.time,
         });
         setHomeTeam(null);
         setAwayTeam(null);
@@ -569,21 +590,37 @@ const CreateMatch = () => {
           </section>
 
           {/* Form Actions */}
-          <div className="bg-white rounded-xl p-5 border border-gray-50 shadow-lg shadow-gray-200/30 flex items-center justify-end space-x-5">
-            <CancelButton onClick={handleCancelOrReset} title={editingTempId ? "Cancel Edit" : "Reset"} />
-            <SubmitButton
-              isSubmitting={isEditMode ? isUpdating : false}
-              title={isEditMode ? "Update Match" : editingTempId ? "Update Match" : "Add Match"}
-            />
+          <div className="bg-white rounded-xl p-5 border border-gray-50 shadow-lg shadow-gray-200/30 flex items-center justify-between">
+            <button
+              type="button"
+              onClick={handleFullReset}
+              className="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-semibold rounded-lg transition-colors cursor-pointer"
+            >
+              Reset All Fields
+            </button>
+            <div className="flex items-center space-x-4">
+              <CancelButton onClick={handleCancelOrReset} title={editingTempId ? "Cancel Edit" : "Clear Teams"} />
+              <SubmitButton
+                isSubmitting={isEditMode ? isUpdating : false}
+                title={isEditMode ? "Update Match" : editingTempId ? "Update Match" : "Add Match to Queue"}
+              />
+            </div>
           </div>
 
           {/* Scheduled Matches Queue Card */}
           {!isEditMode && tempMatches.length > 0 && (
             <section className="bg-white rounded-xl p-8 md:p-10 border border-gray-50 shadow-xl shadow-gray-200/50 space-y-6">
               <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-gray-100">
-                <div>
-                  <h2 className="text-2xl font-bold text-gray-900">Matches Queue</h2>
-                  <p className="text-sm text-gray-400">These matchups will be created together when you submit.</p>
+                <div className="flex items-center space-x-3">
+                  <div>
+                    <h2 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
+                      <span>Matches Queue</span>
+                      <span className="px-2.5 py-0.5 text-xs bg-black text-white rounded-full font-bold">
+                        {tempMatches.length}
+                      </span>
+                    </h2>
+                    <p className="text-sm text-gray-400">These matchups will be created together when you submit.</p>
+                  </div>
                 </div>
                 <div className="flex items-center space-x-3">
                   <button
@@ -637,7 +674,7 @@ const CreateMatch = () => {
                             <div className="flex items-center space-x-2">
                               {match.display.homeTeamLogo ? (
                                 <img
-                                  src={match.display.homeTeamLogo}
+                                  src={formatImagePath(match.display.homeTeamLogo)}
                                   alt={match.display.homeTeamName}
                                   className="w-7 h-7 object-contain rounded"
                                 />
@@ -653,7 +690,7 @@ const CreateMatch = () => {
                             <div className="flex items-center space-x-2">
                               {match.display.awayTeamLogo ? (
                                 <img
-                                  src={match.display.awayTeamLogo}
+                                  src={formatImagePath(match.display.awayTeamLogo)}
                                   alt={match.display.awayTeamName}
                                   className="w-7 h-7 object-contain rounded"
                                 />

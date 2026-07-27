@@ -66,22 +66,21 @@ function CustomTable<TData>({ data, columns, isLoading }: CustomTableProps<TData
           </TableHeader>
           <TableBody className="">
             {isLoading ? (
-              <TableRow>
-                <TableCell
-                  colSpan={columns.length}
-                  className="h-24 text-center"
-                >
-                  <div className="flex items-center justify-center">
-                    <Loader className="w-6 h-6 animate-spin text-gray-700" />
-                  </div>
-                </TableCell>
-              </TableRow>
+              Array.from({ length: 5 }).map((_, index) => (
+                <TableRow key={index} className="animate-pulse bg-white">
+                  {columns.map((_, colIndex) => (
+                    <TableCell key={colIndex} className="py-4">
+                      <div className="h-4 bg-gray-100 rounded-md w-3/4"></div>
+                    </TableCell>
+                  ))}
+                </TableRow>
+              ))
             ) : table.getRowModel().rows?.length ? (
               table.getRowModel().rows.map((row) => (
                 <TableRow
                   key={row.id}
                   data-state={row.getIsSelected() && "selected"}
-                  className="bg-white hover:bg-[#fefaeb] text-gray-800"
+                  className="bg-white hover:bg-[#fefaeb] text-gray-800 transition-colors duration-150"
                 >
                   {row.getVisibleCells().map((cell) => (
                     <TableCell key={cell.id} className="">
@@ -97,9 +96,17 @@ function CustomTable<TData>({ data, columns, isLoading }: CustomTableProps<TData
               <TableRow>
                 <TableCell
                   colSpan={columns.length}
-                  className="h-24 text-center"
+                  className="h-48 text-center"
                 >
-                  No results.
+                  <div className="flex flex-col items-center justify-center space-y-3 py-6">
+                    <div className="w-12 h-12 rounded-full bg-gray-50 flex items-center justify-center border border-gray-100 shadow-sm">
+                      <span className="text-xl">📊</span>
+                    </div>
+                    <div className="space-y-1">
+                      <p className="text-sm font-bold text-gray-800">No records found</p>
+                      <p className="text-xs text-gray-400">There are no items to display right now.</p>
+                    </div>
+                  </div>
                 </TableCell>
               </TableRow>
             )}

@@ -3,7 +3,7 @@ import dayjs from "dayjs";
 import Image from "next/image";
 import Link from "next/link";
 import { FiEdit, FiEye, FiTrash2 } from "react-icons/fi";
-import { baseURL } from '../utils/BaseURL';
+import { formatImagePath } from '../utils/formatImagePath';
 
 export const getEventColumns = (onView: (event: any) => void, onDelete: (id: string) => void): ColumnDef<any>[] => [
   {
@@ -12,7 +12,7 @@ export const getEventColumns = (onView: (event: any) => void, onDelete: (id: str
     cell: ({ row }) => (
       <div className="flex items-center gap-3">
         {row.original.image ? (
-          <Image src={baseURL + row.original.image} alt="event cover" width={100} height={100} className="w-12 h-12 rounded-xl border border-gray-100 object-cover" />
+          <Image src={formatImagePath(row.original.image)} alt="event cover" width={100} height={100} className="w-12 h-12 rounded-xl border border-gray-100 object-cover" />
         ) : (
           <div className="w-12 h-12 rounded-xl bg-gray-50 border border-gray-100 flex items-center justify-center text-[10px] font-black text-gray-300">VOID</div>
         )}

@@ -7,7 +7,7 @@ import {
 } from "@/components/ui/dialog";
 import dayjs from 'dayjs';
 import Image from 'next/image';
-import { baseURL } from '../../../utils/BaseURL';
+import { formatImagePath } from '../../../utils/formatImagePath';
 
 interface MatchViewModalProps {
   match: any;
@@ -37,7 +37,7 @@ const MatchViewModal = ({ match, isOpen, onClose }: MatchViewModalProps) => {
             <div className="flex flex-col items-center flex-1 text-center">
               <div className="w-24 h-24 bg-white rounded-3xl shadow-sm p-4 flex items-center justify-center mb-4 transition-transform hover:scale-105 duration-300">
                 {match.homeTeam?.teamLogo ? (
-                  <Image src={baseURL + match.homeTeam.teamLogo} alt="home" width={100} height={100} className="object-contain" />
+                  <Image src={formatImagePath(match.homeTeam.teamLogo)} alt="home" width={100} height={100} className="object-contain" />
                 ) : (
                   <div className="text-gray-300 text-xs text-center">No Logo</div>
                 )}
@@ -61,7 +61,7 @@ const MatchViewModal = ({ match, isOpen, onClose }: MatchViewModalProps) => {
             <div className="flex flex-col items-center flex-1 text-center">
               <div className="w-24 h-24 bg-white rounded-3xl shadow-sm p-4 flex items-center justify-center mb-4 transition-transform hover:scale-105 duration-300">
                 {match.awayTeam?.teamLogo ? (
-                  <Image src={baseURL + match.awayTeam.teamLogo} alt="away" width={100} height={100} className="object-contain" />
+                  <Image src={formatImagePath(match.awayTeam.teamLogo)} alt="away" width={100} height={100} className="object-contain" />
                 ) : (
                   <div className="text-gray-300 text-xs text-center">No Logo</div>
                 )}

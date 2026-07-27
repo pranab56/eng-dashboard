@@ -1,6 +1,6 @@
 import { ColumnDef } from "@tanstack/react-table";
 import Image from "next/image";
-import { baseURL } from '../utils/BaseURL';
+import { formatImagePath } from '../utils/formatImagePath';
 
 export const tableColumns: ColumnDef<any>[] = [
   {
@@ -18,7 +18,7 @@ export const tableColumns: ColumnDef<any>[] = [
       return (
         <div className="flex items-center gap-2">
           {team?.teamLogo ? (
-            <Image src={baseURL + team.teamLogo} alt="logo" width={100} height={100} className="w-10 h-10 rounded-full border border-gray-100 object-cover" />
+            <Image src={formatImagePath(team.teamLogo)} alt="logo" width={100} height={100} className="w-10 h-10 rounded-full border border-gray-100 object-cover" />
           ) : (
             <div className="w-10 h-10 rounded-full bg-gray-200 border border-gray-100 flex items-center justify-center text-[10px]">No Logo</div>
           )}
