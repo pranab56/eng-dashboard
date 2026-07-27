@@ -40,9 +40,8 @@ function CustomTable<TData>({ data, columns, isLoading }: CustomTableProps<TData
   })
 
   return (
-    <div className="w-full">
-      <div className="rounded-md">
-        <Table className="border-y">
+    <div className="w-full overflow-x-auto rounded-md">
+      <Table className="border-y min-w-full">
           <TableHeader className="bg-[#fefaeb]">
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id}>
@@ -112,7 +111,6 @@ function CustomTable<TData>({ data, columns, isLoading }: CustomTableProps<TData
             )}
           </TableBody>
         </Table>
-      </div>
     </div>
   )
 }

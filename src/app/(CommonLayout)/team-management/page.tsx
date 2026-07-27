@@ -1,11 +1,13 @@
-import React from 'react'
+import React, { Suspense } from 'react'
 import TeamManagement from './TeamManagement'
+
+export const dynamic = 'force-dynamic';
 
 const page = () => {
   return (
-    <div>
+    <Suspense fallback={<div className="p-10 text-center font-medium text-gray-500">Loading teams...</div>}>
       <TeamManagement />
-    </div>
+    </Suspense>
   )
 }
 

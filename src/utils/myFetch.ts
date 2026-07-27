@@ -4,6 +4,7 @@
 
 import { getToken } from "./getToken";
 import { getRefreshToken, setAuthCookie } from "../app/actions/auth";
+import { baseURL } from "./BaseURL";
 
 export interface FetchResponse {
   success: boolean;
@@ -55,7 +56,8 @@ export const myFetch = async (
   };
 
   try {
-    const response = await fetch(`${process.env.BASE_URL}${url}`, {
+    const targetUrl = url.startsWith("http") ? url : `${baseURL}/api/v1${url.startsWith("/") ? "" : "/"}${url}`;
+    const response = await fetch(targetUrl, {
       method,
       headers: reqHeaders,
       ...(hasBody && { body: isFormData ? body : JSON.stringify(body) }),
@@ -67,7 +69,7 @@ export const myFetch = async (
     if ((response.status === 401 || response.status === 403) && !isRetry && !url.includes("refresh-token")) {
       const refreshToken = await getRefreshToken();
       if (refreshToken) {
-        const refreshRes = await fetch(`${process.env.BASE_URL}/auth/refresh-token`, {
+        const refreshRes = await fetch(`${baseURL}/api/v1/auth/refresh-token`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",

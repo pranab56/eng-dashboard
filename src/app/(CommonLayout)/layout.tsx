@@ -10,15 +10,15 @@ export default function RootLayout({
 }>) {
   return (
     <HeadersProvider>
-      <div className="flex">
-        <section className="w-[280px] bg-[#080808]">
+      <div className="flex h-screen overflow-hidden bg-gray-100">
+        <section className="w-[280px] h-screen bg-[#080808] flex-shrink-0">
           <Sidebar />
         </section>
-        <div className="flex-1">
-          <header className="h-20">
+        <div className="flex-1 flex flex-col min-w-0 h-screen overflow-hidden">
+          <header className="h-20 flex-shrink-0 bg-white border-b border-gray-100">
             <Header />
           </header>
-          <main className="bg-gray-100 overflow-y-auto hide-scrollbar" style={{ height: "calc(100vh - 80px)" }}>
+          <main className="flex-1 bg-gray-100 overflow-y-auto hide-scrollbar">
             {children}
           </main>
           <Toaster />

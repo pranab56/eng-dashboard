@@ -70,15 +70,32 @@ const Login = () => {
 
     try {
       const res = await login(payload).unwrap();
-      toast.success(res.message || "Login successful");
-      const accessToken = res?.data?.accessToken;
-      const refreshToken = res?.data?.refreshToken;
+      const accessToken =
+        res?.data?.accessToken ||
+        res?.data?.token ||
+        res?.accessToken ||
+        res?.token;
+      const refreshToken =
+        res?.data?.refreshToken ||
+        res?.refreshToken;
+
+      if (!accessToken) {
+        toast.error(res?.message || "Login failed: Token not received from server");
+        return;
+      }
+
+      toast.success(res?.message || "Login successful");
       dispatch(setAuthenticated({ accessToken, refreshToken }));
       await setAuthCookie(accessToken, refreshToken);
       window.location.replace('/');
     } catch (error: any) {
-      console.log(error?.data?.message);
-      toast.error(error?.data?.message)
+      console.error("Login error:", error);
+      const errorMessage =
+        error?.data?.message ||
+        error?.data?.error ||
+        error?.error ||
+        "Login failed. Please check your credentials.";
+      toast.error(errorMessage);
     }
   }
 

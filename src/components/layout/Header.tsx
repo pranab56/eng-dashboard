@@ -7,7 +7,7 @@ import { useGetProfileQuery } from '@/features/profile/profileApi';
 import { useNotificationUnReadCountQuery } from '@/features/notification/notificationApi';
 import { Bell } from 'lucide-react';
 import Link from 'next/link';
-import { baseURL } from '../../utils/BaseURL';
+import { formatImagePath } from '@/utils/formatImagePath';
 
 const Header = () => {
   const { headers } = useHeaders();
@@ -52,7 +52,7 @@ const Header = () => {
           </p>
           <div className='w-14 h-14 bg-gray-50 flex items-center justify-center rounded-xl border-2 border-white shadow-sm overflow-hidden group-hover:scale-105 transition-transform duration-300'>
             {user?.profile ? (
-              <Image src={baseURL + user.profile} width={200} height={200} alt="profile" className='w-full h-full object-cover' />
+              <Image src={formatImagePath(user.profile)} width={200} height={200} alt="profile" className='w-full h-full object-cover' />
             ) : (
               <div className='w-full h-full bg-gray-200 flex items-center justify-center text-gray-400 font-black text-xs'>VOID</div>
             )}

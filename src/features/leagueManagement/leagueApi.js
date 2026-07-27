@@ -24,8 +24,8 @@ export const leagueApi = baseApi.injectEndpoints({
 
     getAllLeague: builder.query({
       query: (params) => {
-        const page = params?.page || 1;
-        const limit = params?.limit || 10;
+        const page = (typeof params === "object" ? params?.page : params) || 1;
+        const limit = (typeof params === "object" ? params?.limit : 10) || 10;
         return {
           url: `/league?page=${page}&limit=${limit}`,
           method: "GET",
