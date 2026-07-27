@@ -13,6 +13,7 @@ export type TUserManagement = {
   role: string;
   profile: string;
   verified: boolean;
+  status?: string;
 }
 
 export type MatchStatus = "Completed" | "Scheduled" | "On Going";

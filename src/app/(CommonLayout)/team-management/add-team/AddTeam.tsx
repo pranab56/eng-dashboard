@@ -23,7 +23,7 @@ const addTeamSchema = z.object({
   teamName: z.string().min(1, "Team Name is required"),
   shortName: z.string().min(1, "Short Name is required"),
   teamType: z.string().min(1, "Team Type is required"),
-  manager: z.string().min(1, "Manager is required"),
+  manager: z.string().optional(),
   stadiumName: z.string().min(1, "Stadium Name is required"),
   city: z.string().min(1, "City is required"),
   country: z.string().min(1, "Country is required"),
@@ -128,14 +128,18 @@ const AddTeam = () => {
       if (isEditMode) {
         const res = await updateTeam({ id: teamId, data: formData }).unwrap();
         if (res.success) {
-          await assignTeamManager({ manager: data.manager, team: teamId }).unwrap();
+          if (data.manager && data.manager.trim() !== "") {
+            await assignTeamManager({ manager: data.manager, team: teamId }).unwrap();
+          }
           toast.success(res.message || "Team updated successfully");
           router.push("/team-management");
         }
       } else {
         const res = await createTeam(formData).unwrap();
         if (res.success) {
-          await assignTeamManager({ manager: data.manager, team: res.data._id }).unwrap();
+          if (data.manager && data.manager.trim() !== "") {
+            await assignTeamManager({ manager: data.manager, team: res.data._id }).unwrap();
+          }
           toast.success(res.message || "Team created successfully");
           router.push("/team-management");
         }
@@ -172,7 +176,7 @@ const AddTeam = () => {
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                 <SelectField name="teamType" label="Team Type" control={control} error={errors.teamType} options={teamTypeOptions} />
-                <SelectField name="manager" label="Manager" placeholder="Select a manager" control={control} error={errors.manager} options={managerOptions} scrollable />
+                <SelectField name="manager" label="Manager (Optional)" placeholder="Select a manager (optional)" control={control} error={errors.manager} options={managerOptions} scrollable />
               </div>
             </div>
           </section>

@@ -9,6 +9,7 @@ import { CustomModal } from '@/components/modals/CustomModal';
 import CustomTable from '@/components/table/CustomTable';
 import { useDeleteVideoMutation, useGetAllVideoQuery } from '@/features/engTVManagement/engApi';
 import { useHeaders } from '@/hooks/useHeaders';
+import { getYouTubeEmbedUrl } from '@/utils/getYouTubeEmbedUrl';
 import { getEngtvColumns } from '@/tableColumns/engtvColumns';
 import { TEngtv } from '@/types/columnTypes';
 import Link from 'next/link';
@@ -118,25 +119,39 @@ const EngtvManagement = () => {
       >
         {selectedVideo ? (
           <div className="space-y-4 pb-4">
-            <div className="aspect-video bg-black rounded-lg overflow-hidden">
-              {selectedVideo.videoUrl && (
-                <video
-                  src={
-                    selectedVideo.videoUrl.startsWith('http')
-                      ? selectedVideo.videoUrl
-                      : baseURL + selectedVideo.videoUrl
-                  }
-                  poster={
-                    selectedVideo.thumbnail
-                      ? selectedVideo.thumbnail.startsWith('http')
-                        ? selectedVideo.thumbnail
-                        : baseURL + selectedVideo.thumbnail
-                      : undefined
-                  }
-                  controls
-                  className="w-full h-full object-contain"
-                />
-              )}
+            <div className="aspect-video bg-black rounded-lg overflow-hidden relative">
+              {selectedVideo.videoUrl && (() => {
+                const youtubeEmbed = getYouTubeEmbedUrl(selectedVideo.videoUrl);
+                if (youtubeEmbed) {
+                  return (
+                    <iframe
+                      src={youtubeEmbed}
+                      title={selectedVideo.title}
+                      className="w-full h-full border-0"
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                      allowFullScreen
+                    />
+                  );
+                }
+                return (
+                  <video
+                    src={
+                      selectedVideo.videoUrl.startsWith('http')
+                        ? selectedVideo.videoUrl
+                        : baseURL + selectedVideo.videoUrl
+                    }
+                    poster={
+                      selectedVideo.thumbnail
+                        ? selectedVideo.thumbnail.startsWith('http')
+                          ? selectedVideo.thumbnail
+                          : baseURL + selectedVideo.thumbnail
+                        : undefined
+                    }
+                    controls
+                    className="w-full h-full object-contain"
+                  />
+                );
+              })()}
             </div>
             <div className="flex justify-between items-start">
               <div>

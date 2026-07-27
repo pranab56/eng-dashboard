@@ -10,7 +10,7 @@ type ImageUploadFieldProps = {
   label?: string;
   control: Control<any>;
   error?: FieldError;
-  maxSizeMB?: number;
+  maxSizeMB?: number | null;
   children?: React.ReactNode;
 };
 
@@ -19,7 +19,7 @@ const ImageUploadField = ({
   label,
   control,
   error,
-  maxSizeMB = 5,
+  maxSizeMB,
   children,
 }: ImageUploadFieldProps) => {
   const inputRef = useRef<HTMLInputElement>(null);
@@ -78,7 +78,7 @@ const ImageUploadField = ({
                     const file = e.target.files?.[0];
                     if (!file) return;
 
-                    if (file.size > maxSizeMB * 1024 * 1024) {
+                    if (maxSizeMB && maxSizeMB > 0 && file.size > maxSizeMB * 1024 * 1024) {
                       toast.error(`File size must be less than ${maxSizeMB}MB`);
                       return;
                     }
@@ -105,7 +105,7 @@ const ImageUploadField = ({
 };
 
 
-export const ImageChildrenComponent = ({ maxSizeMB }: { maxSizeMB: number }) => {
+export const ImageChildrenComponent = ({ maxSizeMB }: { maxSizeMB?: number | string }) => {
   return (
     <div className="flex flex-col items-center justify-center space-y-5">
       <div className="bg-[#0f0f0f] p-4 rounded-lg shadow-lg ring-4 ring-black/5 group-hover:scale-110 transition-transform duration-300">
@@ -116,7 +116,7 @@ export const ImageChildrenComponent = ({ maxSizeMB }: { maxSizeMB: number }) => 
           Upload Image Here
         </p>
         <p className="text-[13px] font-medium text-gray-400">
-          SVG, PNG, JPG or GIF (max. {maxSizeMB}MB)
+          {maxSizeMB ? `SVG, PNG, JPG or GIF (max. ${maxSizeMB}MB)` : 'SVG, PNG, JPG or GIF (Any size / No limit)'}
         </p>
       </div>
     </div>

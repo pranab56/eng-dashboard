@@ -6,6 +6,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { formatImagePath } from '@/utils/formatImagePath';
 import Image from 'next/image';
 import dayjs from 'dayjs';
 
@@ -17,6 +18,7 @@ interface TeamViewModalProps {
 
 const TeamViewModal = ({ team, isOpen, onClose }: TeamViewModalProps) => {
   if (!team) return null;
+  const logoUrl = formatImagePath(team.teamLogo);
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -24,8 +26,8 @@ const TeamViewModal = ({ team, isOpen, onClose }: TeamViewModalProps) => {
         <DialogHeader className="bg-gradient-to-br from-indigo-900 via-blue-900 to-black p-10 text-white relative">
           <div className="flex flex-col items-center justify-center space-y-4">
             <div className="w-28 h-28 bg-white/10 backdrop-blur-md rounded-3xl p-4 border border-white/20 shadow-2xl">
-              {team.teamLogo ? (
-                <Image src={team.teamLogo} alt="logo" width={200} height={200} className="object-contain w-full h-full drop-shadow-lg" />
+              {logoUrl ? (
+                <Image src={logoUrl} alt="logo" width={200} height={200} className="object-contain w-full h-full drop-shadow-lg" />
               ) : (
                 <div className="w-full h-full flex items-center justify-center text-white/40 font-bold uppercase tracking-widest text-xs">No Logo</div>
               )}

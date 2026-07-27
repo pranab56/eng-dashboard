@@ -1,8 +1,8 @@
+import { formatImagePath } from "@/utils/formatImagePath";
 import { ColumnDef } from "@tanstack/react-table";
 import Image from "next/image";
 import Link from "next/link";
 import { FiEdit, FiEdit2, FiEye, FiTrash2 } from "react-icons/fi";
-import { baseURL } from '../utils/BaseURL';
 
 export const getTeamColumns = (
   onView: (team: any) => void,
@@ -12,19 +12,22 @@ export const getTeamColumns = (
   {
     accessorKey: "teamName",
     header: () => <div className="">Team Identity</div>,
-    cell: ({ row }) => (
-      <div className="flex gap-3">
-        {row.original.teamLogo ? (
-          <Image src={baseURL + row.original.teamLogo} alt="logo" width={100} height={100} className="w-12 h-12 rounded-xl border border-gray-100 object-cover" />
-        ) : (
-          <div className="w-12 h-12 rounded-xl bg-gray-100 border border-gray-100 flex items-center justify-center text-[10px] font-bold text-gray-400">TEAM</div>
-        )}
-        <p className="flex flex-col flex-start items-start ">
-          <span className="font-bold text-gray-900">{row.original.teamName}</span>
-          <span className="text-xs text-gray-400 font-semibold">{row.original.stadiumName || "Stadium Not Set"}</span>
-        </p>
-      </div>
-    ),
+    cell: ({ row }) => {
+      const logoUrl = formatImagePath(row.original.teamLogo);
+      return (
+        <div className="flex gap-3">
+          {logoUrl ? (
+            <Image src={logoUrl} alt="logo" width={100} height={100} className="w-12 h-12 rounded-xl border border-gray-100 object-cover" />
+          ) : (
+            <div className="w-12 h-12 rounded-xl bg-gray-100 border border-gray-100 flex items-center justify-center text-[10px] font-bold text-gray-400">TEAM</div>
+          )}
+          <p className="flex flex-col flex-start items-start ">
+            <span className="font-bold text-gray-900">{row.original.teamName}</span>
+            <span className="text-xs text-gray-400 font-semibold">{row.original.stadiumName || "Stadium Not Set"}</span>
+          </p>
+        </div>
+      );
+    },
   },
   {
     accessorKey: "shortName",
@@ -47,10 +50,11 @@ export const getTeamColumns = (
     cell: ({ row }) => {
       const manager = row.original.managers;
       if (!manager) return <span className="text-xs text-gray-400">Unassigned</span>;
+      const profileUrl = formatImagePath(manager.profile);
       return (
         <div className="flex items-center gap-2">
-          {manager.profile ? (
-            <Image src={manager.profile} alt="manager" width={36} height={36} className="w-9 h-9 rounded-full object-cover border border-gray-100" />
+          {profileUrl ? (
+            <Image src={profileUrl} alt="manager" width={36} height={36} className="w-9 h-9 rounded-full object-cover border border-gray-100" />
           ) : (
             <div className="w-9 h-9 rounded-full bg-gray-100 flex items-center justify-center text-[10px] font-bold text-gray-400">MGR</div>
           )}

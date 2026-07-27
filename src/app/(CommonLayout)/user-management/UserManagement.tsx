@@ -5,7 +5,7 @@ import CustomPagination from '@/components/cui/CustomPagination';
 import GeneralStateCard from '@/components/cui/GeneralStateCard';
 import TableHeader from '@/components/cui/TableHeader';
 import CustomTable from '@/components/table/CustomTable';
-import { useDeleteUserMutation, useGetUserQuery, useUpdateStatusMutation } from '@/features/userManagement/userApi';
+import { useDeleteUserMutation, useGetUserQuery, useUpdateStatusMutation, useUpdateUserStatusMutation } from '@/features/userManagement/userApi';
 import { useHeaders } from '@/hooks/useHeaders';
 import { getUsersColumns } from '@/tableColumns/usersColumns';
 import { TUserManagement } from '@/types/columnTypes';
@@ -21,6 +21,7 @@ const UserManagement = () => {
 
   const { data: userData, isLoading } = useGetUserQuery(page);
   const [toggleStatus] = useUpdateStatusMutation();
+  const [updateUserStatus] = useUpdateUserStatusMutation();
   const [deleteUser] = useDeleteUserMutation();
 
   useEffect(() => {
@@ -33,9 +34,18 @@ const UserManagement = () => {
   const handleToggleStatus = async (id: string) => {
     try {
       await toggleStatus({ id }).unwrap();
-      toast.success("User status updated");
+      toast.success("User verification status updated");
     } catch (error: any) {
-      toast.error(error?.data?.message || "Failed to update status");
+      toast.error(error?.data?.message || "Failed to update verification status");
+    }
+  };
+
+  const handleUpdateUserStatus = async (id: string, status: "APPROVED" | "REJECTED") => {
+    try {
+      await updateUserStatus({ id, data: { status } }).unwrap();
+      toast.success(`User status updated to ${status}`);
+    } catch (error: any) {
+      toast.error(error?.data?.message || "Failed to update user status");
     }
   };
 
@@ -83,7 +93,7 @@ const UserManagement = () => {
     url: "#"
   }
 
-  const columns = getUsersColumns(handleToggleStatus, handleDeleteUser);
+  const columns = getUsersColumns(handleToggleStatus, handleUpdateUserStatus, handleDeleteUser);
 
   return (
     <div className='pt-10 px-8 space-y-4'>

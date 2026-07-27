@@ -1,9 +1,15 @@
+import { baseURL } from "./BaseURL";
 
-export const formatImagePath = (path: string) => {
-  
-  if (path.startsWith("http")) {
-    return path;
-  }else {
-    return process.env.NEXT_PUBLIC_IMAGE_URL + path;
+export const formatImagePath = (path: string | undefined | null): string => {
+  if (!path || typeof path !== 'string') return '';
+  const trimmed = path.trim();
+  if (!trimmed) return '';
+
+  if (trimmed.startsWith("http://") || trimmed.startsWith("https://")) {
+    return trimmed;
   }
+  if (trimmed.startsWith("/")) {
+    return `${baseURL}${trimmed}`;
+  }
+  return `${baseURL}/${trimmed}`;
 };
