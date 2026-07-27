@@ -168,5 +168,8 @@ export const baseApi = createApi({
     "user",
     "event",
     "package",
+    "order",
+    "gallery",
+    "social-media",
   ],
 });

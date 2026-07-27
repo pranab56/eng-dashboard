@@ -131,3 +131,39 @@ export type TReward = {
   status: string;
   usage: number;
 }
+
+export type TOrder = {
+  id: string;
+  _id?: string;
+  userId: string;
+  userName: string;
+  firstName: string;
+  lastName: string;
+  brandName: string;
+  point: number;
+  pointUsed: number;
+  status: string;
+  updatedAt: string;
+  createdAt?: string;
+}
+
+export type TGallery = {
+  _id: string;
+  image: string;
+  category: string;
+  status: string;
+  createdBy?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export type TSocialMedia = {
+  _id: string;
+  platform: string;
+  url: string;
+  icon?: string;
+  status: boolean;
+  order: number;
+  createdAt?: string;
+  updatedAt?: string;
+}
