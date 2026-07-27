@@ -102,7 +102,7 @@ const TeamManagement = () => {
 
 
   return (
-    <div className='pt-10 px-8 space-y-4'>
+    <div className='py-10 px-8 space-y-6 pb-16'>
       <div className='flex items-end'>
         <div className='w-full'>
           <GeneralStateCard items={items} className='grid-cols-4' />

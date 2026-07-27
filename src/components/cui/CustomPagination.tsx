@@ -46,6 +46,10 @@ function MyPaginationSuspense({
     const params = new URLSearchParams(searchParams.toString());
     params.set(qryName, newPage.toString());
     router.push(`${pathname}?${params.toString()}`);
+    const mainEl = document.querySelector('main');
+    if (mainEl) {
+      mainEl.scrollTo({ top: 0, behavior: 'smooth' });
+    }
   };
 
   return (

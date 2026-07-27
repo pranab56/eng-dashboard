@@ -1,5 +1,6 @@
 "use client";
 
+import { Suspense, useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
@@ -135,4 +136,10 @@ const VerifyOtp = () => {
   );
 };
 
-export default VerifyOtp;
+export default function VerifyOtpPage() {
+  return (
+    <Suspense fallback={<div className="text-center p-6 text-gray-500">Loading...</div>}>
+      <VerifyOtp />
+    </Suspense>
+  );
+}

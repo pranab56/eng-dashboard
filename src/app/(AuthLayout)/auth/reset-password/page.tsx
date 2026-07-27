@@ -1,5 +1,6 @@
 "use client";
 
+import { Suspense, useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
@@ -16,7 +17,6 @@ import {
 import { Input } from "@/components/ui/input";
 import { Eye, EyeOff, Loader } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useState } from "react";
 import toast from 'react-hot-toast';
 import { useResetPasswordMutation } from '../../../../features/auth/authApi';
 
@@ -147,4 +147,10 @@ const ResetPassword = () => {
   );
 };
 
-export default ResetPassword;
+export default function ResetPasswordPage() {
+  return (
+    <Suspense fallback={<div className="text-center p-6 text-gray-500">Loading...</div>}>
+      <ResetPassword />
+    </Suspense>
+  );
+}

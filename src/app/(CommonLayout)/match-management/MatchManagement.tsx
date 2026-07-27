@@ -71,7 +71,7 @@ const MatchManagement = () => {
 
 
   return (
-    <div className=' px-8 space-y-4'>
+    <div className='py-10 px-8 space-y-6 pb-16'>
       <div className="flex flex-wrap items-center justify-end gap-4 p-4">
         <Link href="/match-management/create-match">
           <CreateButton text="Add Match" />
