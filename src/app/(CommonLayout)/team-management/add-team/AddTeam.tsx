@@ -13,6 +13,7 @@ import * as z from 'zod'
 import { useCreateTeamMutation, useGetSingleTeamQuery, useUpdateTeamMutation } from '@/features/teamManagement/teamApi'
 import { useAssignTeamManagerMutation, useGetAllManagerTeamQuery } from '@/features/managerTeam/managerTeamApi'
 import { baseURL } from '@/utils/BaseURL'
+import { getErrorMessage } from '@/utils/getErrorMessage'
 import { useRouter, useSearchParams } from 'next/navigation'
 import toast from 'react-hot-toast'
 import SubmitButton from '../../../../components/buttons/SubmitButton'
@@ -145,7 +146,7 @@ const AddTeam = () => {
         }
       }
     } catch (error: any) {
-      toast.error(error?.data?.message || `Failed to ${isEditMode ? 'update' : 'create'} team`);
+      toast.error(getErrorMessage(error, `Failed to ${isEditMode ? 'update' : 'create'} team`));
     }
   }
 

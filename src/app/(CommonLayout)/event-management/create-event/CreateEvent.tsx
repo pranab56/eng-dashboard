@@ -13,6 +13,7 @@ import { useHeaders } from '@/hooks/useHeaders'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useEffect } from 'react'
 import { useForm } from 'react-hook-form'
+import { getErrorMessage } from '@/utils/getErrorMessage'
 import { toast } from 'sonner'
 import * as z from 'zod'
 
@@ -127,7 +128,7 @@ const CreateEvent = () => {
         }
       }
     } catch (error: any) {
-      toast.error(error?.data?.message || `Failed to ${isEditMode ? 'update' : 'create'} event`);
+      toast.error(getErrorMessage(error, `Failed to ${isEditMode ? 'update' : 'create'} event`));
     }
   }
 

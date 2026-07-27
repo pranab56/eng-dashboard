@@ -5,7 +5,8 @@
   "scripts": {
     "dev": "next dev --turbopack -p 3010",
     "build": "next build",
-    "start": "next start -p 3010",
+    "postbuild": "node scripts/fix-manifest.js",
+    "start": "node scripts/fix-manifest.js && next start -p 3010",
     "lint": "next lint"
   },
   "dependencies": {

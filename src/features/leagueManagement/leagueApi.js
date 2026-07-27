@@ -24,10 +24,21 @@ export const leagueApi = baseApi.injectEndpoints({
 
     getAllLeague: builder.query({
       query: (params) => {
-        const page = (typeof params === "object" ? params?.page : params) || 1;
-        const limit = (typeof params === "object" ? params?.limit : 10) || 10;
+        let page = 1;
+        let searchValue = "";
+        if (typeof params === "object" && params !== null) {
+          page = params.page || params.pageNumber || 1;
+          searchValue = params.searchValue || params.searchTerm || "";
+        } else if (params) {
+          page = params;
+        }
+
+        let url = `/league?page=${page}`;
+        if (searchValue) {
+          url += `&searchTerm=${encodeURIComponent(searchValue)}`;
+        }
         return {
-          url: `/league?page=${page}&limit=${limit}`,
+          url,
           method: "GET",
         };
       },

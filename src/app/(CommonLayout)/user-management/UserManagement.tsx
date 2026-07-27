@@ -9,17 +9,34 @@ import { useDeleteUserMutation, useGetUserQuery, useUpdateStatusMutation, useUpd
 import { useHeaders } from '@/hooks/useHeaders';
 import { getUsersColumns } from '@/tableColumns/usersColumns';
 import { TUserManagement } from '@/types/columnTypes';
+import { Search, X } from 'lucide-react';
 import { useSearchParams } from 'next/navigation';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 
+const ROLE_TABS = [
+  { label: 'All Users', value: 'ALL' },
+  { label: 'Players', value: 'PLAYER' },
+  { label: 'Managers', value: 'MANAGER' },
+  { label: 'Clubs', value: 'CLUB' },
+  { label: 'Referees', value: 'REFEREE' },
+  { label: 'Others', value: 'OTHER' },
+];
 
 const UserManagement = () => {
   const { setHeaders } = useHeaders();
   const searchParams = useSearchParams();
   const page = searchParams.get('userPage') || '1';
 
-  const { data: userData, isLoading } = useGetUserQuery(page);
+  const [activeRole, setActiveRole] = useState<string>('ALL');
+  const [searchTerm, setSearchTerm] = useState<string>('');
+
+  const { data: userData, isLoading } = useGetUserQuery({
+    pageNumber: page,
+    searchValue: searchTerm,
+    role: activeRole,
+  });
+
   const [toggleStatus] = useUpdateStatusMutation();
   const [updateUserStatus] = useUpdateUserStatusMutation();
   const [deleteUser] = useDeleteUserMutation();
@@ -95,18 +112,97 @@ const UserManagement = () => {
 
   const columns = getUsersColumns(handleToggleStatus, handleUpdateUserStatus, handleDeleteUser);
 
+  // Instant client-side fallback filtering
+  const filteredUsers = (userData?.data || []).filter((user: any) => {
+    if (activeRole !== 'ALL') {
+      const userRole = (user.role || '').toUpperCase();
+      if (activeRole === 'OTHER') {
+        if (['PLAYER', 'MANAGER', 'CLUB', 'REFEREE'].includes(userRole)) {
+          return false;
+        }
+      } else if (userRole !== activeRole) {
+        return false;
+      }
+    }
+
+    if (searchTerm.trim()) {
+      const q = searchTerm.toLowerCase().trim();
+      const nameMatch = (user.userName || user.name || '').toLowerCase().includes(q);
+      const emailMatch = (user.email || '').toLowerCase().includes(q);
+      const roleMatch = (user.role || '').toLowerCase().includes(q);
+      const phoneMatch = (user.phone || '').toLowerCase().includes(q);
+      if (!nameMatch && !emailMatch && !roleMatch && !phoneMatch) {
+        return false;
+      }
+    }
+
+    return true;
+  });
+
   return (
-    <div className='pt-10 px-8 space-y-4'>
+    <div className='py-10 px-8 space-y-6 pb-16'>
       <GeneralStateCard items={items} className='grid-cols-4' />
 
-      <div className=" bg-white rounded-md py-4 min-h-[600px] flex flex-col">
-        <div className='flex-1'>
+      <div className="bg-white rounded-md py-4 min-h-[600px] flex flex-col space-y-4">
+        {/* Table Header and Search Bar */}
+        <div className="px-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
           <TableHeader payload={tableHeaderPayload} />
-          <div className="pt-4 px-4">
+
+          {/* Search Input */}
+          <div className="relative w-full md:w-80">
+            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 size-4" />
+            <input
+              type="text"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              placeholder="Search by name, email, or role..."
+              className="w-full pl-10 pr-9 py-2 bg-gray-50 border border-gray-200 rounded-xl text-sm text-gray-900 placeholder:text-gray-400 outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
+            />
+            {searchTerm && (
+              <button
+                type="button"
+                onClick={() => setSearchTerm('')}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 cursor-pointer"
+              >
+                <X className="size-4" />
+              </button>
+            )}
+          </div>
+        </div>
+
+        {/* Filter Tabs matching provided design */}
+        <div className="px-6">
+          <div className="inline-flex items-center gap-1.5 p-1.5 bg-gray-100/80 rounded-xl border border-gray-100 flex-wrap">
+            {ROLE_TABS.map((tab) => {
+              const isActive = activeRole === tab.value;
+              return (
+                <button
+                  key={tab.value}
+                  type="button"
+                  onClick={() => setActiveRole(tab.value)}
+                  className={`px-5 py-2 text-sm font-semibold rounded-lg transition-all cursor-pointer ${isActive
+                      ? 'bg-white text-blue-600 shadow-sm border border-gray-100 font-bold'
+                      : 'text-gray-500 hover:text-gray-900 font-medium'
+                    }`}
+                >
+                  {tab.label}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        <div className="flex-1">
+          <div className="pt-2 px-4">
             {isLoading ? (
-              <div className="flex justify-center items-center h-48">Loading users...</div>
+              <div className="flex justify-center items-center h-48 text-gray-500 font-medium">Loading users...</div>
+            ) : filteredUsers.length === 0 ? (
+              <div className="flex flex-col justify-center items-center h-48 text-gray-400 space-y-2">
+                <p className="text-sm font-semibold">No users found</p>
+                <p className="text-xs">Try selecting another category tab or clearing your search.</p>
+              </div>
             ) : (
-              <CustomTable<TUserManagement> columns={columns} data={userData?.data || []} />
+              <CustomTable<TUserManagement> columns={columns} data={filteredUsers} />
             )}
           </div>
         </div>

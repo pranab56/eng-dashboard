@@ -6,11 +6,11 @@ export const getYouTubeEmbedUrl = (url: string | null | undefined): string | nul
   if (!url || typeof url !== 'string') return null;
 
   const trimmed = url.trim();
-  const regExp = /(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?|shorts)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/;
+  const regExp = /(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?|shorts|live)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/;
   const match = trimmed.match(regExp);
 
   if (match && match[1]) {
-    return `https://www.youtube.com/embed/${match[1]}`;
+    return `https://www.youtube-nocookie.com/embed/${match[1]}?rel=0&autoplay=0`;
   }
 
   return null;

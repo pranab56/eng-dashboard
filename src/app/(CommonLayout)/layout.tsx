@@ -1,7 +1,8 @@
 import Header from "@/components/layout/Header";
 import Sidebar from "@/components/layout/Sidebar";
 import { HeadersProvider } from "@/hooks/useHeaders";
-import { Toaster } from "react-hot-toast";
+import { Toaster as HotToaster } from "react-hot-toast";
+import { Toaster as SonnerToaster } from "sonner";
 
 export default function RootLayout({
   children,
@@ -21,7 +22,8 @@ export default function RootLayout({
           <main className="flex-1 bg-gray-100 overflow-y-auto hide-scrollbar">
             {children}
           </main>
-          <Toaster />
+          <HotToaster position="top-right" reverseOrder={false} />
+          <SonnerToaster position="top-right" richColors />
         </div>
       </div>
     </HeadersProvider>

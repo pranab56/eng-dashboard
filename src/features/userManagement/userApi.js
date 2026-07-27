@@ -5,10 +5,31 @@ export const userApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
 
     getUser: builder.query({
-      query: (pageNumber) => ({
-        url: `/user-management?page=${pageNumber}`,
-        method: "GET",
-      }),
+      query: (params) => {
+        let pageNumber = 1;
+        let searchValue = "";
+        let role = "";
+
+        if (typeof params === "object" && params !== null) {
+          pageNumber = params.pageNumber || 1;
+          searchValue = params.searchValue || "";
+          role = params.role || "";
+        } else if (params) {
+          pageNumber = params;
+        }
+
+        let url = `/user-management?page=${pageNumber}`;
+        if (searchValue) {
+          url += `&searchTerm=${encodeURIComponent(searchValue)}`;
+        }
+        if (role && role !== "ALL") {
+          url += `&role=${encodeURIComponent(role)}`;
+        }
+        return {
+          url,
+          method: "GET",
+        };
+      },
       providesTags: ["user"]
     }),
 
@@ -30,6 +51,7 @@ export const userApi = baseApi.injectEndpoints({
 
     updateUserStatus: builder.mutation({
       query: ({ id, data }) => ({
+        
         url: `/user/${id}/approve-status`,
         method: "PATCH",
         body: data,

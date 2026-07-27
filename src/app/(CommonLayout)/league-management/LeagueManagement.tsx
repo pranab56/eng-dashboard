@@ -8,6 +8,7 @@ import CustomTable from '@/components/table/CustomTable';
 import { useDeleteLeagueMutation, useGetAllLeagueQuery } from '@/features/leagueManagement/leagueApi';
 import { useHeaders } from '@/hooks/useHeaders';
 import { getLeagueColumns } from '@/tableColumns/leagueColumns';
+import { Search, X } from 'lucide-react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
@@ -20,7 +21,12 @@ const LeagueManagement = () => {
   const searchParams = useSearchParams();
   const page = searchParams.get("leaguePage") || "1";
 
-  const { data: leagueData, isLoading } = useGetAllLeagueQuery(page);
+  const [searchTerm, setSearchTerm] = useState("");
+
+  const { data: leagueData, isLoading } = useGetAllLeagueQuery({
+    page: page,
+    searchValue: searchTerm,
+  });
   const [deleteLeague, { isLoading: isDeleting }] = useDeleteLeagueMutation();
 
   const [selectedLeague, setSelectedLeague] = useState<any>(null);
@@ -66,21 +72,49 @@ const LeagueManagement = () => {
     url: "https://example.com/export-leagues",
   };
 
+  const rawLeagues = leagueData?.data || [];
+  const filteredLeagues = rawLeagues.filter((league: any) => {
+    if (!searchTerm.trim()) return true;
+    const q = searchTerm.toLowerCase().trim();
+    const title = (league.title || league.leagueName || '').toLowerCase();
+    const desc = (league.description || '').toLowerCase();
+    return title.includes(q) || desc.includes(q);
+  });
+
   return (
-    <div className="px-8 space-y-4">
-      <div className="flex flex-wrap items-center justify-end gap-4 p-4">
+    <div className="py-10 px-8 space-y-6 pb-16">
+      <div className="flex flex-wrap items-center justify-between gap-4 p-4 bg-white rounded-lg border border-gray-100 shadow-sm">
+        <div className="relative w-full sm:w-80">
+          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 size-4" />
+          <input
+            type="text"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            placeholder="Search leagues by name..."
+            className="w-full pl-10 pr-9 py-2 bg-gray-50 border border-gray-200 rounded-xl text-sm text-gray-900 placeholder:text-gray-400 outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
+          />
+          {searchTerm && (
+            <button
+              type="button"
+              onClick={() => setSearchTerm('')}
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 cursor-pointer"
+            >
+              <X className="size-4" />
+            </button>
+          )}
+        </div>
         <Link href="/league-management/create-league">
           <CreateButton text="Add League" />
         </Link>
       </div>
 
-      <div className="bg-white rounded-md py-4 flex flex-col">
+      <div className="bg-white rounded-md py-4 flex flex-col min-h-[600px]">
         <div className="flex-1">
           <TableHeader payload={tableHeaderPayload} />
           <div className="pt-4">
             <CustomTable<any>
               columns={getLeagueColumns(handleView, handleDelete)}
-              data={leagueData?.data || []}
+              data={filteredLeagues}
               isLoading={isLoading}
             />
           </div>

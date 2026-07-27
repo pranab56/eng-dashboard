@@ -3,12 +3,21 @@ import { baseURL } from "./BaseURL";
 import { logout, setTokens } from "../features/auth/authSlice";
 import { removeAuthCookie, setAuthCookie } from "../app/actions/auth";
 
+const getCookieValue = (name) => {
+  if (typeof window === "undefined" || !document.cookie) return null;
+  const match = document.cookie.match(new RegExp("(?:^|; )" + name.replace(/([\.$?*|{}\(\)\[\]\\\/\+^])/g, "\\$1") + "=([^;]*)"));
+  return match ? decodeURIComponent(match[1]) : null;
+};
+
 const rawBaseQuery = fetchBaseQuery({
   baseUrl: `${baseURL}/api/v1`,
   prepareHeaders: (headers, { getState }) => {
-    // Get token from auth state
+    // Get token from auth state or fallback to cookies/localStorage
     const state = getState();
-    const token = state.auth ? state.auth.token : null;
+    let token = state.auth ? state.auth.token : null;
+    if (!token && typeof window !== "undefined") {
+      token = getCookieValue("alexandertel-admin-token") || localStorage.getItem("accessToken") || localStorage.getItem("token");
+    }
     if (token) {
       headers.set("Authorization", `Bearer ${token}`);
     }
@@ -40,12 +49,18 @@ const baseQueryWithReauth = async (args, api, extraOptions) => {
     }
 
     const state = api.getState();
-    const refreshToken = state.auth ? state.auth.refreshToken : null;
+    let refreshToken = state.auth ? state.auth.refreshToken : null;
+    if (!refreshToken && typeof window !== "undefined") {
+      refreshToken = getCookieValue("alexandertel-admin-refresh-token") || localStorage.getItem("refreshToken");
+    }
 
     if (!refreshToken) {
       api.dispatch(logout());
       if (typeof window !== "undefined") {
         removeAuthCookie();
+        localStorage.removeItem("accessToken");
+        localStorage.removeItem("refreshToken");
+        localStorage.removeItem("token");
         window.location.replace("/auth/login");
       }
       return result;

@@ -86,6 +86,11 @@ const Login = () => {
 
       toast.success(res?.message || "Login successful");
       dispatch(setAuthenticated({ accessToken, refreshToken }));
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('token', accessToken);
+        localStorage.setItem('accessToken', accessToken);
+        if (refreshToken) localStorage.setItem('refreshToken', refreshToken);
+      }
       await setAuthCookie(accessToken, refreshToken);
       window.location.replace('/');
     } catch (error: any) {

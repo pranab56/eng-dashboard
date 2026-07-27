@@ -86,11 +86,18 @@ const CreateVideos = () => {
     if (watchedVideo && watchedVideo[0] instanceof File) {
       const url = URL.createObjectURL(watchedVideo[0]);
       setLocalVideoPreview(url);
+      setVideoSourceType('file');
       return () => URL.revokeObjectURL(url);
     } else {
       setLocalVideoPreview(null);
     }
   }, [watchedVideo])
+
+  useEffect(() => {
+    if (watchedYoutubeUrl && getYouTubeEmbedUrl(watchedYoutubeUrl)) {
+      setVideoSourceType('youtube');
+    }
+  }, [watchedYoutubeUrl])
 
   useEffect(() => {
     setHeaders({
@@ -302,7 +309,8 @@ const CreateVideos = () => {
                       src={existingYoutubeEmbed}
                       title="Existing YouTube Video"
                       className="w-full h-full border-0"
-                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                      referrerPolicy="strict-origin-when-cross-origin"
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                       allowFullScreen
                     />
                   ) : (
@@ -406,7 +414,8 @@ const CreateVideos = () => {
                         src={liveYoutubeEmbed}
                         title="YouTube Preview"
                         className="w-full h-full border-0"
-                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                        referrerPolicy="strict-origin-when-cross-origin"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                         allowFullScreen
                       />
                       <div className="absolute top-2 left-2 px-3 py-1 bg-black/70 backdrop-blur-md rounded-full text-[10px] font-bold text-white uppercase tracking-wider text-white">

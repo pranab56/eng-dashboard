@@ -20,6 +20,7 @@ import dayjs from 'dayjs'
 import { useRouter, useSearchParams } from 'next/navigation'
 
 import { baseURL } from '@/utils/BaseURL'
+import { getErrorMessage } from '@/utils/getErrorMessage'
 
 // Form Validation Schema
 const newsSchema = z.object({
@@ -120,7 +121,7 @@ const CreateNews = () => {
         }
       }
     } catch (error: any) {
-      toast.error(error?.data?.message || `Failed to ${isEditMode ? 'update' : 'create'} news article`);
+      toast.error(getErrorMessage(error, `Failed to ${isEditMode ? 'update' : 'create'} news article`));
     }
   }
 

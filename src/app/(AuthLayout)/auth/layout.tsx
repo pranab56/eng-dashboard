@@ -1,4 +1,5 @@
-import { Toaster } from "sonner";
+import { Toaster as SonnerToaster } from "sonner";
+import { Toaster as HotToaster } from "react-hot-toast";
 
 export default function AuthLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
@@ -8,7 +9,8 @@ export default function AuthLayout({ children }: Readonly<{ children: React.Reac
           {children}
         </div>
       </div>
-      <Toaster />
+      <SonnerToaster position="top-right" richColors />
+      <HotToaster position="top-right" reverseOrder={false} />
     </div>
   );
 }

@@ -15,6 +15,7 @@ import { useRouter, useSearchParams } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
+import { getErrorMessage } from '@/utils/getErrorMessage'
 import * as z from 'zod'
 import InputField from '../../../../components/form/InputField'
 import { durationOptions } from '../../../../constants/selectData'
@@ -354,7 +355,7 @@ const CreateMatch = () => {
         router.push("/match-management");
       }
     } catch (error: any) {
-      toast.error(error?.data?.message || "Failed to create matches");
+      toast.error(getErrorMessage(error, "Failed to create matches"));
     }
   };
 
@@ -438,7 +439,7 @@ const CreateMatch = () => {
         setAwayTeam(null);
       }
     } catch (error: any) {
-      toast.error(error?.data?.message || `Failed to ${isEditMode ? 'update' : 'create'} match`)
+      toast.error(getErrorMessage(error, `Failed to ${isEditMode ? 'update' : 'create'} match`));
     }
   }
 
