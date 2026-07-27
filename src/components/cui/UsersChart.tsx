@@ -10,23 +10,23 @@ import {
   ResponsiveContainer,
 } from "recharts";
 import CustomSelectOption from "./CustomSelectOption";
-import { Suspense} from "react";
+import { Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import { selectOptionsRevenue } from "@/types/optionTypes";
 
 const data = [
-  {month: "Jan", users: 4000},
-  {month: "Feb", users: 3000},
-  {month: "Mar", users: 5000},
-  {month: "Apr", users: 4000},
-  {month: "May", users: 3000},
-  {month: "Jun", users: 5000},
-  {month: "Jul", users: 4000},
-  {month: "Aug", users: 3000},
-  {month: "Sep", users: 5000},
-  {month: "Oct", users: 4000},
-  {month: "Nov", users: 3000},
-  {month: "Dec", users: 5000},
+  { month: "Jan", users: 4000 },
+  { month: "Feb", users: 3000 },
+  { month: "Mar", users: 5000 },
+  { month: "Apr", users: 4000 },
+  { month: "May", users: 3000 },
+  { month: "Jun", users: 5000 },
+  { month: "Jul", users: 4000 },
+  { month: "Aug", users: 3000 },
+  { month: "Sep", users: 5000 },
+  { month: "Oct", users: 4000 },
+  { month: "Nov", users: 3000 },
+  { month: "Dec", users: 5000 },
 ]
 
 const SalesTrackingChartSuspense = () => {
@@ -77,7 +77,7 @@ const SalesTrackingChartSuspense = () => {
 
 export default function UsersChart() {
   return (
-    <Suspense fallback={<div>Loading...</div>} >
+    <Suspense fallback={<div></div>} >
       <SalesTrackingChartSuspense />
     </Suspense>
   )

@@ -48,7 +48,7 @@ const CustomSelectOptionSuspense = ({ selectOptions, placeHolderValue, queryKey 
 
 export default function CustomSelectOption({ selectOptions, placeHolderValue, queryKey }: { selectOptions: TSelectOptions[], placeHolderValue: string, queryKey: string }) {
   return (
-    <Suspense fallback={<div>Loading...</div>} >
+    <Suspense fallback={<div></div>} >
       <CustomSelectOptionSuspense selectOptions={selectOptions} placeHolderValue={placeHolderValue} queryKey={queryKey} />
     </Suspense>
   )

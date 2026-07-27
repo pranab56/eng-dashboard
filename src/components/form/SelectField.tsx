@@ -34,27 +34,31 @@ const SelectField = ({
         <Controller
           name={name}
           control={control}
-          render={({ field }) => (
-            <Select key={field.value} onValueChange={field.onChange} value={field.value}>
-              <SelectTrigger
-                size="lg"
-                className={`w-full h-20 py-3 bg-gray-100 ${error ? "border-red-400" : ""
-                  }`}
-              >
-                <SelectValue placeholder={placeholder} />
-              </SelectTrigger>
+          render={({ field }) => {
+            const hasValidValue = Boolean(field.value && options?.some((opt) => opt.value === field.value));
+            const selectValue = hasValidValue ? field.value : undefined;
 
-              <SelectContent className={scrollable ? "max-h-[280px] overflow-y-auto" : ""}>
-                <SelectGroup>
-                  {options.map((option) => (
-                    <SelectItem key={option.value} value={option.value}>
-                      {option.label}
-                    </SelectItem>
-                  ))}
-                </SelectGroup>
-              </SelectContent>
-            </Select>
-          )}
+            return (
+              <Select key={selectValue || 'empty'} onValueChange={field.onChange} value={selectValue}>
+                <SelectTrigger
+                  size="lg"
+                  className={`w-full h-20 py-3 bg-gray-100 ${error ? "border-red-400" : ""}`}
+                >
+                  <SelectValue placeholder={placeholder} />
+                </SelectTrigger>
+
+                <SelectContent className={scrollable ? "max-h-[280px] overflow-y-auto" : ""}>
+                  <SelectGroup>
+                    {options.map((option) => (
+                      <SelectItem key={option.value} value={option.value}>
+                        {option.label}
+                      </SelectItem>
+                    ))}
+                  </SelectGroup>
+                </SelectContent>
+              </Select>
+            );
+          }}
         />
 
         {error && (

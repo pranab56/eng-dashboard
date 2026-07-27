@@ -157,7 +157,7 @@ function SubscriptionGraphSuspense() {
 
 export default function RevenueGraph() {
   return (
-    <Suspense fallback={<div>Loading...</div>} >
+    <Suspense fallback={<div></div>} >
       <SubscriptionGraphSuspense />
     </Suspense>
   )

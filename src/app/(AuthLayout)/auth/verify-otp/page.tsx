@@ -138,7 +138,7 @@ const VerifyOtp = () => {
 
 export default function VerifyOtpPage() {
   return (
-    <Suspense fallback={<div className="text-center p-6 text-gray-500">Loading...</div>}>
+    <Suspense fallback={<div className="text-center p-6 text-gray-500"></div>}>
       <VerifyOtp />
     </Suspense>
   );

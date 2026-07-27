@@ -359,6 +359,16 @@ const CreateMatch = () => {
     }
   };
 
+  const onError = (errors: any) => {
+    const errorKeys = Object.keys(errors);
+    if (errorKeys.length > 0) {
+      const firstError = errors[errorKeys[0]];
+      if (firstError?.message) {
+        toast.error(firstError.message);
+      }
+    }
+  };
+
   const onSubmit = async (formData: CreateMatchFormValues) => {
     if (!homeTeam || !awayTeam) {
       toast.error("Please select both home and away teams");
@@ -378,7 +388,7 @@ const CreateMatch = () => {
         homeTeam: homeTeam.value,
         awayTeam: awayTeam.value,
         matchDate,
-        durationMinutes: parseInt(formData.durationMinutes),  // "90 Minutes" → 95
+        durationMinutes: parseInt(formData.durationMinutes),
         venueName: venueNameCombined,
         referee: formData.referee,
       };
@@ -419,42 +429,42 @@ const CreateMatch = () => {
           const newMatch: TempMatch = {
             id: Math.random().toString(36).substring(2, 9),
             payload,
-            display
+            display,
           };
           setTempMatches(prev => [...prev, newMatch]);
-          toast.success("Match added to queue (common settings retained for next match)");
+          toast.success("Match added to queue");
         }
 
-        // Retain common match form parameters and reset only team selections for the next match
+        // Reset form for next entry
         reset({
           venue: formData.venue,
-          pitch: formData.pitch,
+          pitch: "",
           league: formData.league,
           referee: formData.referee,
           durationMinutes: formData.durationMinutes,
           date: formData.date,
-          time: formData.time,
+          time: "",
         });
         setHomeTeam(null);
         setAwayTeam(null);
       }
-    } catch (error: any) {
-      toast.error(getErrorMessage(error, `Failed to ${isEditMode ? 'update' : 'create'} match`));
+    } catch (err: any) {
+      toast.error(getErrorMessage(err, "Failed to save match"));
     }
-  }
+  };
 
 
   if (isEditMode && isFetching) {
     return <div className="flex items-center justify-center min-h-[400px]">Loading match data...</div>
   }
 
-  
+
   // Filtered lists to prevent same-team selection
   const homeTeamOptions = teamsList.filter(t => t.value !== awayTeam?.value);
   const awayTeamOptions = teamsList.filter(t => t.value !== homeTeam?.value);
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="py-10 px-6 space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
+    <form onSubmit={handleSubmit(onSubmit, onError)} className="py-10 px-6 space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
       <>
         <BackButton />
       </>
@@ -475,7 +485,7 @@ const CreateMatch = () => {
                     control={control}
                     error={errors.league}
                     options={leagueOptions}
-                    placeholder="Select league"
+                    placeholder="Select your league"
                     scrollable
                   />
                   <SelectField
@@ -484,7 +494,7 @@ const CreateMatch = () => {
                     control={control}
                     error={errors.referee}
                     options={refereeOptions}
-                    placeholder="Select referee"
+                    placeholder="Select your referee"
                   />
                 </div>
 
@@ -497,16 +507,14 @@ const CreateMatch = () => {
                     options={venueOptions}
                     placeholder="Select venue"
                   />
-                  {selectedVenue && (
-                    <SelectField
-                      name="pitch"
-                      label="Pitch Selection"
-                      control={control}
-                      error={errors.pitch}
-                      options={pitchOptions}
-                      placeholder="Select pitch"
-                    />
-                  )}
+                  <SelectField
+                    name="pitch"
+                    label="Pitch Selection"
+                    control={control}
+                    error={errors.pitch}
+                    options={pitchOptions}
+                    placeholder="Select pitch"
+                  />
                 </div>
               </div>
             </section>
@@ -750,7 +758,7 @@ const CreateMatch = () => {
                             <button
                               type="button"
                               onClick={() => handleEditTempMatch(match)}
-                              className="p-2 text-gray-500 hover:text-black hover:bg-gray-100 rounded-lg transition-colors duration-150"
+                              className="p-2 text-gray-500 hover:text-black hover:bg-gray-100 rounded-lg transition-colors duration-150 cursor-pointer"
                               title="Edit Match"
                             >
                               <Pencil className="w-4 h-4" />
@@ -758,7 +766,7 @@ const CreateMatch = () => {
                             <button
                               type="button"
                               onClick={() => handleDeleteTempMatch(match.id)}
-                              className="p-2 text-red-500 hover:text-red-700 hover:bg-red-50 rounded-lg transition-colors duration-150"
+                              className="p-2 text-red-500 hover:text-red-700 hover:bg-red-50 rounded-lg transition-colors duration-150 cursor-pointer"
                               title="Remove Match"
                             >
                               <Trash2 className="w-4 h-4" />

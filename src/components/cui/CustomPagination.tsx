@@ -142,7 +142,7 @@ export default function CustomPagination({
   qryName?: string;
 }) {
   return (
-    <Suspense fallback={<div>Loading Pagination...</div>}>
+    <Suspense fallback={<div></div>}>
       <MyPaginationSuspense
         TOTAL_PAGES={TOTAL_PAGES}
         qryName={qryName}

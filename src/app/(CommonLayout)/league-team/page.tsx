@@ -5,7 +5,7 @@ export const dynamic = 'force-dynamic';
 
 const LeagueTeamPage = () => {
   return (
-    <Suspense fallback={<div className="flex items-center justify-center p-10 text-gray-500 font-medium">Loading teams...</div>}>
+    <Suspense fallback={<div className="flex items-center justify-center p-10 text-gray-500 font-medium"></div>}>
       <LeagueTeamManagement />
     </Suspense>
   );
