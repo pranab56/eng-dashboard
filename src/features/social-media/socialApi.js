@@ -43,6 +43,7 @@ export const socialApi = baseApi.injectEndpoints({
                 method: "DELETE",
             }),
             invalidatesTags: ["social-media"]
+            
         }),
     }),
 });
