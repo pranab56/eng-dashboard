@@ -610,7 +610,7 @@ export default function CategoryManagement() {
             <Layers className="w-5 h-5" />
           </div>
           <div>
-            <h1 className="text-2xl md:text-3xl font-black text-gray-900 tracking-tight">
+            <h1 className="text-2xl md:text-3xl font-medium text-gray-900 tracking-tight">
               Category Management
             </h1>
             <p className="text-xs text-gray-500 mt-0.5">
@@ -627,11 +627,10 @@ export default function CategoryManagement() {
         <button
           type="button"
           onClick={() => setActiveTab("all")}
-          className={`px-4 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center gap-2 cursor-pointer shrink-0 ${
-            activeTab === "all"
-              ? "bg-black text-white shadow-sm"
-              : "text-gray-600 hover:bg-gray-100"
-          }`}
+          className={`px-4 py-2.5 rounded-xl text-xs font-medium transition-all flex items-center gap-2 cursor-pointer shrink-0 ${activeTab === "all"
+            ? "bg-black text-white shadow-sm"
+            : "text-gray-600 hover:bg-gray-100"
+            }`}
         >
           <Layers className="w-4 h-4" />
           <span>
@@ -654,11 +653,10 @@ export default function CategoryManagement() {
               key={cfg.key}
               type="button"
               onClick={() => setActiveTab(cfg.key)}
-              className={`px-4 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center gap-2 cursor-pointer shrink-0 ${
-                isActive
-                  ? "bg-black text-white shadow-sm"
-                  : "text-gray-600 hover:bg-gray-100"
-              }`}
+              className={`px-4 py-2.5 rounded-xl text-xs font-medium transition-all flex items-center gap-2 cursor-pointer shrink-0 ${isActive
+                ? "bg-black text-white shadow-sm"
+                : "text-gray-600 hover:bg-gray-100"
+                }`}
             >
               <Icon className={`w-4 h-4 ${isActive ? "text-white" : cfg.color.text}`} />
               <span>{cfg.badgeLabel} ({catCount})</span>
@@ -682,14 +680,14 @@ export default function CategoryManagement() {
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-gray-200">
                 <div className="flex items-center gap-3">
                   <div
-                    className={`w-10 h-10 rounded-xl ${config.color.bg} ${config.color.text} flex items-center justify-center font-bold shrink-0`}
+                    className={`w-10 h-10 rounded-xl ${config.color.bg} ${config.color.text} flex items-center justify-center font-medium shrink-0`}
                   >
                     <Icon className="w-5 h-5" />
                   </div>
                   <div>
-                    <h2 className="text-lg font-black text-gray-900 flex items-center gap-2">
+                    <h2 className="text-lg font-medium text-gray-900 flex items-center gap-2">
                       <span>{config.label}</span>
-                      <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${config.color.badgeBg}`}>
+                      <span className={`text-[10px] font-medium px-2 py-0.5 rounded-full ${config.color.badgeBg}`}>
                         {filteredCategories.length} Categories
                       </span>
                     </h2>
@@ -704,7 +702,7 @@ export default function CategoryManagement() {
                 <button
                   type="button"
                   onClick={() => handleOpenAddCategoryModal(config.key)}
-                  className={`px-3.5 py-1.5 rounded-xl border ${config.color.border} ${config.color.bg} ${config.color.text} hover:opacity-80 text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer self-start sm:self-auto`}
+                  className={`px-3.5 py-1.5 rounded-xl border ${config.color.border} ${config.color.bg} ${config.color.text} hover:opacity-80 text-xs font-medium transition-all flex items-center gap-1.5 cursor-pointer self-start sm:self-auto`}
                 >
                   <Plus className="w-3.5 h-3.5" />
                   <span>Add {config.badgeLabel} Category</span>
@@ -724,7 +722,7 @@ export default function CategoryManagement() {
                   <div className={`w-10 h-10 rounded-full ${config.color.bg} ${config.color.text} flex items-center justify-center`}>
                     <FolderPlus className="w-5 h-5" />
                   </div>
-                  <h4 className="text-sm font-bold text-gray-800">
+                  <h4 className="text-sm font-medium text-gray-800">
                     No Categories Found in {config.badgeLabel}
                   </h4>
                   <p className="text-xs text-gray-400 max-w-xs">
@@ -759,21 +757,21 @@ export default function CategoryManagement() {
                           <div className="flex items-start justify-between gap-2">
                             <div className="flex items-center gap-2.5">
                               <div
-                                className={`w-9 h-9 rounded-xl ${config.color.bg} ${config.color.text} flex items-center justify-center font-bold shrink-0`}
+                                className={`w-9 h-9 rounded-xl ${config.color.bg} ${config.color.text} flex items-center justify-center font-medium shrink-0`}
                               >
                                 <Icon className="w-4 h-4" />
                               </div>
                               <div className="min-w-0">
-                                <h3 className="font-bold text-gray-900 text-sm leading-snug truncate">
+                                <h3 className="font-medium text-gray-900 text-sm leading-snug truncate">
                                   {cat.name}
                                 </h3>
-                                  {cat.slug && (
-                                    <div className="mt-0.5">
-                                      <span className="text-[10px] text-gray-400 bg-gray-100 px-1.5 py-0.5 rounded font-mono truncate max-w-[120px] inline-block">
-                                        /{cat.slug}
-                                      </span>
-                                    </div>
-                                  )}
+                                {cat.slug && (
+                                  <div className="mt-0.5">
+                                    <span className="text-[10px] text-gray-400 bg-gray-100 px-1.5 py-0.5 rounded font-mono truncate max-w-[120px] inline-block">
+                                      /{cat.slug}
+                                    </span>
+                                  </div>
+                                )}
                               </div>
                             </div>
 
@@ -812,7 +810,7 @@ export default function CategoryManagement() {
                         {config.allowSubcategory && (
                           <div className="space-y-2 pt-3 border-t border-gray-100">
                             <div className="flex items-center justify-between">
-                              <span className="text-[10px] font-bold uppercase tracking-wider text-gray-400 flex items-center gap-1">
+                              <span className="text-[10px] font-medium uppercase tracking-wider text-gray-400 flex items-center gap-1">
                                 <GitBranch className="w-3 h-3 text-purple-500" />
                                 Subcategories ({subCats.length})
                               </span>
@@ -825,7 +823,7 @@ export default function CategoryManagement() {
                                     catId
                                   )
                                 }
-                                className="text-[11px] font-bold text-blue-600 hover:text-blue-700 hover:underline cursor-pointer"
+                                className="text-[11px] font-medium text-blue-600 hover:text-blue-700 hover:underline cursor-pointer"
                               >
                                 + Add Sub
                               </button>
@@ -916,13 +914,11 @@ export default function CategoryManagement() {
         isOpen={Boolean(deleteTarget)}
         onClose={() => setDeleteTarget(null)}
         onConfirm={handleConfirmDelete}
-        title={`Delete ${
-          deleteTarget?.isSub ? "Subcategory" : "Category"
-        }`}
-        description={`Are you sure you want to delete "${deleteTarget?.name}" from ${
-          DOMAIN_CONFIGS.find((c) => c.key === deleteTarget?.domain)?.label ||
+        title={`Delete ${deleteTarget?.isSub ? "Subcategory" : "Category"
+          }`}
+        description={`Are you sure you want to delete "${deleteTarget?.name}" from ${DOMAIN_CONFIGS.find((c) => c.key === deleteTarget?.domain)?.label ||
           "Category"
-        }? This action cannot be undone.`}
+          }? This action cannot be undone.`}
         isLoading={isAnyMutationLoading}
       />
     </div>
