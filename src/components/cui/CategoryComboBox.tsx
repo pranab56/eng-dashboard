@@ -49,7 +49,11 @@ export default function CategoryComboBox({
           className="w-full h-11 px-3.5 bg-gray-50 border border-gray-200 rounded-lg text-sm flex items-center justify-between font-medium text-gray-800 hover:bg-gray-100/70 focus:outline-none focus:border-blue-500 transition-all cursor-pointer disabled:opacity-50"
         >
           <span className="truncate">
-            {value ? value : "Select or type category..."}
+            {value
+              ? value
+              : options.length === 0
+              ? "No category available"
+              : "Select or type category..."}
           </span>
           <ChevronsUpDown className="w-4 h-4 text-gray-400 shrink-0 ml-2" />
         </button>
@@ -101,8 +105,10 @@ export default function CategoryComboBox({
           )}
 
           {filteredOptions.length === 0 && !isCustomOption && (
-            <p className="p-3 text-center text-xs text-gray-400">
-              No categories found
+            <p className="p-3 text-center text-xs text-gray-400 font-medium">
+              {options.length === 0
+                ? "No category available"
+                : "No matching categories found"}
             </p>
           )}
         </div>

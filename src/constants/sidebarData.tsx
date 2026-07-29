@@ -16,7 +16,7 @@ import {
   UserManagementIcon
 } from "@/assets/assets";
 
-import { HiOutlinePhotograph, HiOutlineShoppingBag, HiOutlineShare } from "react-icons/hi";
+import { HiOutlinePhotograph, HiOutlineShoppingBag, HiOutlineShare, HiOutlineFolder } from "react-icons/hi";
 
 export type TMenuItem = {
   id: number;
@@ -138,18 +138,24 @@ export const sidebarData: TMenuItem[] = [
   },
   {
     id: 19,
+    icon: HiOutlineFolder,
+    title: "Category Management",
+    label: "/category-management",
+  },
+  {
+    id: 20,
     icon: SettingsIcon,
     title: "Settings",
     label: "/profile",
   },
   {
-    id: 20,
+    id: 21,
     icon: Terms,
     title: "Terms & Condition",
     label: "/terms-and-condition",
   },
   {
-    id: 21,
+    id: 22,
     icon: Privacy,
     title: "Privacy Policy",
     label: "/privacy-policy",

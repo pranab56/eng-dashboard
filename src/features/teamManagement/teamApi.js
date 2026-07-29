@@ -23,10 +23,22 @@ export const teamApi = baseApi.injectEndpoints({
 
     getAllTeam: builder.query({
       query: (params) => {
-        const page = (typeof params === "object" ? params?.page : params) || 1;
-        const limit = (typeof params === "object" ? params?.limit : 10) || 10;
+        let page = 1;
+        let limit = 10;
+        let searchTerm = "";
+        if (typeof params === "object" && params !== null) {
+          page = params?.page || 1;
+          limit = params?.limit || 10;
+          searchTerm = params?.searchTerm || params?.search || "";
+        } else if (params) {
+          page = params;
+        }
+        let url = `/team?page=${page}&limit=${limit}`;
+        if (searchTerm) {
+          url += `&searchTerm=${encodeURIComponent(searchTerm)}`;
+        }
         return {
-          url: `/team?page=${page}&limit=${limit}`,
+          url,
           method: "GET",
         };
       },

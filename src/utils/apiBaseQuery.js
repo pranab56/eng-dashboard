@@ -171,5 +171,10 @@ export const baseApi = createApi({
     "order",
     "gallery",
     "social-media",
+    "category",
+    "venue",
+    "playtime",
+    "ageGroup",
+    "newsCategory",
   ],
 });

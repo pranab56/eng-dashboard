@@ -1,31 +1,40 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-"use client"
-import BackButton from '@/components/buttons/BackButton'
-import CancelButton from '@/components/buttons/CancelButton'
-import SubmitButton from '@/components/buttons/SubmitButton'
-import SelectField from '@/components/form/SelectField'
-import { useCreateMatchMutation, useGetSingleMatchQuery, useUpdateMatchMutation } from '@/features/match/matchApi'
-import { useGetRefereeQuery } from '@/features/referee/refereeApi'
-import { useHeaders } from '@/hooks/useHeaders'
-import { formatImagePath } from '@/utils/formatImagePath'
-import { zodResolver } from '@hookform/resolvers/zod'
-import dayjs from 'dayjs'
-import { Calendar, Clock, Loader2, MapPin, Pencil, Trash2 } from 'lucide-react'
-import { useRouter, useSearchParams } from 'next/navigation'
-import { useEffect, useState } from 'react'
-import { useForm } from 'react-hook-form'
-import { toast } from 'sonner'
-import { getErrorMessage } from '@/utils/getErrorMessage'
-import * as z from 'zod'
-import InputField from '../../../../components/form/InputField'
-import { durationOptions } from '../../../../constants/selectData'
-import { useGetAllLeagueTeamQuery } from '../../../../features/leagueTeam/leagueTeamApi'
-import { TeamCard } from './MatchupSelector'
+"use client";
+
+import BackButton from "@/components/buttons/BackButton";
+import CancelButton from "@/components/buttons/CancelButton";
+import SubmitButton from "@/components/buttons/SubmitButton";
+import SelectField from "@/components/form/SelectField";
+import {
+  useCreateMatchMutation,
+  useGetSingleMatchQuery,
+  useUpdateMatchMutation,
+} from "@/features/match/matchApi";
+import { useGetRefereeQuery } from "@/features/referee/refereeApi";
+import {
+  useGetAllVenueCategoryQuery,
+  useGetAllPlayTimeQuery,
+} from "@/features/categoryManagement/categoryApi";
+import { useHeaders } from "@/hooks/useHeaders";
+import { formatImagePath } from "@/utils/formatImagePath";
+import { getErrorMessage } from "@/utils/getErrorMessage";
+import { zodResolver } from "@hookform/resolvers/zod";
+import dayjs from "dayjs";
+import { Calendar, Clock, Loader2, MapPin, Pencil, Trash2 } from "lucide-react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useEffect, useState } from "react";
+import { useForm } from "react-hook-form";
+import { toast } from "sonner";
+import * as z from "zod";
+import InputField from "../../../../components/form/InputField";
+import { useGetAllLeagueTeamQuery } from "../../../../features/leagueTeam/leagueTeamApi";
+import { TeamCard } from "./MatchupSelector";
 
 // Form Validation Schema
 const createMatchSchema = z.object({
   venue: z.string().min(1, "Venue is required"),
-  pitch: z.string().min(1, "Pitch is required"),
+  subVenue: z.string().optional(),
+  pitch: z.string().optional(),
   league: z.string().min(1, "League is required"),
   referee: z.string().min(1, "Referee is required"),
   durationMinutes: z.string().min(1, "Duration is required"),
@@ -33,7 +42,7 @@ const createMatchSchema = z.object({
   time: z.string().min(1, "Time is required"),
 });
 
-type CreateMatchFormValues = z.infer<typeof createMatchSchema>
+type CreateMatchFormValues = z.infer<typeof createMatchSchema>;
 
 export interface Team {
   value: string;
@@ -48,8 +57,10 @@ export interface TempMatch {
     homeTeam: string;
     awayTeam: string;
     matchDate: string;
-    durationMinutes: number;
+    durationMinutes: string;
     venueName: string;
+    pitch?: string;
+    subVenue?: string;
     referee: string;
   };
   display: {
@@ -67,20 +78,6 @@ export interface TempMatch {
   };
 }
 
-const venueOptions = [
-  { label: "CranFord OutDoor 3G", value: "CranFord OutDoor 3G" },
-  { label: "CranFord Indoor Dome", value: "CranFord Indoor Dome" },
-  { label: "ENG FeatherStone 3G", value: "ENG FeatherStone 3G" },
-];
-
-const pitchOptions = [
-  { label: "PITCH A", value: "PITCH A" },
-  { label: "PITCH B", value: "PITCH B" },
-  { label: "PITCH C", value: "PITCH C" },
-  { label: "PITCH D", value: "PITCH D" },
-  { label: "PITCH E", value: "PITCH E" },
-];
-
 const CreateMatch = () => {
   const searchParams = useSearchParams();
   const matchId = searchParams.get("id");
@@ -88,7 +85,7 @@ const CreateMatch = () => {
 
   const [homeTeam, setHomeTeam] = useState<Team | null>(null);
   const [awayTeam, setAwayTeam] = useState<Team | null>(null);
-  const { setHeaders } = useHeaders()
+  const { setHeaders } = useHeaders();
   const router = useRouter();
 
   const [tempMatches, setTempMatches] = useState<TempMatch[]>([]);
@@ -107,11 +104,12 @@ const CreateMatch = () => {
             const lastMatch = parsed[parsed.length - 1];
             if (lastMatch?.display && !isEditMode) {
               reset({
-                venue: lastMatch.display.venue || "",
-                pitch: lastMatch.display.pitch || "",
+                venue: lastMatch.payload.venueName || lastMatch.display.venue || "",
+                subVenue: lastMatch.payload.subVenue || lastMatch.payload.pitch || "",
+                pitch: lastMatch.payload.pitch || "",
                 league: lastMatch.payload.league || "",
                 referee: lastMatch.payload.referee || "",
-                durationMinutes: lastMatch.display.durationMinutes || "90 Minutes",
+                durationMinutes: lastMatch.payload.durationMinutes?.toString() || "",
                 date: lastMatch.display.date || "",
                 time: lastMatch.display.time || "",
               });
@@ -123,10 +121,9 @@ const CreateMatch = () => {
       }
       setIsHydrated(true);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Save to localStorage only after hydration to avoid overwriting on mount
+  // Save to localStorage after hydration
   useEffect(() => {
     if (isHydrated && typeof window !== "undefined") {
       localStorage.setItem("temp_matches", JSON.stringify(tempMatches));
@@ -135,16 +132,21 @@ const CreateMatch = () => {
 
   const [createMatch, { isLoading: isCreating }] = useCreateMatchMutation();
   const [updateMatch, { isLoading: isUpdating }] = useUpdateMatchMutation();
-  const { data: matchData, isFetching } = useGetSingleMatchQuery(matchId, { skip: !isEditMode });
+  const { data: matchData, isFetching } = useGetSingleMatchQuery(matchId, {
+    skip: !isEditMode,
+  });
 
-  // Single source of truth: league-team API
+  // Queries for Leagues, Referees, Venue Categories, PlayTime
   const { data: leagueTeamData } = useGetAllLeagueTeamQuery(1);
   const { data: refereeData } = useGetRefereeQuery(undefined);
+  const { data: venueCategoryData } = useGetAllVenueCategoryQuery({});
+  const { data: playTimeData } = useGetAllPlayTimeQuery({});
 
-  // All entries: [{ league: {...}, teams: [...] }]
   const leagueTeamList: any[] = leagueTeamData?.data || [];
+  const venueCategories: any[] = venueCategoryData?.data || [];
+  const playTimeList: any[] = playTimeData?.data || [];
 
-  // Build league options for the dropdown
+  // Options for dropdowns
   const leagueOptions = leagueTeamList.map((item: any) => ({
     label: `${item.league.leagueName} (${item.league.season})`,
     value: item.league._id,
@@ -155,6 +157,17 @@ const CreateMatch = () => {
     value: r._id,
   }));
 
+  const venueOptions = venueCategories.map((v: any) => ({
+    label: v.name,
+    value: v._id || v.id,
+  }));
+
+  // Duration passes text title (e.g. "90 minute") instead of ID as requested by user
+  const durationOptions = playTimeList.map((p: any) => ({
+    label: p.name,
+    value: p.name,
+  }));
+
   const {
     register,
     handleSubmit,
@@ -162,31 +175,45 @@ const CreateMatch = () => {
     reset,
     setValue,
     watch,
-    formState: { errors }
+    formState: { errors },
   } = useForm<CreateMatchFormValues>({
     resolver: zodResolver(createMatchSchema),
     defaultValues: {
       venue: "",
+      subVenue: "",
       pitch: "",
       league: "",
       referee: "",
-      durationMinutes: "90 Minutes",
+      durationMinutes: "",
       date: "",
       time: "",
-    }
-  })
+    },
+  });
 
-  // Watch the selected league value
+  // Watch fields
   const selectedLeagueId = watch("league");
-  const selectedVenue = watch("venue");
+  const selectedVenueId = watch("venue");
 
-  const [prevVenue, setPrevVenue] = useState(selectedVenue);
+  // Derive venue object and subcategories if present
+  const selectedVenueObj = venueCategories.find(
+    (v: any) => (v._id || v.id) === selectedVenueId || v.name === selectedVenueId
+  );
+  const subCategoriesList: any[] = selectedVenueObj?.subCategories || [];
+
+  const subVenueOptions = subCategoriesList.map((s: any) => ({
+    label: s.name,
+    value: s._id || s.id,
+  }));
+
+  // Reset subVenue when parent venue changes
+  const [prevVenueId, setPrevVenueId] = useState(selectedVenueId);
   useEffect(() => {
-    if (prevVenue && selectedVenue !== prevVenue) {
+    if (prevVenueId && selectedVenueId !== prevVenueId) {
+      setValue("subVenue", "");
       setValue("pitch", "");
     }
-    setPrevVenue(selectedVenue);
-  }, [selectedVenue, prevVenue, setValue]);
+    setPrevVenueId(selectedVenueId);
+  }, [selectedVenueId, prevVenueId, setValue]);
 
   // Derive teams for the selected league
   const selectedLeagueEntry = leagueTeamList.find(
@@ -198,7 +225,7 @@ const CreateMatch = () => {
     logo: t.teamLogo || null,
   }));
 
-  // Reset home/away whenever the league changes (only if it changes from one populated value to another)
+  // Reset home/away teams when league changes
   const [prevLeagueId, setPrevLeagueId] = useState(selectedLeagueId);
   useEffect(() => {
     if (prevLeagueId && selectedLeagueId !== prevLeagueId) {
@@ -208,21 +235,28 @@ const CreateMatch = () => {
     setPrevLeagueId(selectedLeagueId);
   }, [selectedLeagueId, prevLeagueId]);
 
-  // Auto-pick first two teams in create mode once teams load (only if not editing a temp match)
+  // Auto-pick first two teams in create mode once loaded
   useEffect(() => {
-    if (!isEditMode && !editingTempId && teamsList.length >= 2 && !homeTeam && !awayTeam) {
+    if (
+      !isEditMode &&
+      !editingTempId &&
+      teamsList.length >= 2 &&
+      !homeTeam &&
+      !awayTeam
+    ) {
       setHomeTeam(teamsList[0]);
       setAwayTeam(teamsList[1]);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedLeagueId, leagueTeamData, editingTempId]);
 
   useEffect(() => {
     setHeaders({
       title: isEditMode ? "Edit Match" : "Create Match",
-      des: isEditMode ? "Update details for this match." : "Set up a new matchup between teams in the league."
-    })
-  }, [setHeaders, isEditMode])
+      des: isEditMode
+        ? "Update details for this match."
+        : "Set up a new matchup between teams in the league.",
+    });
+  }, [setHeaders, isEditMode]);
 
   // Populate form in edit mode
   useEffect(() => {
@@ -230,25 +264,17 @@ const CreateMatch = () => {
       const match = matchData.data;
       const date = dayjs(match.matchDate);
 
-      let venue = "";
-      let pitch = "";
-      if (match.venueName) {
-        const regex = /^(.*?)\s*\((PITCH\s+[A-E])\)$/i;
-        const matchResult = match.venueName.match(regex);
-        if (matchResult) {
-          venue = matchResult[1].trim();
-          pitch = matchResult[2].toUpperCase();
-        } else {
-          venue = match.venueName;
-        }
-      }
+      const venueVal = typeof match.venueName === "object" ? match.venueName?._id : match.venueName || "";
+      const subVal = typeof match.subVenue === "object" ? match.subVenue?._id : match.subVenue || typeof match.pitch === "object" ? match.pitch?._id : match.pitch || "";
+      const durVal = typeof match.durationMinutes === "object" ? match.durationMinutes?.name : match.durationMinutes || "";
 
       reset({
-        venue: venue,
-        pitch: pitch,
-        league: typeof match.league === 'string' ? match.league : match.league?._id,
-        referee: typeof match.referee === 'string' ? match.referee : match.referee?._id,
-        durationMinutes: `${match.durationMinutes} Minutes`,
+        venue: venueVal,
+        subVenue: subVal,
+        pitch: subVal,
+        league: typeof match.league === "object" ? match.league?._id : match.league || "",
+        referee: typeof match.referee === "object" ? match.referee?._id : match.referee || "",
+        durationMinutes: durVal,
         date: date.format("YYYY-MM-DD"),
         time: date.format("HH:mm"),
       });
@@ -268,8 +294,7 @@ const CreateMatch = () => {
         });
       }
     }
-  }, [matchData, reset])
-
+  }, [matchData, reset]);
 
   const handleCancelOrReset = () => {
     setHomeTeam(null);
@@ -285,10 +310,11 @@ const CreateMatch = () => {
   const handleFullReset = () => {
     reset({
       venue: "",
+      subVenue: "",
       pitch: "",
       league: "",
       referee: "",
-      durationMinutes: "90 Minutes",
+      durationMinutes: "",
       date: "",
       time: "",
     });
@@ -303,34 +329,34 @@ const CreateMatch = () => {
   const handleEditTempMatch = (match: TempMatch) => {
     setEditingTempId(match.id);
 
-    // Set form fields
+    const subVal = match.payload.subVenue || match.payload.pitch || "";
     reset({
-      venue: match.display.venue,
-      pitch: match.display.pitch,
+      venue: match.payload.venueName || match.display.venue,
+      subVenue: subVal,
+      pitch: subVal,
       league: match.payload.league,
       referee: match.payload.referee,
-      durationMinutes: match.display.durationMinutes,
+      durationMinutes: match.payload.durationMinutes || match.display.durationMinutes,
       date: match.display.date,
       time: match.display.time,
     });
 
-    // Set home and away teams
     setHomeTeam({
       value: match.payload.homeTeam,
       name: match.display.homeTeamName,
-      logo: match.display.homeTeamLogo
+      logo: match.display.homeTeamLogo,
     });
     setAwayTeam({
       value: match.payload.awayTeam,
       name: match.display.awayTeamName,
-      logo: match.display.awayTeamLogo
+      logo: match.display.awayTeamLogo,
     });
 
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   const handleDeleteTempMatch = (id: string) => {
-    setTempMatches(prev => prev.filter(m => m.id !== id));
+    setTempMatches((prev) => prev.filter((m) => m.id !== id));
     if (editingTempId === id) {
       setEditingTempId(null);
       setHomeTeam(null);
@@ -346,7 +372,7 @@ const CreateMatch = () => {
     }
 
     try {
-      const payloads = tempMatches.map(m => m.payload);
+      const payloads = tempMatches.map((m) => m.payload);
       const res = await createMatch(payloads).unwrap();
       if (res.success) {
         toast.success(res.message || "All matches created successfully!");
@@ -381,27 +407,44 @@ const CreateMatch = () => {
 
     try {
       const matchDate = `${formData.date}T${formData.time}:00Z`;
-      const venueNameCombined = `${formData.venue} (${formData.pitch})`;
 
-      const payload = {
+      const selectedSubCategoryVal = formData.subVenue || formData.pitch || "";
+
+      // Labels for display preview
+      const selectedVenueLabel = selectedVenueObj?.name || formData.venue;
+      const selectedSubVenueObj = subCategoriesList.find(
+        (s: any) => (s._id || s.id) === selectedSubCategoryVal || s.name === selectedSubCategoryVal
+      );
+      const selectedSubVenueLabel = selectedSubVenueObj?.name || selectedSubCategoryVal || "";
+
+      const payload: any = {
         league: formData.league,
         homeTeam: homeTeam.value,
         awayTeam: awayTeam.value,
         matchDate,
-        durationMinutes: parseInt(formData.durationMinutes),
-        venueName: venueNameCombined,
+        durationMinutes: formData.durationMinutes, // title text (e.g. "90 minute")
+        venueName: formData.venue, // venue category ID
+        pitch: selectedSubCategoryVal, // subcategory ID sent as pitch
         referee: formData.referee,
       };
+
+      if (selectedSubCategoryVal) {
+        payload.subVenue = selectedSubCategoryVal;
+      }
 
       if (isEditMode) {
         const res = await updateMatch({ id: matchId, data: payload }).unwrap();
         if (res.success) {
-          toast.success(res.message || "Match updated successfully")
-          router.push("/match-management")
+          toast.success(res.message || "Match updated successfully");
+          router.push("/match-management");
         }
       } else {
-        const leagueLabel = leagueOptions.find((opt: any) => opt.value === formData.league)?.label || "Unknown League";
-        const refereeLabel = refereeOptions.find((opt: any) => opt.value === formData.referee)?.label || "Unknown Referee";
+        const leagueLabel =
+          leagueOptions.find((opt: any) => opt.value === formData.league)?.label ||
+          "Unknown League";
+        const refereeLabel =
+          refereeOptions.find((opt: any) => opt.value === formData.referee)?.label ||
+          "Unknown Referee";
 
         const display = {
           leagueName: leagueLabel,
@@ -413,16 +456,22 @@ const CreateMatch = () => {
           date: formData.date,
           time: formData.time,
           durationMinutes: formData.durationMinutes,
-          venue: formData.venue,
-          pitch: formData.pitch,
+          venue: selectedVenueLabel,
+          pitch: selectedSubVenueLabel,
         };
 
         if (editingTempId) {
-          setTempMatches(prev => prev.map(m => m.id === editingTempId ? {
-            ...m,
-            payload,
-            display
-          } : m));
+          setTempMatches((prev) =>
+            prev.map((m) =>
+              m.id === editingTempId
+                ? {
+                    ...m,
+                    payload,
+                    display,
+                  }
+                : m
+            )
+          );
           setEditingTempId(null);
           toast.success("Match updated in queue");
         } else {
@@ -431,14 +480,15 @@ const CreateMatch = () => {
             payload,
             display,
           };
-          setTempMatches(prev => [...prev, newMatch]);
+          setTempMatches((prev) => [...prev, newMatch]);
           toast.success("Match added to queue");
         }
 
         // Reset form for next entry
         reset({
           venue: formData.venue,
-          pitch: "",
+          subVenue: selectedSubCategoryVal,
+          pitch: selectedSubCategoryVal,
           league: formData.league,
           referee: formData.referee,
           durationMinutes: formData.durationMinutes,
@@ -453,32 +503,37 @@ const CreateMatch = () => {
     }
   };
 
-
   if (isEditMode && isFetching) {
-    return <div className="flex items-center justify-center min-h-[400px]">Loading match data...</div>
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        Loading match data...
+      </div>
+    );
   }
 
-
   // Filtered lists to prevent same-team selection
-  const homeTeamOptions = teamsList.filter(t => t.value !== awayTeam?.value);
-  const awayTeamOptions = teamsList.filter(t => t.value !== homeTeam?.value);
+  const homeTeamOptions = teamsList.filter((t) => t.value !== awayTeam?.value);
+  const awayTeamOptions = teamsList.filter((t) => t.value !== homeTeam?.value);
 
   return (
-    <form onSubmit={handleSubmit(onSubmit, onError)} className="py-10 px-6 space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
-      <>
-        <BackButton />
-      </>
-      <div className='w-full flex gap-4'>
-        <div className='flex-1 space-y-4 '>
+    <form
+      onSubmit={handleSubmit(onSubmit, onError)}
+      className="py-10 px-6 space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700"
+    >
+      <BackButton />
 
-          <div className='flex justify-between gap-5'>
+      <div className="w-full flex gap-4">
+        <div className="flex-1 space-y-4">
+          <div className="flex justify-between gap-5">
             {/* Match Settings Card */}
-            <section className="bg-white rounded-xl w-8/12 p-8 md:p-10  shadow-xl shadow-gray-200/50">
-              <h2 className="text-2xl font-bold text-gray-900 mb-8">Match Setting</h2>
+            <section className="bg-white rounded-xl w-8/12 p-8 md:p-10 shadow-xl shadow-gray-200/50">
+              <h2 className="text-2xl font-bold text-gray-900 mb-8">
+                Match Setting
+              </h2>
 
               <div className="space-y-8">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                  {/* League dropdown — scrollable when > 10 items */}
+                  {/* League dropdown */}
                   <SelectField
                     name="league"
                     label="League"
@@ -506,40 +561,71 @@ const CreateMatch = () => {
                     error={errors.venue}
                     options={venueOptions}
                     placeholder="Select venue"
+                    scrollable
                   />
-                  <SelectField
-                    name="pitch"
-                    label="Pitch Selection"
-                    control={control}
-                    error={errors.pitch}
-                    options={pitchOptions}
-                    placeholder="Select pitch"
-                  />
+
+                  {/* Render Subcategory dropdown if parent venue has subcategories */}
+                  {subCategoriesList.length > 0 && (
+                    <SelectField
+                      name="subVenue"
+                      label="Sub Category"
+                      control={control}
+                      error={errors.subVenue}
+                      options={subVenueOptions}
+                      placeholder="Select subcategory"
+                      scrollable
+                    />
+                  )}
                 </div>
               </div>
             </section>
 
-            <div className=' w-4/12 space-y-4'>
+            {/* Schedule Card */}
+            <div className="w-4/12 space-y-4">
               <section className="bg-white rounded-xl p-8 md:p-10 border border-gray-50 shadow-xl shadow-gray-200/50">
-                <h2 className="text-2xl font-bold text-gray-900 mb-8">Schedule</h2>
+                <h2 className="text-2xl font-bold text-gray-900 mb-8">
+                  Schedule
+                </h2>
 
                 <div className="space-y-8">
                   <div className="grid grid-cols-1 gap-4">
-                    <InputField name="date" type='date' title="Match Date" register={register} error={errors.date} />
-                    <InputField name="time" type='time' title="Kick-off Time" register={register} error={errors.time} />
-                    <SelectField name="durationMinutes" label="Duration" control={control} error={errors.durationMinutes} options={durationOptions} />
+                    <InputField
+                      name="date"
+                      type="date"
+                      title="Match Date"
+                      register={register}
+                      error={errors.date}
+                    />
+                    <InputField
+                      name="time"
+                      type="time"
+                      title="Kick-off Time"
+                      register={register}
+                      error={errors.time}
+                    />
+                    <SelectField
+                      name="durationMinutes"
+                      label="Duration"
+                      control={control}
+                      error={errors.durationMinutes}
+                      options={durationOptions}
+                      placeholder="Select duration"
+                      scrollable
+                    />
                   </div>
                 </div>
               </section>
             </div>
-
-
           </div>
 
           {/* Matchup Selection Card */}
           <section className="bg-white rounded-xl p-8 md:p-10 border border-gray-50 shadow-xl shadow-gray-200/50">
-            <h2 className="text-2xl font-bold text-gray-900 mb-2">Matchup Selection</h2>
-            <p className="text-sm text-gray-400 mb-8">Home and away teams must be different.</p>
+            <h2 className="text-2xl font-bold text-gray-900 mb-2">
+              Matchup Selection
+            </h2>
+            <p className="text-sm text-gray-400 mb-8">
+              Home and away teams must be different.
+            </p>
 
             {/* No league selected yet */}
             {!selectedLeagueId ? (
@@ -547,8 +633,12 @@ const CreateMatch = () => {
                 <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center">
                   <span className="text-3xl">🏆</span>
                 </div>
-                <p className="text-gray-500 font-semibold">Select a league above to view available teams</p>
-                <p className="text-gray-400 text-sm">Teams are filtered based on the selected league</p>
+                <p className="text-gray-500 font-semibold">
+                  Select a league above to view available teams
+                </p>
+                <p className="text-gray-400 text-sm">
+                  Teams are filtered based on the selected league
+                </p>
               </div>
             ) : teamsList.length < 2 ? (
               /* League has fewer than 2 teams */
@@ -557,14 +647,16 @@ const CreateMatch = () => {
                   <span className="text-3xl">⚠️</span>
                 </div>
                 <p className="text-amber-600 font-semibold">
-                  This league has {teamsList.length === 0 ? 'no' : 'only 1'} team assigned.
+                  This league has {teamsList.length === 0 ? "no" : "only 1"} team
+                  assigned.
                 </p>
-                <p className="text-gray-400 text-sm">Add at least 2 teams to this league to create a match.</p>
+                <p className="text-gray-400 text-sm">
+                  Add at least 2 teams to this league to create a match.
+                </p>
               </div>
             ) : (
               /* Show team selector */
               <div className="flex items-center justify-center gap-8 p-8 bg-white rounded-2xl max-w-4xl mx-auto">
-
                 {/* Home Team */}
                 <TeamCard
                   teams={homeTeamOptions}
@@ -597,193 +689,136 @@ const CreateMatch = () => {
               </p>
             )}
           </section>
+        </div>
+      </div>
 
-          {/* Form Actions */}
-          <div className="bg-white rounded-xl p-5 border border-gray-50 shadow-lg shadow-gray-200/30 flex items-center justify-between">
+      {/* Temp Matches Queue / List */}
+      {!isEditMode && tempMatches.length > 0 && (
+        <section className="bg-white rounded-xl p-8 md:p-10 border border-gray-50 shadow-xl shadow-gray-200/50 space-y-6">
+          <div className="flex items-center justify-between">
+            <div>
+              <h2 className="text-2xl font-bold text-gray-900">
+                Matches to Create ({tempMatches.length})
+              </h2>
+              <p className="text-sm text-gray-400 mt-1">
+                Review queued matches before submitting.
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={handleCreateMatches}
+              disabled={isCreating}
+              className="px-6 py-2.5 bg-black hover:bg-gray-800 text-white font-semibold rounded-lg transition-all shadow-md flex items-center gap-2 cursor-pointer disabled:opacity-50"
+            >
+              {isCreating ? (
+                <Loader2 className="w-4 h-4 animate-spin" />
+              ) : (
+                <span>Submit All Matches ({tempMatches.length})</span>
+              )}
+            </button>
+          </div>
+
+          <div className="space-y-4">
+            {tempMatches.map((m, index) => {
+              const isBeingEdited = editingTempId === m.id;
+              return (
+                <div
+                  key={m.id}
+                  className={`p-6 rounded-2xl border transition-all flex flex-col md:flex-row items-center justify-between gap-6 ${
+                    isBeingEdited
+                      ? "bg-amber-50/60 border-amber-300 ring-2 ring-amber-400/50"
+                      : "bg-gray-50/70 border-gray-100 hover:border-gray-200"
+                  }`}
+                >
+                  {/* Left: Match Details */}
+                  <div className="flex items-center gap-4 flex-1">
+                    <span className="w-8 h-8 rounded-full bg-gray-900 text-white font-bold text-sm flex items-center justify-center shrink-0">
+                      #{index + 1}
+                    </span>
+                    <div>
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <span className="font-bold text-gray-900 text-base">
+                          {m.display.homeTeamName} vs {m.display.awayTeamName}
+                        </span>
+                        <span className="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-blue-100 text-blue-700">
+                          {m.display.leagueName}
+                        </span>
+                      </div>
+
+                      <div className="flex items-center gap-4 text-xs text-gray-500 mt-2 flex-wrap">
+                        <span className="flex items-center gap-1">
+                          <Calendar className="w-3.5 h-3.5 text-gray-400" />
+                          {m.display.date} at {m.display.time}
+                        </span>
+                        <span className="flex items-center gap-1">
+                          <Clock className="w-3.5 h-3.5 text-gray-400" />
+                          {m.display.durationMinutes}
+                        </span>
+                        <span className="flex items-center gap-1">
+                          <MapPin className="w-3.5 h-3.5 text-gray-400" />
+                          {m.display.venue}{" "}
+                          {m.display.pitch ? `(${m.display.pitch})` : ""}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Actions */}
+                  <div className="flex items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={() => handleEditTempMatch(m)}
+                      className="p-2 rounded-lg text-gray-500 hover:text-black hover:bg-gray-200/60 transition-colors cursor-pointer"
+                      title="Edit queued match"
+                    >
+                      <Pencil className="w-4 h-4" />
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => handleDeleteTempMatch(m.id)}
+                      className="p-2 rounded-lg text-red-500 hover:text-red-700 hover:bg-red-50 transition-colors cursor-pointer"
+                      title="Delete queued match"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </section>
+      )}
+
+      {/* Form Action Footer */}
+      <div className="flex justify-between items-center pt-4">
+        <CancelButton onClick={handleCancelOrReset} title="Cancel" />
+        <div className="flex gap-4">
+          {!isEditMode && (
             <button
               type="button"
               onClick={handleFullReset}
-              className="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-semibold rounded-lg transition-colors cursor-pointer"
+              className="px-5 py-2.5 rounded-lg border border-gray-200 text-gray-600 hover:bg-gray-100 font-semibold text-sm transition-all cursor-pointer"
             >
-              Reset All Fields
+              Clear Form
             </button>
-            <div className="flex items-center space-x-4">
-              <CancelButton onClick={handleCancelOrReset} title={editingTempId ? "Cancel Edit" : "Clear Teams"} />
-              <SubmitButton
-                isSubmitting={isEditMode ? isUpdating : false}
-                title={isEditMode ? "Update Match" : editingTempId ? "Update Match" : "Add Match to Queue"}
-              />
-            </div>
-          </div>
+          )}
 
-          {/* Scheduled Matches Queue Card */}
-          {!isEditMode && tempMatches.length > 0 && (
-            <section className="bg-white rounded-xl p-8 md:p-10 border border-gray-50 shadow-xl shadow-gray-200/50 space-y-6">
-              <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-gray-100">
-                <div className="flex items-center space-x-3">
-                  <div>
-                    <h2 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
-                      <span>Matches Queue</span>
-                      <span className="px-2.5 py-0.5 text-xs bg-black text-white rounded-full font-bold">
-                        {tempMatches.length}
-                      </span>
-                    </h2>
-                    <p className="text-sm text-gray-400">These matchups will be created together when you submit.</p>
-                  </div>
-                </div>
-                <div className="flex items-center space-x-3">
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setTempMatches([]);
-                      localStorage.removeItem("temp_matches");
-                      toast.success("Successfully cleared matches queue");
-                    }}
-                    className="px-5 py-2.5 bg-red-50 text-red-600 cursor-pointer hover:bg-red-100 text-sm font-semibold rounded-lg transition-all duration-200"
-                  >
-                    Clear Queue
-                  </button>
-                  <button
-                    type="button"
-                    onClick={handleCreateMatches}
-                    disabled={isCreating}
-                    className="px-6 py-2.5 bg-black cursor-pointer text-white hover:bg-gray-800 disabled:bg-gray-400 text-sm font-semibold rounded-lg transition-all duration-200 flex items-center space-x-2 animate-pulse-subtle"
-                  >
-                    {isCreating ? (
-                      <>
-                        <Loader2 className="w-4 h-4 animate-spin" />
-                        <span>Creating...</span>
-                      </>
-                    ) : (
-                      <span>Create {tempMatches.length} Matches</span>
-                    )}
-                  </button>
-                </div>
-              </div>
-
-              <div className="overflow-x-auto rounded-xl border border-gray-100">
-                <table className="min-w-full divide-y divide-gray-100">
-                  <thead className="bg-gray-50">
-                    <tr>
-                      <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Matchup</th>
-                      <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">League & Referee</th>
-                      <th className="px-4 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Date & Time</th>
-                      <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Venue & Pitch</th>
-                      <th className="px-4 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Duration</th>
-                      <th className="px-6 py-4 text-right text-xs font-semibold text-gray-500 uppercase tracking-wider">Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody className="bg-white divide-y divide-gray-100">
-                    {tempMatches.map((match) => (
-                      <tr key={match.id} className="hover:bg-gray-50/50 transition-colors duration-150">
-                        {/* Matchup */}
-                        <td className="px-6 py-4.5 whitespace-nowrap">
-                          <div className="flex items-center space-x-3.5">
-                            {/* Home Team */}
-                            <div className="flex items-center space-x-2">
-                              {match.display.homeTeamLogo ? (
-                                <img
-                                  src={formatImagePath(match.display.homeTeamLogo)}
-                                  alt={match.display.homeTeamName}
-                                  className="w-7 h-7 object-contain rounded"
-                                />
-                              ) : (
-                                <div className="w-7 h-7 bg-gray-100 text-gray-400 rounded flex items-center justify-center font-bold text-xs uppercase">
-                                  {match.display.homeTeamName[0]}
-                                </div>
-                              )}
-                              <span className="text-sm font-semibold text-gray-800">{match.display.homeTeamName}</span>
-                            </div>
-                            <span className="text-gray-400 font-bold text-xs">VS</span>
-                            {/* Away Team */}
-                            <div className="flex items-center space-x-2">
-                              {match.display.awayTeamLogo ? (
-                                <img
-                                  src={formatImagePath(match.display.awayTeamLogo)}
-                                  alt={match.display.awayTeamName}
-                                  className="w-7 h-7 object-contain rounded"
-                                />
-                              ) : (
-                                <div className="w-7 h-7 bg-gray-100 text-gray-400 rounded flex items-center justify-center font-bold text-xs uppercase">
-                                  {match.display.awayTeamName[0]}
-                                </div>
-                              )}
-                              <span className="text-sm font-semibold text-gray-800">{match.display.awayTeamName}</span>
-                            </div>
-                          </div>
-                        </td>
-
-                        {/* League & Referee */}
-                        <td className="px-6 py-4 text-sm text-gray-600">
-                          <div className="font-semibold text-gray-800">{match.display.leagueName}</div>
-                          <div className="text-xs text-gray-400 flex items-center mt-1">
-                            <span className="mr-1">🏁 Ref:</span>
-                            {match.display.refereeName}
-                          </div>
-                        </td>
-
-                        {/* Date & Time */}
-                        <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-600">
-                          <div className="flex items-center gap-1.5 font-medium text-gray-700">
-                            <Calendar className="w-3.5 h-3.5 text-gray-400" />
-                            {dayjs(match.payload.matchDate).format("MMM DD, YYYY")}
-                          </div>
-                          <div className="flex items-center gap-1.5 text-xs text-gray-400 mt-1">
-                            <Clock className="w-3.5 h-3.5 text-gray-400" />
-                            {dayjs(match.payload.matchDate).format("hh:mm A")}
-                          </div>
-                        </td>
-
-                        {/* Venue & Pitch */}
-                        <td className="px-6 py-4 text-sm text-gray-600">
-                          <div className="flex items-center gap-1.5 font-medium text-gray-800">
-                            <MapPin className="w-3.5 h-3.5 text-gray-400" />
-                            {match.display.venue}
-                          </div>
-                          <div className="mt-1">
-                            <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-100">
-                              {match.display.pitch}
-                            </span>
-                          </div>
-                        </td>
-
-                        {/* Duration */}
-                        <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-700 font-medium">
-                          {match.display.durationMinutes}
-                        </td>
-
-                        {/* Actions */}
-                        <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                          <div className="flex items-center justify-end space-x-2.5">
-                            <button
-                              type="button"
-                              onClick={() => handleEditTempMatch(match)}
-                              className="p-2 text-gray-500 hover:text-black hover:bg-gray-100 rounded-lg transition-colors duration-150 cursor-pointer"
-                              title="Edit Match"
-                            >
-                              <Pencil className="w-4 h-4" />
-                            </button>
-                            <button
-                              type="button"
-                              onClick={() => handleDeleteTempMatch(match.id)}
-                              className="p-2 text-red-500 hover:text-red-700 hover:bg-red-50 rounded-lg transition-colors duration-150 cursor-pointer"
-                              title="Remove Match"
-                            >
-                              <Trash2 className="w-4 h-4" />
-                            </button>
-                          </div>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </section>
+          {isEditMode ? (
+            <SubmitButton
+              text="Update Match"
+              isLoading={isUpdating}
+              disabled={isUpdating}
+            />
+          ) : (
+            <SubmitButton
+              text={editingTempId ? "Save Queued Match" : "+ Add Match to Queue"}
+              disabled={isCreating}
+            />
           )}
         </div>
       </div>
     </form>
-  )
-}
+  );
+};
 
 export default CreateMatch;

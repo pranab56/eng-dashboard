@@ -1,21 +1,37 @@
 /* eslint-disable @next/next/no-img-element */
 "use client";
 
-import CategoryComboBox from "@/components/cui/CategoryComboBox";
-import { TGallery } from "@/types/columnTypes";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { useGetAllCategoryQuery } from "@/features/gallery/galleryApi";
+import { TCategory, TGallery, TSubCategory } from "@/types/columnTypes";
 import { formatImagePath } from "@/utils/formatImagePath";
-import { X, Upload, Loader2, Image as ImageIcon } from "lucide-react";
+import {
+  X,
+  Upload,
+  Loader2,
+  Image as ImageIcon,
+  Check,
+  ChevronsUpDown,
+  Search,
+} from "lucide-react";
 import React, { useEffect, useState } from "react";
 
 interface GalleryModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSubmit: (data: { category: string; status: string; file: File | null }) => Promise<void>;
+  onSubmit: (data: {
+    category: string;
+    subCategory?: string;
+    status: string;
+    file: File | null;
+  }) => Promise<void>;
   editingItem: TGallery | null;
   isLoading: boolean;
 }
-
-const CATEGORY_OPTIONS = ["Football", "Basketball", "Cricket", "Events", "General"];
 
 export default function GalleryModal({
   isOpen,
@@ -24,25 +40,40 @@ export default function GalleryModal({
   editingItem,
   isLoading,
 }: GalleryModalProps) {
-  const [category, setCategory] = useState("Football");
+  const { data: categoryData } = useGetAllCategoryQuery({});
+  const categoriesList: TCategory[] = categoryData?.data || [];
+
+  const [selectedCategory, setSelectedCategory] = useState<string>("");
+  const [selectedSubCategory, setSelectedSubCategory] = useState<string>("");
   const [status, setStatus] = useState("active");
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [errorMsg, setErrorMsg] = useState("");
 
+  // Popover States
+  const [parentPopoverOpen, setParentPopoverOpen] = useState(false);
+  const [parentSearch, setParentSearch] = useState("");
+
+  const [subPopoverOpen, setSubPopoverOpen] = useState(false);
+  const [subSearch, setSubSearch] = useState("");
+
   useEffect(() => {
     if (editingItem) {
-      setCategory(editingItem.category || "Football");
+      setSelectedCategory(editingItem.category || "");
+      setSelectedSubCategory(editingItem.subCategory || "");
       setStatus(editingItem.status || "active");
       setPreviewUrl(formatImagePath(editingItem.image));
       setSelectedFile(null);
     } else {
-      setCategory("Football");
+      setSelectedCategory("");
+      setSelectedSubCategory("");
       setStatus("active");
       setSelectedFile(null);
       setPreviewUrl(null);
     }
     setErrorMsg("");
+    setParentSearch("");
+    setSubSearch("");
   }, [editingItem, isOpen]);
 
   if (!isOpen) return null;
@@ -60,14 +91,36 @@ export default function GalleryModal({
     }
   };
 
+  // Find selected parent category object
+  const selectedParentObj = categoriesList.find(
+    (c) => (c._id || c.id) === selectedCategory || c.name === selectedCategory
+  );
+
+  // Subcategories array for selected parent category
+  const subCategoriesList: TSubCategory[] =
+    selectedParentObj?.subCategories || [];
+
+  // Find selected subcategory object
+  const selectedSubObj = subCategoriesList.find(
+    (s) =>
+      (s._id || s.id) === selectedSubCategory || s.name === selectedSubCategory
+  );
+
+  // Filtered lists for search
+  const filteredParentCategories = categoriesList.filter((c) =>
+    (c.name || "").toLowerCase().includes(parentSearch.toLowerCase())
+  );
+
+  const filteredSubCategories = subCategoriesList.filter((s) =>
+    (s.name || "").toLowerCase().includes(subSearch.toLowerCase())
+  );
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMsg("");
 
-    const finalCategory = category.trim();
-
-    if (!finalCategory) {
-      setErrorMsg("Category is required");
+    if (!selectedCategory) {
+      setErrorMsg("Please select a Category");
       return;
     }
 
@@ -77,7 +130,8 @@ export default function GalleryModal({
     }
 
     await onSubmit({
-      category: finalCategory,
+      category: selectedCategory,
+      subCategory: selectedSubCategory || undefined,
       status,
       file: selectedFile,
     });
@@ -112,7 +166,7 @@ export default function GalleryModal({
         </div>
 
         {/* Form */}
-        <form onSubmit={handleSubmit} className="p-6 space-y-6">
+        <form onSubmit={handleSubmit} className="p-6 space-y-5">
           {/* Image Upload Dropzone */}
           <div className="space-y-2">
             <label className="block text-sm font-semibold text-gray-800">
@@ -130,10 +184,10 @@ export default function GalleryModal({
               />
               <label
                 htmlFor="gallery-image-input"
-                className="flex flex-col items-center justify-center w-full min-h-[160px] border-2 border-dashed border-gray-200 hover:border-blue-400 bg-gray-50/50 hover:bg-blue-50/30 rounded-xl transition-all cursor-pointer overflow-hidden relative"
+                className="flex flex-col items-center justify-center w-full min-h-[150px] border-2 border-dashed border-gray-200 hover:border-blue-400 bg-gray-50/50 hover:bg-blue-50/30 rounded-xl transition-all cursor-pointer overflow-hidden relative"
               >
                 {previewUrl ? (
-                  <div className="relative w-full h-44 group-hover:opacity-90 transition-opacity">
+                  <div className="relative w-full h-40 group-hover:opacity-90 transition-opacity">
                     <img
                       src={previewUrl}
                       alt="Preview"
@@ -161,18 +215,163 @@ export default function GalleryModal({
             </div>
           </div>
 
-          {/* Category ComboBox */}
+          {/* Step 1: Parent Category Selection */}
           <div className="space-y-2">
             <label className="block text-sm font-semibold text-gray-800">
               Category <span className="text-red-500">*</span>
             </label>
-            <CategoryComboBox
-              value={category}
-              onChange={setCategory}
-              options={CATEGORY_OPTIONS}
-              disabled={isLoading}
-            />
+            <Popover
+              open={parentPopoverOpen}
+              onOpenChange={setParentPopoverOpen}
+            >
+              <PopoverTrigger asChild>
+                <button
+                  type="button"
+                  disabled={isLoading}
+                  className="w-full h-11 px-3.5 bg-gray-50 border border-gray-200 rounded-lg text-sm flex items-center justify-between font-medium text-gray-800 hover:bg-gray-100/70 focus:outline-none focus:border-blue-500 transition-all cursor-pointer disabled:opacity-50"
+                >
+                  <span className="truncate">
+                    {selectedParentObj
+                      ? selectedParentObj.name
+                      : categoriesList.length === 0
+                      ? "No category available"
+                      : "Select Category..."}
+                  </span>
+                  <ChevronsUpDown className="w-4 h-4 text-gray-400 shrink-0 ml-2" />
+                </button>
+              </PopoverTrigger>
+              <PopoverContent className="w-[var(--radix-popover-trigger-width)] p-0 bg-white border border-gray-200 shadow-xl rounded-xl overflow-hidden z-[60]">
+                <div className="p-2 border-b border-gray-100 relative flex items-center">
+                  <Search className="w-4 h-4 text-gray-400 absolute left-3.5" />
+                  <input
+                    type="text"
+                    placeholder="Search category..."
+                    value={parentSearch}
+                    onChange={(e) => setParentSearch(e.target.value)}
+                    className="w-full pl-9 pr-3 py-1.5 bg-gray-50 border border-gray-100 rounded-md text-xs focus:outline-none focus:border-blue-500 transition-colors"
+                  />
+                </div>
+                <div className="max-h-56 overflow-y-auto p-1 space-y-0.5">
+                  {filteredParentCategories.map((cat) => {
+                    const catId = cat._id || cat.id || "";
+                    const isSelected = selectedCategory === catId;
+
+                    const handleSelect = (e: React.SyntheticEvent) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      setSelectedCategory(catId);
+                      setSelectedSubCategory(""); // Reset subcategory
+                      setParentPopoverOpen(false);
+                      setParentSearch("");
+                    };
+
+                    return (
+                      <button
+                        key={catId}
+                        type="button"
+                        onPointerDown={handleSelect}
+                        onClick={handleSelect}
+                        className={`w-full px-3 py-2 text-xs rounded-md flex items-center justify-between transition-colors cursor-pointer text-left ${
+                          isSelected
+                            ? "bg-blue-50 text-blue-600 font-semibold"
+                            : "text-gray-700 hover:bg-gray-50"
+                        }`}
+                      >
+                        <span>{cat.name}</span>
+                        {isSelected && (
+                          <Check className="w-3.5 h-3.5 text-blue-600" />
+                        )}
+                      </button>
+                    );
+                  })}
+
+                  {filteredParentCategories.length === 0 && (
+                    <p className="p-3 text-center text-xs text-gray-400 font-medium">
+                      {categoriesList.length === 0
+                        ? "No category available"
+                        : "No matching categories found"}
+                    </p>
+                  )}
+                </div>
+              </PopoverContent>
+            </Popover>
           </div>
+
+          {/* Step 2: SubCategory Selection (Only if Parent Category has children) */}
+          {selectedCategory && subCategoriesList.length > 0 && (
+            <div className="space-y-2 animate-in fade-in duration-200">
+              <label className="block text-sm font-semibold text-gray-800">
+                SubCategory <span className="text-gray-400 text-xs font-normal">(Optional)</span>
+              </label>
+              <Popover open={subPopoverOpen} onOpenChange={setSubPopoverOpen}>
+                <PopoverTrigger asChild>
+                  <button
+                    type="button"
+                    disabled={isLoading}
+                    className="w-full h-11 px-3.5 bg-gray-50 border border-gray-200 rounded-lg text-sm flex items-center justify-between font-medium text-gray-800 hover:bg-gray-100/70 focus:outline-none focus:border-blue-500 transition-all cursor-pointer disabled:opacity-50"
+                  >
+                    <span className="truncate">
+                      {selectedSubObj
+                        ? selectedSubObj.name
+                        : "Select SubCategory..."}
+                    </span>
+                    <ChevronsUpDown className="w-4 h-4 text-gray-400 shrink-0 ml-2" />
+                  </button>
+                </PopoverTrigger>
+                <PopoverContent className="w-[var(--radix-popover-trigger-width)] p-0 bg-white border border-gray-200 shadow-xl rounded-xl overflow-hidden z-[60]">
+                  <div className="p-2 border-b border-gray-100 relative flex items-center">
+                    <Search className="w-4 h-4 text-gray-400 absolute left-3.5" />
+                    <input
+                      type="text"
+                      placeholder="Search subcategory..."
+                      value={subSearch}
+                      onChange={(e) => setSubSearch(e.target.value)}
+                      className="w-full pl-9 pr-3 py-1.5 bg-gray-50 border border-gray-100 rounded-md text-xs focus:outline-none focus:border-blue-500 transition-colors"
+                    />
+                  </div>
+                  <div className="max-h-56 overflow-y-auto p-1 space-y-0.5">
+                    {filteredSubCategories.map((sub) => {
+                      const subId = sub._id || sub.id || "";
+                      const isSelected = selectedSubCategory === subId;
+
+                      const handleSelectSub = (e: React.SyntheticEvent) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        setSelectedSubCategory(subId);
+                        setSubPopoverOpen(false);
+                        setSubSearch("");
+                      };
+
+                      return (
+                        <button
+                          key={subId}
+                          type="button"
+                          onPointerDown={handleSelectSub}
+                          onClick={handleSelectSub}
+                          className={`w-full px-3 py-2 text-xs rounded-md flex items-center justify-between transition-colors cursor-pointer text-left ${
+                            isSelected
+                              ? "bg-blue-50 text-blue-600 font-semibold"
+                              : "text-gray-700 hover:bg-gray-50"
+                          }`}
+                        >
+                          <span>{sub.name}</span>
+                          {isSelected && (
+                            <Check className="w-3.5 h-3.5 text-blue-600" />
+                          )}
+                        </button>
+                      );
+                    })}
+
+                    {filteredSubCategories.length === 0 && (
+                      <p className="p-3 text-center text-xs text-gray-400 font-medium">
+                        No subcategories found
+                      </p>
+                    )}
+                  </div>
+                </PopoverContent>
+              </Popover>
+            </div>
+          )}
 
           {/* Status Selection */}
           <div className="space-y-2">

@@ -7,7 +7,7 @@ import {
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import Image from 'next/image';
-import { baseURL } from '../../../utils/BaseURL';
+import { formatImagePath } from '@/utils/formatImagePath';
 
 dayjs.extend(relativeTime);
 
@@ -27,7 +27,7 @@ const NewsViewModal = ({ news, isOpen, onClose }: NewsViewModalProps) => {
         {/* Cover Image Section */}
         <div className="relative h-64 w-full bg-gray-100">
           {news.image ? (
-            <Image src={baseURL + news.image} alt="news cover" fill quality={100} className="object-cover" />
+            <Image src={formatImagePath(news.image)} alt="news cover" fill quality={100} className="object-cover" />
           ) : (
             <div className="w-full h-full flex items-center justify-center text-gray-300 font-black text-xl bg-gray-50 uppercase tracking-widest">
               NO IMAGE PROVIDED
@@ -36,18 +36,36 @@ const NewsViewModal = ({ news, isOpen, onClose }: NewsViewModalProps) => {
           <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
 
           <div className="absolute bottom-6 left-10 right-10">
-            <div className="flex items-center gap-3 mb-2">
-              <span className="px-3 py-1 bg-blue-600 text-white rounded-full text-[10px] font-black uppercase tracking-widest">
-                {news.category}
-              </span>
-              <span className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest border ${news.status === 'publish' ? 'bg-green-500 text-white' : 'bg-orange-500 text-white'
+            <div className="flex items-center gap-3 flex-wrap">
+              <DialogTitle className="text-3xl font-black text-white leading-tight tracking-tight shadow-sm">
+                {news.title}
+              </DialogTitle>
+
+              {(() => {
+                const catVal = news.category;
+                const rawName =
+                  typeof catVal === "object" && catVal
+                    ? catVal.name
+                    : typeof catVal === "string"
+                    ? catVal
+                    : "";
+                const isHexId = Boolean(rawName && /^[0-9a-fA-F]{24}$/.test(rawName));
+                const categoryDisplayName = isHexId ? null : rawName;
+
+                if (!categoryDisplayName) return null;
+
+                return (
+                  <span className="px-3 py-1 bg-blue-600 text-white rounded-full text-[10px] font-black uppercase tracking-widest shrink-0">
+                    {categoryDisplayName}
+                  </span>
+                );
+              })()}
+
+              <span className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest border shrink-0 ${news.status === 'publish' ? 'bg-green-500 text-white border-green-400' : 'bg-orange-500 text-white border-orange-400'
                 }`}>
                 {news.status}
               </span>
             </div>
-            <DialogTitle className="text-3xl font-black text-white leading-tight tracking-tight shadow-sm">
-              {news.title}
-            </DialogTitle>
           </div>
         </div>
 

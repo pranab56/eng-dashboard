@@ -8,6 +8,7 @@ import { useCreatePackageMutation, useUpdatePackageMutation } from '@/features/p
 import toast from 'react-hot-toast'
 import InputField from '@/components/form/InputField'
 import SelectField from '@/components/form/SelectField'
+import TextareaField from '@/components/form/TextareaField'
 import SubmitButton from '@/components/buttons/SubmitButton'
 
 const packageSchema = z.object({
@@ -15,8 +16,9 @@ const packageSchema = z.object({
   description: z.string().min(1, "Description is required"),
   userType: z.enum(['Player', 'Manager', 'Club', 'Referee', 'Other']),
   price: z.number().min(0, "Price must be at least 0"),
-  duration: z.string().min(1, "Duration is required"),
+  duration: z.enum(['1 month', '3 months', '6 months', '1 year']),
   paymentType: z.string().min(1, "Payment type is required"),
+  packageType: z.enum(['Semi Pro', 'Professional', 'Other']),
   credit: z.number().min(0, "Credit must be at least 0"),
   loginLimit: z.number().min(1, "Login limit must be at least 1"),
 })
@@ -38,6 +40,19 @@ const paymentTypeOptions = [
   { label: "One-time", value: "One-time" },
 ]
 
+const packageTypeOptions = [
+  { label: "Semi Pro", value: "Semi Pro" },
+  { label: "Professional", value: "Professional" },
+  { label: "Other", value: "Other" },
+]
+
+const durationOptions = [
+  { label: "1 month", value: "1 month" },
+  { label: "3 months", value: "3 months" },
+  { label: "6 months", value: "6 months" },
+  { label: "1 year", value: "1 year" },
+]
+
 interface CreatePackageProps {
   initialData?: any
   onSuccess?: () => void
@@ -56,6 +71,7 @@ const CreatePackage = ({ initialData, onSuccess }: CreatePackageProps) => {
       price: 0,
       duration: "1 month",
       paymentType: "Monthly",
+      packageType: "Semi Pro",
       credit: 0,
       loginLimit: 1,
     }
@@ -64,14 +80,15 @@ const CreatePackage = ({ initialData, onSuccess }: CreatePackageProps) => {
   useEffect(() => {
     if (initialData) {
       reset({
-        title: initialData.title,
-        description: initialData.description,
-        userType: initialData.userType,
-        price: initialData.price,
-        duration: initialData.duration,
-        paymentType: initialData.paymentType,
-        credit: initialData.credit,
-        loginLimit: initialData.loginLimit,
+        title: initialData.title || "",
+        description: initialData.description || "",
+        userType: initialData.userType || "Player",
+        price: initialData.price || 0,
+        duration: initialData.duration || "1 month",
+        paymentType: initialData.paymentType || "Monthly",
+        packageType: initialData.packageType || "Semi Pro",
+        credit: initialData.credit || 0,
+        loginLimit: initialData.loginLimit || 1,
       })
     }
   }, [initialData, reset])
@@ -94,16 +111,17 @@ const CreatePackage = ({ initialData, onSuccess }: CreatePackageProps) => {
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 py-4">
       <InputField name="title" title="Plan Title" placeholder="e.g. Premium Plan" register={register} error={errors.title} />
-      <InputField name="description" title="Description" placeholder="Best subscription package" register={register} error={errors.description} />
+      <TextareaField name="description" title="Description" placeholder="Best subscription package" register={register} error={errors.description} />
 
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-3 gap-4">
         <SelectField name="userType" label="User Type" control={control} options={userTypeOptions} error={errors.userType} />
         <SelectField name="paymentType" label="Payment Type" control={control} options={paymentTypeOptions} error={errors.paymentType} />
+        <SelectField name="packageType" label="Package Type" control={control} options={packageTypeOptions} error={errors.packageType} />
       </div>
 
       <div className="grid grid-cols-2 gap-4">
         <InputField name="price" title="Price" type="number" register={register} error={errors.price} registerOptions={{ valueAsNumber: true }} />
-        <InputField name="duration" title="Duration" placeholder="e.g. 1 month" register={register} error={errors.duration} />
+        <SelectField name="duration" label="Duration" control={control} options={durationOptions} error={errors.duration} />
       </div>
 
       <div className="grid grid-cols-2 gap-4">

@@ -37,11 +37,23 @@ export const getGalleryColumns = (
   {
     accessorKey: "category",
     header: () => <div>Category</div>,
-    cell: ({ row }) => (
-      <div className="font-semibold text-gray-800 capitalize">
-        {row.original.category || "General"}
-      </div>
-    ),
+    cell: ({ row }) => {
+      const cat = row.original.category as any;
+      const sub = row.original.subCategory as any;
+      const catName = typeof cat === "object" && cat ? cat.name : typeof cat === "string" ? cat : "";
+      const subName = typeof sub === "object" && sub ? sub.name : typeof sub === "string" ? sub : "";
+
+      return (
+        <div className="font-semibold text-gray-800 capitalize flex items-center gap-1.5 flex-wrap">
+          <span>{catName || "General"}</span>
+          {subName && (
+            <span className="text-xs bg-blue-50 text-blue-600 px-2 py-0.5 rounded font-medium">
+              › {subName}
+            </span>
+          )}
+        </div>
+      );
+    },
   },
   {
     accessorKey: "status",

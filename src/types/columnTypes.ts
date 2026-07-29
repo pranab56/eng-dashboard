@@ -151,6 +151,7 @@ export type TGallery = {
   _id: string;
   image: string;
   category: string;
+  subCategory?: string;
   status: string;
   createdBy?: string;
   createdAt: string;
@@ -164,6 +165,31 @@ export type TSocialMedia = {
   icon?: string;
   status: boolean;
   order: number;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export type TSubCategory = {
+  _id: string;
+  id?: string;
+  name: string;
+  parentCategory: string;
+  status?: string;
+  order?: number;
+  slug?: string;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export type TCategory = {
+  _id: string;
+  id?: string;
+  name: string;
+  parentCategory?: string | null;
+  status?: string;
+  order?: number;
+  slug?: string;
+  subCategories?: TSubCategory[];
   createdAt?: string;
   updatedAt?: string;
 }

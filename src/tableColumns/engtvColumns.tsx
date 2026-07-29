@@ -22,19 +22,41 @@ export const getEngtvColumns = (onView: (video: TEngtv) => void, onDelete: (id: 
   {
     accessorKey: "title",
     header: () => <div className="">Video Details</div>,
-    cell: ({ row }) => (
-      <div className="flex gap-2">
-        {row.original.thumbnail ? (
-          <Image src={formatImagePath(row.original.thumbnail)} alt="thumbnail" width={40} height={40} className="w-10 h-10 rounded-md border border-gray-200 object-cover" />
-        ) : (
-          <div className="w-10 h-10 rounded-md bg-gray-200 flex items-center justify-center text-[10px]">No Image</div>
-        )}
-        <div className="flex flex-col">
-          <span className="font-semibold">{row.original.title}</span>
-          <span className="text-gray-500 text-xs capitalize">{row.original.category}</span>
+    cell: ({ row }) => {
+      const catVal = row.original.category as any;
+      const catName =
+        typeof catVal === "object" && catVal
+          ? catVal.name
+          : typeof catVal === "string"
+          ? catVal
+          : "";
+
+      return (
+        <div className="flex gap-2">
+          {row.original.thumbnail ? (
+            <Image
+              src={formatImagePath(row.original.thumbnail)}
+              alt="thumbnail"
+              width={40}
+              height={40}
+              className="w-10 h-10 rounded-md border border-gray-200 object-cover"
+            />
+          ) : (
+            <div className="w-10 h-10 rounded-md bg-gray-200 flex items-center justify-center text-[10px]">
+              No Image
+            </div>
+          )}
+          <div className="flex flex-col">
+            <span className="font-semibold">{row.original.title}</span>
+            {catName && (
+              <span className="text-gray-500 text-xs capitalize">
+                {catName}
+              </span>
+            )}
+          </div>
         </div>
-      </div>
-    ),
+      );
+    },
   },
   {
     accessorKey: "publishDateTime",

@@ -56,8 +56,14 @@ const PackageCard = ({ packageData }: PackageCardProps) => {
           </div>
         </div>
 
-        <div className="pt-2 text-xs text-gray-500 font-medium">
-          Type: <span className="text-blue-600">{packageData.userType}</span> • {packageData.paymentType}
+        <div className="pt-2 text-xs text-gray-500 font-medium flex items-center gap-1.5 flex-wrap">
+          <span>Type: <span className="text-blue-600 font-semibold">{packageData.userType}</span></span>
+          <span>• {packageData.paymentType}</span>
+          {packageData.packageType && (
+            <span className="bg-blue-50 text-blue-700 px-2 py-0.5 rounded font-semibold text-[11px]">
+              {packageData.packageType}
+            </span>
+          )}
         </div>
       </CardContent>
 

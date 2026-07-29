@@ -7,7 +7,7 @@ import {
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import Image from 'next/image';
-import { baseURL } from '../../../utils/BaseURL';
+import { formatImagePath } from '@/utils/formatImagePath';
 import { MapPin, Calendar } from 'lucide-react';
 
 dayjs.extend(relativeTime);
@@ -28,7 +28,7 @@ const EventViewModal = ({ event, isOpen, onClose }: EventViewModalProps) => {
         {/* Cover Image Section */}
         <div className="relative h-64 w-full bg-gray-100">
           {event.image ? (
-            <Image src={baseURL + event.image} alt="event cover" fill quality={100} className="object-cover" />
+            <Image src={formatImagePath(event.image)} alt="event cover" fill quality={100} className="object-cover" />
           ) : (
             <div className="w-full h-full flex items-center justify-center text-gray-300 font-black text-xl bg-gray-50 uppercase tracking-widest">
               NO IMAGE PROVIDED

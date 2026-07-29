@@ -88,7 +88,7 @@ const TableManagement = () => {
       </div>
 
       {/* Standings Table */}
-      <div className="bg-white rounded-xl shadow-sm border border-gray-100 py-4 flex flex-col min-h-[500px]">
+      <div className="bg-white rounded-xl shadow-sm border border-gray-100 py-4 flex flex-col">
         <div className='flex-1'>
           <div className="flex flex-wrap items-center justify-between px-6 py-2 gap-4 border-b border-gray-100 pb-4">
             <TableTitle payload={{ title: tableHeaderPayload.title, des: tableHeaderPayload.des }} />

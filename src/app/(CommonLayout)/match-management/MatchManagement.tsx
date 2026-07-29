@@ -77,7 +77,7 @@ const MatchManagement = () => {
           <CreateButton text="Add Match" />
         </Link>
       </div>
-      <div className=" bg-white rounded-md py-4 flex flex-col min-h-[600px]">
+      <div className=" bg-white rounded-md py-4 flex flex-col">
         <div className='flex-1'>
           <>
             <TableHeader payload={tableHeaderPayload} />

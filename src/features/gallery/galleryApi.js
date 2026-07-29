@@ -50,7 +50,49 @@ export const galleryApi = baseApi.injectEndpoints({
             invalidatesTags: ["gallery"]
         }),
 
+        createCategory: builder.mutation({
+            query: (data) => ({
+                url: `/gallery-category`,
+                method: "POST",
+                body: data,
+            }),
+            invalidatesTags: ["gallery"]
+        }),
 
+        createSubCategory: builder.mutation({
+            query: (data) => ({
+                url: `/gallery-category`,
+                method: "POST",
+                body: data,
+            }),
+            invalidatesTags: ["gallery"]
+        }),
+
+
+        getAllCategory: builder.query({
+            query: () => ({
+                url: `/gallery-category`,
+                method: "GET",
+            }),
+            providesTags: ["gallery"]
+        }),
+
+        deleteCategory: builder.mutation({
+            query: (id) => ({
+                url: `/gallery-category/${id}`,
+                method: "DELETE",
+            }),
+            invalidatesTags: ["gallery"]
+        }),
+
+        updateCategory: builder.mutation({
+            query: ({ data, id }) => ({
+                url: `/gallery-category/${id}`,
+                method: "PATCH",
+                body: data,
+            }),
+            invalidatesTags: ["gallery"]
+        }),
     }),
 });
 
@@ -59,4 +101,9 @@ export const {
     useUpdateGalleryMutation,
     useGetAllGalleryQuery,
     useDeleteGalleryMutation,
+    useCreateCategoryMutation,
+    useCreateSubCategoryMutation,
+    useGetAllCategoryQuery,
+    useDeleteCategoryMutation,
+    useUpdateCategoryMutation,
 } = galleryApi;

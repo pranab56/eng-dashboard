@@ -160,7 +160,7 @@ const OrderManagement = () => {
       </div>
 
       {/* Main Content Table Card */}
-      <div className="bg-white rounded-xl shadow-sm border border-gray-100 py-4 flex flex-col min-h-[500px]">
+      <div className="bg-white rounded-xl shadow-sm border border-gray-100 py-4 flex flex-col">
         <div className="flex-1">
           {/* Header Bar with Title & Search Input */}
           <div className="px-6 flex flex-wrap items-center justify-between gap-4 border-b border-gray-100 pb-4">

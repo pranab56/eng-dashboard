@@ -16,6 +16,7 @@ import { toast } from 'sonner'
 import * as z from 'zod'
 
 import { useCreateNewsMutation, useGetSingleNewsQuery, useUpdateNewsMutation } from '@/features/news/newsApi'
+import { useGetAllNewsCategoryQuery } from '@/features/categoryManagement/categoryApi'
 import dayjs from 'dayjs'
 import { useRouter, useSearchParams } from 'next/navigation'
 
@@ -45,6 +46,15 @@ const CreateNews = () => {
   const [createNews, { isLoading: isCreating }] = useCreateNewsMutation()
   const [updateNews, { isLoading: isUpdating }] = useUpdateNewsMutation()
   const { data: newsData, isFetching } = useGetSingleNewsQuery(newsId, { skip: !isEditMode })
+  const { data: newsCategoryData } = useGetAllNewsCategoryQuery({})
+
+  const newsCategories: any[] = newsCategoryData?.data || [];
+  const dynamicNewsCategoryOptions = newsCategories.length > 0
+    ? newsCategories.map((c: any) => ({
+        label: c.name,
+        value: c._id || c.id || c.name,
+      }))
+    : newsTypeOptions;
 
   const {
     register,
@@ -57,7 +67,7 @@ const CreateNews = () => {
     defaultValues: {
       title: '',
       description: '',
-      category: 'Match',
+      category: '',
       status: 'publish',
       pubDate: dayjs().format("YYYY-MM-DD"),
       pubTime: dayjs().format("HH:mm"),
@@ -77,7 +87,7 @@ const CreateNews = () => {
       reset({
         title: news.title,
         description: news.description,
-        category: news.category,
+        category: typeof news.category === 'object' ? news.category?._id || news.category?.name : news.category,
         status: news.status,
         pubDate: dayjs(news.publishDateTime).format("YYYY-MM-DD"),
         pubTime: dayjs(news.publishDateTime).format("HH:mm"),
@@ -143,7 +153,7 @@ const CreateNews = () => {
 
             <div className="space-y-8">
               <InputField name="title" title="Headline" placeholder="Enter a compelling headline" register={register} error={errors.title} />
-              <SelectField name="category" label="Article Category" control={control} error={errors.category} options={newsTypeOptions} />
+              <SelectField name="category" label="Article Category" control={control} error={errors.category} options={dynamicNewsCategoryOptions} placeholder="Select news category" scrollable />
               <TextareaField name="description" title="Article Body" placeholder="Draft your content here..." register={register} error={errors.description} />
             </div>
           </section>

@@ -89,7 +89,7 @@ const TransferManagement = () => {
     <div className='pt-10 px-8 space-y-4'>
       <GeneralStateCard items={items} className='grid-cols-4' />
 
-      <div className="bg-white rounded-md py-4 flex flex-col min-h-[600px]">
+      <div className="bg-white rounded-md py-4 flex flex-col">
         <div className='flex-1 text-left'>
           <TableHeader payload={{ title: "Transfer Request List", url: "" }} />
           <div className="pt-4 px-4 overflow-hidden">

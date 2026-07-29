@@ -143,7 +143,7 @@ const UserManagement = () => {
     <div className='py-10 px-8 space-y-6 pb-16'>
       <GeneralStateCard items={items} className='grid-cols-4' />
 
-      <div className="bg-white rounded-md py-4 min-h-[600px] flex flex-col space-y-4">
+      <div className="bg-white rounded-md py-4 flex flex-col space-y-4">
         {/* Table Header and Search Bar */}
         <div className="px-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
           <TableHeader payload={tableHeaderPayload} />

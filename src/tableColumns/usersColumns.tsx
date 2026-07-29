@@ -48,7 +48,7 @@ export const getUsersColumns = (
   },
   {
     accessorKey: "verified",
-    header: () => <div className="">Verification</div>,
+    header: () => <div className="">Status</div>,
     cell: ({ row }) => (
       <div className="flex items-center gap-2">
         <label className="relative inline-flex items-center cursor-pointer">
@@ -68,7 +68,7 @@ export const getUsersColumns = (
   },
   {
     accessorKey: "status",
-    header: () => <div className="">Status</div>,
+    header: () => <div className="">Verification</div>,
     cell: ({ row }) => {
       const currentStatus = (row.original.status || "REJECTED").toUpperCase();
       const isApproved = currentStatus === "APPROVED";

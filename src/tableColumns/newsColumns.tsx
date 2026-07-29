@@ -9,19 +9,33 @@ export const getNewsColumns = (onView: (news: any) => void, onDelete: (id: strin
   {
     accessorKey: "title",
     header: () => <div className="">Article Title</div>,
-    cell: ({ row }) => (
-      <div className="flex items-center gap-3">
-        {row.original.image ? (
-          <Image src={formatImagePath(row.original.image)} alt="news cover" width={100} height={100} className="w-12 h-12 rounded-xl border border-gray-100 object-cover" />
-        ) : (
-          <div className="w-12 h-12 rounded-xl bg-gray-50 border border-gray-100 flex items-center justify-center text-[10px] font-black text-gray-300">VOID</div>
-        )}
-        <div className="flex flex-col max-w-[280px]">
-          <span className="font-bold text-gray-900 leading-tight line-clamp-1">{row.getValue("title")}</span>
-          <span className="text-[10px] text-gray-400 font-bold uppercase tracking-widest mt-0.5">{row.original.category}</span>
+    cell: ({ row }) => {
+      const catVal = row.original.category as any;
+      const rawCatName =
+        typeof catVal === "object" && catVal
+          ? catVal.name
+          : typeof catVal === "string"
+          ? catVal
+          : "";
+      const isHexId = Boolean(rawCatName && /^[0-9a-fA-F]{24}$/.test(rawCatName));
+      const catName = isHexId ? null : rawCatName;
+
+      return (
+        <div className="flex items-center gap-3">
+          {row.original.image ? (
+            <Image src={formatImagePath(row.original.image)} alt="news cover" width={100} height={100} className="w-12 h-12 rounded-xl border border-gray-100 object-cover" />
+          ) : (
+            <div className="w-12 h-12 rounded-xl bg-gray-50 border border-gray-100 flex items-center justify-center text-[10px] font-black text-gray-300">VOID</div>
+          )}
+          <div className="flex flex-col max-w-[280px]">
+            <span className="font-bold text-gray-900 leading-tight line-clamp-1">{row.getValue("title")}</span>
+            {catName && (
+              <span className="text-[10px] text-gray-400 font-bold uppercase tracking-widest mt-0.5">{catName}</span>
+            )}
+          </div>
         </div>
-      </div>
-    ),
+      );
+    },
   },
   {
     accessorKey: "publishDateTime",

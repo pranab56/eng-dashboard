@@ -15,7 +15,7 @@ import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import * as z from 'zod'
 import Image from 'next/image'
-import { baseURL } from '@/utils/BaseURL'
+import { formatImagePath } from '@/utils/formatImagePath'
 import { cn } from '@/lib/utils'
 import { Check } from 'lucide-react'
 
@@ -128,6 +128,7 @@ const CreateLeagueTeam = () => {
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
               {teamsList.map((team: any) => {
                 const isSelected = selectedTeams.includes(team._id);
+                const logoUrl = formatImagePath(team.teamLogo);
                 return (
                   <div
                     key={team._id}
@@ -151,10 +152,10 @@ const CreateLeagueTeam = () => {
                       "w-20 h-20 rounded-xl bg-white flex items-center justify-center mb-3 shadow-sm overflow-hidden",
                       isSelected ? "border border-blue-100" : ""
                     )}>
-                      {team.teamLogo ? (
+                      {logoUrl ? (
                         <Image
-                          src={baseURL + team.teamLogo}
-                          alt={team.teamName}
+                          src={logoUrl}
+                          alt={team.teamName || "team logo"}
                           width={80}
                           height={80}
                           className="object-contain p-2"
