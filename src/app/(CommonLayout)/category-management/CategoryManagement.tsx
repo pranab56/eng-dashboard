@@ -634,12 +634,20 @@ export default function CategoryManagement() {
           }`}
         >
           <Layers className="w-4 h-4" />
-          <span>All Overview</span>
+          <span>
+            All Overview (
+            {Object.values(domainDataMap).reduce(
+              (acc, list) => acc + (list?.length || 0),
+              0
+            )}
+            )
+          </span>
         </button>
 
         {DOMAIN_CONFIGS.map((cfg) => {
           const Icon = cfg.icon;
           const isActive = activeTab === cfg.key;
+          const catCount = (domainDataMap[cfg.key] || []).length;
 
           return (
             <button
@@ -653,7 +661,7 @@ export default function CategoryManagement() {
               }`}
             >
               <Icon className={`w-4 h-4 ${isActive ? "text-white" : cfg.color.text}`} />
-              <span>{cfg.badgeLabel}</span>
+              <span>{cfg.badgeLabel} ({catCount})</span>
             </button>
           );
         })}
