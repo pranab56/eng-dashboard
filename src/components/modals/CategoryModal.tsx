@@ -47,6 +47,7 @@ export default function CategoryModal({
 }: CategoryModalProps) {
   const [isSubcategory, setIsSubcategory] = useState<boolean>(false);
   const [name, setName] = useState("");
+  const [order, setOrder] = useState<number | string>("");
   const [parentCategory, setParentCategory] = useState<string>("");
   const [errorMsg, setErrorMsg] = useState("");
 
@@ -61,6 +62,11 @@ export default function CategoryModal({
     }
     if (editingCategory) {
       setName(editingCategory.name || "");
+      setOrder(
+        editingCategory.order !== undefined && editingCategory.order !== null
+          ? editingCategory.order
+          : ""
+      );
       if (editingCategory.parentCategory && allowSubcategory) {
         setIsSubcategory(true);
         setParentCategory(editingCategory.parentCategory);
@@ -72,10 +78,12 @@ export default function CategoryModal({
       setIsSubcategory(true);
       setParentCategory(parentCategoryIdForSub);
       setName("");
+      setOrder("");
     } else {
       setIsSubcategory(false);
       setParentCategory(categories[0]?._id || categories[0]?.id || "");
       setName("");
+      setOrder("");
     }
     setErrorMsg("");
     setSearchQuery("");
@@ -106,6 +114,7 @@ export default function CategoryModal({
 
     await onSubmit({
       name: name.trim(),
+      order: !isSubcategory && order !== "" ? Number(order) : undefined,
       parentCategory: isSubcategory ? parentCategory : null,
       id: editingCategory?._id || editingCategory?.id,
     });
@@ -306,6 +315,23 @@ export default function CategoryModal({
               className="w-full h-11 px-3.5 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-blue-500 transition-colors font-medium text-gray-800"
             />
           </div>
+
+          {/* Category Order (Only for main categories, not subcategories) */}
+          {!isSubcategory && (
+            <div className="space-y-2">
+              <label className="block text-sm font-semibold text-gray-800">
+                Order Number <span className="text-xs font-normal text-gray-400">(e.g. 1, 2, 3)</span>
+              </label>
+              <input
+                type="number"
+                placeholder="e.g. 1"
+                value={order}
+                onChange={(e) => setOrder(e.target.value)}
+                disabled={isLoading}
+                className="w-full h-11 px-3.5 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-blue-500 transition-colors font-medium text-gray-800"
+              />
+            </div>
+          )}
 
 
 

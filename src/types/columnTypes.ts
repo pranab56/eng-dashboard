@@ -193,3 +193,47 @@ export type TCategory = {
   createdAt?: string;
   updatedAt?: string;
 }
+
+export type TPositionReward = {
+  position: number;
+  positionName: string;
+  points: number;
+};
+
+export type TTournament = {
+  _id: string;
+  id?: string;
+  title: string;
+  description: string;
+  banner?: string;
+  startDate: string;
+  endDate: string;
+  positionRewards: TPositionReward[];
+  status: "upcoming" | "ongoing" | "completed" | string;
+  createdBy?: string;
+  createdAt?: string;
+  updatedAt?: string;
+};
+
+export type TTournamentClaimUser = {
+  _id: string;
+  userName: string;
+  role: string;
+  email: string;
+  profile?: string | null;
+};
+
+export type TTournamentClaim = {
+  _id: string;
+  id?: string;
+  tournament: TTournament;
+  user: TTournamentClaimUser;
+  claimedPosition: number;
+  claimedPositionName: string;
+  proofNotes: string;
+  status: "pending" | "approved" | "rejected" | string;
+  pointsAwarded?: number;
+  approvedBy?: string | null;
+  createdAt: string;
+  updatedAt: string;
+};

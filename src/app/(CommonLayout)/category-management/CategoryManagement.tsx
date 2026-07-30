@@ -384,6 +384,7 @@ export default function CategoryManagement() {
   // Submit Modal Action
   const handleCategoryModalSubmit = async (data: {
     name: string;
+    order?: number;
     parentCategory?: string | null;
     id?: string;
   }) => {
@@ -391,34 +392,36 @@ export default function CategoryManagement() {
       const isSub = Boolean(data.parentCategory);
       const isEdit = Boolean(data.id);
 
+      const catBody: any = { name: data.name };
+      if (data.order !== undefined && !isNaN(data.order)) {
+        catBody.order = data.order;
+      }
+
+      const subBody: any = {
+        name: data.name,
+        parentCategory: data.parentCategory!,
+      };
+
       if (modalTargetDomain === "gallery") {
         if (isEdit) {
           if (isSub) {
             const res = await updateGallerySubCategory({
               id: data.id!,
-              data: {
-                name: data.name,
-                parentCategory: data.parentCategory!,
-              },
+              data: subBody,
             }).unwrap();
             if (res.success !== false) toast.success(res.message || "Subcategory updated");
           } else {
             const res = await updateGalleryCategory({
               id: data.id!,
-              data: { name: data.name },
+              data: catBody,
             }).unwrap();
             if (res.success !== false) toast.success(res.message || "Category updated");
           }
         } else if (isSub) {
-          const res = await createGallerySubCategory({
-            name: data.name,
-            parentCategory: data.parentCategory!,
-          }).unwrap();
+          const res = await createGallerySubCategory(subBody).unwrap();
           if (res.success !== false) toast.success(res.message || "Subcategory created");
         } else {
-          const res = await createGalleryCategory({
-            name: data.name,
-          }).unwrap();
+          const res = await createGalleryCategory(catBody).unwrap();
           if (res.success !== false) toast.success(res.message || "Category created");
         }
       } else if (modalTargetDomain === "video") {
@@ -426,29 +429,21 @@ export default function CategoryManagement() {
           if (isSub) {
             const res = await updateVideoSubCategory({
               id: data.id!,
-              data: {
-                name: data.name,
-                parentCategory: data.parentCategory!,
-              },
+              data: subBody,
             }).unwrap();
             if (res.success !== false) toast.success(res.message || "Subcategory updated");
           } else {
             const res = await updateVideoCategory({
               id: data.id!,
-              data: { name: data.name },
+              data: catBody,
             }).unwrap();
             if (res.success !== false) toast.success(res.message || "Category updated");
           }
         } else if (isSub) {
-          const res = await createVideoSubCategory({
-            name: data.name,
-            parentCategory: data.parentCategory!,
-          }).unwrap();
+          const res = await createVideoSubCategory(subBody).unwrap();
           if (res.success !== false) toast.success(res.message || "Subcategory created");
         } else {
-          const res = await createVideoCategory({
-            name: data.name,
-          }).unwrap();
+          const res = await createVideoCategory(catBody).unwrap();
           if (res.success !== false) toast.success(res.message || "Category created");
         }
       } else if (modalTargetDomain === "venue") {
@@ -456,68 +451,54 @@ export default function CategoryManagement() {
           if (isSub) {
             const res = await updateVenueSubCategory({
               id: data.id!,
-              data: {
-                name: data.name,
-                parentCategory: data.parentCategory!,
-              },
+              data: subBody,
             }).unwrap();
             if (res.success !== false) toast.success(res.message || "Subcategory updated");
           } else {
             const res = await updateVenueCategory({
               id: data.id!,
-              data: { name: data.name },
+              data: catBody,
             }).unwrap();
             if (res.success !== false) toast.success(res.message || "Category updated");
           }
         } else if (isSub) {
-          const res = await createVenueSubCategory({
-            name: data.name,
-            parentCategory: data.parentCategory!,
-          }).unwrap();
+          const res = await createVenueSubCategory(subBody).unwrap();
           if (res.success !== false) toast.success(res.message || "Subcategory created");
         } else {
-          const res = await createVenueCategory({
-            name: data.name,
-          }).unwrap();
+          const res = await createVenueCategory(catBody).unwrap();
           if (res.success !== false) toast.success(res.message || "Category created");
         }
       } else if (modalTargetDomain === "time") {
         if (isEdit) {
           const res = await updatePlayTime({
             id: data.id!,
-            data: { name: data.name },
+            data: catBody,
           }).unwrap();
           if (res.success !== false) toast.success(res.message || "Time category updated");
         } else {
-          const res = await createPlayTime({
-            name: data.name,
-          }).unwrap();
+          const res = await createPlayTime(catBody).unwrap();
           if (res.success !== false) toast.success(res.message || "Time category created");
         }
       } else if (modalTargetDomain === "ageGroup") {
         if (isEdit) {
           const res = await updateAgeGroup({
             id: data.id!,
-            data: { name: data.name },
+            data: catBody,
           }).unwrap();
           if (res.success !== false) toast.success(res.message || "Age group updated");
         } else {
-          const res = await createAgeGroup({
-            name: data.name,
-          }).unwrap();
+          const res = await createAgeGroup(catBody).unwrap();
           if (res.success !== false) toast.success(res.message || "Age group created");
         }
       } else if (modalTargetDomain === "news") {
         if (isEdit) {
           const res = await updateNewsCategory({
             id: data.id!,
-            data: { name: data.name },
+            data: catBody,
           }).unwrap();
           if (res.success !== false) toast.success(res.message || "News category updated");
         } else {
-          const res = await createNewsCategory({
-            name: data.name,
-          }).unwrap();
+          const res = await createNewsCategory(catBody).unwrap();
           if (res.success !== false) toast.success(res.message || "News category created");
         }
       }
@@ -762,8 +743,13 @@ export default function CategoryManagement() {
                                 <Icon className="w-4 h-4" />
                               </div>
                               <div className="min-w-0">
-                                <h3 className="font-medium text-gray-900 text-sm leading-snug truncate">
-                                  {cat.name}
+                                <h3 className="font-medium text-gray-900 text-sm leading-snug truncate flex items-center gap-1.5">
+                                  <span>{cat.name}</span>
+                                  {cat.order !== undefined && cat.order !== null && (
+                                    <span className="text-[10px] text-blue-600 bg-blue-50 px-1.5 py-0.5 rounded font-bold border border-blue-100">
+                                      Order: {cat.order}
+                                    </span>
+                                  )}
                                 </h3>
                                 {cat.slug && (
                                   <div className="mt-0.5">

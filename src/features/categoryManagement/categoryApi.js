@@ -22,7 +22,7 @@ export const categoryApi = baseApi.injectEndpoints({
 
         createGallerySubCategory: builder.mutation({
             query: (data) => ({
-                url: `/gallery-subcategory`,
+                url: `/gallery-category`,
                 method: "POST",
                 body: data,
             }),
@@ -40,7 +40,7 @@ export const categoryApi = baseApi.injectEndpoints({
 
         updateGallerySubCategory: builder.mutation({
             query: ({ data, id }) => ({
-                url: `/gallery-subcategory/${id}`,
+                url: `/gallery-category/${id}`,
                 method: "PATCH",
                 body: data,
             }),
@@ -57,7 +57,7 @@ export const categoryApi = baseApi.injectEndpoints({
 
         deleteGallerySubCategory: builder.mutation({
             query: (id) => ({
-                url: `/gallery-subcategory/${id}`,
+                url: `/gallery-category/${id}`,
                 method: "DELETE",
             }),
             invalidatesTags: ["gallery"],
@@ -383,4 +383,6 @@ export const {
 
 // Export galleryApi alias for backward compatibility
 export const galleryApi = categoryApi;
+
+
 

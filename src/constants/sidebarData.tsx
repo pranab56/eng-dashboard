@@ -16,7 +16,13 @@ import {
   UserManagementIcon
 } from "@/assets/assets";
 
-import { HiOutlinePhotograph, HiOutlineShoppingBag, HiOutlineShare, HiOutlineFolder } from "react-icons/hi";
+import {
+  HiOutlinePhotograph,
+  HiOutlineShoppingBag,
+  HiOutlineShare,
+  HiOutlineFolder,
+} from "react-icons/hi";
+import { Trophy, Award, Users, Calendar, Gift } from "lucide-react";
 
 export type TMenuItem = {
   id: number;
@@ -41,9 +47,21 @@ export const sidebarData: TMenuItem[] = [
   },
   {
     id: 3,
-    icon: MatchIcon,
+    icon: Trophy,
     title: "League Management",
     label: "/league-management",
+  },
+  {
+    id: 31,
+    icon: Award,
+    title: "Tournaments",
+    label: "/tournaments",
+  },
+  {
+    id: 32,
+    icon: Gift,
+    title: "Tournament Claim",
+    label: "/tournament-claim",
   },
 
   {
@@ -54,7 +72,7 @@ export const sidebarData: TMenuItem[] = [
   },
   {
     id: 5,
-    icon: MatchIcon,
+    icon: Users,
     title: "League Team",
     label: "/league-team",
   },
@@ -96,7 +114,7 @@ export const sidebarData: TMenuItem[] = [
   },
   {
     id: 12,
-    icon: UserManagementIcon,
+    icon: Calendar,
     title: "Event Management",
     label: "/event-management",
   },

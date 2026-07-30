@@ -176,5 +176,7 @@ export const baseApi = createApi({
     "playtime",
     "ageGroup",
     "newsCategory",
+    "tournaments",
+    "tournamentClaim",
   ],
 });

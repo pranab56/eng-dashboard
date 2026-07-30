@@ -11,6 +11,7 @@ import dayjs from 'dayjs';
 import Image from "next/image";
 import { ChangeEvent, useEffect, useRef, useState } from "react";
 import toast from "react-hot-toast";
+import { Eye, EyeOff } from "lucide-react";
 
 interface ProfileData {
   userName: string;
@@ -40,6 +41,10 @@ export default function ProfilePage() {
     newPassword: "",
     confirmPassword: "",
   });
+
+  const [showCurrentPassword, setShowCurrentPassword] = useState(false);
+  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const [errors, setErrors] = useState<ValidationErrors>({});
   const [imgPreview, setImgPreview] = useState<string | null>(null);
@@ -264,17 +269,31 @@ export default function ProfilePage() {
             <CardContent className="p-8 space-y-8">
               <div className="space-y-2.5">
                 <Label className="text-[13px] font-medium text-gray-400 ml-1">Current Password</Label>
-                <Input
-                  name="currentPassword"
-                  type="password"
-                  value={formData.currentPassword}
-                  onChange={handleInputChange}
-                  placeholder="••••••••"
-                  className={cn(
-                    "h-12 bg-white border border-gray-200 rounded-xl focus-visible:ring-2 focus-visible:ring-[#1D68D5]/20 focus-visible:border-[#1D68D5] px-5 transition-all",
-                    errors.currentPassword && "border-red-500 focus-visible:border  -red-500"
-                  )}
-                />
+                <div className="relative">
+                  <Input
+                    name="currentPassword"
+                    type={showCurrentPassword ? "text" : "password"}
+                    value={formData.currentPassword}
+                    onChange={handleInputChange}
+                    placeholder="••••••••"
+                    className={cn(
+                      "h-12 bg-white border border-gray-200 rounded-xl focus-visible:ring-2 focus-visible:ring-[#1D68D5]/20 focus-visible:border-[#1D68D5] px-5 pr-12 transition-all",
+                      errors.currentPassword && "border-red-500 focus-visible:border-red-500"
+                    )}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowCurrentPassword(!showCurrentPassword)}
+                    className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors cursor-pointer p-1"
+                    title={showCurrentPassword ? "Hide password" : "Show password"}
+                  >
+                    {showCurrentPassword ? (
+                      <EyeOff className="w-5 h-5" />
+                    ) : (
+                      <Eye className="w-5 h-5" />
+                    )}
+                  </button>
+                </div>
                 {errors.currentPassword && <p className="text-xs font-medium text-red-500 mt-1 ml-1">{errors.currentPassword}</p>}
                 <p className="text-[11px] text-gray-400 ml-1 italic font-medium">Verify your current identity to authorize a password change.</p>
               </div>
@@ -282,32 +301,60 @@ export default function ProfilePage() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8 pt-2">
                 <div className="space-y-2.5">
                   <Label className="text-[13px] font-medium text-gray-400 ml-1">New Password</Label>
-                  <Input
-                    name="newPassword"
-                    type="password"
-                    value={formData.newPassword}
-                    onChange={handleInputChange}
-                    placeholder="Create new password"
-                    className={cn(
-                      "h-12 bg-white border border-gray-200 rounded-xl focus-visible:ring-2 focus-visible:ring-[#1D68D5]/20 focus-visible:border-[#1D68D5] px-5 transition-all",
-                      errors.newPassword && "border-red-500 focus-visible:border-red-500"
-                    )}
-                  />
+                  <div className="relative">
+                    <Input
+                      name="newPassword"
+                      type={showNewPassword ? "text" : "password"}
+                      value={formData.newPassword}
+                      onChange={handleInputChange}
+                      placeholder="Create new password"
+                      className={cn(
+                        "h-12 bg-white border border-gray-200 rounded-xl focus-visible:ring-2 focus-visible:ring-[#1D68D5]/20 focus-visible:border-[#1D68D5] px-5 pr-12 transition-all",
+                        errors.newPassword && "border-red-500 focus-visible:border-red-500"
+                      )}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowNewPassword(!showNewPassword)}
+                      className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors cursor-pointer p-1"
+                      title={showNewPassword ? "Hide password" : "Show password"}
+                    >
+                      {showNewPassword ? (
+                        <EyeOff className="w-5 h-5" />
+                      ) : (
+                        <Eye className="w-5 h-5" />
+                      )}
+                    </button>
+                  </div>
                   {errors.newPassword && <p className="text-xs font-medium text-red-500 mt-1 ml-1">{errors.newPassword}</p>}
                 </div>
                 <div className="space-y-2.5">
                   <Label className="text-[13px] font-medium text-gray-400 ml-1">Confirm New Password</Label>
-                  <Input
-                    name="confirmPassword"
-                    type="password"
-                    value={formData.confirmPassword}
-                    onChange={handleInputChange}
-                    placeholder="Repeat new password"
-                    className={cn(
-                      "h-12 bg-white border border-gray-200 rounded-xl focus-visible:ring-2 focus-visible:ring-[#1D68D5]/20 focus-visible:border-[#1D68D5] px-5 transition-all",
-                      errors.confirmPassword && "border-red-500 focus-visible:border-red-500"
-                    )}
-                  />
+                  <div className="relative">
+                    <Input
+                      name="confirmPassword"
+                      type={showConfirmPassword ? "text" : "password"}
+                      value={formData.confirmPassword}
+                      onChange={handleInputChange}
+                      placeholder="Repeat new password"
+                      className={cn(
+                        "h-12 bg-white border border-gray-200 rounded-xl focus-visible:ring-2 focus-visible:ring-[#1D68D5]/20 focus-visible:border-[#1D68D5] px-5 pr-12 transition-all",
+                        errors.confirmPassword && "border-red-500 focus-visible:border-red-500"
+                      )}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                      className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors cursor-pointer p-1"
+                      title={showConfirmPassword ? "Hide password" : "Show password"}
+                    >
+                      {showConfirmPassword ? (
+                        <EyeOff className="w-5 h-5" />
+                      ) : (
+                        <Eye className="w-5 h-5" />
+                      )}
+                    </button>
+                  </div>
                   {errors.confirmPassword && <p className="text-xs font-medium text-red-500 mt-1 ml-1">{errors.confirmPassword}</p>}
                 </div>
               </div>
