@@ -6,7 +6,8 @@ import { formatImagePath } from "@/utils/formatImagePath";
 
 export const getPlayerColumns = (
   onView: (player: TPlayer) => void,
-  onEditCoin?: (player: TPlayer) => void
+  onEditCoin?: (player: TPlayer) => void,
+  onEdit?: (player: TPlayer) => void
 ): ColumnDef<TPlayer>[] => [
   {
     accessorKey: "name",
@@ -15,7 +16,7 @@ export const getPlayerColumns = (
       <div className="flex items-center gap-3">
         <div className="w-10 h-10 rounded-full border-2 border-white overflow-hidden bg-gray-100 flex items-center justify-center">
           {row.original.profile ? (
-            <Image src={row.original.profile} alt="profilePic" width={40} height={40} className="w-full h-full object-cover" />
+            <Image src={formatImagePath(row.original.profile)} alt="profilePic" width={40} height={40} className="w-full h-full object-cover" />
           ) : (
             <span className="text-xs text-gray-400 font-bold uppercase">
               {row.original.firstName?.[0] || 'P'}
@@ -78,9 +79,19 @@ export const getPlayerColumns = (
         <button
           onClick={() => onView(row.original)}
           className="flex items-center justify-center h-9 w-9 rounded-sm bg-[#F3F3F3] hover:bg-gray-200 transition-colors duration-300 cursor-pointer"
+          title="View Player"
         >
           <FiEye className="size-5 text-gray-800" />
         </button>
+        {onEdit && (
+          <button
+            onClick={() => onEdit(row.original)}
+            className="flex items-center justify-center h-9 w-9 rounded-sm bg-blue-50 hover:bg-blue-100 transition-colors duration-300 cursor-pointer text-blue-600"
+            title="Edit Player"
+          >
+            <FiEdit2 className="size-4" />
+          </button>
+        )}
       </div>
     ),
   }

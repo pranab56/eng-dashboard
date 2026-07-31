@@ -21,14 +21,25 @@ import {
   HiOutlineShoppingBag,
   HiOutlineShare,
   HiOutlineFolder,
+  HiOutlineUser,
+  HiOutlineDocumentText,
+  HiOutlineShieldCheck,
 } from "react-icons/hi";
 import { Trophy, Award, Users, Calendar, Gift } from "lucide-react";
+
+export type TSubMenuItem = {
+  id: number;
+  icon?: React.ElementType;
+  title: string;
+  label: string;
+};
 
 export type TMenuItem = {
   id: number;
   icon: React.ElementType;
   title: string;
-  label: string;
+  label?: string;
+  children?: TSubMenuItem[];
 };
 
 
@@ -164,18 +175,25 @@ export const sidebarData: TMenuItem[] = [
     id: 20,
     icon: SettingsIcon,
     title: "Settings",
-    label: "/profile",
-  },
-  {
-    id: 21,
-    icon: Terms,
-    title: "Terms & Condition",
-    label: "/terms-and-condition",
-  },
-  {
-    id: 22,
-    icon: Privacy,
-    title: "Privacy Policy",
-    label: "/privacy-policy",
+    children: [
+      {
+        id: 201,
+        icon: HiOutlineUser,
+        title: "Profile",
+        label: "/profile",
+      },
+      {
+        id: 202,
+        icon: HiOutlineDocumentText,
+        title: "Terms & Condition",
+        label: "/terms-and-condition",
+      },
+      {
+        id: 203,
+        icon: HiOutlineShieldCheck,
+        title: "Privacy Policy",
+        label: "/privacy-policy",
+      },
+    ],
   },
 ];

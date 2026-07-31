@@ -10,10 +10,25 @@ export type TUser = {
 export type TUserManagement = {
   _id: string;
   userName: string;
+  name?: string;
   role: string;
   profile: string;
+  profilePic?: string;
   verified: boolean;
   status?: string;
+  email?: string;
+  phone?: string;
+  phoneNumber?: string;
+  document?: string | string[];
+  documents?: string | string[];
+  nid?: string;
+  passport?: string;
+  tradeLicense?: string;
+  certificate?: string;
+  verificationDoc?: string;
+  idProof?: string;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 export type MatchStatus = "Completed" | "Scheduled" | "On Going";
@@ -58,6 +73,7 @@ export type TPlayer = {
   lastName: string;
   profile: string | null;
   position: string | null;
+  location?: string | null;
   teamName: string | null;
   shortName: string | null;
   teamLogo: string | null;

@@ -8,6 +8,7 @@ import {
 } from "@/components/ui/dialog";
 import Image from 'next/image';
 import { TPlayer } from '@/types/columnTypes';
+import { formatImagePath } from '@/utils/formatImagePath';
 
 interface PlayerViewModalProps {
   player: TPlayer | null;
@@ -36,7 +37,7 @@ const PlayerViewModal = ({ player, isOpen, onClose }: PlayerViewModalProps) => {
             <div className="w-28 h-28 bg-white/10 backdrop-blur-md rounded-full border-4 border-white/20 shadow-2xl overflow-hidden flex items-center justify-center">
               {player.profile ? (
                 <Image
-                  src={player.profile}
+                  src={formatImagePath(player.profile)}
                   alt={fullName}
                   width={112}
                   height={112}
@@ -84,15 +85,17 @@ const PlayerViewModal = ({ player, isOpen, onClose }: PlayerViewModalProps) => {
             </div>
           </div>
 
-          {/* Stats Grid */}
+          {/* Stats & Info Grid */}
           <div className="grid grid-cols-2 gap-4">
             <div className="bg-gray-50 border border-gray-100 p-5 rounded-2xl flex flex-col items-center text-center transition-all hover:border-emerald-200 hover:bg-white hover:shadow-xl hover:shadow-emerald-500/5 duration-300">
-              <span className="text-[10px] font-black text-emerald-500 uppercase tracking-[0.2em] mb-2">Position</span>
-              <span className="text-gray-900 font-bold text-sm">{player.position || 'N/A'}</span>
+              <span className="text-[10px] font-black text-emerald-500 uppercase tracking-[0.2em] mb-2">Market Value</span>
+              <span className="text-gray-900 font-bold text-lg">
+                {player.marketValue ? `$${player.marketValue.toLocaleString()}` : 'N/A'}
+              </span>
             </div>
             <div className="bg-gray-50 border border-gray-100 p-5 rounded-2xl flex flex-col items-center text-center transition-all hover:border-emerald-200 hover:bg-white hover:shadow-xl hover:shadow-emerald-500/5 duration-300">
               <span className="text-[10px] font-black text-emerald-500 uppercase tracking-[0.2em] mb-2">ENG Coin</span>
-              <span className="text-gray-900 font-bold text-2xl flex items-center gap-1">
+              <span className="text-gray-900 font-bold text-lg flex items-center gap-1">
                 🪙 {((player.engCoine ?? player.engCoin ?? player.coin) ?? 0).toLocaleString()}
               </span>
             </div>

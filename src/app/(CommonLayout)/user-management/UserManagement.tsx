@@ -13,6 +13,7 @@ import { Search, X } from 'lucide-react';
 import { useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
+import UserVerificationModal from './UserVerificationModal';
 
 const ROLE_TABS = [
   { label: 'All Users', value: 'ALL' },
@@ -31,6 +32,9 @@ const UserManagement = () => {
   const [activeRole, setActiveRole] = useState<string>('ALL');
   const [searchTerm, setSearchTerm] = useState<string>('');
 
+  const [selectedUser, setSelectedUser] = useState<TUserManagement | null>(null);
+  const [isVerificationModalOpen, setIsVerificationModalOpen] = useState<boolean>(false);
+
   const { data: userData, isLoading } = useGetUserQuery({
     pageNumber: page,
     searchValue: searchTerm,
@@ -38,7 +42,7 @@ const UserManagement = () => {
   });
 
   const [toggleStatus] = useUpdateStatusMutation();
-  const [updateUserStatus] = useUpdateUserStatusMutation();
+  const [updateUserStatus, { isLoading: isUpdatingUserStatus }] = useUpdateUserStatusMutation();
   const [deleteUser] = useDeleteUserMutation();
 
   useEffect(() => {
@@ -64,6 +68,19 @@ const UserManagement = () => {
     } catch (error: any) {
       toast.error(error?.data?.message || "Failed to update user status");
     }
+  };
+
+  const handleViewUser = (user: TUserManagement) => {
+    setSelectedUser(user);
+    setIsVerificationModalOpen(true);
+  };
+
+  const handleApproveVerification = async (id: string) => {
+    await handleUpdateUserStatus(id, "APPROVED");
+  };
+
+  const handleRejectVerification = async (id: string) => {
+    await handleUpdateUserStatus(id, "REJECTED");
   };
 
   const handleDeleteUser = async (id: string) => {
@@ -110,7 +127,7 @@ const UserManagement = () => {
     url: "#"
   }
 
-  const columns = getUsersColumns(handleToggleStatus, handleUpdateUserStatus, handleDeleteUser);
+  const columns = getUsersColumns(handleToggleStatus, handleUpdateUserStatus, handleDeleteUser, handleViewUser);
 
   // Instant client-side fallback filtering
   const filteredUsers = (userData?.data || []).filter((user: any) => {
@@ -210,6 +227,18 @@ const UserManagement = () => {
           <CustomPagination TOTAL_PAGES={userData?.pagination?.totalPage || 1} qryName="userPage" />
         </div>
       </div>
+
+      <UserVerificationModal
+        user={selectedUser}
+        isOpen={isVerificationModalOpen}
+        onClose={() => {
+          setIsVerificationModalOpen(false);
+          setSelectedUser(null);
+        }}
+        onApprove={handleApproveVerification}
+        onReject={handleRejectVerification}
+        isUpdating={isUpdatingUserStatus}
+      />
     </div>
   )
 }

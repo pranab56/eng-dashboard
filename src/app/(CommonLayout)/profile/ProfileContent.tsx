@@ -84,10 +84,6 @@ export default function ProfilePage() {
   const handleImageChange = (e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      if (file.size > 2 * 1024 * 1024) {
-        toast.error("Image size must be less than 2MB");
-        return;
-      }
       setImageFile(file);
       const reader = new FileReader();
       reader.onloadend = () => {
@@ -202,7 +198,7 @@ export default function ProfilePage() {
           <div className="space-y-4 text-center sm:text-left">
             <div>
               <h2 className="text-2xl font-medium text-gray-900">Profile Photo</h2>
-              <p className="text-sm text-gray-500 mt-1">Update your professional identity. Recommended: Square JPG or PNG, max 2MB.</p>
+              <p className="text-sm text-gray-500 mt-1">Update your professional identity. Recommended: Square JPG or PNG format.</p>
             </div>
             <div className="flex flex-wrap items-center justify-center sm:justify-start gap-4">
               <input
@@ -252,7 +248,7 @@ export default function ProfilePage() {
                     name="email"
                     readOnly
                     value={formData.email}
-                    className="h-12 bg-gray-50 border border-gray-100 rounded-xl px-5 text-gray-400 font-medium cursor-not-allowed italic"
+                    className="h-12 bg-gray-50 border border-gray-100 rounded-xl px-5 text-gray-400 font-medium cursor-not-allowed "
                   />
                 </div>
               </div>
@@ -295,7 +291,7 @@ export default function ProfilePage() {
                   </button>
                 </div>
                 {errors.currentPassword && <p className="text-xs font-medium text-red-500 mt-1 ml-1">{errors.currentPassword}</p>}
-                <p className="text-[11px] text-gray-400 ml-1 italic font-medium">Verify your current identity to authorize a password change.</p>
+                <p className="text-[11px] text-gray-400 ml-1 font-medium">Verify your current identity to authorize a password change.</p>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8 pt-2">
@@ -364,7 +360,7 @@ export default function ProfilePage() {
 
         {/* Info Sidebar */}
         <div className="space-y-6">
-          <Card className="border border-indigo-100 bg-yellow-600 rounded-2xl overflow-hidden text-white shadow-lg shadow-blue-100">
+          <Card className="border border-indigo-100 bg-yellow-600 rounded-2xl overflow-hidden text-white shadow-lg shadow-blue-100 p-0">
             <CardContent className="p-8 space-y-6">
               <div className="inline-flex p-3 bg-white/10 rounded-2xl">
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" /></svg>

@@ -16,6 +16,7 @@ import { useSearchParams } from 'next/navigation';
 import { toast } from 'sonner';
 import CreateButton from '../../../components/buttons/CreateButton';
 import PlayerViewModal from './PlayerViewModal';
+import PlayerEditModal from './PlayerEditModal';
 import { UpdateCoinModal } from '@/components/modals/UpdateCoinModal';
 
 const PlayerManagement = () => {
@@ -31,6 +32,9 @@ const PlayerManagement = () => {
   const [selectedPlayer, setSelectedPlayer] = useState<TPlayer | null>(null);
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
 
+  const [editTargetPlayer, setEditTargetPlayer] = useState<TPlayer | null>(null);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+
   const [coinTargetPlayer, setCoinTargetPlayer] = useState<TPlayer | null>(null);
   const [isCoinModalOpen, setIsCoinModalOpen] = useState(false);
 
@@ -44,6 +48,11 @@ const PlayerManagement = () => {
   const handleView = (player: TPlayer) => {
     setSelectedPlayer(player);
     setIsViewModalOpen(true);
+  };
+
+  const handleEdit = (player: TPlayer) => {
+    setEditTargetPlayer(player);
+    setIsEditModalOpen(true);
   };
 
   const handleEditCoin = (player: TPlayer) => {
@@ -104,7 +113,7 @@ const PlayerManagement = () => {
           </>
           <div className="pt-4">
             <CustomTable<TPlayer>
-              columns={getPlayerColumns(handleView, handleEditCoin)}
+              columns={getPlayerColumns(handleView, handleEditCoin, handleEdit)}
               data={players}
               isLoading={isLoading}
             />
@@ -122,6 +131,15 @@ const PlayerManagement = () => {
         isOpen={isViewModalOpen}
         onClose={() => setIsViewModalOpen(false)}
         player={selectedPlayer}
+      />
+
+      <PlayerEditModal
+        isOpen={isEditModalOpen}
+        onClose={() => {
+          setIsEditModalOpen(false);
+          setEditTargetPlayer(null);
+        }}
+        player={editTargetPlayer}
       />
 
       <UpdateCoinModal

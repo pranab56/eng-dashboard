@@ -38,6 +38,15 @@ export const playerApi = baseApi.injectEndpoints({
       invalidatesTags: ["player"]
     }),
 
+    updatePlayer: builder.mutation({
+      query: ({ id, data }) => ({
+        url: `/player/${id}`,
+        method: "PATCH",
+        body: data,
+      }),
+      invalidatesTags: ["player"]
+    }),
+
 
   }),
 });
@@ -48,4 +57,5 @@ export const {
   useCreatePlayerEconomyMutation,
   useGetPlayerEconomyQuery,
   useUpdateEngCoinBudgetMutation,
+  useUpdatePlayerMutation,
 } = playerApi;
