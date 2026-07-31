@@ -175,7 +175,7 @@ export default function TournamentFormModal({
               <Trophy className="w-5 h-5" />
             </div>
             <div>
-              <DialogTitle className="font-bold text-gray-900 text-lg">
+              <DialogTitle className="font-medium text-gray-900 text-lg">
                 {editingTournament ? "Edit Tournament" : "Create New Tournament"}
               </DialogTitle>
               <p className="text-xs text-gray-500">
@@ -276,7 +276,7 @@ export default function TournamentFormModal({
                         setStatusPopoverOpen(false);
                       }}
                       className={`w-full px-3.5 py-2.5 text-xs rounded-lg flex items-center justify-between transition-colors cursor-pointer text-left ${status === opt.value
-                        ? "bg-black text-white font-bold"
+                        ? "bg-black text-white font-medium"
                         : "text-gray-700 hover:bg-gray-100"
                         }`}
                     >
@@ -295,7 +295,7 @@ export default function TournamentFormModal({
           <div className="space-y-3 pt-2 border-t border-gray-100">
             <div className="flex items-center justify-between">
               <div>
-                <h4 className="text-sm font-bold text-gray-900 flex items-center gap-1.5">
+                <h4 className="text-sm font-medium text-gray-900 flex items-center gap-1.5">
                   <Sparkles className="w-4 h-4 text-amber-500" />
                   <span>Position Rewards</span>
                 </h4>
@@ -308,7 +308,7 @@ export default function TournamentFormModal({
                 type="button"
                 onClick={handleAddRewardRow}
                 disabled={isLoading}
-                className="px-3 py-1.5 rounded-lg bg-blue-50 border border-blue-100 text-blue-600 hover:bg-blue-100 text-xs font-bold transition-colors flex items-center gap-1 cursor-pointer"
+                className="px-3 py-1.5 rounded-lg bg-blue-50 border border-blue-100 text-blue-600 hover:bg-blue-100 text-xs font-medium transition-colors flex items-center gap-1 cursor-pointer"
               >
                 <Plus className="w-3.5 h-3.5" />
                 <span>Add Rank</span>
@@ -322,7 +322,7 @@ export default function TournamentFormModal({
                   className="flex items-center gap-2 p-3 bg-gray-50 border border-gray-200 rounded-xl"
                 >
                   <div className="w-16">
-                    <label className="block text-[10px] font-bold text-gray-400 uppercase mb-0.5">
+                    <label className="block text-[10px] font-medium text-gray-400 . mb-0.5">
                       Pos
                     </label>
                     <input
@@ -332,12 +332,12 @@ export default function TournamentFormModal({
                       onChange={(e) =>
                         handleRewardChange(index, "position", e.target.value)
                       }
-                      className="w-full h-9 px-2 bg-white border border-gray-200 rounded-md text-xs font-bold text-center"
+                      className="w-full h-9 px-2 bg-white border border-gray-200 rounded-md text-xs font-medium text-center"
                     />
                   </div>
 
                   <div className="flex-1">
-                    <label className="block text-[10px] font-bold text-gray-400 uppercase mb-0.5">
+                    <label className="block text-[10px] font-medium text-gray-400 . mb-0.5">
                       Position Title
                     </label>
                     <input
@@ -352,7 +352,7 @@ export default function TournamentFormModal({
                   </div>
 
                   <div className="w-28">
-                    <label className="block text-[10px] font-bold text-gray-400 uppercase mb-0.5">
+                    <label className="block text-[10px] font-medium text-gray-400 . mb-0.5">
                       Points
                     </label>
                     <input
@@ -362,7 +362,7 @@ export default function TournamentFormModal({
                       onChange={(e) =>
                         handleRewardChange(index, "points", e.target.value)
                       }
-                      className="w-full h-9 px-2 bg-white border border-gray-200 rounded-md text-xs font-bold text-blue-600"
+                      className="w-full h-9 px-2 bg-white border border-gray-200 rounded-md text-xs font-medium text-blue-600"
                     />
                   </div>
 

@@ -169,11 +169,10 @@ export default function TournamentClaim() {
                       setStatusFilter(opt.value);
                       setStatusPopoverOpen(false);
                     }}
-                    className={`w-full px-3 py-3 text-xs rounded-lg flex items-center justify-between transition-colors cursor-pointer text-left ${
-                      statusFilter === opt.value
-                        ? "bg-black text-white font-bold"
+                    className={`w-full px-3 py-3 text-xs rounded-lg flex items-center justify-between transition-colors cursor-pointer text-left ${statusFilter === opt.value
+                        ? "bg-black text-white font-medium"
                         : "text-gray-700 hover:bg-gray-100"
-                    }`}
+                      }`}
                   >
                     <span>{opt.label}</span>
                     {statusFilter === opt.value && (

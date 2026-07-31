@@ -27,7 +27,7 @@ const SubmitButton: React.FC<SubmitButtonProps> = ({
       type="submit"
       disabled={loading || disabled}
       className={cn(
-        `px-10 py-3 rounded-lg font-bold text-white bg-[#0f0f0f] hover:bg-black active:scale-95 transition-all text-[15px] shadow-lg shadow-black/10 flex items-center space-x-2 disabled:opacity-70 disabled:cursor-not-allowed cursor-pointer`,
+        `px-10 py-3 rounded-lg font-medium text-white bg-[#0f0f0f] hover:bg-black active:scale-95 transition-all text-[15px] shadow-lg shadow-black/10 flex items-center space-x-2 disabled:opacity-70 disabled:cursor-not-allowed cursor-pointer`,
         className
       )}
     >

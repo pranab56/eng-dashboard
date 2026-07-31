@@ -152,6 +152,7 @@ export const baseApi = createApi({
     "match",
     "team",
     "reword",
+    "reward",
     "profile",
     "news",
     "terms",

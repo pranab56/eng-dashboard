@@ -56,7 +56,7 @@ const PlayerTransferDetail = () => {
           />
         </div>
         <div>
-          <h2 className="text-2xl font-bold text-gray-900">{playerData?.name}</h2>
+          <h2 className="text-2xl font-medium text-gray-900">{playerData?.name}</h2>
           <div className="flex items-center gap-3 mt-1 text-gray-500 text-sm">
             <span className="flex items-center gap-1.5">
               <span className="w-2 h-2 rounded-full bg-yellow-400"></span>

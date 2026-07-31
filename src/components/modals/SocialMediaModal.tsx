@@ -99,7 +99,7 @@ export default function SocialMediaModal({
               <Share2 className="w-5 h-5" />
             </div>
             <div>
-              <h3 className="font-bold text-gray-900 text-lg">
+              <h3 className="font-medium text-gray-900 text-lg">
                 {editingItem ? "Edit Social Media Link" : "Add Social Media Link"}
               </h3>
               <p className="text-xs text-gray-500">

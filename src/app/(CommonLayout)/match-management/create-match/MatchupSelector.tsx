@@ -17,7 +17,7 @@ export const TeamCard = ({
 }) => {
   return (
     <div className="flex flex-col items-center bg-gray-100 p-8 rounded-3xl w-full md:w-72">
-      <span className="text-gray-500 font-bold mb-6 tracking-wide">{label}</span>
+      <span className="text-gray-500 font-medium mb-6 tracking-wide">{label}</span>
 
       {/* Logo Container */}
       <div className="bg-white p-2 rounded-3xl shadow-sm mb-8 w-40 h-40 flex items-center justify-center relative overflow-hidden">
@@ -31,7 +31,7 @@ export const TeamCard = ({
           />
         ) : (
           <div className="w-full h-full flex items-center justify-center bg-gray-50 rounded-3xl">
-            <span className="text-3xl font-black text-gray-300 uppercase">
+            <span className="text-3xl font-black text-gray-300 .">
               {selectedTeam?.name?.[0] || '?'}
             </span>
           </div>
@@ -40,7 +40,7 @@ export const TeamCard = ({
 
       {/* Team Name */}
       {selectedTeam && (
-        <p className="text-sm font-bold text-gray-700 mb-3 text-center">{selectedTeam.name}</p>
+        <p className="text-sm font-medium text-gray-700 mb-3 text-center">{selectedTeam.name}</p>
       )}
 
       {/* Custom Styled Select */}
@@ -57,7 +57,7 @@ export const TeamCard = ({
                 const team = teams.find(t => t.value === e.target.value);
                 if (team) onSelect(team);
               }}
-              className="w-full appearance-none bg-white py-3 px-4 rounded-xl text-gray-800 font-bold shadow-sm focus:outline-none cursor-pointer pr-10"
+              className="w-full appearance-none bg-white py-3 px-4 rounded-xl text-gray-800 font-medium shadow-sm focus:outline-none cursor-pointer pr-10"
             >
               {!selectedTeam && (
                 <option value="" disabled>Select team</option>

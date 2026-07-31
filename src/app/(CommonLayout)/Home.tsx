@@ -128,7 +128,7 @@ const Home = () => {
             <div className="flex justify-between items-start">
               <div className="space-y-4">
                 <p className={`text-sm font-medium opacity-80 ${card.textColor}`}>{card.title}</p>
-                <h3 className={`text-4xl font-bold ${card.textColor}`}>{card.value}</h3>
+                <h3 className={`text-4xl font-medium ${card.textColor}`}>{card.value}</h3>
               </div>
               <div className="p-3 bg-white/50 backdrop-blur-sm rounded-xl border border-white/50 shadow-sm group-hover:scale-110 transition-transform duration-300">
                 {card.icon}
@@ -143,7 +143,7 @@ const Home = () => {
         {/* User Distribution Chart */}
         <div className="bg-white p-8 rounded-3xl shadow-sm border border-gray-100 flex flex-col items-center">
           <div className="w-full flex justify-between items-center mb-8">
-            <h3 className="text-xl font-bold text-gray-800">User Role Distribution</h3>
+            <h3 className="text-xl font-medium text-gray-800">User Role Distribution</h3>
             <div className="px-3 py-1 bg-gray-50 rounded-full text-xs font-semibold text-gray-500 border border-gray-200">Live Data</div>
           </div>
           <div className="w-full h-[350px]">
@@ -174,7 +174,7 @@ const Home = () => {
         {/* League Summary Chart */}
         <div className="bg-white p-8 rounded-3xl shadow-sm border border-gray-100 flex flex-col items-center">
           <div className="w-full flex justify-between items-center mb-8">
-            <h3 className="text-xl font-bold text-gray-800">League Summary</h3>
+            <h3 className="text-xl font-medium text-gray-800">League Summary</h3>
             <div className="px-3 py-1 bg-gray-50 rounded-full text-xs font-semibold text-gray-500 border border-gray-200">Across Entities</div>
           </div>
           <div className="w-full h-[350px]">

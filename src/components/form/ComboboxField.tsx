@@ -40,7 +40,7 @@ const ComboboxField = ({
   return (
     <div className="space-y-2">
       {label && (
-        <label className="text-sm font-bold text-gray-700 block">
+        <label className="text-sm font-medium text-gray-700 block">
           {label}
         </label>
       )}
@@ -87,7 +87,7 @@ const ComboboxField = ({
                       key={option.value}
                       className={cn(
                         "relative flex cursor-pointer select-none items-center rounded-lg px-3 py-2.5 text-sm outline-none transition-colors hover:bg-blue-50 hover:text-blue-900 group",
-                        field.value === option.value ? "bg-blue-50 text-blue-900 font-bold" : "text-gray-600"
+                        field.value === option.value ? "bg-blue-50 text-blue-900 font-medium" : "text-gray-600"
                       )}
                       onClick={() => {
                         field.onChange(option.value === field.value ? "" : option.value)

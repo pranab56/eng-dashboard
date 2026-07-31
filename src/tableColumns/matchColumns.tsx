@@ -88,18 +88,18 @@ export const getMatchColumns = (onView: (match: any) => void, onDelete: (id: str
           onClick={() => onView(row.original)}
           className="flex items-center justify-center h-9 w-9 rounded-sm bg-[#F3F3F3] hover:bg-gray-200 transition-colors duration-300 cursor-pointer"
         >
-          <FiEye className="size-5 font-bold text-gray-800" />
+          <FiEye className="size-5 font-medium text-gray-800" />
         </button>
         <Link href={`/match-management/create-match?id=${row.original._id}`}>
           <button className="flex items-center justify-center h-9 w-9 rounded-sm bg-[#F3F3F3] hover:bg-gray-200 transition-colors duration-300 cursor-pointer">
-            <FiEdit className="size-5 font-bold text-gray-800" />
+            <FiEdit className="size-5 font-medium text-gray-800" />
           </button>
         </Link>
         <button
           onClick={() => onDelete(row.original._id)}
           className="flex items-center justify-center h-9 w-9 rounded-sm bg-[#F3F3F3] hover:bg-red-50 hover:text-red-600 transition-colors duration-300 cursor-pointer"
         >
-          <FiTrash2 className="size-5 font-bold" />
+          <FiTrash2 className="size-5 font-medium" />
         </button>
       </div>
     ),

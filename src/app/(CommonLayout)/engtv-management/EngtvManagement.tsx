@@ -155,7 +155,7 @@ const EngtvManagement = () => {
             </div>
             <div className="flex justify-between items-start">
               <div>
-                <h3 className="text-xl font-bold text-gray-900">{selectedVideo.title}</h3>
+                <h3 className="text-xl font-medium text-gray-900">{selectedVideo.title}</h3>
                 <div className="flex items-center gap-2 mt-1">
                   {(() => {
                     const catVal = selectedVideo.category as any;
@@ -163,24 +163,24 @@ const EngtvManagement = () => {
                       typeof catVal === "object" && catVal
                         ? catVal.name
                         : typeof catVal === "string"
-                        ? catVal
-                        : "";
+                          ? catVal
+                          : "";
                     const subVal = (selectedVideo as any).subCategory;
                     const subName =
                       typeof subVal === "object" && subVal
                         ? subVal.name
                         : typeof subVal === "string"
-                        ? subVal
-                        : "";
+                          ? subVal
+                          : "";
                     return (
                       <>
                         {catName && (
-                          <span className="text-xs font-semibold text-blue-600 bg-blue-50 px-2 py-0.5 rounded uppercase tracking-wider">
+                          <span className="text-xs font-semibold text-blue-600 bg-blue-50 px-2 py-0.5 rounded . tracking-wider">
                             {catName}
                           </span>
                         )}
                         {subName && (
-                          <span className="text-xs font-semibold text-amber-700 bg-amber-50 px-2 py-0.5 rounded uppercase tracking-wider">
+                          <span className="text-xs font-semibold text-amber-700 bg-amber-50 px-2 py-0.5 rounded . tracking-wider">
                             {subName}
                           </span>
                         )}

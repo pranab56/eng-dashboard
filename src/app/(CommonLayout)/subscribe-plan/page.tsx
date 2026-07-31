@@ -86,7 +86,7 @@ const SubscribePlan = () => {
               <div className="absolute inset-0 z-10 flex items-center justify-center bg-white/40 backdrop-blur-[1px] rounded-3xl transition-all duration-300">
                 <div className="bg-white p-4 rounded-2xl shadow-xl border border-gray-100 flex items-center gap-3 animate-in zoom-in-95">
                   <Loader2 className="w-5 h-5 animate-spin text-blue-600" />
-                  <span className="text-sm font-bold text-gray-600 tracking-tight">Updating List...</span>
+                  <span className="text-sm font-medium text-gray-600 tracking-tight">Updating List...</span>
                 </div>
               </div>
             )}
@@ -98,7 +98,7 @@ const SubscribePlan = () => {
                 ))
               ) : (
                 <div className="col-span-full flex flex-col items-center justify-center py-20 bg-gray-50 rounded-xl">
-                  <p className="text-lg font-bold text-gray-500">No {activeTab} packages found</p>
+                  <p className="text-lg font-medium text-gray-500">No {activeTab} packages found</p>
                   <p className="text-sm text-gray-400 mt-1">Create a new plan to get started</p>
                 </div>
               )}

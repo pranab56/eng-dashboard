@@ -30,12 +30,12 @@ const PackageCard = ({ packageData }: PackageCardProps) => {
 
   return (
     <Card className="relative overflow-hidden border-2 transition-all hover:border-blue-500/20 hover:shadow-xl group">
-      <div className={`absolute top-4 right-4 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest border ${statusColor}`}>
+      <div className={`absolute top-4 right-4 px-3 py-1 rounded-full text-[10px] font-medium . tracking-widest border ${statusColor}`}>
         {packageData.status}
       </div>
 
       <CardHeader>
-        <CardTitle className="text-xl font-bold text-gray-900">{packageData.title}</CardTitle>
+        <CardTitle className="text-xl font-medium text-gray-900">{packageData.title}</CardTitle>
         <CardDescription className="line-clamp-2">{packageData.description}</CardDescription>
       </CardHeader>
 
@@ -47,19 +47,19 @@ const PackageCard = ({ packageData }: PackageCardProps) => {
 
         <div className="grid grid-cols-2 gap-3">
           <div className="p-3 rounded-xl bg-gray-50 border border-gray-100">
-            <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Credits</p>
-            <p className="text-lg font-bold text-gray-900">{packageData.credit}</p>
+            <p className="text-[10px] font-medium text-gray-400 . tracking-widest">Credits</p>
+            <p className="text-lg font-medium text-gray-900">{packageData.credit}</p>
           </div>
           <div className="p-3 rounded-xl bg-gray-50 border border-gray-100">
-            <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Logins</p>
-            <p className="text-lg font-bold text-gray-900">{packageData.loginLimit}</p>
+            <p className="text-[10px] font-medium text-gray-400 . tracking-widest">Logins</p>
+            <p className="text-lg font-medium text-gray-900">{packageData.loginLimit}</p>
           </div>
         </div>
 
         {/* Package Features list if present */}
         {Array.isArray(packageData.features) && packageData.features.length > 0 && (
           <div className="space-y-2 pt-2 border-t border-gray-100">
-            <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Features</p>
+            <p className="text-[10px] font-medium text-gray-400 . tracking-widest">Features</p>
             <ul className="space-y-1.5 max-h-36 overflow-y-auto pr-1">
               {packageData.features.map((feat: any, idx: number) => {
                 const isIncluded = typeof feat === 'object' ? (feat.isIncluded ?? true) : true

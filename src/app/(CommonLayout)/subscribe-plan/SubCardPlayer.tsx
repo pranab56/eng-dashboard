@@ -48,7 +48,7 @@ const SubCardPlayer: React.FC<PricingTierProps> = ({ title, price, period, featu
       {/* Header */}
       <div className="flex items-center gap-3 mb-4">
         <span className=''>{title && selectIcon(title)}</span>
-        <h2 className="text-2xl font-bold text-gray-900 uppercase">
+        <h2 className="text-2xl font-medium text-gray-900 .">
           {title}
         </h2>
       </div>
@@ -75,7 +75,7 @@ const SubCardPlayer: React.FC<PricingTierProps> = ({ title, price, period, featu
 
         {/* Pricing */}
         <div className="flex flex-col justify-center">
-          <div className={`text-3xl font-bold ${priceColor(title)}`}>
+          <div className={`text-3xl font-medium ${priceColor(title)}`}>
             £{price}
           </div>
           <div className="text-gray-400 font-medium italic">
@@ -87,7 +87,7 @@ const SubCardPlayer: React.FC<PricingTierProps> = ({ title, price, period, featu
       {/* Action Button */}
       <CustomModal
         title="Create New Notification"
-        trigger={<button className="w-full py-2 bg-black text-white rounded-xl font-bold text-lg hover:bg-gray-800 transition-colors cursor-pointer">
+        trigger={<button className="w-full py-2 bg-black text-white rounded-xl font-medium text-lg hover:bg-gray-800 transition-colors cursor-pointer">
           Edit Details
         </button>}
       >

@@ -106,7 +106,7 @@ function SubscriptionGraphSuspense() {
   return (
     <div className="w-full  rounded-2xl p-3 bg-white py-10">
       <div className="flex items-center justify-between mb-1 px-8 pb-8">
-        <h2 className="text-2xl font-bold text-gray-700">Total Revenue</h2>
+        <h2 className="text-2xl font-medium text-gray-700">Total Revenue</h2>
         <div className='w-30'>
           <CustomSelectOption selectOptions={selectOptionsRevenue} placeHolderValue="Select Year" queryKey="revenueDuration" />
         </div>

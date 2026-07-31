@@ -51,7 +51,7 @@ const TransferConfirmModal = ({
             </div>
 
             <div className="space-y-2">
-              <h3 className="text-2xl font-bold text-gray-900 leading-tight">
+              <h3 className="text-2xl font-medium text-gray-900 leading-tight">
                 {title}
               </h3>
               <p className="text-gray-500 text-sm leading-relaxed px-4">
@@ -65,7 +65,7 @@ const TransferConfirmModal = ({
               variant="outline"
               onClick={onClose}
               disabled={isLoading}
-              className="flex-1 h-12 rounded-xl cursor-pointer text-gray-600 font-bold hover:bg-gray-50 border-gray-200 transition-all duration-200"
+              className="flex-1 h-12 rounded-xl cursor-pointer text-gray-600 font-medium hover:bg-gray-50 border-gray-200 transition-all duration-200"
             >
               Cancel
             </Button>
@@ -73,7 +73,7 @@ const TransferConfirmModal = ({
               onClick={onConfirm}
               disabled={isLoading}
               className={cn(
-                "flex-1 h-12 rounded-xl cursor-pointer text-white font-bold shadow-lg transition-all duration-200 flex items-center justify-center gap-2",
+                "flex-1 h-12 rounded-xl cursor-pointer text-white font-medium shadow-lg transition-all duration-200 flex items-center justify-center gap-2",
                 isApprove ? "bg-green-600 hover:bg-green-700 shadow-green-200" : "bg-red-600 hover:bg-red-700 shadow-red-200"
               )}
             >

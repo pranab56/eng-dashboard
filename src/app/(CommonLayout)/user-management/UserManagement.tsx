@@ -129,26 +129,30 @@ const UserManagement = () => {
 
   const columns = getUsersColumns(handleToggleStatus, handleUpdateUserStatus, handleDeleteUser, handleViewUser);
 
-  // Instant client-side fallback filtering
+  // Flexible client-side fallback filtering
   const filteredUsers = (userData?.data || []).filter((user: any) => {
     if (activeRole !== 'ALL') {
       const userRole = (user.role || '').toUpperCase();
       if (activeRole === 'OTHER') {
-        if (['PLAYER', 'MANAGER', 'CLUB', 'REFEREE'].includes(userRole)) {
+        if (['PLAYER', 'MANAGER', 'CLUB', 'CLUBS', 'OTHER_CLUBS', 'REFEREE'].includes(userRole)) {
           return false;
         }
-      } else if (userRole !== activeRole) {
+      } else if (activeRole === 'CLUB') {
+        if (!['CLUB', 'CLUBS', 'OTHER_CLUBS'].includes(userRole)) {
+          return false;
+        }
+      } else if (userRole !== activeRole && !userRole.includes(activeRole)) {
         return false;
       }
     }
 
     if (searchTerm.trim()) {
       const q = searchTerm.toLowerCase().trim();
-      const nameMatch = (user.userName || user.name || '').toLowerCase().includes(q);
+      const fullName = (user.userName || user.name || `${user.firstName || ''} ${user.lastName || ''}`).toLowerCase();
       const emailMatch = (user.email || '').toLowerCase().includes(q);
       const roleMatch = (user.role || '').toLowerCase().includes(q);
-      const phoneMatch = (user.phone || '').toLowerCase().includes(q);
-      if (!nameMatch && !emailMatch && !roleMatch && !phoneMatch) {
+      const phoneMatch = (user.phone || user.phoneNumber || '').toLowerCase().includes(q);
+      if (!fullName.includes(q) && !emailMatch && !roleMatch && !phoneMatch) {
         return false;
       }
     }
@@ -198,8 +202,8 @@ const UserManagement = () => {
                   type="button"
                   onClick={() => setActiveRole(tab.value)}
                   className={`px-5 py-2 text-sm font-semibold rounded-lg transition-all cursor-pointer ${isActive
-                      ? 'bg-white text-blue-600 shadow-sm border border-gray-100 font-bold'
-                      : 'text-gray-500 hover:text-gray-900 font-medium'
+                    ? 'bg-white text-blue-600 shadow-sm border border-gray-100 font-medium'
+                    : 'text-gray-500 hover:text-gray-900 font-medium'
                     }`}
                 >
                   {tab.label}

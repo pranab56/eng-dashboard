@@ -1,4 +1,6 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client"
+import React from 'react';
 import {
   Dialog,
   DialogContent,
@@ -6,7 +8,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import dayjs from "dayjs";
-import { CalendarDays, Trophy } from "lucide-react";
+import { CalendarDays, Trophy, X, Clock } from "lucide-react";
 
 interface LeagueViewModalProps {
   league: any;
@@ -16,10 +18,10 @@ interface LeagueViewModalProps {
 
 const statusStyle = (status: string) => {
   switch (status?.toLowerCase()) {
-    case "running": return "bg-green-500/20 text-green-300 border-green-500/30";
-    case "upcoming": return "bg-blue-500/20 text-blue-300 border-blue-500/30";
-    case "finished": return "bg-gray-500/20 text-gray-300 border-gray-500/30";
-    default: return "bg-yellow-500/20 text-yellow-300 border-yellow-500/30";
+    case "running": return "bg-emerald-500/20 text-emerald-300 border-emerald-400/30";
+    case "upcoming": return "bg-blue-500/20 text-blue-300 border-blue-400/30";
+    case "finished": return "bg-gray-500/20 text-gray-300 border-gray-400/30";
+    default: return "bg-amber-500/20 text-amber-300 border-amber-400/30";
   }
 };
 
@@ -30,75 +32,85 @@ const LeagueViewModal = ({ league, isOpen, onClose }: LeagueViewModalProps) => {
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-lg bg-white rounded-2xl p-0 overflow-hidden border-none shadow-2xl animate-in zoom-in-95 duration-200">
+      <DialogContent showCloseButton={false} className="max-w-lg bg-white rounded-3xl p-0 overflow-hidden border-none shadow-2xl animate-in zoom-in-95 duration-200">
 
         {/* Header */}
-        <DialogHeader className="bg-gradient-to-br from-violet-900 via-purple-900 to-black p-10 text-white relative overflow-hidden">
-          <div className="absolute top-0 right-0 w-48 h-48 bg-white/5 rounded-full -translate-y-1/2 translate-x-1/2" />
-          <div className="absolute bottom-0 left-0 w-28 h-28 bg-white/5 rounded-full translate-y-1/2 -translate-x-1/2" />
+        <DialogHeader className="bg-gradient-to-br from-violet-950 via-purple-900 to-black p-8 text-white relative overflow-hidden">
+          <button
+            type="button"
+            onClick={onClose}
+            className="absolute top-5 right-5 p-2 rounded-full bg-white/10 hover:bg-white/20 text-white transition-all cursor-pointer z-20 backdrop-blur-md"
+          >
+            <X className="w-4 h-4" />
+          </button>
 
-          <div className="relative z-10 flex flex-col items-center space-y-4">
-            <div className="w-20 h-20 bg-white/10 backdrop-blur-md rounded-2xl border border-white/20 flex items-center justify-center shadow-2xl">
-              <Trophy className="w-10 h-10 text-yellow-400" />
+          <div className="absolute top-0 right-0 w-48 h-48 bg-purple-500/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
+
+          <div className="relative z-10 flex flex-col items-center space-y-4 text-center pt-2">
+            <div className="w-20 h-20 bg-white/10 backdrop-blur-md rounded-3xl border-2 border-white/20 flex items-center justify-center shadow-2xl">
+              <Trophy className="w-10 h-10 text-amber-400" />
             </div>
-            <div className="text-center">
-              <DialogTitle className="text-2xl font-black tracking-tight leading-tight">
+            <div className="space-y-1">
+              <DialogTitle className="text-2xl font-black text-white tracking-tight leading-tight">
                 {league.leagueName}
               </DialogTitle>
-              <p className="text-purple-300/70 font-bold tracking-widest uppercase text-xs mt-1">
-                Season {league.season}
+              <p className="text-purple-300/80 font-extrabold tracking-widest . text-xs">
+                Season {league.season || '1'}
               </p>
             </div>
-            <span className={`inline-flex items-center px-4 py-1 rounded-full text-xs font-bold uppercase tracking-widest border ${statusStyle(league.status)}`}>
+            <span className={`inline-flex items-center px-3.5 py-0.5 rounded-full text-[10px] font-extrabold . tracking-widest border ${statusStyle(league.status)}`}>
               {league.status}
             </span>
           </div>
         </DialogHeader>
 
         {/* Body */}
-        <div className="p-8 space-y-6">
+        <div className="p-6 space-y-5">
 
           {/* Date Range */}
-          <div className="grid grid-cols-2 gap-4">
-            <div className="bg-gray-50 border border-gray-100 p-5 rounded-2xl flex flex-col items-center text-center transition-all hover:border-purple-200 hover:bg-white hover:shadow-lg hover:shadow-purple-500/5 duration-300">
-              <CalendarDays className="w-5 h-5 text-purple-500 mb-2" />
-              <span className="text-[10px] font-black text-purple-500 uppercase tracking-[0.2em] mb-1">Start Date</span>
-              <span className="text-gray-900 font-bold text-sm">
-                {dayjs(league.startDate).format("DD MMM, YYYY")}
+          <div className="grid grid-cols-2 gap-3">
+            <div className="bg-gray-50/80 border border-gray-100 p-4 rounded-2xl flex flex-col items-center text-center transition-all hover:border-purple-200 hover:bg-white hover:shadow-md duration-300">
+              <CalendarDays className="w-4 h-4 text-purple-600 mb-1" />
+              <span className="text-[10px] font-extrabold text-purple-600 . tracking-widest mb-0.5">Start Date</span>
+              <span className="text-gray-900 font-medium text-xs">
+                {league.startDate ? dayjs(league.startDate).format("DD MMM, YYYY") : "N/A"}
               </span>
             </div>
-            <div className="bg-gray-50 border border-gray-100 p-5 rounded-2xl flex flex-col items-center text-center transition-all hover:border-purple-200 hover:bg-white hover:shadow-lg hover:shadow-purple-500/5 duration-300">
-              <CalendarDays className="w-5 h-5 text-purple-500 mb-2" />
-              <span className="text-[10px] font-black text-purple-500 uppercase tracking-[0.2em] mb-1">End Date</span>
-              <span className="text-gray-900 font-bold text-sm">
-                {dayjs(league.endDate).format("DD MMM, YYYY")}
+
+            <div className="bg-gray-50/80 border border-gray-100 p-4 rounded-2xl flex flex-col items-center text-center transition-all hover:border-purple-200 hover:bg-white hover:shadow-md duration-300">
+              <CalendarDays className="w-4 h-4 text-purple-600 mb-1" />
+              <span className="text-[10px] font-extrabold text-purple-600 . tracking-widest mb-0.5">End Date</span>
+              <span className="text-gray-900 font-medium text-xs">
+                {league.endDate ? dayjs(league.endDate).format("DD MMM, YYYY") : "N/A"}
               </span>
             </div>
           </div>
 
           {/* Duration Banner */}
-          <div className="flex items-center justify-between bg-gradient-to-br from-violet-50 to-purple-50 border border-purple-100 rounded-2xl p-6">
-            <div>
-              <p className="text-[10px] font-black text-purple-600 uppercase tracking-widest">Total Duration</p>
-              <h4 className="text-3xl font-black text-purple-900 mt-1">
-                {duration} <span className="text-sm font-bold text-purple-400">Days</span>
+          <div className="flex items-center justify-between bg-gradient-to-r from-violet-50/80 to-purple-50/80 border border-purple-100 rounded-2xl p-5">
+            <div className="space-y-0.5">
+              <span className="text-purple-600 font-extrabold text-[10px] . tracking-widest flex items-center gap-1.5">
+                <Clock className="w-3.5 h-3.5" /> Total Duration
+              </span>
+              <h4 className="text-2xl font-black text-purple-950">
+                {isNaN(duration) ? '0' : duration} <span className="text-xs font-medium text-purple-500 ml-0.5">Days</span>
               </h4>
             </div>
-            <div className="w-14 h-14 bg-purple-100 rounded-2xl flex items-center justify-center text-purple-600">
-              <Trophy className="w-7 h-7" />
+            <div className="w-12 h-12 bg-white rounded-2xl border border-purple-100 shadow-sm flex items-center justify-center text-purple-600">
+              <Trophy className="w-6 h-6 text-purple-600" />
             </div>
           </div>
 
           {/* Footer Dark Bar */}
-          <div className="flex items-center justify-between p-5 bg-gray-900 rounded-2xl text-white shadow-xl">
+          <div className="flex items-center justify-between p-4 bg-slate-900 rounded-2xl text-white shadow-md">
             <div>
-              <p className="text-[10px] text-white/40 font-black uppercase tracking-widest">Created</p>
-              <p className="font-bold text-sm">{dayjs(league.createdAt).format("DD MMM, YYYY")}</p>
+              <p className="text-[9px] text-slate-400 font-extrabold . tracking-widest">Created Date</p>
+              <p className="font-medium text-xs">{league.createdAt ? dayjs(league.createdAt).format("DD MMM, YYYY") : "N/A"}</p>
             </div>
-            <div className="h-8 w-px bg-white/20" />
+            <div className="h-6 w-px bg-white/20" />
             <div className="text-right">
-              <p className="text-[10px] text-white/40 font-black uppercase tracking-widest">League ID</p>
-              <p className="font-mono text-[11px] text-purple-300">{league._id}</p>
+              <p className="text-[9px] text-slate-400 font-extrabold . tracking-widest">League ID</p>
+              <p className="font-mono text-[10px] text-purple-300">{league._id}</p>
             </div>
           </div>
         </div>

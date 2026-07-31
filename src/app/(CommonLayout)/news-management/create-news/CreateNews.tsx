@@ -51,9 +51,9 @@ const CreateNews = () => {
   const newsCategories: any[] = newsCategoryData?.data || [];
   const dynamicNewsCategoryOptions = newsCategories.length > 0
     ? newsCategories.map((c: any) => ({
-        label: c.name,
-        value: c._id || c.id || c.name,
-      }))
+      label: c.name,
+      value: c._id || c.id || c.name,
+    }))
     : newsTypeOptions;
 
   const {
@@ -149,7 +149,7 @@ const CreateNews = () => {
         <div className='basis-[70%] space-y-8'>
           {/* Basic Information Card */}
           <section className="bg-white rounded-xl p-8 md:p-10 border border-gray-50 shadow-xl shadow-gray-200/50 text-gray-800">
-            <h2 className="text-2xl font-bold text-gray-900 mb-8">Editorial Content</h2>
+            <h2 className="text-2xl font-medium text-gray-900 mb-8">Editorial Content</h2>
 
             <div className="space-y-8">
               <InputField name="title" title="Headline" placeholder="Enter a compelling headline" register={register} error={errors.title} />
@@ -160,7 +160,7 @@ const CreateNews = () => {
 
           {/* Media Card */}
           <section className="bg-white rounded-xl p-8 md:p-10 border border-gray-50 shadow-xl shadow-gray-200/50 text-gray-800">
-            <h2 className="text-2xl font-bold text-gray-900 mb-8">Cover Media</h2>
+            <h2 className="text-2xl font-medium text-gray-900 mb-8">Cover Media</h2>
 
             <div className="w-full">
               <ImageUploadField name="logo" label="Article Thumbnail" control={control} error={errors.logo as any}>
@@ -179,7 +179,7 @@ const CreateNews = () => {
         {/* Scheduling Sidebar */}
         <div className='basis-[30%]'>
           <section className="bg-white rounded-xl p-8 md:p-10 border border-gray-50 shadow-xl shadow-gray-200/50 text-gray-800">
-            <h2 className="text-2xl font-bold text-gray-900 mb-8">Scheduling</h2>
+            <h2 className="text-2xl font-medium text-gray-900 mb-8">Scheduling</h2>
 
             <div className="space-y-8">
               <SelectField name="status" label="Publishing Status" control={control} error={errors.status} options={publishStatusOptions} />

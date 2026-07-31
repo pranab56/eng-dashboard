@@ -89,38 +89,33 @@ const Sidebar = () => {
                     <button
                       type="button"
                       onClick={() => toggleSubMenu(item.id)}
-                      className={`flex items-center justify-between py-3 px-4 rounded-md transition-colors duration-300 cursor-pointer ${
-                        isParentActive
+                      className={`flex items-center justify-between py-3 px-4 rounded-md transition-colors duration-300 cursor-pointer ${isParentActive
                           ? "text-white bg-[#373737] border-l-4 border-[#EABB00]"
                           : "text-white border-l-4 border-transparent hover:bg-gray-800"
-                      }`}
+                        }`}
                     >
                       <div className="flex gap-2.5 items-center">
                         <Icon
-                          className={`w-6 h-6 shrink-0 ${
-                            isParentActive ? "text-[#EABB00]" : "text-gray-400"
-                          }`}
+                          className={`w-6 h-6 shrink-0 ${isParentActive ? "text-[#EABB00]" : "text-gray-400"
+                            }`}
                         />
                         <span
-                          className={`${
-                            isParentActive ? "text-[#EABB00]" : "text-gray-400"
-                          }`}
+                          className={`${isParentActive ? "text-[#EABB00]" : "text-gray-400"
+                            }`}
                         >
                           {item.title}
                         </span>
                       </div>
                       <ChevronDown
-                        className={`w-4 h-4 shrink-0 transition-transform duration-300 ${
-                          isOpen ? "rotate-180 text-white" : "rotate-0 text-gray-400"
-                        }`}
+                        className={`w-4 h-4 shrink-0 transition-transform duration-300 ${isOpen ? "rotate-180 text-white" : "rotate-0 text-gray-400"
+                          }`}
                       />
                     </button>
 
                     {/* Submenu Accordion with Smooth Transition */}
                     <div
-                      className={`overflow-hidden transition-all duration-300 ease-in-out ${
-                        isOpen ? "max-h-60 opacity-100 mt-1.5 mb-1" : "max-h-0 opacity-0 mt-0 mb-0"
-                      }`}
+                      className={`overflow-hidden transition-all duration-300 ease-in-out ${isOpen ? "max-h-60 opacity-100 mt-1.5 mb-1" : "max-h-0 opacity-0 mt-0 mb-0"
+                        }`}
                     >
                       <div className="flex flex-col gap-1 ml-4 pl-3.5 border-l-2 border-gray-700/60">
                         {item.children?.map((child) => {
@@ -131,17 +126,15 @@ const Sidebar = () => {
                             <Link
                               href={child.label}
                               key={child.id}
-                              className={`flex gap-3 items-center py-2.5 px-3.5 rounded-lg transition-all duration-200 cursor-pointer text-sm font-medium ${
-                                isSubActive
+                              className={`flex gap-3 items-center py-2.5 px-3.5 rounded-lg transition-all duration-200 cursor-pointer text-sm font-medium ${isSubActive
                                   ? "text-[#EABB00] font-semibold bg-[#2a2a2a] shadow-sm"
                                   : "text-gray-400 hover:text-white hover:bg-gray-800/80"
-                              }`}
+                                }`}
                             >
                               {ChildIcon && (
                                 <ChildIcon
-                                  className={`w-5 h-5 shrink-0 transition-colors ${
-                                    isSubActive ? "text-[#EABB00]" : "text-gray-400"
-                                  }`}
+                                  className={`w-5 h-5 shrink-0 transition-colors ${isSubActive ? "text-[#EABB00]" : "text-gray-400"
+                                    }`}
                                 />
                               )}
                               <span>{child.title}</span>
@@ -158,21 +151,18 @@ const Sidebar = () => {
                 <Link
                   href={item.label || "#"}
                   key={item.id}
-                  className={`flex gap-2 items-center py-3 px-4 rounded-md transition-colors duration-300 cursor-pointer ${
-                    isParentActive
+                  className={`flex gap-2 items-center py-3 px-4 rounded-md transition-colors duration-300 cursor-pointer ${isParentActive
                       ? "text-white bg-[#373737] border-l-4 border-[#EABB00]"
                       : "text-white border-l-4 border-transparent hover:bg-gray-800"
-                  }`}
+                    }`}
                 >
                   <Icon
-                    className={`w-6 h-6 ${
-                      isParentActive ? "text-[#EABB00]" : "text-gray-400"
-                    }`}
+                    className={`w-6 h-6 ${isParentActive ? "text-[#EABB00]" : "text-gray-400"
+                      }`}
                   />
                   <span
-                    className={`${
-                      isParentActive ? "text-[#EABB00]" : "text-gray-400"
-                    }`}
+                    className={`${isParentActive ? "text-[#EABB00]" : "text-gray-400"
+                      }`}
                   >
                     {item.title}
                   </span>
@@ -185,7 +175,7 @@ const Sidebar = () => {
               onClick={() => setIsLogoutModalOpen(true)}
               className='flex gap-2 items-center py-2 px-4 bg-red-500 hover:bg-red-600 transition-colors duration-300 rounded-md cursor-pointer'
             >
-              <span className='font-bold text-2xl'>
+              <span className='font-medium text-2xl'>
                 <MdLogout className='text-white' />
               </span>
               <span className='font-semibold text-lg text-white'>Log Out</span>

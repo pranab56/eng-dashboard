@@ -13,7 +13,7 @@ export const notificationColumns: ColumnDef<TNotification>[] = [
           <Bell className="w-5 h-5" />
         </div>
         <div className="flex flex-col">
-          <span className="font-bold text-gray-900 leading-tight">{row.original.title}</span>
+          <span className="font-medium text-gray-900 leading-tight">{row.original.title}</span>
         </div>
       </div>
     ),
@@ -24,7 +24,7 @@ export const notificationColumns: ColumnDef<TNotification>[] = [
     cell: ({ row }) => (
       <div className="flex flex-col">
         <span className="font-medium text-gray-700">{row.original.message || "N/A"}</span>
-        <span className="text-[10px] text-gray-400 uppercase font-bold">{row.original.user?.email}</span>
+        <span className="text-[10px] text-gray-400 . font-medium">{row.original.user?.email}</span>
       </div>
     ),
   },

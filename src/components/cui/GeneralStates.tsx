@@ -40,11 +40,11 @@ const SubComponent = ({ title, des, icon }: { title: string; des: string | numbe
       </div>
       <div className="flex flex-col items-start gap-1">
         <h2 className="text-center text-2xl font-semibold text-gray-500">{title}</h2>
-        <h3 className="text-center text-3xl font-bold text-gray-700">
+        <h3 className="text-center text-3xl font-medium text-gray-700">
           {des}
         </h3>
       </div>
-      <div className="absolute -bottom-10 left-0  w-full h-20 rounded-full bg-clr/10"/>
+      <div className="absolute -bottom-10 left-0  w-full h-20 rounded-full bg-clr/10" />
     </div>
   )
 }

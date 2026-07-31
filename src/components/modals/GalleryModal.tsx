@@ -147,7 +147,7 @@ export default function GalleryModal({
               <ImageIcon className="w-5 h-5" />
             </div>
             <div>
-              <h3 className="font-bold text-gray-900 text-lg">
+              <h3 className="font-medium text-gray-900 text-lg">
                 {editingItem ? "Edit Gallery Item" : "Add New Gallery Item"}
               </h3>
               <p className="text-xs text-gray-500">
@@ -234,8 +234,8 @@ export default function GalleryModal({
                     {selectedParentObj
                       ? selectedParentObj.name
                       : categoriesList.length === 0
-                      ? "No category available"
-                      : "Select Category..."}
+                        ? "No category available"
+                        : "Select Category..."}
                   </span>
                   <ChevronsUpDown className="w-4 h-4 text-gray-400 shrink-0 ml-2" />
                 </button>
@@ -271,11 +271,10 @@ export default function GalleryModal({
                         type="button"
                         onPointerDown={handleSelect}
                         onClick={handleSelect}
-                        className={`w-full px-3 py-2 text-xs rounded-md flex items-center justify-between transition-colors cursor-pointer text-left ${
-                          isSelected
+                        className={`w-full px-3 py-2 text-xs rounded-md flex items-center justify-between transition-colors cursor-pointer text-left ${isSelected
                             ? "bg-blue-50 text-blue-600 font-semibold"
                             : "text-gray-700 hover:bg-gray-50"
-                        }`}
+                          }`}
                       >
                         <span>{cat.name}</span>
                         {isSelected && (
@@ -348,11 +347,10 @@ export default function GalleryModal({
                           type="button"
                           onPointerDown={handleSelectSub}
                           onClick={handleSelectSub}
-                          className={`w-full px-3 py-2 text-xs rounded-md flex items-center justify-between transition-colors cursor-pointer text-left ${
-                            isSelected
+                          className={`w-full px-3 py-2 text-xs rounded-md flex items-center justify-between transition-colors cursor-pointer text-left ${isSelected
                               ? "bg-blue-50 text-blue-600 font-semibold"
                               : "text-gray-700 hover:bg-gray-50"
-                          }`}
+                            }`}
                         >
                           <span>{sub.name}</span>
                           {isSelected && (

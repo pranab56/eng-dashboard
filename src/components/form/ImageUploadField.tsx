@@ -112,7 +112,7 @@ export const ImageChildrenComponent = ({ maxSizeMB }: { maxSizeMB?: number | str
         <CloudUpload className="w-8 h-8 text-yellow-500" />
       </div>
       <div className="text-center space-y-1">
-        <p className="text-[17px] font-bold text-gray-900">
+        <p className="text-[17px] font-medium text-gray-900">
           Upload Image Here
         </p>
         <p className="text-[13px] font-medium text-gray-400">

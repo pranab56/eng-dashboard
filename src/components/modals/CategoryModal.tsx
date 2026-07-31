@@ -145,14 +145,14 @@ export default function CategoryModal({
               )}
             </div>
             <div>
-              <h3 className="font-bold text-gray-900 text-lg">
+              <h3 className="font-medium text-gray-900 text-lg">
                 {editingCategory
                   ? isSubcategory
                     ? `Edit ${domainName} Subcategory`
                     : `Edit ${domainName} Category`
                   : isSubcategory
-                  ? `Add ${domainName} Subcategory`
-                  : `Add ${domainName} Category`}
+                    ? `Add ${domainName} Subcategory`
+                    : `Add ${domainName} Category`}
               </h3>
               <p className="text-xs text-gray-500">
                 {isSubcategory
@@ -176,7 +176,7 @@ export default function CategoryModal({
           {/* Category Type Toggle (Only when creating new & allowSubcategory is true) */}
           {allowSubcategory && !editingCategory && !parentCategoryIdForSub && (
             <div className="space-y-2">
-              <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider">
+              <label className="block text-xs font-medium text-gray-500 . tracking-wider">
                 Category Type
               </label>
               <div className="grid grid-cols-2 gap-2 bg-gray-100 p-1 rounded-xl border border-gray-200">
@@ -186,11 +186,10 @@ export default function CategoryModal({
                     setIsSubcategory(false);
                     setParentCategory("");
                   }}
-                  className={`py-2 px-3 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
-                    !isSubcategory
-                      ? "bg-white text-gray-900 shadow-sm"
-                      : "text-gray-500 hover:text-gray-900"
-                  }`}
+                  className={`py-2 px-3 rounded-lg text-xs font-semibold transition-all cursor-pointer ${!isSubcategory
+                    ? "bg-white text-gray-900 shadow-sm"
+                    : "text-gray-500 hover:text-gray-900"
+                    }`}
                 >
                   Parent Category
                 </button>
@@ -204,11 +203,10 @@ export default function CategoryModal({
                       );
                     }
                   }}
-                  className={`py-2 px-3 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
-                    isSubcategory
-                      ? "bg-white text-gray-900 shadow-sm"
-                      : "text-gray-500 hover:text-gray-900"
-                  }`}
+                  className={`py-2 px-3 rounded-lg text-xs font-semibold transition-all cursor-pointer ${isSubcategory
+                    ? "bg-white text-gray-900 shadow-sm"
+                    : "text-gray-500 hover:text-gray-900"
+                    }`}
                 >
                   Subcategory
                 </button>
@@ -274,11 +272,10 @@ export default function CategoryModal({
                           type="button"
                           onPointerDown={handleSelectCategory}
                           onClick={handleSelectCategory}
-                          className={`w-full px-3 py-2 text-xs rounded-md flex items-center justify-between transition-colors cursor-pointer text-left ${
-                            isSelected
-                              ? "bg-blue-50 text-blue-600 font-semibold"
-                              : "text-gray-700 hover:bg-gray-50"
-                          }`}
+                          className={`w-full px-3 py-2 text-xs rounded-md flex items-center justify-between transition-colors cursor-pointer text-left ${isSelected
+                            ? "bg-blue-50 text-blue-600 font-semibold"
+                            : "text-gray-700 hover:bg-gray-50"
+                            }`}
                         >
                           <span>{cat.name}</span>
                           {isSelected && (
@@ -362,8 +359,8 @@ export default function CategoryModal({
                 {editingCategory
                   ? "Save Changes"
                   : isSubcategory
-                  ? "Create Subcategory"
-                  : "Create Category"}
+                    ? "Create Subcategory"
+                    : "Create Category"}
               </span>
             </button>
           </div>

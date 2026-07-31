@@ -16,8 +16,8 @@ export const getRewardsColumns = (onView: (reward: any) => void, onDelete: (id: 
           <div className="w-12 h-12 rounded-xl bg-gray-50 border border-gray-100 flex items-center justify-center text-[10px] font-black text-gray-300">VOID</div>
         )}
         <div className="flex flex-col">
-          <span className="font-bold text-gray-900 leading-tight">{row.getValue("brand")}</span>
-          <span className="text-[10px] text-gray-400 font-bold uppercase tracking-widest mt-0.5">{row.original.productType}</span>
+          <span className="font-medium text-gray-900 leading-tight">{row.getValue("brand")}</span>
+          <span className="text-[10px] text-gray-400 font-medium . tracking-widest mt-0.5">{row.original.productType}</span>
         </div>
       </div>
     ),
@@ -28,7 +28,7 @@ export const getRewardsColumns = (onView: (reward: any) => void, onDelete: (id: 
     cell: ({ row }) => (
       <div className="flex items-center justify-center gap-1">
         <span className="font-black text-gray-900">{row.getValue("point")}</span>
-        <span className="text-[10px] font-bold text-gray-400 uppercase tracking-tighter">pts</span>
+        <span className="text-[10px] font-medium text-gray-400 . tracking-tighter">pts</span>
       </div>
     ),
   },
@@ -39,7 +39,7 @@ export const getRewardsColumns = (onView: (reward: any) => void, onDelete: (id: 
       const status = row.getValue("status") as string;
       return (
         <div className="flex justify-center">
-          <div className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest border inline-block ${status === 'publish' ? 'bg-green-50 text-green-600 border-green-100' : 'bg-orange-50 text-orange-600 border-orange-100'
+          <div className={`px-3 py-1 rounded-full text-[10px] font-black . tracking-widest border inline-block ${status === 'publish' ? 'bg-green-50 text-green-600 border-green-100' : 'bg-orange-50 text-orange-600 border-orange-100'
             }`}>
             {status}
           </div>
@@ -57,18 +57,18 @@ export const getRewardsColumns = (onView: (reward: any) => void, onDelete: (id: 
           onClick={() => onView(row.original)}
           className="flex items-center justify-center h-9 w-9 rounded-sm bg-[#F3F3F3] hover:bg-gray-200 transition-colors duration-300 cursor-pointer text-gray-800"
         >
-          <FiEye className="size-5 font-bold" />
+          <FiEye className="size-5 font-medium" />
         </button>
         <Link href={`/rewards-redemption/create-reward/?id=${row.original._id}`}>
           <button className="flex items-center justify-center h-9 w-9 rounded-sm bg-[#F3F3F3] hover:bg-gray-200 transition-colors duration-300 cursor-pointer text-gray-800">
-            <FiEdit className="size-5 font-bold" />
+            <FiEdit className="size-5 font-medium" />
           </button>
         </Link>
         <button
           onClick={() => onDelete(row.original._id)}
           className="flex items-center justify-center h-9 w-9 rounded-sm bg-[#F3F3F3] hover:bg-red-50 hover:text-red-600 transition-colors duration-300 cursor-pointer"
         >
-          <FiTrash2 className="size-5 font-bold" />
+          <FiTrash2 className="size-5 font-medium" />
         </button>
       </div>
     ),

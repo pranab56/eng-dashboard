@@ -79,7 +79,7 @@ const TransferManagement = () => {
     },
     {
       title: "Pending Requests",
-      value: transferData?.data?.result?.filter((t: TTransfer) => t.status === 'PENDING').length || 0,
+      value: transferData?.data?.result?.filter((t: TTransfer) => t.status === 'PENDING' || t.status === 'MANAGER_APPROVED').length || 0,
       id: "table2",
       description: "Requests awaiting approval"
     }

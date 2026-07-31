@@ -746,7 +746,7 @@ export default function CategoryManagement() {
                                 <h3 className="font-medium text-gray-900 text-sm leading-snug truncate flex items-center gap-1.5">
                                   <span>{cat.name}</span>
                                   {cat.order !== undefined && cat.order !== null && (
-                                    <span className="text-[10px] text-blue-600 bg-blue-50 px-1.5 py-0.5 rounded font-bold border border-blue-100">
+                                    <span className="text-[10px] text-blue-600 bg-blue-50 px-1.5 py-0.5 rounded font-medium border border-blue-100">
                                       Order: {cat.order}
                                     </span>
                                   )}
@@ -796,7 +796,7 @@ export default function CategoryManagement() {
                         {config.allowSubcategory && (
                           <div className="space-y-2 pt-3 border-t border-gray-100">
                             <div className="flex items-center justify-between">
-                              <span className="text-[10px] font-medium uppercase tracking-wider text-gray-400 flex items-center gap-1">
+                              <span className="text-[10px] font-medium . tracking-wider text-gray-400 flex items-center gap-1">
                                 <GitBranch className="w-3 h-3 text-purple-500" />
                                 Subcategories ({subCats.length})
                               </span>

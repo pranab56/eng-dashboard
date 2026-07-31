@@ -178,10 +178,10 @@ const GalleryManagement = () => {
             <ImageIcon className="w-6 h-6 text-blue-600" />
           </div>
           <div>
-            <p className="text-xs text-gray-400 font-medium uppercase tracking-wide">
+            <p className="text-xs text-gray-400 font-medium . tracking-wide">
               Total Images
             </p>
-            <p className="text-2xl font-bold text-gray-900">
+            <p className="text-2xl font-medium text-gray-900">
               {isGalleryLoading ? "—" : totalGalleryItems}
             </p>
           </div>
@@ -192,10 +192,10 @@ const GalleryManagement = () => {
             <CheckCircle2 className="w-6 h-6 text-green-600" />
           </div>
           <div>
-            <p className="text-xs text-gray-400 font-medium uppercase tracking-wide">
+            <p className="text-xs text-gray-400 font-medium . tracking-wide">
               Active Images
             </p>
-            <p className="text-2xl font-bold text-green-600">
+            <p className="text-2xl font-medium text-green-600">
               {isGalleryLoading ? "—" : activeGalleryCount}
             </p>
           </div>
@@ -215,11 +215,10 @@ const GalleryManagement = () => {
                 <button
                   type="button"
                   onClick={() => setViewMode("grid")}
-                  className={`p-1.5 rounded-md text-xs font-medium flex items-center gap-1 transition-colors cursor-pointer ${
-                    viewMode === "grid"
-                      ? "bg-white text-gray-900 shadow-sm font-semibold"
-                      : "text-gray-500 hover:text-gray-900"
-                  }`}
+                  className={`p-1.5 rounded-md text-xs font-medium flex items-center gap-1 transition-colors cursor-pointer ${viewMode === "grid"
+                    ? "bg-white text-gray-900 shadow-sm font-semibold"
+                    : "text-gray-500 hover:text-gray-900"
+                    }`}
                   title="Grid View"
                 >
                   <LayoutGrid className="w-4 h-4" />
@@ -227,11 +226,10 @@ const GalleryManagement = () => {
                 <button
                   type="button"
                   onClick={() => setViewMode("table")}
-                  className={`p-1.5 rounded-md text-xs font-medium flex items-center gap-1 transition-colors cursor-pointer ${
-                    viewMode === "table"
-                      ? "bg-white text-gray-900 shadow-sm font-semibold"
-                      : "text-gray-500 hover:text-gray-900"
-                  }`}
+                  className={`p-1.5 rounded-md text-xs font-medium flex items-center gap-1 transition-colors cursor-pointer ${viewMode === "table"
+                    ? "bg-white text-gray-900 shadow-sm font-semibold"
+                    : "text-gray-500 hover:text-gray-900"
+                    }`}
                   title="Table View"
                 >
                   <List className="w-4 h-4" />
@@ -283,14 +281,14 @@ const GalleryManagement = () => {
                     typeof catObj === "object" && catObj
                       ? catObj.name
                       : typeof catObj === "string"
-                      ? catObj
-                      : "";
+                        ? catObj
+                        : "";
                   const subName =
                     typeof subObj === "object" && subObj
                       ? subObj.name
                       : typeof subObj === "string"
-                      ? subObj
-                      : "";
+                        ? subObj
+                        : "";
 
                   return (
                     <div
@@ -315,11 +313,10 @@ const GalleryManagement = () => {
                         {/* Status Badge Over Image */}
                         <div className="absolute top-3 right-3 z-10">
                           <span
-                            className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider backdrop-blur-md shadow-sm border ${
-                              isActive
-                                ? "bg-green-500/90 text-white border-green-400"
-                                : "bg-gray-500/90 text-white border-gray-400"
-                            }`}
+                            className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-medium . tracking-wider backdrop-blur-md shadow-sm border ${isActive
+                              ? "bg-green-500/90 text-white border-green-400"
+                              : "bg-gray-500/90 text-white border-gray-400"
+                              }`}
                           >
                             {item.status || "active"}
                           </span>
@@ -331,11 +328,11 @@ const GalleryManagement = () => {
                         <div>
                           <div className="flex items-center justify-between gap-2 flex-wrap">
                             <div className="flex items-center gap-1.5 flex-wrap">
-                              <span className="text-xs font-bold text-blue-600 bg-blue-50 px-2.5 py-1 rounded-md uppercase tracking-wider">
+                              <span className="text-xs font-medium text-blue-600 bg-blue-50 px-2.5 py-1 rounded-md . tracking-wider">
                                 {catName || "General"}
                               </span>
                               {subName && (
-                                <span className="text-[10px] font-bold text-amber-700 bg-amber-50 px-2 py-0.5 rounded-md uppercase tracking-wider">
+                                <span className="text-[10px] font-medium text-amber-700 bg-amber-50 px-2 py-0.5 rounded-md . tracking-wider">
                                   {subName}
                                 </span>
                               )}

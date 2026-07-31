@@ -36,7 +36,7 @@ const LogoutConfirmModal = ({
             </div>
 
             <div className="space-y-2">
-              <DialogTitle className="text-2xl font-bold text-gray-900 leading-tight">
+              <DialogTitle className="text-2xl font-medium text-gray-900 leading-tight">
                 Confirm Logout
 
               </DialogTitle>
@@ -51,14 +51,14 @@ const LogoutConfirmModal = ({
               variant="outline"
               onClick={onClose}
               disabled={isLoading}
-              className="flex-1 h-12 rounded-xl cursor-pointer text-gray-600 font-bold hover:bg-gray-50 border-gray-200 transition-all duration-200"
+              className="flex-1 h-12 rounded-xl cursor-pointer text-gray-600 font-medium hover:bg-gray-50 border-gray-200 transition-all duration-200"
             >
               Cancel
             </Button>
             <Button
               onClick={onConfirm}
               disabled={isLoading}
-              className="flex-1 h-12 rounded-xl bg-red-600 cursor-pointer hover:bg-red-700 text-white font-bold shadow-lg shadow-red-200 transition-all duration-200 flex items-center justify-center gap-2"
+              className="flex-1 h-12 rounded-xl bg-red-600 cursor-pointer hover:bg-red-700 text-white font-medium shadow-lg shadow-red-200 transition-all duration-200 flex items-center justify-center gap-2"
             >
               {isLoading ? (
                 <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>

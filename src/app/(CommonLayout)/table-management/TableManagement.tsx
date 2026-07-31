@@ -72,8 +72,8 @@ const TableManagement = () => {
             <Trophy className="w-6 h-6 text-blue-600" />
           </div>
           <div>
-            <p className="text-xs text-gray-400 font-medium uppercase tracking-wide">Active Leagues</p>
-            <p className="text-2xl font-bold text-gray-900">{isLoading ? "—" : totalLeagues}</p>
+            <p className="text-xs text-gray-400 font-medium . tracking-wide">Active Leagues</p>
+            <p className="text-2xl font-medium text-gray-900">{isLoading ? "—" : totalLeagues}</p>
           </div>
         </div>
         <div className="bg-white rounded-xl p-5 shadow-sm border border-gray-100 flex items-center gap-4">
@@ -81,8 +81,8 @@ const TableManagement = () => {
             <span className="text-xl">⚽</span>
           </div>
           <div>
-            <p className="text-xs text-gray-400 font-medium uppercase tracking-wide">Teams in League</p>
-            <p className="text-2xl font-bold text-gray-900">{isLoading ? "—" : totalTeams}</p>
+            <p className="text-xs text-gray-400 font-medium . tracking-wide">Teams in League</p>
+            <p className="text-2xl font-medium text-gray-900">{isLoading ? "—" : totalTeams}</p>
           </div>
         </div>
       </div>

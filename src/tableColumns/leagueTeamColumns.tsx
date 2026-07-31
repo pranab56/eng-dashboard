@@ -21,7 +21,7 @@ export const getLeagueTeamColumns = (
               <Trophy className="w-4 h-4 text-yellow-400" />
             </div>
             <div className="flex flex-col">
-              <span className="font-bold text-gray-900 leading-tight">
+              <span className="font-medium text-gray-900 leading-tight">
                 {league?.leagueName || "N/A"}
               </span>
               <span className="text-xs text-gray-400 font-medium">
@@ -68,7 +68,7 @@ export const getLeagueTeamColumns = (
               ))}
               {remaining > 0 && (
                 <div
-                  className="relative w-8 h-8 rounded-full border-2 border-white bg-slate-700 flex items-center justify-center flex-shrink-0 text-[10px] font-bold text-white"
+                  className="relative w-8 h-8 rounded-full border-2 border-white bg-slate-700 flex items-center justify-center flex-shrink-0 text-[10px] font-medium text-white"
                   style={{ marginLeft: -10 }}
                 >
                   +{remaining}
@@ -77,7 +77,7 @@ export const getLeagueTeamColumns = (
             </div>
 
             {/* Count badge */}
-            <span className="ml-1 px-2 py-0.5 bg-blue-50 text-blue-700 rounded-full text-xs font-bold border border-blue-100">
+            <span className="ml-1 px-2 py-0.5 bg-blue-50 text-blue-700 rounded-full text-xs font-medium border border-blue-100">
               {teams.length} {teams.length === 1 ? "Team" : "Teams"}
             </span>
           </div>

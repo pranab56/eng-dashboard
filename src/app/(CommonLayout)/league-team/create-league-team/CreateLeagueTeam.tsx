@@ -63,9 +63,9 @@ const CreateLeagueTeam = () => {
   }, [setHeaders])
 
   const toggleTeamSelection = (teamId: string) => {
-    setSelectedTeams(prev => 
-      prev.includes(teamId) 
-        ? prev.filter(id => id !== teamId) 
+    setSelectedTeams(prev =>
+      prev.includes(teamId)
+        ? prev.filter(id => id !== teamId)
         : [...prev, teamId]
     );
   };
@@ -95,12 +95,12 @@ const CreateLeagueTeam = () => {
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="py-10 px-6 space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700 text-left">
       <BackButton />
-      
+
       <div className='w-full flex flex-col md:flex-row gap-6'>
         <div className='flex-1 space-y-6'>
           {/* League Selection Card */}
           <section className="bg-white rounded-xl p-8 md:p-10 border border-gray-50 shadow-xl shadow-gray-200/50">
-            <h2 className="text-2xl font-bold text-gray-900 mb-8">League Selection</h2>
+            <h2 className="text-2xl font-medium text-gray-900 mb-8">League Selection</h2>
             <div className="max-w-md">
               <ComboboxField
                 name="league"
@@ -117,10 +117,10 @@ const CreateLeagueTeam = () => {
           <section className="bg-white rounded-xl p-8 md:p-10 border border-gray-50 shadow-xl shadow-gray-200/50">
             <div className="flex items-center justify-between mb-8">
               <div>
-                <h2 className="text-2xl font-bold text-gray-900">Select Teams</h2>
+                <h2 className="text-2xl font-medium text-gray-900">Select Teams</h2>
                 <p className="text-sm text-gray-400 mt-1">Click on teams to add them to this league.</p>
               </div>
-              <div className="bg-blue-50 text-blue-700 px-4 py-2 rounded-lg font-bold text-sm">
+              <div className="bg-blue-50 text-blue-700 px-4 py-2 rounded-lg font-medium text-sm">
                 {selectedTeams.length} Teams Selected
               </div>
             </div>
@@ -135,8 +135,8 @@ const CreateLeagueTeam = () => {
                     onClick={() => toggleTeamSelection(team._id)}
                     className={cn(
                       "relative group cursor-pointer transition-all duration-300 rounded-2xl p-4 flex flex-col items-center border-2",
-                      isSelected 
-                        ? "bg-blue-50 border-blue-500 shadow-md transform scale-[1.02]" 
+                      isSelected
+                        ? "bg-blue-50 border-blue-500 shadow-md transform scale-[1.02]"
                         : "bg-gray-50 border-transparent hover:border-gray-200"
                     )}
                   >
@@ -161,7 +161,7 @@ const CreateLeagueTeam = () => {
                           className="object-contain p-2"
                         />
                       ) : (
-                        <span className="text-2xl font-bold text-gray-300">
+                        <span className="text-2xl font-medium text-gray-300">
                           {team.teamName?.[0]}
                         </span>
                       )}
@@ -169,7 +169,7 @@ const CreateLeagueTeam = () => {
 
                     {/* Name */}
                     <span className={cn(
-                      "text-xs font-bold text-center line-clamp-1",
+                      "text-xs font-medium text-center line-clamp-1",
                       isSelected ? "text-blue-900" : "text-gray-600"
                     )}>
                       {team.teamName}

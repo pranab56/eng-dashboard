@@ -358,7 +358,7 @@ const CreateVideos = () => {
         <div className="basis-full space-y-8 flex w-full items-start justify-between gap-10">
           {/* Basic Information Card */}
           <section className="bg-white rounded-xl p-8 md:p-10 h-full w-8/12 border border-gray-50 shadow-xl shadow-gray-200/50">
-            <h2 className="text-2xl font-bold text-gray-900 mb-8">
+            <h2 className="text-2xl font-medium text-gray-900 mb-8">
               Basic Information
             </h2>
 
@@ -413,7 +413,7 @@ const CreateVideos = () => {
 
           {/* Video & Thumbnail Preferences Card */}
           <section className="bg-white rounded-xl p-8 md:p-10 w-4/12 h-full border border-gray-50 shadow-xl shadow-gray-200/50 space-y-6">
-            <h2 className="text-2xl font-bold text-gray-900">
+            <h2 className="text-2xl font-medium text-gray-900">
               Thumbnail & Media
             </h2>
 
@@ -421,7 +421,7 @@ const CreateVideos = () => {
             {id && existingVideoUrl && !isExistingVideoRemoved && (
               <div className="space-y-3 p-4 bg-gray-50 rounded-2xl border border-gray-200">
                 <div className="flex items-center justify-between mb-1">
-                  <span className="text-xs font-bold uppercase tracking-wider text-gray-700">
+                  <span className="text-xs font-medium . tracking-wider text-gray-700">
                     Current Video
                   </span>
                   <button
@@ -468,7 +468,7 @@ const CreateVideos = () => {
                   <button
                     type="button"
                     onClick={handleRestoreExistingVideo}
-                    className="flex items-center gap-1 text-xs font-bold text-amber-900 underline hover:no-underline cursor-pointer"
+                    className="flex items-center gap-1 text-xs font-medium text-amber-900 underline hover:no-underline cursor-pointer"
                   >
                     <FiRotateCcw className="size-3" />
                     <span>Undo</span>
@@ -492,11 +492,10 @@ const CreateVideos = () => {
                 <button
                   type="button"
                   onClick={() => setVideoSourceType("file")}
-                  className={`flex items-center justify-center gap-2 py-2.5 px-3 rounded-lg text-xs font-bold transition-all cursor-pointer ${
-                    videoSourceType === "file"
-                      ? "bg-white text-emerald-600 shadow-sm border border-emerald-100"
-                      : "text-gray-600 hover:text-gray-900"
-                  }`}
+                  className={`flex items-center justify-center gap-2 py-2.5 px-3 rounded-lg text-xs font-medium transition-all cursor-pointer ${videoSourceType === "file"
+                    ? "bg-white text-emerald-600 shadow-sm border border-emerald-100"
+                    : "text-gray-600 hover:text-gray-900"
+                    }`}
                 >
                   <FiVideo className="size-4" />
                   <span>Broadcast Video</span>
@@ -504,11 +503,10 @@ const CreateVideos = () => {
                 <button
                   type="button"
                   onClick={() => setVideoSourceType("youtube")}
-                  className={`flex items-center justify-center gap-2 py-2.5 px-3 rounded-lg text-xs font-bold transition-all cursor-pointer ${
-                    videoSourceType === "youtube"
-                      ? "bg-white text-red-600 shadow-sm border border-red-100"
-                      : "text-gray-600 hover:text-gray-900"
-                  }`}
+                  className={`flex items-center justify-center gap-2 py-2.5 px-3 rounded-lg text-xs font-medium transition-all cursor-pointer ${videoSourceType === "youtube"
+                    ? "bg-white text-red-600 shadow-sm border border-red-100"
+                    : "text-gray-600 hover:text-gray-900"
+                    }`}
                 >
                   <FaYoutube className="size-4 text-red-600" />
                   <span>YouTube Link</span>
@@ -538,7 +536,7 @@ const CreateVideos = () => {
                         controls
                         className="w-full h-full object-contain"
                       />
-                      <div className="absolute top-2 left-2 px-3 py-1 bg-black/70 backdrop-blur-md rounded-full text-[10px] font-bold text-white uppercase tracking-wider">
+                      <div className="absolute top-2 left-2 px-3 py-1 bg-black/70 backdrop-blur-md rounded-full text-[10px] font-medium text-white . tracking-wider">
                         New Selected File
                       </div>
                     </div>
@@ -563,7 +561,7 @@ const CreateVideos = () => {
                         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                         allowFullScreen
                       />
-                      <div className="absolute top-2 left-2 px-3 py-1 bg-black/70 backdrop-blur-md rounded-full text-[10px] font-bold text-white uppercase tracking-wider text-white">
+                      <div className="absolute top-2 left-2 px-3 py-1 bg-black/70 backdrop-blur-md rounded-full text-[10px] font-medium text-white . tracking-wider text-white">
                         YouTube Preview
                       </div>
                     </div>

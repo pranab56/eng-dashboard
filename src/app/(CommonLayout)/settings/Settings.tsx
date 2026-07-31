@@ -66,7 +66,7 @@ const Settings = () => {
       await new Promise(resolve => setTimeout(resolve, 1500))
       console.log('Form Data:', data)
       toast.success("Settings updated successfully")
-    } catch (error:any) {
+    } catch (error: any) {
       toast.error("Failed to update settings", error.message)
     }
   }
@@ -75,7 +75,7 @@ const Settings = () => {
     <form onSubmit={handleSubmit(onSubmit)} className="max-w-4xl mx-auto py-10 px-6 space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
       {/* Application Identity Card */}
       <section className="bg-white rounded-xl p-8 md:p-10 border border-gray-50 shadow-xl shadow-gray-200/50">
-        <h2 className="text-2xl font-bold text-gray-900 mb-8">Application Identity</h2>
+        <h2 className="text-2xl font-medium text-gray-900 mb-8">Application Identity</h2>
 
         <div className="space-y-8">
           {/* App Name Input */}
@@ -94,7 +94,7 @@ const Settings = () => {
 
       {/* Regional Preferences Card */}
       <section className="bg-white rounded-xl p-8 md:p-10 border border-gray-50 shadow-xl shadow-gray-200/50">
-        <h2 className="text-2xl font-bold text-gray-900 mb-8">Regional Preferences</h2>
+        <h2 className="text-2xl font-medium text-gray-900 mb-8">Regional Preferences</h2>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           {/* Timezone Select */}

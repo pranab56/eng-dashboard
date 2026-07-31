@@ -47,13 +47,13 @@ export const UpdateCoinModal: React.FC<UpdateCoinModalProps> = ({
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="max-w-md bg-white rounded-2xl p-6 shadow-2xl border-none">
         <DialogHeader className="pb-2">
-          <DialogTitle className="text-xl font-bold text-gray-900 flex items-center gap-2">
+          <DialogTitle className="text-xl font-medium text-gray-900 flex items-center gap-2">
             <span className="text-yellow-500 text-2xl">🪙</span>
             {title}
           </DialogTitle>
           {entityName && (
             <p className="text-xs font-semibold text-gray-500 mt-1">
-              Target: <span className="text-gray-900 font-bold">{entityName}</span>
+              Target: <span className="text-gray-900 font-medium">{entityName}</span>
             </p>
           )}
         </DialogHeader>
@@ -88,7 +88,7 @@ export const UpdateCoinModal: React.FC<UpdateCoinModalProps> = ({
             <button
               type="submit"
               disabled={isLoading || value.trim() === ""}
-              className="flex items-center gap-2 px-6 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-600 text-white font-bold text-sm shadow-md transition-all cursor-pointer disabled:opacity-50"
+              className="flex items-center gap-2 px-6 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-600 text-white font-medium text-sm shadow-md transition-all cursor-pointer disabled:opacity-50"
             >
               {isLoading && <Loader2 className="w-4 h-4 animate-spin" />}
               Update Coin

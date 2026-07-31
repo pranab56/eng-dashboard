@@ -126,7 +126,7 @@ const CreateReward = () => {
       </div>
       {/* Basic Information Card */}
       <section className="bg-white rounded-xl p-8 md:p-10 border border-gray-50 shadow-xl shadow-gray-200/50 text-gray-800">
-        <h2 className="text-2xl font-bold text-gray-900 mb-8">Basic Information</h2>
+        <h2 className="text-2xl font-medium text-gray-900 mb-8">Basic Information</h2>
 
         <div className="space-y-8">
           <InputField name="brand" title="Brand / Product Name" placeholder="e.g. Starbucks Latte" register={register} error={errors.brand} />
@@ -139,7 +139,7 @@ const CreateReward = () => {
 
       {/* Media Card */}
       <section className="bg-white rounded-xl p-8 md:p-10 border border-gray-50 shadow-xl shadow-gray-200/50 text-gray-800">
-        <h2 className="text-2xl font-bold text-gray-900 mb-8">Reward Media</h2>
+        <h2 className="text-2xl font-medium text-gray-900 mb-8">Reward Media</h2>
 
         <div className="w-full">
           <ImageUploadField name="logo" label="Reward Image" control={control} error={errors.logo as any}>

@@ -465,10 +465,10 @@ const CreateMatch = () => {
             prev.map((m) =>
               m.id === editingTempId
                 ? {
-                    ...m,
-                    payload,
-                    display,
-                  }
+                  ...m,
+                  payload,
+                  display,
+                }
                 : m
             )
           );
@@ -527,7 +527,7 @@ const CreateMatch = () => {
           <div className="flex justify-between gap-5">
             {/* Match Settings Card */}
             <section className="bg-white rounded-xl w-8/12 p-8 md:p-10 shadow-xl shadow-gray-200/50">
-              <h2 className="text-2xl font-bold text-gray-900 mb-8">
+              <h2 className="text-2xl font-medium text-gray-900 mb-8">
                 Match Setting
               </h2>
 
@@ -583,7 +583,7 @@ const CreateMatch = () => {
             {/* Schedule Card */}
             <div className="w-4/12 space-y-4">
               <section className="bg-white rounded-xl p-8 md:p-10 border border-gray-50 shadow-xl shadow-gray-200/50">
-                <h2 className="text-2xl font-bold text-gray-900 mb-8">
+                <h2 className="text-2xl font-medium text-gray-900 mb-8">
                   Schedule
                 </h2>
 
@@ -620,7 +620,7 @@ const CreateMatch = () => {
 
           {/* Matchup Selection Card */}
           <section className="bg-white rounded-xl p-8 md:p-10 border border-gray-50 shadow-xl shadow-gray-200/50">
-            <h2 className="text-2xl font-bold text-gray-900 mb-2">
+            <h2 className="text-2xl font-medium text-gray-900 mb-2">
               Matchup Selection
             </h2>
             <p className="text-sm text-gray-400 mb-8">
@@ -667,7 +667,7 @@ const CreateMatch = () => {
 
                 {/* VS Badge */}
                 <div className="z-10 flex-shrink-0">
-                  <div className="w-16 h-16 bg-black text-white rounded-full flex items-center justify-center text-xl font-bold border-4 border-white shadow-lg">
+                  <div className="w-16 h-16 bg-black text-white rounded-full flex items-center justify-center text-xl font-medium border-4 border-white shadow-lg">
                     VS
                   </div>
                 </div>
@@ -697,7 +697,7 @@ const CreateMatch = () => {
         <section className="bg-white rounded-xl p-8 md:p-10 border border-gray-50 shadow-xl shadow-gray-200/50 space-y-6">
           <div className="flex items-center justify-between">
             <div>
-              <h2 className="text-2xl font-bold text-gray-900">
+              <h2 className="text-2xl font-medium text-gray-900">
                 Matches to Create ({tempMatches.length})
               </h2>
               <p className="text-sm text-gray-400 mt-1">
@@ -724,20 +724,19 @@ const CreateMatch = () => {
               return (
                 <div
                   key={m.id}
-                  className={`p-6 rounded-2xl border transition-all flex flex-col md:flex-row items-center justify-between gap-6 ${
-                    isBeingEdited
+                  className={`p-6 rounded-2xl border transition-all flex flex-col md:flex-row items-center justify-between gap-6 ${isBeingEdited
                       ? "bg-amber-50/60 border-amber-300 ring-2 ring-amber-400/50"
                       : "bg-gray-50/70 border-gray-100 hover:border-gray-200"
-                  }`}
+                    }`}
                 >
                   {/* Left: Match Details */}
                   <div className="flex items-center gap-4 flex-1">
-                    <span className="w-8 h-8 rounded-full bg-gray-900 text-white font-bold text-sm flex items-center justify-center shrink-0">
+                    <span className="w-8 h-8 rounded-full bg-gray-900 text-white font-medium text-sm flex items-center justify-center shrink-0">
                       #{index + 1}
                     </span>
                     <div>
                       <div className="flex items-center gap-2 flex-wrap">
-                        <span className="font-bold text-gray-900 text-base">
+                        <span className="font-medium text-gray-900 text-base">
                           {m.display.homeTeamName} vs {m.display.awayTeamName}
                         </span>
                         <span className="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-blue-100 text-blue-700">

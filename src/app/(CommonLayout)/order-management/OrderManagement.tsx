@@ -107,10 +107,10 @@ const OrderManagement = () => {
             <ShoppingBag className="w-6 h-6 text-blue-600" />
           </div>
           <div>
-            <p className="text-xs text-gray-400 font-medium uppercase tracking-wide">
+            <p className="text-xs text-gray-400 font-medium . tracking-wide">
               Total Orders
             </p>
-            <p className="text-2xl font-bold text-gray-900">
+            <p className="text-2xl font-medium text-gray-900">
               {isLoading ? "—" : totalOrders}
             </p>
           </div>
@@ -121,10 +121,10 @@ const OrderManagement = () => {
             <Clock className="w-6 h-6 text-amber-600" />
           </div>
           <div>
-            <p className="text-xs text-gray-400 font-medium uppercase tracking-wide">
+            <p className="text-xs text-gray-400 font-medium . tracking-wide">
               Pending Orders
             </p>
-            <p className="text-2xl font-bold text-amber-600">
+            <p className="text-2xl font-medium text-amber-600">
               {isLoading ? "—" : pendingCount}
             </p>
           </div>
@@ -135,10 +135,10 @@ const OrderManagement = () => {
             <CheckCircle2 className="w-6 h-6 text-green-600" />
           </div>
           <div>
-            <p className="text-xs text-gray-400 font-medium uppercase tracking-wide">
+            <p className="text-xs text-gray-400 font-medium . tracking-wide">
               Approved
             </p>
-            <p className="text-2xl font-bold text-green-600">
+            <p className="text-2xl font-medium text-green-600">
               {isLoading ? "—" : approvedCount}
             </p>
           </div>
@@ -149,10 +149,10 @@ const OrderManagement = () => {
             <XCircle className="w-6 h-6 text-red-600" />
           </div>
           <div>
-            <p className="text-xs text-gray-400 font-medium uppercase tracking-wide">
+            <p className="text-xs text-gray-400 font-medium . tracking-wide">
               Rejected
             </p>
-            <p className="text-2xl font-bold text-red-600">
+            <p className="text-2xl font-medium text-red-600">
               {isLoading ? "—" : rejectedCount}
             </p>
           </div>

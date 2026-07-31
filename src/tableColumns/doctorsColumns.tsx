@@ -65,13 +65,13 @@ export const doctorsColumns: ColumnDef<TUser>[] = [
     cell: ({ row }) => (
       <div className="flex items-center justify-center gap-2">
         <Link href={`/doctor-list/${row.getValue("id")}`} className="flex items-center justify-center h-9 w-9 bg-gray-500 hover:bg-gray-600 transition-colors duration-300  cursor-pointer">
-          <PiEyeBold className="text-2xl font-bold text-white transition-colors duration-300" />
+          <PiEyeBold className="text-2xl font-medium text-white transition-colors duration-300" />
         </Link>
-        <button onClick={() => handleBlock(row.getValue("id")) } className="flex items-center justify-center h-9 w-9 bg-violet-500 hover:bg-violet-600 transition-colors duration-300 cursor-pointer">
-          <MdLockOutline className="text-2xl font-bold text-white transition-colors duration-300" />
+        <button onClick={() => handleBlock(row.getValue("id"))} className="flex items-center justify-center h-9 w-9 bg-violet-500 hover:bg-violet-600 transition-colors duration-300 cursor-pointer">
+          <MdLockOutline className="text-2xl font-medium text-white transition-colors duration-300" />
         </button>
         <button onClick={() => handleDelete(row.getValue("id"))} className="flex items-center justify-center h-9 w-9 bg-red-500 hover:bg-red-600 transition-colors duration-300 cursor-pointer">
-          <RiDeleteBin2Line className="text-2xl font-bold text-white transition-colors duration-300" />
+          <RiDeleteBin2Line className="text-2xl font-medium text-white transition-colors duration-300" />
         </button>
       </div>
     ),

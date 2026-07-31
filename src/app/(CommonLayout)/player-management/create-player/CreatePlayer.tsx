@@ -84,7 +84,7 @@ const CreatePlayer = () => {
       </>
       {/* Application Identity Card */}
       <section className="bg-white rounded-xl p-8 md:p-10 border border-gray-50 shadow-xl shadow-gray-200/50">
-        <h2 className="text-2xl font-bold text-gray-900 mb-8">Player Information</h2>
+        <h2 className="text-2xl font-medium text-gray-900 mb-8">Player Information</h2>
 
         <div className="space-y-8">
           {/* App Name Input */}
@@ -103,7 +103,7 @@ const CreatePlayer = () => {
       <section className="bg-white rounded-xl p-8 md:p-10 border border-gray-50 shadow-xl shadow-gray-200/50">
 
         <div className="space-y-8">
-          <h2 className="text-2xl font-bold text-gray-900 mb-8">Offensive Stats</h2>
+          <h2 className="text-2xl font-medium text-gray-900 mb-8">Offensive Stats</h2>
           {/* App Name Input */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             <InputField name="goals" type="number" title="Goals" placeholder="" register={register} error={errors.goals} />
@@ -122,7 +122,7 @@ const CreatePlayer = () => {
       <section className="bg-white rounded-xl p-8 md:p-10 border border-gray-50 shadow-xl shadow-gray-200/50">
 
         <div className="space-y-8">
-          <h2 className="text-2xl font-bold text-gray-900 mb-8">Defensive Stats</h2>
+          <h2 className="text-2xl font-medium text-gray-900 mb-8">Defensive Stats</h2>
           {/* App Name Input */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             <InputField name="tackles" type="number" title="Tackles" placeholder="" register={register} error={errors.tackles} />

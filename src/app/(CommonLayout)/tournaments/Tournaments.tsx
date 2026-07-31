@@ -256,7 +256,7 @@ export default function Tournaments() {
                       setStatusPopoverOpen(false);
                     }}
                     className={`w-full px-3 py-3 text-xs rounded-lg flex items-center justify-between transition-colors cursor-pointer text-left ${statusFilter === opt.value
-                      ? "bg-black text-white font-bold"
+                      ? "bg-black text-white font-medium"
                       : "text-gray-700 hover:bg-gray-100"
                       }`}
                   >
@@ -284,7 +284,7 @@ export default function Tournaments() {
         {isLoading ? (
           <div className="bg-gray-50/50 rounded-2xl border border-gray-100 p-12 text-center flex flex-col items-center justify-center gap-3">
             <Loader2 className="w-8 h-8 text-amber-500 animate-spin" />
-            <p className="text-xs font-bold text-gray-500">
+            <p className="text-xs font-medium text-gray-500">
               Loading tournament tree structure...
             </p>
           </div>
@@ -293,7 +293,7 @@ export default function Tournaments() {
             <div className="w-12 h-12 rounded-2xl bg-amber-50 border border-amber-100 flex items-center justify-center text-amber-600">
               <FolderPlus className="w-6 h-6" />
             </div>
-            <h4 className="text-base font-bold text-gray-800">
+            <h4 className="text-base font-medium text-gray-800">
               No Tournaments Found
             </h4>
             <p className="text-xs text-gray-400 max-w-xs">
@@ -304,7 +304,7 @@ export default function Tournaments() {
             <button
               type="button"
               onClick={handleOpenCreateModal}
-              className="mt-2 px-4 py-2 bg-black text-white text-xs font-bold rounded-xl hover:bg-gray-800 transition-all cursor-pointer shadow-sm"
+              className="mt-2 px-4 py-2 bg-black text-white text-xs font-medium rounded-xl hover:bg-gray-800 transition-all cursor-pointer shadow-sm"
             >
               + Create Tournament
             </button>
@@ -354,18 +354,18 @@ export default function Tournaments() {
                       </button>
 
                       {/* Tournament Icon */}
-                      <div className="w-11 h-11 rounded-xl bg-amber-50 border border-amber-200 text-amber-600 flex items-center justify-center font-bold shrink-0 shadow-sm">
+                      <div className="w-11 h-11 rounded-xl bg-amber-50 border border-amber-200 text-amber-600 flex items-center justify-center font-medium shrink-0 shadow-sm">
                         <Trophy className="w-5 h-5" />
                       </div>
 
                       {/* Info & Status */}
                       <div className="space-y-1 min-w-0">
                         <div className="flex items-center gap-2.5 flex-wrap">
-                          <h3 className="font-bold text-gray-900 text-base leading-snug truncate">
+                          <h3 className="font-medium text-gray-900 text-base leading-snug truncate">
                             {tournament.title}
                           </h3>
                           <span
-                            className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider border ${badgeStyle}`}
+                            className={`px-2.5 py-0.5 rounded-full text-[10px] font-medium . tracking-wider border ${badgeStyle}`}
                           >
                             {status}
                           </span>
@@ -388,7 +388,7 @@ export default function Tournaments() {
 
                     {/* Root Action Buttons */}
                     <div className="flex items-center gap-2 self-end md:self-auto shrink-0">
-                      <span className="text-xs font-bold text-gray-400 bg-gray-100 px-2.5 py-1 rounded-lg flex items-center gap-1">
+                      <span className="text-xs font-medium text-gray-400 bg-gray-100 px-2.5 py-1 rounded-lg flex items-center gap-1">
                         <GitBranch className="w-3 h-3 text-purple-500" />
                         {rewards.length} Ranks
                       </span>
@@ -426,7 +426,7 @@ export default function Tournaments() {
                       {/* Visual Tree Vertical Main Stem Connector */}
                       <div className="absolute left-10 top-6 bottom-8 w-0.5 bg-gradient-to-b from-amber-200 via-gray-200 to-transparent pointer-events-none" />
 
-                      <div className="flex items-center gap-2 text-xs font-bold text-gray-400 uppercase tracking-wider ml-8 mb-4">
+                      <div className="flex items-center gap-2 text-xs font-medium text-gray-400 . tracking-wider ml-8 mb-4">
                         <Award className="w-4 h-4 text-amber-500" />
                         <span>Position Rewards Tree Branches ({rewards.length})</span>
                       </div>
@@ -473,7 +473,7 @@ export default function Tournaments() {
                                       {iconMark}
                                     </span>
                                     <div>
-                                      <h4 className="text-sm font-bold leading-snug">
+                                      <h4 className="text-sm font-medium leading-snug">
                                         {reward.positionName}
                                       </h4>
                                       <p className="text-[11px] text-gray-500 font-medium">

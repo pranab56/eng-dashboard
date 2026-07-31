@@ -154,10 +154,10 @@ const SocialMediaManagement = () => {
             <Share2 className="w-6 h-6 text-blue-600" />
           </div>
           <div>
-            <p className="text-xs text-gray-400 font-medium uppercase tracking-wide">
+            <p className="text-xs text-gray-400 font-medium . tracking-wide">
               Total Platforms
             </p>
-            <p className="text-2xl font-bold text-gray-900">
+            <p className="text-2xl font-medium text-gray-900">
               {isLoading ? "—" : totalCount}
             </p>
           </div>
@@ -168,10 +168,10 @@ const SocialMediaManagement = () => {
             <CheckCircle2 className="w-6 h-6 text-green-600" />
           </div>
           <div>
-            <p className="text-xs text-gray-400 font-medium uppercase tracking-wide">
+            <p className="text-xs text-gray-400 font-medium . tracking-wide">
               Active Links
             </p>
-            <p className="text-2xl font-bold text-green-600">
+            <p className="text-2xl font-medium text-green-600">
               {isLoading ? "—" : activeCount}
             </p>
           </div>
@@ -182,10 +182,10 @@ const SocialMediaManagement = () => {
             <XCircle className="w-6 h-6 text-gray-500" />
           </div>
           <div>
-            <p className="text-xs text-gray-400 font-medium uppercase tracking-wide">
+            <p className="text-xs text-gray-400 font-medium . tracking-wide">
               Inactive Links
             </p>
-            <p className="text-2xl font-bold text-gray-600">
+            <p className="text-2xl font-medium text-gray-600">
               {isLoading ? "—" : inactiveCount}
             </p>
           </div>

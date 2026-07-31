@@ -39,7 +39,7 @@ const SalesTrackingChartSuspense = () => {
   return (
     <div className="bg-white rounded-2xl py-4">
       <div className="flex items-center justify-between mb-4 px-6 py-4">
-        <h2 className="text-2xl font-bold text-gray-700">Total Users</h2>
+        <h2 className="text-2xl font-medium text-gray-700">Total Users</h2>
         <div className="w-40">
           <CustomSelectOption selectOptions={selectOptionsRevenue} placeHolderValue="Select Year" queryKey="userDuration" />
         </div>

@@ -30,7 +30,7 @@ const EventViewModal = ({ event, isOpen, onClose }: EventViewModalProps) => {
           {event.image ? (
             <Image src={formatImagePath(event.image)} alt="event cover" fill quality={100} className="object-cover" />
           ) : (
-            <div className="w-full h-full flex items-center justify-center text-gray-300 font-black text-xl bg-gray-50 uppercase tracking-widest">
+            <div className="w-full h-full flex items-center justify-center text-gray-300 font-black text-xl bg-gray-50 . tracking-widest">
               NO IMAGE PROVIDED
             </div>
           )}
@@ -38,10 +38,10 @@ const EventViewModal = ({ event, isOpen, onClose }: EventViewModalProps) => {
 
           <div className="absolute bottom-6 left-10 right-10">
             <div className="flex items-center gap-3 mb-2">
-              <span className="px-3 py-1 bg-yellow-600 text-white rounded-full text-[10px] font-black uppercase tracking-widest">
+              <span className="px-3 py-1 bg-yellow-600 text-white rounded-full text-[10px] font-black . tracking-widest">
                 Event
               </span>
-              <span className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest border ${event.status === 'publish' ? 'bg-green-500 text-white' : 'bg-orange-500 text-white'
+              <span className={`px-3 py-1 rounded-full text-[10px] font-black . tracking-widest border ${event.status === 'publish' ? 'bg-green-500 text-white' : 'bg-orange-500 text-white'
                 }`}>
                 {event.status}
               </span>
@@ -60,8 +60,8 @@ const EventViewModal = ({ event, isOpen, onClose }: EventViewModalProps) => {
                 <MapPin className="w-5 h-5" />
               </div>
               <div>
-                <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Location</p>
-                <p className="text-sm font-bold text-gray-900">{event.location || "N/A"}</p>
+                <p className="text-[10px] font-black text-gray-400 . tracking-widest">Location</p>
+                <p className="text-sm font-medium text-gray-900">{event.location || "N/A"}</p>
               </div>
             </div>
 
@@ -70,11 +70,11 @@ const EventViewModal = ({ event, isOpen, onClose }: EventViewModalProps) => {
                 <Calendar className="w-5 h-5" />
               </div>
               <div>
-                <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Event Date</p>
-                <p className="text-sm font-bold text-gray-900">
+                <p className="text-[10px] font-black text-gray-400 . tracking-widest">Event Date</p>
+                <p className="text-sm font-medium text-gray-900">
                   {event.eventDate ? dayjs(event.eventDate).format("DD MMMM, YYYY") : "N/A"}
                 </p>
-                <p className="text-[9px] text-gray-400 font-bold uppercase">
+                <p className="text-[9px] text-gray-400 font-medium .">
                   {event.eventDate ? dayjs(event.eventDate).format("hh:mm A") : ""}
                 </p>
               </div>
@@ -92,9 +92,9 @@ const EventViewModal = ({ event, isOpen, onClose }: EventViewModalProps) => {
           {/* Publication Date */}
           <div className="flex items-center justify-between border-t border-gray-100 pt-6">
             <div className="text-left">
-              <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Publication Date</p>
-              <p className="text-sm font-bold text-gray-900">{dayjs(event.publishDateTime).format("DD MMMM YYYY")}</p>
-              <p className="text-[9px] text-gray-400 font-bold uppercase">{dayjs(event.publishDateTime).fromNow()}</p>
+              <p className="text-[10px] font-black text-gray-400 . tracking-widest">Publication Date</p>
+              <p className="text-sm font-medium text-gray-900">{dayjs(event.publishDateTime).format("DD MMMM YYYY")}</p>
+              <p className="text-[9px] text-gray-400 font-medium .">{dayjs(event.publishDateTime).fromNow()}</p>
             </div>
           </div>
         </div>

@@ -42,7 +42,7 @@ const SubCardManager: React.FC<PricingTierProps> = ({ title, price, period, desc
       {/* Header */}
       <div className="flex items-center gap-3 mb-4">
         <span className='bg-[#0053DB]/10 p-2 rounded-md'>{title && selectIcon(title)}</span>
-        <h2 className="text-xl font-bold text-gray-900">
+        <h2 className="text-xl font-medium text-gray-900">
           {title}
         </h2>
       </div>
@@ -56,7 +56,7 @@ const SubCardManager: React.FC<PricingTierProps> = ({ title, price, period, desc
 
         {/* Pricing */}
         {price && <div className="flex items-end gap-1">
-          <div className={`text-4xl font-bold ${priceColor(title)}`}>
+          <div className={`text-4xl font-medium ${priceColor(title)}`}>
             £{price}
           </div>
           <div className="text-gray-400 font-medium italic">
@@ -68,7 +68,7 @@ const SubCardManager: React.FC<PricingTierProps> = ({ title, price, period, desc
       {/* Action Button */}
       <CustomModal
         title="Create New Notification"
-        trigger={<button className="w-full py-2 bg-black text-white rounded-xl font-bold text-lg hover:bg-gray-800 transition-colors">
+        trigger={<button className="w-full py-2 bg-black text-white rounded-xl font-medium text-lg hover:bg-gray-800 transition-colors">
           Edit Details
         </button>}
       >

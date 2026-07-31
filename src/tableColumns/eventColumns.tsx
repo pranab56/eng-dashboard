@@ -17,8 +17,8 @@ export const getEventColumns = (onView: (event: any) => void, onDelete: (id: str
           <div className="w-12 h-12 rounded-xl bg-gray-50 border border-gray-100 flex items-center justify-center text-[10px] font-black text-gray-300">VOID</div>
         )}
         <div className="flex flex-col max-w-[280px]">
-          <span className="font-bold text-gray-900 leading-tight line-clamp-1">{row.getValue("title")}</span>
-          <span className="text-[10px] text-gray-400 font-bold uppercase tracking-widest mt-0.5">{row.original.location || "No Location"}</span>
+          <span className="font-medium text-gray-900 leading-tight line-clamp-1">{row.getValue("title")}</span>
+          <span className="text-[10px] text-gray-400 font-medium . tracking-widest mt-0.5">{row.original.location || "No Location"}</span>
         </div>
       </div>
     ),
@@ -30,8 +30,8 @@ export const getEventColumns = (onView: (event: any) => void, onDelete: (id: str
       const val = row.getValue("eventDate") as string;
       return (
         <div className="flex flex-col">
-          <span className="text-sm font-bold text-gray-900">{val ? dayjs(val).format("DD MMM, YYYY") : "N/A"}</span>
-          <span className="text-[10px] text-gray-400 font-bold uppercase tracking-tighter">{val ? dayjs(val).format("hh:mm A") : ""}</span>
+          <span className="text-sm font-medium text-gray-900">{val ? dayjs(val).format("DD MMM, YYYY") : "N/A"}</span>
+          <span className="text-[10px] text-gray-400 font-medium . tracking-tighter">{val ? dayjs(val).format("hh:mm A") : ""}</span>
         </div>
       );
     },
@@ -43,8 +43,8 @@ export const getEventColumns = (onView: (event: any) => void, onDelete: (id: str
       const val = row.getValue("publishDateTime") as string;
       return (
         <div className="flex flex-col">
-          <span className="text-sm font-bold text-gray-900">{val ? dayjs(val).format("DD MMM, YYYY") : "N/A"}</span>
-          <span className="text-[10px] text-gray-400 font-bold uppercase tracking-tighter">{val ? dayjs(val).format("hh:mm A") : ""}</span>
+          <span className="text-sm font-medium text-gray-900">{val ? dayjs(val).format("DD MMM, YYYY") : "N/A"}</span>
+          <span className="text-[10px] text-gray-400 font-medium . tracking-tighter">{val ? dayjs(val).format("hh:mm A") : ""}</span>
         </div>
       );
     },
@@ -55,7 +55,7 @@ export const getEventColumns = (onView: (event: any) => void, onDelete: (id: str
     cell: ({ row }) => {
       const status = row.getValue("status") as string;
       return (
-        <div className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest border inline-block ${status === 'publish' ? 'bg-green-50 text-green-600 border-green-100' : 'bg-orange-50 text-orange-600 border-orange-100'
+        <div className={`px-3 py-1 rounded-full text-[10px] font-black . tracking-widest border inline-block ${status === 'publish' ? 'bg-green-50 text-green-600 border-green-100' : 'bg-orange-50 text-orange-600 border-orange-100'
           }`}>
           {status}
         </div>
@@ -71,18 +71,18 @@ export const getEventColumns = (onView: (event: any) => void, onDelete: (id: str
           onClick={() => onView(row.original)}
           className="flex items-center justify-center h-9 w-9 rounded-sm bg-[#F3F3F3] hover:bg-gray-200 transition-colors duration-300 cursor-pointer text-gray-800"
         >
-          <FiEye className="size-5 font-bold" />
+          <FiEye className="size-5 font-medium" />
         </button>
         <Link href={`/event-management/create-event?id=${row.original._id}`}>
           <button className="flex items-center justify-center h-9 w-9 rounded-sm bg-[#F3F3F3] hover:bg-gray-200 transition-colors duration-300 cursor-pointer text-gray-800">
-            <FiEdit className="size-5 font-bold" />
+            <FiEdit className="size-5 font-medium" />
           </button>
         </Link>
         <button
           onClick={() => onDelete(row.original._id)}
           className="flex items-center justify-center h-9 w-9 rounded-sm bg-[#F3F3F3] hover:bg-red-50 hover:text-red-600 transition-colors duration-300 cursor-pointer"
         >
-          <FiTrash2 className="size-5 font-bold" />
+          <FiTrash2 className="size-5 font-medium" />
         </button>
       </div>
     ),

@@ -53,7 +53,7 @@ export const subscribersColumns: ColumnDef<TUser>[] = [
     cell: ({ row }) => (
       <div className="flex items-center justify-center gap-2">
         <Link href={`/subscriber-list/${row.getValue("id")}`} className="flex items-center justify-center h-9 w-9 bg-gray-500 hover:bg-gray-600 transition-colors duration-300  cursor-pointer">
-          <PiEyeBold className="text-2xl font-bold text-white transition-colors duration-300" />
+          <PiEyeBold className="text-2xl font-medium text-white transition-colors duration-300" />
         </Link>
       </div>
     ),

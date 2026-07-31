@@ -56,7 +56,7 @@ export const singleTeamColumns: ColumnDef<any>[] = [
           title="Transfer Approval Request"
           className="sm:max-w-[720px]"
           trigger={<button className="flex items-center justify-center h-9 w-9 rounded-sm bg-[#F3F3F3]  transition-colors duration-300 cursor-pointer">
-            <FiEye className="size-5 font-bold text-gray-800 transition-colors duration-300" />
+            <FiEye className="size-5 font-medium text-gray-800 transition-colors duration-300" />
           </button>}
         >
           <PlayerDetails />

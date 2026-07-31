@@ -181,7 +181,7 @@ const CreateEvent = () => {
             <div className="space-y-8">
               <SelectField name="status" label="Publishing Status" control={control} error={errors.status} options={publishStatusOptions} />
               <div className="space-y-4">
-                <p className="text-xs font-black text-gray-400 uppercase tracking-widest">Release Date & Time</p>
+                <p className="text-xs font-black text-gray-400 . tracking-widest">Release Date & Time</p>
                 <InputField name="pubDate" type='date' title="Release Date" register={register} error={errors.pubDate} />
                 <InputField name="pubTime" type='time' title="Release Time" register={register} error={errors.pubTime} />
               </div>

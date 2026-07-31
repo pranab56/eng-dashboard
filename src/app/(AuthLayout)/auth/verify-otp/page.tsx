@@ -79,7 +79,7 @@ const VerifyOtp = () => {
 
   return (
     <>
-      <h2 className="text-2xl md:text-3xl xl:text-4xl font-bold text-gray-800 pb-12">Verify OTP</h2>
+      <h2 className="text-2xl md:text-3xl xl:text-4xl font-medium text-gray-800 pb-12">Verify OTP</h2>
 
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
@@ -118,7 +118,7 @@ const VerifyOtp = () => {
               type="button"
               onClick={handleResendOTP}
               disabled={isResendLoading}
-              className="text-gray-700 hover:text-gray-900 font-bold disabled:opacity-50"
+              className="text-gray-700 hover:text-gray-900 font-medium disabled:opacity-50"
             >
               {isResendLoading ? "Resending..." : "Resend OTP"}
             </button>

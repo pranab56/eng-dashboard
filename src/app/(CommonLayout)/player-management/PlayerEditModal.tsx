@@ -96,7 +96,7 @@ const PlayerEditModal = ({ player, isOpen, onClose }: PlayerEditModalProps) => {
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-2xl bg-white rounded-2xl p-6 shadow-2xl animate-in zoom-in-95 duration-200">
         <DialogHeader className="pb-4 border-b border-gray-100">
-          <DialogTitle className="text-xl font-bold text-gray-900">
+          <DialogTitle className="text-xl font-medium text-gray-900">
             Edit Player Details
           </DialogTitle>
         </DialogHeader>

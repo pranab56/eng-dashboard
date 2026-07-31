@@ -30,7 +30,7 @@ const SubscriptionPie = () => {
   return (
     <div className="rounded-2xl bg-white p-4 flex flex-col items-center py-6">
       <div className="w-full flex items-center justify-between mb-12 ">
-        <h2 className="text-2xl font-bold text-gray-700">Subscriptions</h2>
+        <h2 className="text-2xl font-medium text-gray-700">Subscriptions</h2>
         <div className='w-40'>
           <CustomSelectOption selectOptions={selectOptionsRevenue} placeHolderValue="Select Year" queryKey="brandEngagementDuration" />
         </div>
@@ -66,7 +66,7 @@ const SubscriptionPie = () => {
         </svg>
 
         <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-secondary w-28 h-28 rounded-full flex flex-col items-center justify-center">
-          <span className="text-3xl font-bold">
+          <span className="text-3xl font-medium">
             {subscriptionSummary?.totalSubscribers}%
           </span>
         </div>

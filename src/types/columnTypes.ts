@@ -11,6 +11,8 @@ export type TUserManagement = {
   _id: string;
   userName: string;
   name?: string;
+  firstName?: string;
+  lastName?: string;
   role: string;
   profile: string;
   profilePic?: string;
@@ -21,6 +23,12 @@ export type TUserManagement = {
   phoneNumber?: string;
   document?: string | string[];
   documents?: string | string[];
+  selectTeam?: {
+    _id?: string;
+    teamName?: string;
+    shortName?: string;
+    teamLogo?: string;
+  };
   nid?: string;
   passport?: string;
   tradeLicense?: string;
@@ -98,7 +106,7 @@ export type TTransfer = {
   approvedByFirstName: string | null;
   approvedByLastName: string | null;
   transferType: string;
-  status: 'PENDING' | 'APPROVED' | 'REJECTED';
+  status: 'PENDING' | 'MANAGER_APPROVED' | 'APPROVED' | 'REJECTED' | string;
   rejectReason: string | null;
   createdAt: string;
   updatedAt: string;

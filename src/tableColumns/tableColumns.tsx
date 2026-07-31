@@ -23,8 +23,8 @@ export const tableColumns: ColumnDef<any>[] = [
             <div className="w-10 h-10 rounded-full bg-gray-200 border border-gray-100 flex items-center justify-center text-[10px]">No Logo</div>
           )}
           <div className="flex flex-col">
-            <span className="font-bold text-gray-900 leading-none">{team?.teamName}</span>
-            <span className="text-[10px] text-gray-400 font-semibold uppercase">{team?.shortName}</span>
+            <span className="font-medium text-gray-900 leading-none">{team?.teamName}</span>
+            <span className="text-[10px] text-gray-400 font-semibold .">{team?.shortName}</span>
           </div>
         </div>
       );
@@ -63,7 +63,7 @@ export const tableColumns: ColumnDef<any>[] = [
     accessorKey: "points",
     header: () => <div className="">PTS</div>,
     cell: ({ row }) => (
-      <div className="font-bold text-gray-900">{row.getValue("points")}</div>
+      <div className="font-medium text-gray-900">{row.getValue("points")}</div>
     ),
   },
 ]

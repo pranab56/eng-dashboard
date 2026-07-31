@@ -229,7 +229,7 @@ export default function ProfilePage() {
             <CardContent className="p-8 space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                 <div className="space-y-2.5">
-                  <Label className="text-[13px] font-medium text-gray-400 uppercase tracking-wider ml-1">Full Name</Label>
+                  <Label className="text-[13px] font-medium text-gray-400 . tracking-wider ml-1">Full Name</Label>
                   <Input
                     name="userName"
                     value={formData.userName}
@@ -243,7 +243,7 @@ export default function ProfilePage() {
                   {errors.userName && <p className="text-xs font-medium text-red-500 mt-1 ml-1">{errors.userName}</p>}
                 </div>
                 <div className="space-y-2.5">
-                  <Label className="text-[13px] font-medium text-gray-400 uppercase tracking-wider ml-1">Registered Email</Label>
+                  <Label className="text-[13px] font-medium text-gray-400 . tracking-wider ml-1">Registered Email</Label>
                   <Input
                     name="email"
                     readOnly
@@ -383,13 +383,13 @@ export default function ProfilePage() {
             <div className="space-y-4">
               <div className="flex justify-between items-center text-xs">
                 <span className="text-gray-500 font-medium">Role</span>
-                <span className="bg-white px-2 py-1 rounded text-[#1D68D5] font-black border border-gray-100 uppercase tracking-tighter">
+                <span className="bg-white px-2 py-1 rounded text-[#1D68D5] font-black border border-gray-100 . tracking-tighter">
                   {profileData?.data?.role?.replace("_", " ")}
                 </span>
               </div>
               <div className="flex justify-between items-center text-xs">
                 <span className="text-gray-500 font-medium">Status</span>
-                <span className="flex items-center gap-1.5 text-green-600 font-black uppercase">
+                <span className="flex items-center gap-1.5 text-green-600 font-black .">
                   <span className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse"></span>
                   Verified
                 </span>
