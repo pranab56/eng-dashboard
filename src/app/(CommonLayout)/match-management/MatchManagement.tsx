@@ -15,6 +15,7 @@ import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 import DeleteConfirmModal from './DeleteConfirmModal';
 import MatchViewModal from './MatchViewModal';
+import ModifyScoreModal from './ModifyScoreModal';
 
 
 const MatchManagement = () => {
@@ -32,6 +33,9 @@ const MatchManagement = () => {
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [deletingId, setDeletingId] = useState<string | null>(null);
 
+  const [isScoreModalOpen, setIsScoreModalOpen] = useState(false);
+  const [scoreModifyingMatch, setScoreModifyingMatch] = useState<any>(null);
+
   useEffect(() => {
     setHeaders({
       title: "Matches",
@@ -42,6 +46,11 @@ const MatchManagement = () => {
   const handleView = (match: any) => {
     setSelectedMatch(match);
     setIsModalOpen(true);
+  };
+
+  const handleModifyScore = (match: any) => {
+    setScoreModifyingMatch(match);
+    setIsScoreModalOpen(true);
   };
 
   const handleDelete = (id: string) => {
@@ -84,7 +93,7 @@ const MatchManagement = () => {
           </>
 
           <div className="pt-4">
-            <CustomTable<any> columns={getMatchColumns(handleView, handleDelete)} data={matchData?.data || []} isLoading={isLoading} />
+            <CustomTable<any> columns={getMatchColumns(handleView, handleDelete, handleModifyScore)} data={matchData?.data || []} isLoading={isLoading} />
           </div>
         </div>
 
@@ -97,6 +106,15 @@ const MatchManagement = () => {
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         match={selectedMatch}
+      />
+
+      <ModifyScoreModal
+        isOpen={isScoreModalOpen}
+        onClose={() => {
+          setIsScoreModalOpen(false);
+          setScoreModifyingMatch(null);
+        }}
+        match={scoreModifyingMatch}
       />
 
       <DeleteConfirmModal

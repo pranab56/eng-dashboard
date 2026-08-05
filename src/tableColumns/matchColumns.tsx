@@ -18,7 +18,11 @@ const statusStyle = (status: string): string => {
   }
 };
 
-export const getMatchColumns = (onView: (match: any) => void, onDelete: (id: string) => void): ColumnDef<any>[] => [
+export const getMatchColumns = (
+  onView: (match: any) => void,
+  onDelete: (id: string) => void,
+  onModifyScore: (match: any) => void
+): ColumnDef<any>[] => [
   {
     accessorKey: "homeTeam",
     header: () => <div className="">Teams & Matchup</div>,
@@ -87,17 +91,28 @@ export const getMatchColumns = (onView: (match: any) => void, onDelete: (id: str
         <button
           onClick={() => onView(row.original)}
           className="flex items-center justify-center h-9 w-9 rounded-sm bg-[#F3F3F3] hover:bg-gray-200 transition-colors duration-300 cursor-pointer"
+          title="View Match"
         >
           <FiEye className="size-5 font-medium text-gray-800" />
         </button>
+        <button
+          onClick={() => onModifyScore(row.original)}
+          className="flex items-center justify-center h-9 w-9 rounded-sm bg-[#F3F3F3] hover:bg-emerald-50 hover:text-emerald-600 transition-colors duration-300 cursor-pointer"
+          title="Modify Score"
+        >
+          <svg className="size-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
+          </svg>
+        </button>
         <Link href={`/match-management/create-match?id=${row.original._id}`}>
-          <button className="flex items-center justify-center h-9 w-9 rounded-sm bg-[#F3F3F3] hover:bg-gray-200 transition-colors duration-300 cursor-pointer">
+          <button className="flex items-center justify-center h-9 w-9 rounded-sm bg-[#F3F3F3] hover:bg-gray-200 transition-colors duration-300 cursor-pointer" title="Edit Match">
             <FiEdit className="size-5 font-medium text-gray-800" />
           </button>
         </Link>
         <button
           onClick={() => onDelete(row.original._id)}
           className="flex items-center justify-center h-9 w-9 rounded-sm bg-[#F3F3F3] hover:bg-red-50 hover:text-red-600 transition-colors duration-300 cursor-pointer"
+          title="Delete Match"
         >
           <FiTrash2 className="size-5 font-medium" />
         </button>

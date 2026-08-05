@@ -47,6 +47,14 @@ export const matchApi = baseApi.injectEndpoints({
       invalidatesTags: ["match"]
     }),
 
+    modifyScore: builder.mutation({
+      query: ({ id, data }) => ({
+        url: `/match/${id}/modify-score`,
+        method: "PATCH",
+        body: data,
+      }),
+      invalidatesTags: ["match"]
+    }),
 
   }),
 });
@@ -58,4 +66,5 @@ export const {
   useGetAllMatchQuery,
   useGetSingleMatchQuery,
   useDeleteMatchMutation,
+  useModifyScoreMutation,
 } = matchApi;
