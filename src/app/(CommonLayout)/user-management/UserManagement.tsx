@@ -14,6 +14,7 @@ import { useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import UserVerificationModal from './UserVerificationModal';
+import AssignTeamsModal from './AssignTeamsModal';
 
 const ROLE_TABS = [
   { label: 'All Users', value: 'ALL' },
@@ -34,6 +35,9 @@ const UserManagement = () => {
 
   const [selectedUser, setSelectedUser] = useState<TUserManagement | null>(null);
   const [isVerificationModalOpen, setIsVerificationModalOpen] = useState<boolean>(false);
+
+  const [assignTargetUser, setAssignTargetUser] = useState<TUserManagement | null>(null);
+  const [isAssignModalOpen, setIsAssignModalOpen] = useState<boolean>(false);
 
   const { data: userData, isLoading } = useGetUserQuery({
     pageNumber: page,
@@ -73,6 +77,11 @@ const UserManagement = () => {
   const handleViewUser = (user: TUserManagement) => {
     setSelectedUser(user);
     setIsVerificationModalOpen(true);
+  };
+
+  const handleAssignTeams = (user: TUserManagement) => {
+    setAssignTargetUser(user);
+    setIsAssignModalOpen(true);
   };
 
   const handleApproveVerification = async (id: string) => {
@@ -127,7 +136,7 @@ const UserManagement = () => {
     url: "#"
   }
 
-  const columns = getUsersColumns(handleToggleStatus, handleUpdateUserStatus, handleDeleteUser, handleViewUser);
+  const columns = getUsersColumns(handleToggleStatus, handleUpdateUserStatus, handleDeleteUser, handleViewUser, handleAssignTeams);
 
   // Flexible client-side fallback filtering
   const filteredUsers = (userData?.data || []).filter((user: any) => {
@@ -242,6 +251,15 @@ const UserManagement = () => {
         onApprove={handleApproveVerification}
         onReject={handleRejectVerification}
         isUpdating={isUpdatingUserStatus}
+      />
+
+      <AssignTeamsModal
+        user={assignTargetUser}
+        isOpen={isAssignModalOpen}
+        onClose={() => {
+          setIsAssignModalOpen(false);
+          setAssignTargetUser(null);
+        }}
       />
     </div>
   )

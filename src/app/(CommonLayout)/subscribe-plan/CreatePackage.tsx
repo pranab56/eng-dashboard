@@ -26,7 +26,6 @@ const packageSchema = z.object({
   paymentType: z.string().min(1, "Payment type is required"),
   packageType: z.enum(['Semi Pro', 'Professional', 'Other']),
   credit: z.number().min(0, "Credit must be at least 0"),
-  loginLimit: z.number().min(1, "Login limit must be at least 1"),
   features: z.array(featureItemSchema),
 })
 
@@ -83,7 +82,6 @@ const CreatePackage = ({ initialData, onSuccess }: CreatePackageProps) => {
       paymentType: "Monthly",
       packageType: "Semi Pro",
       credit: 0,
-      loginLimit: 1,
       features: [],
     }
   })
@@ -112,7 +110,6 @@ const CreatePackage = ({ initialData, onSuccess }: CreatePackageProps) => {
         paymentType: initialData.paymentType || "Monthly",
         packageType: initialData.packageType || "Semi Pro",
         credit: initialData.credit || 0,
-        loginLimit: initialData.loginLimit || 1,
         features: formattedFeatures,
       })
     }
@@ -159,9 +156,8 @@ const CreatePackage = ({ initialData, onSuccess }: CreatePackageProps) => {
         <SelectField name="duration" label="Duration" control={control} options={durationOptions} error={errors.duration} />
       </div>
 
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 gap-4">
         <InputField name="credit" title="Eng Coins" type="number" register={register} error={errors.credit} registerOptions={{ valueAsNumber: true }} />
-        <InputField name="loginLimit" title="Login Limit" type="number" register={register} error={errors.loginLimit} registerOptions={{ valueAsNumber: true }} />
       </div>
 
       {/* Dynamic Features Section after loginLimit */}

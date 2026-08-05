@@ -45,14 +45,10 @@ const PackageCard = ({ packageData }: PackageCardProps) => {
           <span className="text-sm font-medium text-gray-500">/ {packageData.duration}</span>
         </div>
 
-        <div className="grid grid-cols-2 gap-3">
+        <div className="grid grid-cols-1 gap-3">
           <div className="p-3 rounded-xl bg-gray-50 border border-gray-100">
             <p className="text-[10px] font-medium text-gray-400 . tracking-widest">Credits</p>
             <p className="text-lg font-medium text-gray-900">{packageData.credit}</p>
-          </div>
-          <div className="p-3 rounded-xl bg-gray-50 border border-gray-100">
-            <p className="text-[10px] font-medium text-gray-400 . tracking-widest">Logins</p>
-            <p className="text-lg font-medium text-gray-900">{packageData.loginLimit}</p>
           </div>
         </div>
 

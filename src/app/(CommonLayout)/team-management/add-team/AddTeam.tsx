@@ -11,7 +11,7 @@ import { useForm } from 'react-hook-form'
 import * as z from 'zod'
 
 import { useCreateTeamMutation, useGetSingleTeamQuery, useUpdateTeamMutation } from '@/features/teamManagement/teamApi'
-import { useAssignTeamManagerMutation, useGetAllManagerTeamQuery } from '@/features/managerTeam/managerTeamApi'
+import { useAssignTeamManagerMutation, useRemoveTeamManagerMutation, useGetAllManagerTeamQuery } from '@/features/managerTeam/managerTeamApi'
 import { baseURL } from '@/utils/BaseURL'
 import { getErrorMessage } from '@/utils/getErrorMessage'
 import { useRouter, useSearchParams } from 'next/navigation'
@@ -48,6 +48,7 @@ const AddTeam = () => {
   const [createTeam, { isLoading: isCreating }] = useCreateTeamMutation()
   const [updateTeam, { isLoading: isUpdating }] = useUpdateTeamMutation()
   const [assignTeamManager, { isLoading: isAssigning }] = useAssignTeamManagerMutation()
+  const [removeTeamManager, { isLoading: isRemoving }] = useRemoveTeamManagerMutation()
   const { data: teamData, isFetching } = useGetSingleTeamQuery(teamId, { skip: !isEditMode })
   const { data: managersData } = useGetAllManagerTeamQuery(undefined)
 
@@ -131,6 +132,8 @@ const AddTeam = () => {
         if (res.success) {
           if (data.manager && data.manager.trim() !== "") {
             await assignTeamManager({ manager: data.manager, team: teamId }).unwrap();
+          } else {
+            await removeTeamManager(teamId).unwrap();
           }
           toast.success(res.message || "Team updated successfully");
           router.push("/team-management");
@@ -161,7 +164,7 @@ const AddTeam = () => {
         <BackButton />
 
         <div className="">
-          <SubmitButton isSubmitting={isCreating || isUpdating || isAssigning} title={isEditMode ? "Update Team" : "Create Team"} />
+          <SubmitButton isSubmitting={isCreating || isUpdating || isAssigning || isRemoving} title={isEditMode ? "Update Team" : "Create Team"} />
         </div>
       </div>
       <div className='w-full flex gap-4'>

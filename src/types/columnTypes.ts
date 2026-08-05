@@ -35,6 +35,10 @@ export type TUserManagement = {
   certificate?: string;
   verificationDoc?: string;
   idProof?: string;
+  playForAcademy?: boolean;
+  academyClubName?: string;
+  isDevelopmentPlayer?: boolean;
+  mediaConsent?: boolean;
   createdAt?: string;
   updatedAt?: string;
 }

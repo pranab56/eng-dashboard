@@ -4,12 +4,14 @@ import { FiEye } from "react-icons/fi";
 import { TUserManagement } from "@/types/columnTypes";
 import Image from "next/image";
 import { formatImagePath } from "@/utils/formatImagePath";
+import { Shield } from "lucide-react";
 
 export const getUsersColumns = (
   onToggleStatus: (id: string) => void,
   onUpdateUserStatus: (id: string, status: "APPROVED" | "REJECTED") => void,
   onDelete: (id: string) => void,
-  onView?: (user: TUserManagement) => void
+  onView?: (user: TUserManagement) => void,
+  onAssignTeams?: (user: TUserManagement) => void
 ): ColumnDef<TUserManagement>[] => [
     {
       accessorKey: "userName",
@@ -115,6 +117,16 @@ export const getUsersColumns = (
               title="Inspect Details & Verification Documents"
             >
               <FiEye className="size-4" />
+            </button>
+          )}
+          {onAssignTeams && row.original.role === "MANAGER" && (
+            <button
+              type="button"
+              onClick={() => onAssignTeams(row.original)}
+              className="flex items-center justify-center h-8 w-8 rounded-md bg-amber-50 hover:bg-amber-100 text-amber-600 transition-colors duration-200 cursor-pointer"
+              title="Assign Teams to Coach"
+            >
+              <Shield className="size-4" />
             </button>
           )}
           <button

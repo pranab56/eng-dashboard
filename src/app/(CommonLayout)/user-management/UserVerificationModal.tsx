@@ -206,6 +206,41 @@ const UserVerificationModal: React.FC<UserVerificationModalProps> = ({
               </div>
             </div>
 
+            {/* Academy Info Section */}
+            {user.role === 'PLAYER' && (
+              <div className="space-y-2">
+                <h3 className="text-xs font-extrabold text-blue-600 uppercase tracking-widest flex items-center gap-1.5">
+                  <Shield className="w-3.5 h-3.5 text-blue-600" /> Academy & Registration Status
+                </h3>
+                <div className="p-4 bg-gradient-to-r from-amber-50/50 to-orange-50/50 border border-amber-100 rounded-2xl shadow-sm space-y-2">
+                  <div className="flex justify-between items-center text-sm font-semibold text-gray-700">
+                    <span>Plays for CAT 1-3 Academy?</span>
+                    <span className={`px-2 py-0.5 rounded-full text-xs font-bold ${user.playForAcademy ? 'bg-amber-100 text-amber-800' : 'bg-gray-100 text-gray-600'}`}>
+                      {user.playForAcademy ? 'Yes' : 'No'}
+                    </span>
+                  </div>
+                  {user.playForAcademy && (
+                    <div className="pt-2 border-t border-amber-200/40 flex justify-between items-center text-sm font-semibold text-gray-700">
+                      <span>Club Name</span>
+                      <span className="text-gray-900 font-bold">{user.academyClubName || 'N/A'}</span>
+                    </div>
+                  )}
+                  <div className="pt-2 border-t border-amber-200/40 flex justify-between items-center text-sm font-semibold text-gray-700">
+                    <span>Development Player?</span>
+                    <span className={`px-2 py-0.5 rounded-full text-xs font-bold ${user.isDevelopmentPlayer ? 'bg-amber-100 text-amber-800' : 'bg-gray-100 text-gray-600'}`}>
+                      {user.isDevelopmentPlayer ? 'Yes' : 'No'}
+                    </span>
+                  </div>
+                  <div className="pt-2 border-t border-amber-200/40 flex justify-between items-center text-sm font-semibold text-gray-700">
+                    <span>Media Consent Provided?</span>
+                    <span className={`px-2 py-0.5 rounded-full text-xs font-bold ${user.mediaConsent ? 'bg-green-100 text-green-800' : 'bg-rose-100 text-rose-800'}`}>
+                      {user.mediaConsent ? 'Yes' : 'No'}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            )}
+
             {/* Selected Team Card Section */}
             {selectedTeam && (selectedTeam.teamName || selectedTeam.shortName) && (
               <div className="space-y-2">
