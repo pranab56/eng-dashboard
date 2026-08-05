@@ -124,6 +124,8 @@ export type TEngtv = {
   publishDateTime: string;
   createdAt: string;
   updatedAt: string;
+  isHighlight?: boolean;
+  order?: number;
 }
 
 export type TNews = {

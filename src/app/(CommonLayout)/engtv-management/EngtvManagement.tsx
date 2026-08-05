@@ -7,7 +7,7 @@ import GeneralStateCard from '@/components/cui/GeneralStateCard';
 import TableHeader from '@/components/cui/TableHeader';
 import { CustomModal } from '@/components/modals/CustomModal';
 import CustomTable from '@/components/table/CustomTable';
-import { useDeleteVideoMutation, useGetAllVideoQuery } from '@/features/engTVManagement/engApi';
+import { useDeleteVideoMutation, useGetAllVideoQuery, useRearrangeVideosMutation } from '@/features/engTVManagement/engApi';
 import { useHeaders } from '@/hooks/useHeaders';
 import { getYouTubeEmbedUrl } from '@/utils/getYouTubeEmbedUrl';
 import { getEngtvColumns } from '@/tableColumns/engtvColumns';
@@ -28,11 +28,47 @@ const EngtvManagement = () => {
   console.log("video data", videoData)
 
   const [deleteVideo, { isLoading: isDeleting }] = useDeleteVideoMutation();
+  const [rearrangeVideos] = useRearrangeVideosMutation();
 
+  const [localVideos, setLocalVideos] = useState<TEngtv[]>([]);
   const [selectedVideo, setSelectedVideo] = useState<TEngtv | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [deletingId, setDeletingId] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (videoData?.data) {
+      setLocalVideos(videoData.data);
+    }
+  }, [videoData]);
+
+  const handleDragEnd = async (startIndex: number, endIndex: number) => {
+    const updatedVideos = [...localVideos];
+    const [removed] = updatedVideos.splice(startIndex, 1);
+    updatedVideos.splice(endIndex, 0, removed);
+
+    setLocalVideos(updatedVideos);
+
+    const limit = videoData?.pagination?.limit || 10;
+    const pageNum = Number(page) || 1;
+    const offset = (pageNum - 1) * limit;
+
+    const reorderedPayload = updatedVideos.map((video, index) => ({
+      id: video._id,
+      order: offset + index + 1,
+      isHighlight: !!video.isHighlight
+    }));
+
+    try {
+      await rearrangeVideos({ videos: reorderedPayload }).unwrap();
+      toast.success("Videos rearranged successfully");
+    } catch (error: any) {
+      toast.error(error?.data?.message || "Failed to rearrange videos");
+      if (videoData?.data) {
+        setLocalVideos(videoData.data);
+      }
+    }
+  };
 
   useEffect(() => {
     setHeaders({
@@ -102,7 +138,12 @@ const EngtvManagement = () => {
             {isLoading ? (
               <div className="flex justify-center items-center h-48">Loading videos...</div>
             ) : (
-              <CustomTable<TEngtv> columns={columns} data={videoData?.data || []} />
+              <CustomTable<TEngtv>
+                columns={columns}
+                data={localVideos}
+                isSortable={true}
+                onDragEnd={handleDragEnd}
+              />
             )}
           </div>
         </div>

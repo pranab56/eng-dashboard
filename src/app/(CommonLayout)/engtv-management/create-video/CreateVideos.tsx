@@ -43,6 +43,8 @@ const videoSchema = z.object({
   pubStatus: z.string().min(1),
   pubDate: z.string().optional(),
   pubTime: z.string().optional(),
+  isHighlight: z.boolean(),
+  order: z.number().min(0, "Order must be at least 0"),
 });
 
 type videoFormValues = z.infer<typeof videoSchema>;
@@ -92,6 +94,8 @@ const CreateVideos = () => {
       pubStatus: "draft",
       pubDate: "",
       pubTime: "",
+      isHighlight: false,
+      order: 0,
     },
   });
 
@@ -187,6 +191,8 @@ const CreateVideos = () => {
             ? video.thumbnail
             : baseURL + video.thumbnail
           : "",
+        isHighlight: !!video.isHighlight,
+        order: typeof video.order === "number" ? video.order : 0,
       });
       setIsExistingVideoRemoved(false);
     }
@@ -304,6 +310,8 @@ const CreateVideos = () => {
       description: data.description,
       videoUrl: finalVideoUrl,
       status: data.pubStatus,
+      isHighlight: data.isHighlight,
+      order: data.order,
     };
 
     if (data.subCategory) {
@@ -400,6 +408,31 @@ const CreateVideos = () => {
                   error={errors.pubStatus}
                   options={publishStatusOptions}
                 />
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-end">
+                <InputField
+                  name="order"
+                  title="Sort Order"
+                  type="number"
+                  placeholder="0"
+                  register={register}
+                  registerOptions={{ valueAsNumber: true }}
+                  error={errors.order}
+                />
+
+                <div className="flex items-center space-x-3 h-full pb-3">
+                  <label className="relative inline-flex items-center cursor-pointer select-none">
+                    <input
+                      type="checkbox"
+                      {...register("isHighlight")}
+                      className="sr-only peer"
+                    />
+                    <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-500"></div>
+                    <span className="ml-3 text-[15px] font-medium text-gray-800">
+                      Mark as Highlight
+                    </span>
+                  </label>
+                </div>
               </div>
               <TextareaField
                 name="description"

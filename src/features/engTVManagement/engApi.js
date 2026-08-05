@@ -69,6 +69,15 @@ export const engApi = baseApi.injectEndpoints({
       invalidatesTags: ["video"]
     }),
 
+    rearrangeVideos: builder.mutation({
+      query: (data) => ({
+        url: "/video/rearrange",
+        method: "PATCH",
+        body: data,
+      }),
+      invalidatesTags: ["video"]
+    }),
+
   }),
 });
 
@@ -82,4 +91,5 @@ export const {
   useFrontEndVideoQuery,
   useLazyFrontEndVideoQuery,
   useUpdateVideoFileMutation,
+  useRearrangeVideosMutation,
 } = engApi;

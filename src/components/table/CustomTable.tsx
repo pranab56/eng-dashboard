@@ -23,13 +23,40 @@ interface CustomTableProps<TData> {
   data: TData[];
   columns: ColumnDef<TData>[];
   isLoading?: boolean;
+  isSortable?: boolean;
+  onDragEnd?: (startIndex: number, endIndex: number) => void;
 }
 
-function CustomTable<TData>({ data, columns, isLoading }: CustomTableProps<TData>) {
+function CustomTable<TData>({
+  data,
+  columns,
+  isLoading,
+  isSortable = false,
+  onDragEnd,
+}: CustomTableProps<TData>) {
+  const [draggedIndex, setDraggedIndex] = React.useState<number | null>(null);
+  const [dragOverIndex, setDragOverIndex] = React.useState<number | null>(null);
+
+  const tableColumns = React.useMemo(() => {
+    if (!isSortable) return columns;
+
+    const dragColumn: ColumnDef<TData> = {
+      id: "drag-handle",
+      header: () => <div className="w-8"></div>,
+      cell: () => (
+        <div className="flex justify-center items-center cursor-grab active:cursor-grabbing text-slate-400 hover:text-slate-600 transition-colors">
+          <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 8h16M4 16h16" />
+          </svg>
+        </div>
+      ),
+    };
+    return [dragColumn, ...columns];
+  }, [columns, isSortable]);
 
   const table = useReactTable({
     data,
-    columns,
+    columns: tableColumns,
     getCoreRowModel: getCoreRowModel(),
     state: {
       pagination: {
@@ -37,7 +64,35 @@ function CustomTable<TData>({ data, columns, isLoading }: CustomTableProps<TData
         pageSize: data?.length,
       },
     },
-  })
+  });
+
+  const handleDragStart = (e: React.DragEvent, index: number) => {
+    setDraggedIndex(index);
+    if (e.dataTransfer) {
+      e.dataTransfer.effectAllowed = "move";
+    }
+  };
+
+  const handleDragOver = (e: React.DragEvent, index: number) => {
+    e.preventDefault();
+    if (draggedIndex !== index && dragOverIndex !== index) {
+      setDragOverIndex(index);
+    }
+  };
+
+  const handleDrop = (e: React.DragEvent, index: number) => {
+    e.preventDefault();
+    if (draggedIndex !== null && draggedIndex !== index) {
+      onDragEnd?.(draggedIndex, index);
+    }
+    setDraggedIndex(null);
+    setDragOverIndex(null);
+  };
+
+  const handleDragEnd = () => {
+    setDraggedIndex(null);
+    setDragOverIndex(null);
+  };
 
   return (
     <div className="w-full overflow-x-auto rounded-lg border border-slate-200/60 shadow-2xs">
@@ -75,22 +130,41 @@ function CustomTable<TData>({ data, columns, isLoading }: CustomTableProps<TData
               </TableRow>
             ))
           ) : table.getRowModel().rows?.length ? (
-            table.getRowModel().rows.map((row) => (
-              <TableRow
-                key={row.id}
-                data-state={row.getIsSelected() && "selected"}
-                className="bg-white hover:bg-slate-50/80 text-slate-800 transition-colors duration-150"
-              >
-                {row.getVisibleCells().map((cell) => (
-                  <TableCell key={cell.id} className="py-3 px-4 text-sm align-middle">
-                    {flexRender(
-                      cell.column.columnDef.cell,
-                      cell.getContext()
-                    )}
-                  </TableCell>
-                ))}
-              </TableRow>
-            ))
+            table.getRowModel().rows.map((row, index) => {
+              let rowClassName = "bg-white hover:bg-slate-50/80 text-slate-800 transition-colors duration-150";
+              if (index === draggedIndex) {
+                rowClassName += " opacity-40 bg-slate-100";
+              } else if (index === dragOverIndex) {
+                rowClassName += " bg-indigo-50 border-t-2 border-indigo-400";
+              }
+
+              return (
+                <TableRow
+                  key={row.id}
+                  data-state={row.getIsSelected() && "selected"}
+                  className={rowClassName}
+                  draggable={isSortable}
+                  onDragStart={(e) => handleDragStart(e, index)}
+                  onDragOver={(e) => handleDragOver(e, index)}
+                  onDrop={(e) => handleDrop(e, index)}
+                  onDragEnd={handleDragEnd}
+                  onDragLeave={() => {
+                    if (dragOverIndex === index) {
+                      setDragOverIndex(null);
+                    }
+                  }}
+                >
+                  {row.getVisibleCells().map((cell) => (
+                    <TableCell key={cell.id} className="py-3 px-4 text-sm align-middle">
+                      {flexRender(
+                        cell.column.columnDef.cell,
+                        cell.getContext()
+                      )}
+                    </TableCell>
+                  ))}
+                </TableRow>
+              );
+            })
           ) : (
             <TableRow>
               <TableCell
