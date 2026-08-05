@@ -137,12 +137,17 @@ export type TNews = {
 
 export type TNotification = {
   _id: string;
+  receiver?: string;
   title: string;
   message: string;
+  type?: string;
+  isRead?: boolean;
+  read?: boolean;
   createdAt: string;
-  user: {
-    userName: string;
-    email: string;
+  updatedAt?: string;
+  user?: {
+    userName?: string;
+    email?: string;
   };
 }
 

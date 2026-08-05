@@ -124,12 +124,14 @@ const TeamManagement = () => {
   return (
     <div className='py-10 px-8 space-y-6 pb-16'>
       <div className='flex items-end'>
-        <div className='w-full'>
-          <GeneralStateCard items={items} className='grid-cols-4' />
+        <div className='w-9/12 '>
+          <GeneralStateCard items={items} className='grid-cols-3' />
         </div>
-        <Link href="/team-management/budget_economay" className='w-3/12'>
-          <CreateButton text="Edit Club Budget & Economay" className='py-4' />
-        </Link>
+        <div className='w-3/12 '>
+          <Link href="/team-management/budget_economay" className='w-full' >
+            <CreateButton text="Edit Club Budget & Economay" className='py-4' />
+          </Link>
+        </div>
       </div>
 
       <div className=" bg-white rounded-md py-4 flex flex-col ">

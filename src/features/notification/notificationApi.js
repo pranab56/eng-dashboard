@@ -2,18 +2,9 @@ import { baseApi } from "../../utils/apiBaseQuery";
 
 export const notificationApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
-    createNotification: builder.mutation({
-      query: (data) => ({
-        url: "/push-notification/send",
-        method: "POST",
-        body: data
-      }),
-      invalidatesTags: ["notification"]
-    }),
-
     getAllNotifications: builder.query({
       query: (page) => ({
-        url: page ? `/notification?page=${page}` : "/notification",
+        url: page ? `/notification/my?page=${page}` : "/notification/my?page=1",
         method: "GET",
       }),
       providesTags: ["notification"]
@@ -27,10 +18,43 @@ export const notificationApi = baseApi.injectEndpoints({
       providesTags: ["notification"]
     }),
 
-    readNotification: builder.mutation({
+    readAllNotification: builder.mutation({
       query: () => ({
-        url: "/notification/read-all",
+        url: "notification/read-all",
         method: "PATCH",
+      }),
+      invalidatesTags: ["notification"]
+    }),
+
+    readSingleNotification: builder.mutation({
+      query: (id) => ({
+        url: `/notification/${id}/read`,
+        method: "PATCH",
+      }),
+      invalidatesTags: ["notification"]
+    }),
+
+    deleteNotification: builder.mutation({
+      query: () => ({
+        url: "/notification/clear-all",
+        method: "DELETE",
+      }),
+      invalidatesTags: ["notification"]
+    }),
+
+    singleDeleteNotification: builder.mutation({
+      query: (id) => ({
+        url: `/notification/delete/${id}`,
+        method: "DELETE",
+      }),
+      invalidatesTags: ["notification"]
+    }),
+
+    createNotification: builder.mutation({
+      query: (data) => ({
+        url: "/push-notification/send",
+        method: "POST",
+        body: data
       }),
       invalidatesTags: ["notification"]
     }),
@@ -40,7 +64,11 @@ export const notificationApi = baseApi.injectEndpoints({
 // Export hooks
 export const {
   useCreateNotificationMutation,
+  useDeleteNotificationMutation,
   useGetAllNotificationsQuery,
   useNotificationUnReadCountQuery,
-  useReadNotificationMutation,
+  useReadAllNotificationMutation,
+  useReadAllNotificationMutation: useReadNotificationMutation,
+  useReadSingleNotificationMutation,
+  useSingleDeleteNotificationMutation,
 } = notificationApi;

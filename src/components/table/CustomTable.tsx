@@ -40,16 +40,16 @@ function CustomTable<TData>({ data, columns, isLoading }: CustomTableProps<TData
   })
 
   return (
-    <div className="w-full overflow-x-auto rounded-md">
-      <Table className="border-y min-w-full">
-        <TableHeader className="bg-[#fefaeb]">
+    <div className="w-full overflow-x-auto rounded-lg border border-slate-200/60 shadow-2xs">
+      <Table className="min-w-full divide-y divide-slate-200/60">
+        <TableHeader className="bg-slate-50/90">
           {table.getHeaderGroups().map((headerGroup) => (
-            <TableRow key={headerGroup.id}>
+            <TableRow key={headerGroup.id} className="hover:bg-transparent border-b border-slate-200/80">
               {headerGroup.headers.map((header) => {
                 return (
                   <TableHead
                     key={header.id}
-                    className="bg-[#fefaeb] text-[#6B6B6B] h-12"
+                    className="bg-slate-50/90 text-slate-600 font-semibold text-xs uppercase tracking-wider h-11 px-4 text-left"
                   >
                     {header.isPlaceholder
                       ? null
@@ -63,13 +63,13 @@ function CustomTable<TData>({ data, columns, isLoading }: CustomTableProps<TData
             </TableRow>
           ))}
         </TableHeader>
-        <TableBody className="">
+        <TableBody className="divide-y divide-slate-100 bg-white">
           {isLoading ? (
             Array.from({ length: 5 }).map((_, index) => (
               <TableRow key={index} className="animate-pulse bg-white">
                 {columns.map((_, colIndex) => (
-                  <TableCell key={colIndex} className="py-4">
-                    <div className="h-4 bg-gray-100 rounded-md w-3/4"></div>
+                  <TableCell key={colIndex} className="py-3.5 px-4">
+                    <div className="h-4 bg-slate-100 rounded-md w-3/4"></div>
                   </TableCell>
                 ))}
               </TableRow>
@@ -79,10 +79,10 @@ function CustomTable<TData>({ data, columns, isLoading }: CustomTableProps<TData
               <TableRow
                 key={row.id}
                 data-state={row.getIsSelected() && "selected"}
-                className="bg-white hover:bg-[#fefaeb] text-gray-800 transition-colors duration-150"
+                className="bg-white hover:bg-slate-50/80 text-slate-800 transition-colors duration-150"
               >
                 {row.getVisibleCells().map((cell) => (
-                  <TableCell key={cell.id} className="">
+                  <TableCell key={cell.id} className="py-3 px-4 text-sm align-middle">
                     {flexRender(
                       cell.column.columnDef.cell,
                       cell.getContext()
@@ -97,13 +97,13 @@ function CustomTable<TData>({ data, columns, isLoading }: CustomTableProps<TData
                 colSpan={columns.length}
                 className="h-48 text-center"
               >
-                <div className="flex flex-col items-center justify-center space-y-3 py-6">
-                  <div className="w-12 h-12 rounded-full bg-gray-50 flex items-center justify-center border border-gray-100 shadow-sm">
-                    <span className="text-xl">📊</span>
+                <div className="flex flex-col items-center justify-center space-y-3 py-8">
+                  <div className="w-12 h-12 rounded-full bg-slate-100 flex items-center justify-center border border-slate-200/60 shadow-xs">
+                    <span className="text-xl" aria-hidden="true">📊</span>
                   </div>
                   <div className="space-y-1">
-                    <p className="text-sm font-medium text-gray-800">No records found</p>
-                    <p className="text-xs text-gray-400">There are no items to display right now.</p>
+                    <p className="text-sm font-semibold text-slate-900">No records found</p>
+                    <p className="text-xs text-slate-500">There are no items to display right now.</p>
                   </div>
                 </div>
               </TableCell>
@@ -112,7 +112,7 @@ function CustomTable<TData>({ data, columns, isLoading }: CustomTableProps<TData
         </TableBody>
       </Table>
     </div>
-  )
+  );
 }
 
 export default CustomTable

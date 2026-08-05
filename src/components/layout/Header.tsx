@@ -29,7 +29,7 @@ const Header = () => {
       <div className="flex items-center gap-5">
         {/* Notification Bell Button */}
         <Link
-          href="/notifications"
+          href="/my-notification"
           className="relative p-3 bg-gray-50 border border-gray-100 hover:bg-gray-100 text-gray-500 hover:text-black rounded-xl transition-all duration-200 group flex items-center justify-center shadow-sm select-none"
         >
           <Bell className="w-5 h-5 transition-transform group-hover:rotate-12 duration-200" />

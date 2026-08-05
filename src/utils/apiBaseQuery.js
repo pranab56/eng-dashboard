@@ -162,6 +162,7 @@ export const baseApi = createApi({
     "leagueTeam",
     "manager-team",
     "notification",
+    "pushNotification",
     "overview",
     "player",
     "transfer",

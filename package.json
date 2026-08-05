@@ -22,6 +22,7 @@
     "cookies-next": "^6.1.0",
     "dayjs": "^1.11.13",
     "dotenv": "^17.2.1",
+    "framer-motion": "^12.43.0",
     "input-otp": "^1.4.2",
     "jodit-react": "^5.2.19",
     "lucide-react": "^0.536.0",

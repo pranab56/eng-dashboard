@@ -6,7 +6,7 @@ import GeneralStateCard from '@/components/cui/GeneralStateCard';
 import TableHeader from '@/components/cui/TableHeader';
 import CustomTable from '@/components/table/CustomTable';
 import { useHeaders } from '@/hooks/useHeaders';
-import { getPlayerColumns } from '@/tableColumns/playerColumns';
+import { getPlayerColumns } from '@/modules/players';
 import { TPlayer } from '@/types/columnTypes';
 import { useEffect, useState } from 'react';
 
@@ -27,12 +27,15 @@ const PlayerManagement = () => {
   const { data: playerData, isLoading } = useGetAllPlayerQuery({
     pageNumber: Number(pageNumber)
   });
+
   const [updateEngCoinBudget, { isLoading: isUpdatingCoin }] = useUpdateEngCoinBudgetMutation();
 
   const [selectedPlayer, setSelectedPlayer] = useState<TPlayer | null>(null);
+
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
 
   const [editTargetPlayer, setEditTargetPlayer] = useState<TPlayer | null>(null);
+
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
   const [coinTargetPlayer, setCoinTargetPlayer] = useState<TPlayer | null>(null);
@@ -96,22 +99,22 @@ const PlayerManagement = () => {
   ];
 
   return (
-    <div className='pt-10 px-8 space-y-6'>
-      <div className="flex items-end">
-        <div className='w-full'>
-          <GeneralStateCard items={summaryItems} className="grid-cols-4" />
+    <div className="p-4 sm:p-6 lg:pt-10 lg:px-8 space-y-4 sm:space-y-6">
+      {/* Header Section: Stacked on mobile, flex row on tablet & desktop */}
+      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
+        <div className="w-full">
+          <GeneralStateCard items={summaryItems} className="grid-cols-1 sm:grid-cols-2 lg:grid-cols-4" />
         </div>
-        <Link href="/player-management/player-economy" className='w-2/12'>
-          <CreateButton text="View Player Economy" className='py-4' />
+        <Link href="/player-management/player-economy" className="w-full sm:w-auto lg:w-2/12 shrink-0">
+          <CreateButton text="View Player Economy" className="w-full py-3.5 sm:py-4 justify-center" />
         </Link>
       </div>
 
-      <div className=" bg-white rounded-xl shadow-sm border border-gray-100 py-4 flex flex-col">
-        <div className='flex-1'>
-          <>
-            <TableHeader payload={tableHeaderPayload} />
-          </>
-          <div className="pt-4">
+      {/* Main Table Container: No horizontal overflow on mobile */}
+      <div className="bg-white rounded-xl shadow-xs border border-gray-100 py-3 sm:py-4 flex flex-col">
+        <div className="flex-1">
+          <TableHeader payload={tableHeaderPayload} />
+          <div className="pt-2 sm:pt-4">
             <CustomTable<TPlayer>
               columns={getPlayerColumns(handleView, handleEditCoin, handleEdit)}
               data={players}
@@ -119,7 +122,7 @@ const PlayerManagement = () => {
             />
           </div>
         </div>
-        <div className='pt-8 px-4'>
+        <div className="pt-4 sm:pt-8 px-2 sm:px-4">
           <CustomPagination
             TOTAL_PAGES={pagination.totalPage}
             qryName="userPage"
@@ -157,6 +160,4 @@ const PlayerManagement = () => {
     </div>
   )
 }
-
-
 export default PlayerManagement

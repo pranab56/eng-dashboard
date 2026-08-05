@@ -6,13 +6,12 @@ export type TableTitleProps = {
 }
 
 const TableTitle = ({ payload }: { payload: TableTitleProps }) => {
-
   return (
-    <div>
-      <h2 className="text-2xl font-semibold text-gray-800">{payload.title}</h2>
-      {payload.des && <p className="text-sm text-gray-500">{payload.des}</p>}
+    <div className="py-1">
+      <h2 className="text-lg sm:text-xl font-bold tracking-tight text-slate-900">{payload.title}</h2>
+      {payload.des && <p className="text-xs text-slate-500 font-normal mt-0.5">{payload.des}</p>}
     </div>
-  )
-}
+  );
+};
 
 export default TableTitle

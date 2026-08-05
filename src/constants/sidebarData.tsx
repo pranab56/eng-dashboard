@@ -25,7 +25,7 @@ import {
   HiOutlineDocumentText,
   HiOutlineShieldCheck,
 } from "react-icons/hi";
-import { Trophy, Award, Users, Calendar, Gift } from "lucide-react";
+import { Trophy, Award, Users, Calendar, Gift, Bell } from "lucide-react";
 
 export type TSubMenuItem = {
   id: number;
@@ -130,10 +130,10 @@ export const sidebarData: TMenuItem[] = [
     label: "/event-management",
   },
   {
-    id: 13,
-    icon: NotificationsIcon,
-    title: "Notifications",
-    label: "/notifications",
+    id: 131,
+    icon: Bell,
+    title: "Push Notification",
+    label: "/push-notification",
   },
   {
     id: 14,
