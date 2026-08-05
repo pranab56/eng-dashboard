@@ -8,6 +8,7 @@ import TableHeader from '@/components/cui/TableHeader';
 import { CustomModal } from '@/components/modals/CustomModal';
 import CustomTable from '@/components/table/CustomTable';
 import { useDeleteVideoMutation, useGetAllVideoQuery, useRearrangeVideosMutation } from '@/features/engTVManagement/engApi';
+import { useGetAllVideoCategoryQuery } from '@/features/categoryManagement/categoryApi';
 import { useHeaders } from '@/hooks/useHeaders';
 import { getYouTubeEmbedUrl } from '@/utils/getYouTubeEmbedUrl';
 import { getEngtvColumns } from '@/tableColumns/engtvColumns';
@@ -24,7 +25,10 @@ const EngtvManagement = () => {
   const searchParams = useSearchParams();
   const page = searchParams.get('userPage') || '1';
 
-  const { data: videoData, isLoading } = useGetAllVideoQuery(page);
+  const [selectedCategory, setSelectedCategory] = useState<string>('');
+
+  const { data: videoData, isLoading } = useGetAllVideoQuery({ page, category: selectedCategory });
+  const { data: categoriesData } = useGetAllVideoCategoryQuery({});
   console.log("video data", videoData)
 
   const [deleteVideo, { isLoading: isDeleting }] = useDeleteVideoMutation();
@@ -125,7 +129,21 @@ const EngtvManagement = () => {
     <div className='pt-10 px-8 space-y-4'>
       <GeneralStateCard items={items} className='grid-cols-4' />
 
-      <div className="flex flex-wrap items-center justify-end">
+      <div className="flex flex-wrap items-center justify-between gap-4">
+        <div>
+          <select
+            value={selectedCategory}
+            onChange={(e) => setSelectedCategory(e.target.value)}
+            className="px-4 py-2 border border-gray-300 rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer min-w-[200px]"
+          >
+            <option value="">All Categories</option>
+            {categoriesData?.data?.map((cat: any) => (
+              <option key={cat._id} value={cat._id}>
+                {cat.name}
+              </option>
+            ))}
+          </select>
+        </div>
         <Link href="/engtv-management/create-video">
           <CreateButton text="Add Video" />
         </Link>

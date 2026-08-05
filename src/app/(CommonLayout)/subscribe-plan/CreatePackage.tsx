@@ -152,7 +152,7 @@ const CreatePackage = ({ initialData, onSuccess }: CreatePackageProps) => {
       </div>
 
       <div className="grid grid-cols-2 gap-4">
-        <InputField name="price" title="Price" type="number" register={register} error={errors.price} registerOptions={{ valueAsNumber: true }} />
+        <InputField name="price" title="Price (£)" type="number" register={register} error={errors.price} registerOptions={{ valueAsNumber: true }} />
         <SelectField name="duration" label="Duration" control={control} options={durationOptions} error={errors.duration} />
       </div>
 

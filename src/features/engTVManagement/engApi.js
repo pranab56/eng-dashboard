@@ -23,10 +23,27 @@ export const engApi = baseApi.injectEndpoints({
     }),
 
     getAllVideo: builder.query({
-      query: (pageNumber) => ({
-        url: `/video?page=${pageNumber}`,
-        method: "GET",
-      }),
+      query: (params) => {
+        let page = "1";
+        let category = "";
+
+        if (params && typeof params === 'object') {
+          page = params.page || "1";
+          category = params.category || "";
+        } else if (params) {
+          page = params;
+        }
+
+        let url = `/video?page=${page}`;
+        if (category) {
+          url += `&category=${category}`;
+        }
+
+        return {
+          url,
+          method: "GET",
+        };
+      },
       providesTags: ["video"]
     }),
 
