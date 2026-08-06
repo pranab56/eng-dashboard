@@ -23,6 +23,7 @@ interface CategoryModalProps {
   onSubmit: (data: {
     name: string;
     order?: number;
+    isLandscape?: boolean;
     parentCategory?: string | null;
     id?: string;
   }) => Promise<void>;
@@ -31,6 +32,7 @@ interface CategoryModalProps {
   parentCategoryIdForSub?: string | null;
   isLoading: boolean;
   allowSubcategory?: boolean;
+  showIsLandscape?: boolean;
   domainName?: string;
 }
 
@@ -43,11 +45,13 @@ export default function CategoryModal({
   parentCategoryIdForSub,
   isLoading,
   allowSubcategory = true,
+  showIsLandscape = false,
   domainName = "Category",
 }: CategoryModalProps) {
   const [isSubcategory, setIsSubcategory] = useState<boolean>(false);
   const [name, setName] = useState("");
   const [order, setOrder] = useState<number | string>("");
+  const [isLandscape, setIsLandscape] = useState<boolean>(false);
   const [parentCategory, setParentCategory] = useState<string>("");
   const [errorMsg, setErrorMsg] = useState("");
 
@@ -67,6 +71,7 @@ export default function CategoryModal({
           ? editingCategory.order
           : ""
       );
+      setIsLandscape(!!(editingCategory as any).isLandscape);
       if (editingCategory.parentCategory && allowSubcategory) {
         setIsSubcategory(true);
         setParentCategory(editingCategory.parentCategory);
@@ -79,11 +84,13 @@ export default function CategoryModal({
       setParentCategory(parentCategoryIdForSub);
       setName("");
       setOrder("");
+      setIsLandscape(false);
     } else {
       setIsSubcategory(false);
       setParentCategory(categories[0]?._id || categories[0]?.id || "");
       setName("");
       setOrder("");
+      setIsLandscape(false);
     }
     setErrorMsg("");
     setSearchQuery("");
@@ -115,6 +122,7 @@ export default function CategoryModal({
     await onSubmit({
       name: name.trim(),
       order: !isSubcategory && order !== "" ? Number(order) : undefined,
+      isLandscape: showIsLandscape && !isSubcategory ? isLandscape : undefined,
       parentCategory: isSubcategory ? parentCategory : null,
       id: editingCategory?._id || editingCategory?.id,
     });
@@ -330,7 +338,29 @@ export default function CategoryModal({
             </div>
           )}
 
-
+          {/* isLandscape Toggle (Only for video categories, not subcategories) */}
+          {showIsLandscape && !isSubcategory && (
+            <div className="flex items-center justify-between p-3 bg-gray-50 border border-gray-200 rounded-lg">
+              <div>
+                <p className="text-sm font-semibold text-gray-800">Landscape Layout</p>
+                <p className="text-xs text-gray-500 mt-0.5">Display this category in landscape (wide) format</p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setIsLandscape((prev) => !prev)}
+                disabled={isLoading}
+                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors duration-200 cursor-pointer focus:outline-none ${
+                  isLandscape ? "bg-blue-600" : "bg-gray-300"
+                }`}
+              >
+                <span
+                  className={`inline-block h-4 w-4 transform rounded-full bg-white shadow-md transition-transform duration-200 ${
+                    isLandscape ? "translate-x-6" : "translate-x-1"
+                  }`}
+                />
+              </button>
+            </div>
+          )}
 
           {/* Validation Error Message */}
           {errorMsg && (

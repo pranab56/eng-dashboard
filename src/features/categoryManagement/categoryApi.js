@@ -124,6 +124,15 @@ export const categoryApi = baseApi.injectEndpoints({
             invalidatesTags: ["video"],
         }),
 
+        rearrangeVideoCategories: builder.mutation({
+            query: (data) => ({
+                url: `/eng-tv-category/rearrange`,
+                method: "PATCH",
+                body: data,
+            }),
+            invalidatesTags: ["video"],
+        }),
+
         // --------------------------- Venue Management ------------------------------
         getAllVenueCategory: builder.query({
             query: () => ({
@@ -256,7 +265,7 @@ export const categoryApi = baseApi.injectEndpoints({
         // --------------------------- Age Group Management ------------------------------
         getAllAgeGroup: builder.query({
             query: () => ({
-                url: `/age-group-category`,
+                url: `/age-group-category/admin`,
                 method: "GET",
             }),
             providesTags: ["ageGroup"],
@@ -269,6 +278,23 @@ export const categoryApi = baseApi.injectEndpoints({
                 body: data,
             }),
             invalidatesTags: ["ageGroup"],
+        }),
+
+        createAgeGroupSubCategory: builder.mutation({
+            query: (data) => ({
+                url: `/age-group-category`,
+                method: "POST",
+                body: data,
+            }),
+            invalidatesTags: ["ageGroup"],
+        }),
+
+        getAgeGroupSubCategories: builder.query({
+            query: (parentId) => ({
+                url: `/age-group-category/${parentId}/sub-categories`,
+                method: "GET",
+            }),
+            providesTags: ["ageGroup"],
         }),
 
         updateAgeGroup: builder.mutation({
@@ -348,6 +374,7 @@ export const {
     useUpdateVideoSubCategoryMutation,
     useDeleteVideoCategoryMutation,
     useDeleteVideoSubCategoryMutation,
+    useRearrangeVideoCategoriesMutation,
 
     // Venue
     useGetAllVenueCategoryQuery,
@@ -371,6 +398,8 @@ export const {
     // Age Group
     useGetAllAgeGroupQuery,
     useCreateAgeGroupMutation,
+    useCreateAgeGroupSubCategoryMutation,
+    useGetAgeGroupSubCategoriesQuery,
     useUpdateAgeGroupMutation,
     useDeleteAgeGroupMutation,
 

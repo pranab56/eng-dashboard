@@ -20,6 +20,7 @@ import {
   useUpdateVideoSubCategoryMutation,
   useDeleteVideoCategoryMutation,
   useDeleteVideoSubCategoryMutation,
+  useRearrangeVideoCategoriesMutation,
 
   // Venue
   useGetAllVenueCategoryQuery,
@@ -40,6 +41,7 @@ import {
   // Age Group
   useGetAllAgeGroupQuery,
   useCreateAgeGroupMutation,
+  useCreateAgeGroupSubCategoryMutation,
   useUpdateAgeGroupMutation,
   useDeleteAgeGroupMutation,
 
@@ -64,8 +66,10 @@ import {
   Clock,
   Users,
   Newspaper,
+  GripVertical,
+  Maximize2,
 } from "lucide-react";
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useRef, useCallback } from "react";
 import toast from "react-hot-toast";
 import { FiEdit, FiTrash2 } from "react-icons/fi";
 
@@ -164,7 +168,7 @@ const DOMAIN_CONFIGS: DomainConfig[] = [
     label: "Age Group Management",
     badgeLabel: "Age Group",
     icon: Users,
-    allowSubcategory: false,
+    allowSubcategory: true,
     color: {
       bg: "bg-purple-50",
       text: "text-purple-600",
@@ -228,6 +232,12 @@ export default function CategoryManagement() {
     useDeleteVideoCategoryMutation();
   const [deleteVideoSubCategory, { isLoading: isDeletingVideoSub }] =
     useDeleteVideoSubCategoryMutation();
+  const [rearrangeVideoCategories, { isLoading: isRearrangingVideo }] =
+    useRearrangeVideoCategoriesMutation();
+
+  // Local state for drag-and-drop ordering of video categories
+  const [videoCategoriesLocal, setVideoCategoriesLocal] = useState<TCategory[]>([]);
+  const dragIndexRef = useRef<number | null>(null);
 
   // 3. Venue API Hooks
   const { data: venueRes, isLoading: isVenueLoading } =
@@ -261,6 +271,8 @@ export default function CategoryManagement() {
     useGetAllAgeGroupQuery({});
   const [createAgeGroup, { isLoading: isCreatingAgeGroupCat }] =
     useCreateAgeGroupMutation();
+  const [createAgeGroupSubCategory, { isLoading: isCreatingAgeGroupSub }] =
+    useCreateAgeGroupSubCategoryMutation();
   const [updateAgeGroup, { isLoading: isUpdatingAgeGroupCat }] =
     useUpdateAgeGroupMutation();
   const [deleteAgeGroup, { isLoading: isDeletingAgeGroupCat }] =
@@ -285,6 +297,15 @@ export default function CategoryManagement() {
     () => videoRes?.data || [],
     [videoRes]
   );
+
+  // Sync server data into local drag state whenever server data changes
+  const prevVideoRef = useRef<string>("");
+  const serverVideoJson = JSON.stringify(videoCategories);
+  if (prevVideoRef.current !== serverVideoJson) {
+    prevVideoRef.current = serverVideoJson;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    setVideoCategoriesLocal(videoCategories);
+  }
   const venueCategories: TCategory[] = useMemo(
     () => venueRes?.data || [],
     [venueRes]
@@ -306,7 +327,7 @@ export default function CategoryManagement() {
   const domainDataMap: Record<CategoryDomainKey, TCategory[]> = useMemo(
     () => ({
       gallery: galleryCategories,
-      video: videoCategories,
+      video: videoCategoriesLocal,
       venue: venueCategories,
       time: timeCategories,
       ageGroup: ageGroupCategories,
@@ -314,7 +335,7 @@ export default function CategoryManagement() {
     }),
     [
       galleryCategories,
-      videoCategories,
+      videoCategoriesLocal,
       venueCategories,
       timeCategories,
       ageGroupCategories,
@@ -353,6 +374,38 @@ export default function CategoryManagement() {
 
 
 
+  // Drag-and-drop handlers for Video categories
+  const handleVideoDragStart = useCallback((index: number) => {
+    dragIndexRef.current = index;
+  }, []);
+
+  const handleVideoDragOver = useCallback((e: React.DragEvent, index: number) => {
+    e.preventDefault();
+    const from = dragIndexRef.current;
+    if (from === null || from === index) return;
+    setVideoCategoriesLocal((prev) => {
+      const updated = [...prev];
+      const [moved] = updated.splice(from, 1);
+      updated.splice(index, 0, moved);
+      dragIndexRef.current = index;
+      return updated;
+    });
+  }, []);
+
+  const handleVideoDragEnd = useCallback(async () => {
+    dragIndexRef.current = null;
+    try {
+      const payload = videoCategoriesLocal.map((cat, idx) => ({
+        id: cat._id || cat.id || "",
+        order: idx + 1,
+      }));
+      await rearrangeVideoCategories({ categories: payload }).unwrap();
+      toast.success("Category order saved!");
+    } catch (err: any) {
+      toast.error(getErrorMessage(err, "Failed to save order"));
+    }
+  }, [videoCategoriesLocal, rearrangeVideoCategories]);
+
   // Open Modal Handlers
   const handleOpenAddCategoryModal = (domainKey: CategoryDomainKey) => {
     setModalTargetDomain(domainKey);
@@ -385,6 +438,7 @@ export default function CategoryManagement() {
   const handleCategoryModalSubmit = async (data: {
     name: string;
     order?: number;
+    isLandscape?: boolean;
     parentCategory?: string | null;
     id?: string;
   }) => {
@@ -395,6 +449,9 @@ export default function CategoryManagement() {
       const catBody: any = { name: data.name };
       if (data.order !== undefined && !isNaN(data.order)) {
         catBody.order = data.order;
+      }
+      if (data.isLandscape !== undefined) {
+        catBody.isLandscape = data.isLandscape;
       }
 
       const subBody: any = {
@@ -483,9 +540,12 @@ export default function CategoryManagement() {
         if (isEdit) {
           const res = await updateAgeGroup({
             id: data.id!,
-            data: catBody,
+            data: isSub ? subBody : catBody,
           }).unwrap();
           if (res.success !== false) toast.success(res.message || "Age group updated");
+        } else if (isSub) {
+          const res = await createAgeGroupSubCategory(subBody).unwrap();
+          if (res.success !== false) toast.success(res.message || "Age group sub-category created");
         } else {
           const res = await createAgeGroup(catBody).unwrap();
           if (res.success !== false) toast.success(res.message || "Age group created");
@@ -562,6 +622,7 @@ export default function CategoryManagement() {
     isUpdatingVideoSub ||
     isDeletingVideoCat ||
     isDeletingVideoSub ||
+    isRearrangingVideo ||
     isCreatingVenueCat ||
     isCreatingVenueSub ||
     isUpdatingVenueCat ||
@@ -690,7 +751,7 @@ export default function CategoryManagement() {
                 </button>
               </div>
 
-              {/* 4-Grid Style Cards Section */}
+              {/* 4-Grid Card Section for ALL Domains */}
               {isLoading ? (
                 <div className="bg-white rounded-2xl border border-gray-100 p-10 text-center flex flex-col items-center justify-center gap-2">
                   <Loader2 className="w-7 h-7 text-gray-400 animate-spin" />
@@ -718,165 +779,198 @@ export default function CategoryManagement() {
                   </button>
                 </div>
               ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
-                  {filteredCategories.map((cat) => {
-                    const catId = cat._id || cat.id || "";
-                    const subCats: TSubCategory[] = cat.subCategories || [];
+                <div className="space-y-3">
+                  {config.key === "video" && isRearrangingVideo && (
+                    <div className="flex items-center gap-2 text-xs text-blue-600 font-medium">
+                      <Loader2 className="w-3.5 h-3.5 animate-spin" /> Saving order...
+                    </div>
+                  )}
 
-                    return (
-                      <div
-                        key={catId}
-                        className={`bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-all p-5 flex flex-col justify-between space-y-4 group relative overflow-hidden`}
-                      >
-                        {/* Top Decorative Indicator */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
+                    {filteredCategories.map((cat, index) => {
+                      const catId = cat._id || cat.id || "";
+                      const subCats: TSubCategory[] = cat.subCategories || [];
+                      const isVideo = config.key === "video";
+                      const isLandscape = !!(cat as any).isLandscape;
+
+                      return (
                         <div
-                          className={`absolute top-0 left-0 right-0 h-1 ${config.color.bg}`}
-                        />
+                          key={catId}
+                          draggable={isVideo}
+                          onDragStart={() => isVideo && handleVideoDragStart(index)}
+                          onDragOver={(e) => isVideo && handleVideoDragOver(e, index)}
+                          onDragEnd={() => isVideo && handleVideoDragEnd()}
+                          className={`bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-all p-5 flex flex-col justify-between space-y-4 group relative overflow-hidden ${
+                            isVideo ? "cursor-grab active:cursor-grabbing select-none" : ""
+                          }`}
+                        >
+                          {/* Top Decorative Indicator */}
+                          <div
+                            className={`absolute top-0 left-0 right-0 h-1 ${config.color.bg}`}
+                          />
 
-                        {/* Category Card Header */}
-                        <div className="space-y-2">
-                          <div className="flex items-start justify-between gap-2">
-                            <div className="flex items-center gap-2.5">
-                              <div
-                                className={`w-9 h-9 rounded-xl ${config.color.bg} ${config.color.text} flex items-center justify-center font-medium shrink-0`}
-                              >
-                                <Icon className="w-4 h-4" />
-                              </div>
-                              <div className="min-w-0">
-                                <h3 className="font-medium text-gray-900 text-sm leading-snug truncate flex items-center gap-1.5">
-                                  <span>{cat.name}</span>
-                                  {cat.order !== undefined && cat.order !== null && (
-                                    <span className="text-[10px] text-blue-600 bg-blue-50 px-1.5 py-0.5 rounded font-medium border border-blue-100">
-                                      Order: {cat.order}
-                                    </span>
-                                  )}
-                                </h3>
-                                {cat.slug && (
-                                  <div className="mt-0.5">
-                                    <span className="text-[10px] text-gray-400 bg-gray-100 px-1.5 py-0.5 rounded font-mono truncate max-w-[120px] inline-block">
-                                      /{cat.slug}
-                                    </span>
+                          {/* Category Card Header */}
+                          <div className="space-y-2">
+                            <div className="flex items-start justify-between gap-2">
+                              <div className="flex items-center gap-2.5 min-w-0">
+                                {isVideo && (
+                                  <div className="text-gray-300 hover:text-gray-500 transition-colors shrink-0">
+                                    <GripVertical className="w-4 h-4" />
                                   </div>
                                 )}
-                              </div>
-                            </div>
-
-                            {/* Category Actions */}
-                            <div className="flex items-center gap-0.5 opacity-90 group-hover:opacity-100 transition-opacity">
-                              <button
-                                type="button"
-                                onClick={() =>
-                                  handleOpenEditCategoryModal(config.key, cat)
-                                }
-                                className="p-1.5 rounded-lg text-gray-400 hover:text-blue-600 hover:bg-blue-50 transition-colors cursor-pointer"
-                                title="Edit Category"
-                              >
-                                <FiEdit className="w-3.5 h-3.5" />
-                              </button>
-                              <button
-                                type="button"
-                                onClick={() =>
-                                  setDeleteTarget({
-                                    id: catId,
-                                    name: cat.name,
-                                    isSub: false,
-                                    domain: config.key,
-                                  })
-                                }
-                                className="p-1.5 rounded-lg text-gray-400 hover:text-red-600 hover:bg-red-50 transition-colors cursor-pointer"
-                                title="Delete Category"
-                              >
-                                <FiTrash2 className="w-3.5 h-3.5" />
-                              </button>
-                            </div>
-                          </div>
-                        </div>
-
-                        {/* Subcategories Section (Only if supported by domain) */}
-                        {config.allowSubcategory && (
-                          <div className="space-y-2 pt-3 border-t border-gray-100">
-                            <div className="flex items-center justify-between">
-                              <span className="text-[10px] font-medium . tracking-wider text-gray-400 flex items-center gap-1">
-                                <GitBranch className="w-3 h-3 text-purple-500" />
-                                Subcategories ({subCats.length})
-                              </span>
-
-                              <button
-                                type="button"
-                                onClick={() =>
-                                  handleOpenAddSubCategoryModal(
-                                    config.key,
-                                    catId
-                                  )
-                                }
-                                className="text-[11px] font-medium text-blue-600 hover:text-blue-700 hover:underline cursor-pointer"
-                              >
-                                + Add Sub
-                              </button>
-                            </div>
-
-                            {subCats.length === 0 ? (
-                              <p className="text-[11px] text-gray-400 italic bg-gray-50/80 p-2 rounded-xl text-center">
-                                No subcategories
-                              </p>
-                            ) : (
-                              <div className="space-y-1.5 max-h-36 overflow-y-auto pr-1">
-                                {subCats.map((sub) => {
-                                  const subId = sub._id || sub.id || "";
-                                  return (
-                                    <div
-                                      key={subId}
-                                      className="flex items-center justify-between p-1.5 px-2 rounded-xl bg-gray-50 hover:bg-blue-50/50 border border-gray-100 transition-colors group/sub"
-                                    >
-                                      <div className="flex items-center gap-1.5 min-w-0">
-                                        <span className="w-1.5 h-1.5 rounded-full bg-purple-500 shrink-0" />
-                                        <span className="text-xs font-medium text-gray-700 truncate">
-                                          {sub.name}
-                                        </span>
-                                      </div>
-
-                                      <div className="flex items-center gap-0.5 shrink-0 opacity-70 group-hover/sub:opacity-100 transition-opacity">
-                                        <button
-                                          type="button"
-                                          onClick={() =>
-                                            handleOpenEditCategoryModal(
-                                              config.key,
-                                              sub as unknown as TCategory
-                                            )
-                                          }
-                                          className="p-1 text-gray-400 hover:text-blue-600 transition-colors cursor-pointer"
-                                          title="Edit Subcategory"
-                                        >
-                                          <FiEdit className="w-3 h-3" />
-                                        </button>
-                                        <button
-                                          type="button"
-                                          onClick={() =>
-                                            setDeleteTarget({
-                                              id: subId,
-                                              name: sub.name,
-                                              isSub: true,
-                                              domain: config.key,
-                                            })
-                                          }
-                                          className="p-1 text-gray-400 hover:text-red-600 transition-colors cursor-pointer"
-                                          title="Delete Subcategory"
-                                        >
-                                          <FiTrash2 className="w-3 h-3" />
-                                        </button>
-                                      </div>
+                                <div
+                                  className={`w-9 h-9 rounded-xl ${config.color.bg} ${config.color.text} flex items-center justify-center font-medium shrink-0`}
+                                >
+                                  <Icon className="w-4 h-4" />
+                                </div>
+                                <div className="min-w-0">
+                                  <h3 className="font-medium text-gray-900 text-sm leading-snug truncate flex items-center gap-1.5 flex-wrap">
+                                    <span>{cat.name}</span>
+                                    {cat.order !== undefined && cat.order !== null && (
+                                      <span className="text-[10px] text-blue-600 bg-blue-50 px-1.5 py-0.5 rounded font-medium border border-blue-100">
+                                        Order: {cat.order}
+                                      </span>
+                                    )}
+                                    {isLandscape && (
+                                      <span className="inline-flex items-center gap-1 text-[10px] font-medium text-violet-700 bg-violet-50 border border-violet-100 px-1.5 py-0.5 rounded">
+                                        <Maximize2 className="w-2.5 h-2.5" />
+                                        Landscape
+                                      </span>
+                                    )}
+                                  </h3>
+                                  {cat.slug && (
+                                    <div className="mt-0.5">
+                                      <span className="text-[10px] text-gray-400 bg-gray-100 px-1.5 py-0.5 rounded font-mono truncate max-w-[120px] inline-block">
+                                        /{cat.slug}
+                                      </span>
                                     </div>
-                                  );
-                                })}
+                                  )}
+                                </div>
                               </div>
-                            )}
+
+                              {/* Category Actions */}
+                              <div className="flex items-center gap-0.5 opacity-90 group-hover:opacity-100 transition-opacity shrink-0">
+                                <button
+                                  type="button"
+                                  onClick={() =>
+                                    handleOpenEditCategoryModal(config.key, cat)
+                                  }
+                                  className="p-1.5 rounded-lg text-gray-400 hover:text-blue-600 hover:bg-blue-50 transition-colors cursor-pointer"
+                                  title="Edit Category"
+                                >
+                                  <FiEdit className="w-3.5 h-3.5" />
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={() =>
+                                    setDeleteTarget({
+                                      id: catId,
+                                      name: cat.name,
+                                      isSub: false,
+                                      domain: config.key,
+                                    })
+                                  }
+                                  className="p-1.5 rounded-lg text-gray-400 hover:text-red-600 hover:bg-red-50 transition-colors cursor-pointer"
+                                  title="Delete Category"
+                                >
+                                  <FiTrash2 className="w-3.5 h-3.5" />
+                                </button>
+                              </div>
+                            </div>
                           </div>
-                        )}
-                      </div>
-                    );
-                  })}
+
+                          {/* Subcategories Section (Only if supported by domain) */}
+                          {config.allowSubcategory && (
+                            <div className="space-y-2 pt-3 border-t border-gray-100">
+                              <div className="flex items-center justify-between">
+                                <span className="text-[10px] font-medium . tracking-wider text-gray-400 flex items-center gap-1">
+                                  <GitBranch className="w-3 h-3 text-purple-500" />
+                                  Subcategories ({subCats.length})
+                                </span>
+
+                                <button
+                                  type="button"
+                                  onClick={() =>
+                                    handleOpenAddSubCategoryModal(
+                                      config.key,
+                                      catId
+                                    )
+                                  }
+                                  className="text-[11px] font-medium text-blue-600 hover:text-blue-700 hover:underline cursor-pointer"
+                                >
+                                  + Add Sub
+                                </button>
+                              </div>
+
+                              {subCats.length === 0 ? (
+                                <p className="text-[11px] text-gray-400 italic bg-gray-50/80 p-2 rounded-xl text-center">
+                                  No subcategories
+                                </p>
+                              ) : (
+                                <div className="space-y-1.5 max-h-36 overflow-y-auto pr-1">
+                                  {subCats.map((sub) => {
+                                    const subId = sub._id || sub.id || "";
+                                    return (
+                                      <div
+                                        key={subId}
+                                        className="flex items-center justify-between p-1.5 px-2 rounded-xl bg-gray-50 hover:bg-blue-50/50 border border-gray-100 transition-colors group/sub"
+                                      >
+                                        <div className="flex items-center gap-1.5 min-w-0">
+                                          <span className="w-1.5 h-1.5 rounded-full bg-purple-500 shrink-0" />
+                                          <span className="text-xs font-medium text-gray-700 truncate">
+                                            {sub.name}
+                                          </span>
+                                        </div>
+
+                                        <div className="flex items-center gap-0.5 shrink-0 opacity-70 group-hover/sub:opacity-100 transition-opacity">
+                                          <button
+                                            type="button"
+                                            onClick={() =>
+                                              handleOpenEditCategoryModal(
+                                                config.key,
+                                                sub as unknown as TCategory
+                                              )
+                                            }
+                                            className="p-1 text-gray-400 hover:text-blue-600 transition-colors cursor-pointer"
+                                            title="Edit Subcategory"
+                                          >
+                                            <FiEdit className="w-3 h-3" />
+                                          </button>
+                                          <button
+                                            type="button"
+                                            onClick={() =>
+                                              setDeleteTarget({
+                                                id: subId,
+                                                name: sub.name,
+                                                isSub: true,
+                                                domain: config.key,
+                                              })
+                                            }
+                                            className="p-1 text-gray-400 hover:text-red-600 transition-colors cursor-pointer"
+                                            title="Delete Subcategory"
+                                          >
+                                            <FiTrash2 className="w-3 h-3" />
+                                          </button>
+                                        </div>
+                                      </div>
+                                    );
+                                  })}
+                                </div>
+                              )}
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+                  {config.key === "video" && (
+                    <p className="text-[11px] text-gray-400 italic text-center pt-1">
+                      Drag cards to reorder — order saves automatically
+                    </p>
+                  )}
                 </div>
               )}
+
             </div>
           );
         })}
@@ -892,6 +986,7 @@ export default function CategoryManagement() {
         parentCategoryIdForSub={parentCategoryIdForSub}
         isLoading={isAnyMutationLoading}
         allowSubcategory={currentDomainConfig?.allowSubcategory ?? true}
+        showIsLandscape={modalTargetDomain === "video"}
         domainName={currentDomainConfig?.badgeLabel || "Category"}
       />
 
