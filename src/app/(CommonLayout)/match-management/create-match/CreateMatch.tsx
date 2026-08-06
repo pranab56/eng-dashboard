@@ -38,9 +38,17 @@ const createMatchSchema = z.object({
   league: z.string().min(1, "League is required"),
   referee: z.string().min(1, "Referee is required"),
   durationMinutes: z.string().min(1, "Duration is required"),
+  formation: z.string().min(1, "Formation is required"),
   date: z.string().min(1, "Date is required"),
   time: z.string().min(1, "Time is required"),
 });
+
+const formationOptions = [
+  { label: "5 v 5", value: "5 v 5" },
+  { label: "7 v 7", value: "7 v 7" },
+  { label: "8 v 8", value: "8 v 8" },
+  { label: "9 v 9", value: "9 v 9" },
+];
 
 type CreateMatchFormValues = z.infer<typeof createMatchSchema>;
 
@@ -58,6 +66,7 @@ export interface TempMatch {
     awayTeam: string;
     matchDate: string;
     durationMinutes: string;
+    formation: string;
     venueName: string;
     pitch?: string;
     subVenue?: string;
@@ -73,6 +82,7 @@ export interface TempMatch {
     date: string;
     time: string;
     durationMinutes: string;
+    formation: string;
     venue: string;
     pitch: string;
   };
@@ -185,6 +195,7 @@ const CreateMatch = () => {
       league: "",
       referee: "",
       durationMinutes: "",
+      formation: "",
       date: "",
       time: "",
     },
@@ -275,6 +286,7 @@ const CreateMatch = () => {
         league: typeof match.league === "object" ? match.league?._id : match.league || "",
         referee: typeof match.referee === "object" ? match.referee?._id : match.referee || "",
         durationMinutes: durVal,
+        formation: match.formation || "",
         date: date.format("YYYY-MM-DD"),
         time: date.format("HH:mm"),
       });
@@ -315,6 +327,7 @@ const CreateMatch = () => {
       league: "",
       referee: "",
       durationMinutes: "",
+      formation: "",
       date: "",
       time: "",
     });
@@ -337,6 +350,7 @@ const CreateMatch = () => {
       league: match.payload.league,
       referee: match.payload.referee,
       durationMinutes: match.payload.durationMinutes || match.display.durationMinutes,
+      formation: match.payload.formation || match.display.formation || "",
       date: match.display.date,
       time: match.display.time,
     });
@@ -423,6 +437,7 @@ const CreateMatch = () => {
         awayTeam: awayTeam.value,
         matchDate,
         durationMinutes: formData.durationMinutes, // title text (e.g. "90 minute")
+        formation: formData.formation,
         venueName: formData.venue, // venue category ID
         pitch: selectedSubCategoryVal, // subcategory ID sent as pitch
         referee: formData.referee,
@@ -456,6 +471,7 @@ const CreateMatch = () => {
           date: formData.date,
           time: formData.time,
           durationMinutes: formData.durationMinutes,
+          formation: formData.formation,
           venue: selectedVenueLabel,
           pitch: selectedSubVenueLabel,
         };
@@ -492,6 +508,7 @@ const CreateMatch = () => {
           league: formData.league,
           referee: formData.referee,
           durationMinutes: formData.durationMinutes,
+          formation: formData.formation,
           date: formData.date,
           time: "",
         });
@@ -576,6 +593,16 @@ const CreateMatch = () => {
                       scrollable
                     />
                   )}
+
+                  <SelectField
+                    name="formation"
+                    label="Formation"
+                    control={control}
+                    error={errors.formation}
+                    options={formationOptions}
+                    placeholder="Select formation"
+                    scrollable
+                  />
                 </div>
               </div>
             </section>
@@ -742,6 +769,11 @@ const CreateMatch = () => {
                         <span className="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-blue-100 text-blue-700">
                           {m.display.leagueName}
                         </span>
+                        {m.display.formation && (
+                          <span className="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-purple-100 text-purple-700">
+                            {m.display.formation}
+                          </span>
+                        )}
                       </div>
 
                       <div className="flex items-center gap-4 text-xs text-gray-500 mt-2 flex-wrap">
