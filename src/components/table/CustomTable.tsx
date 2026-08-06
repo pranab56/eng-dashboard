@@ -17,8 +17,6 @@ import {
   TableRow,
 } from "@/components/ui/table";
 
-import { Loader } from "lucide-react"
-
 interface CustomTableProps<TData> {
   data: TData[];
   columns: ColumnDef<TData>[];

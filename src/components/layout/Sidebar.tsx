@@ -2,13 +2,13 @@
 
 import Image from 'next/image'
 import Link from 'next/link'
-import { usePathname, useRouter } from 'next/navigation'
-import React, { useEffect, useState } from 'react'
+import { usePathname } from 'next/navigation'
+import React, { useCallback, useEffect, useState } from 'react'
 import { toast } from 'sonner'
 import { sidebarData, TMenuItem, TSubMenuItem } from '@/constants/sidebarData'
 import { logo } from '@/assets/assets'
 import { MdLogout } from "react-icons/md";
-import { ChevronDown, ChevronRight } from "lucide-react";
+import { ChevronDown } from "lucide-react";
 
 import { logout } from '@/features/auth/authSlice';
 import { useDispatch } from 'react-redux';
@@ -16,23 +16,22 @@ import { removeAuthCookie } from '../../app/actions/auth';
 import LogoutConfirmModal from '../modals/LogoutConfirmModal';
 
 const Sidebar = () => {
-  const router = useRouter();
   const pathname = usePathname();
   const dispatch = useDispatch();
   const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const [openSubMenus, setOpenSubMenus] = useState<Record<number, boolean>>({});
 
-  const isActive = (url?: string) => {
+  const isActive = useCallback((url?: string) => {
     if (!url) return false;
     if (url === "/") return pathname === "/";
     return pathname === url || pathname.startsWith(`${url}/`);
-  };
+  }, [pathname]);
 
-  const isChildActive = (children?: TSubMenuItem[]) => {
+  const isChildActive = useCallback((children?: TSubMenuItem[]) => {
     if (!children) return false;
     return children.some((child) => isActive(child.label));
-  };
+  }, [isActive]);
 
   // Auto-expand parent if active child route is loaded
   useEffect(() => {
@@ -41,7 +40,7 @@ const Sidebar = () => {
         setOpenSubMenus((prev) => ({ ...prev, [item.id]: true }));
       }
     });
-  }, [pathname]);
+  }, [pathname, isChildActive]);
 
   const toggleSubMenu = (id: number) => {
     setOpenSubMenus((prev) => ({
@@ -61,7 +60,7 @@ const Sidebar = () => {
       dispatch(logout());
       toast.success('Logged out successfully', { id: 'logout' });
       window.location.replace('/auth/login');
-    } catch (error) {
+    } catch {
       toast.error('Failed to log out', { id: 'logout' });
       setIsLoggingOut(false);
     }

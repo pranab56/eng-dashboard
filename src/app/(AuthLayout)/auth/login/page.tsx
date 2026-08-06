@@ -23,7 +23,6 @@ import { setAuthenticated } from '@/features/auth/authSlice';
 import { Eye, EyeOff, Loader } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from 'sonner';
 import { useDispatch } from 'react-redux';
@@ -50,7 +49,6 @@ const defaultValues: Partial<ContactUsFormValues> = {
 
 const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
-  const router = useRouter();
   const dispatch = useDispatch();
 
 

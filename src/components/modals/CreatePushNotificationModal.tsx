@@ -6,7 +6,7 @@ import { useCreatePushNotificationMutation } from "@/features/pushNotification/p
 import { useGetUserQuery } from "@/features/userManagement/userApi";
 import { CustomModal } from "@/components/modals/CustomModal";
 import SubmitButton from "@/components/buttons/SubmitButton";
-import { Bell, Send, User, Check, ChevronsUpDown, Search, X } from "lucide-react";
+import { User, Check, ChevronsUpDown, Search, X } from "lucide-react";
 import toast from "react-hot-toast";
 
 interface CreatePushNotificationModalProps {

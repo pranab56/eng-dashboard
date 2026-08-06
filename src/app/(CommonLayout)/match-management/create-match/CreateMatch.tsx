@@ -102,6 +102,29 @@ const CreateMatch = () => {
   const [editingTempId, setEditingTempId] = useState<string | null>(null);
   const [isHydrated, setIsHydrated] = useState(false);
 
+  const {
+    register,
+    handleSubmit,
+    control,
+    reset,
+    setValue,
+    watch,
+    formState: { errors },
+  } = useForm<CreateMatchFormValues>({
+    resolver: zodResolver(createMatchSchema),
+    defaultValues: {
+      venue: "",
+      subVenue: "",
+      pitch: "",
+      league: "",
+      referee: "",
+      durationMinutes: "",
+      formation: "",
+      date: "",
+      time: "",
+    },
+  });
+
   // Load from localStorage on mount
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -131,7 +154,7 @@ const CreateMatch = () => {
       }
       setIsHydrated(true);
     }
-  }, []);
+  }, [isEditMode, reset]);
 
   // Save to localStorage after hydration
   useEffect(() => {
@@ -177,29 +200,6 @@ const CreateMatch = () => {
     label: p.name,
     value: p.name,
   }));
-
-  const {
-    register,
-    handleSubmit,
-    control,
-    reset,
-    setValue,
-    watch,
-    formState: { errors },
-  } = useForm<CreateMatchFormValues>({
-    resolver: zodResolver(createMatchSchema),
-    defaultValues: {
-      venue: "",
-      subVenue: "",
-      pitch: "",
-      league: "",
-      referee: "",
-      durationMinutes: "",
-      formation: "",
-      date: "",
-      time: "",
-    },
-  });
 
   // Watch fields
   const selectedLeagueId = watch("league");
@@ -258,7 +258,7 @@ const CreateMatch = () => {
       setHomeTeam(teamsList[0]);
       setAwayTeam(teamsList[1]);
     }
-  }, [selectedLeagueId, leagueTeamData, editingTempId]);
+  }, [selectedLeagueId, leagueTeamData, editingTempId, isEditMode, teamsList, homeTeam, awayTeam]);
 
   useEffect(() => {
     setHeaders({

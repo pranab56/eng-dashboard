@@ -14,7 +14,7 @@ import CustomPagination from "@/components/cui/CustomPagination";
 import CreatePushNotificationModal from "@/components/modals/CreatePushNotificationModal";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
-import { Bell, Megaphone, Trash2, User, Search, RefreshCw, Inbox, ShieldAlert, Sparkles } from "lucide-react";
+import { Bell, Megaphone, Trash2, User, Search, RefreshCw, Inbox } from "lucide-react";
 import toast from "react-hot-toast";
 import { useSearchParams } from "next/navigation";
 
@@ -44,12 +44,14 @@ export default function PushNotificationPage() {
     return notificationRes?.data || [];
   }, [notificationRes]);
 
-  const paginationInfo = notificationRes?.pagination || {
-    total: rawNotifications.length,
-    limit: 10,
-    page: Number(page),
-    totalPage: 1,
-  };
+  const paginationInfo = useMemo(() => {
+    return notificationRes?.pagination || {
+      total: rawNotifications.length,
+      limit: 10,
+      page: Number(page),
+      totalPage: 1,
+    };
+  }, [notificationRes, rawNotifications.length, page]);
 
   // State Card Items
   const summaryItems: GeneralStateCardProps[] = useMemo(() => {

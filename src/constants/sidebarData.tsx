@@ -2,16 +2,13 @@ import {
   EngtvIcon,
   MatchIcon,
   NewsIcon,
-  NotificationsIcon,
   OverviewIcon,
   PlayerIcon,
-  Privacy,
   Reward,
   SettingsIcon,
   Subscribe,
   TableIcon,
   TeamIcon,
-  Terms,
   TransferIcon,
   UserManagementIcon
 } from "@/assets/assets";

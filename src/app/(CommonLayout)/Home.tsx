@@ -9,7 +9,6 @@ import { PiUserCheck, PiUserGear, PiUserPlus, PiUsersThree } from "react-icons/p
 import { RiTeamLine } from "react-icons/ri";
 
 
-import { Loader2 } from 'lucide-react';
 import {
   Bar,
   BarChart,
@@ -26,7 +25,7 @@ import {
 
 const Home = () => {
   const { setHeaders } = useHeaders();
-  const { data: overviewData, isLoading } = useGetOverviewQuery({});
+  const { data: overviewData } = useGetOverviewQuery({});
 
   useEffect(() => {
     setHeaders({

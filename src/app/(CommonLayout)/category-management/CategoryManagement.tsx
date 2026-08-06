@@ -271,7 +271,7 @@ export default function CategoryManagement() {
     useGetAllAgeGroupQuery({});
   const [createAgeGroup, { isLoading: isCreatingAgeGroupCat }] =
     useCreateAgeGroupMutation();
-  const [createAgeGroupSubCategory, { isLoading: isCreatingAgeGroupSub }] =
+  const [createAgeGroupSubCategory] =
     useCreateAgeGroupSubCategoryMutation();
   const [updateAgeGroup, { isLoading: isUpdatingAgeGroupCat }] =
     useUpdateAgeGroupMutation();

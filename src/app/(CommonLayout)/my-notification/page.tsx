@@ -14,18 +14,15 @@ import { TNotification } from "@/types/columnTypes";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 import {
-  AlertCircle,
   Bell,
   CheckCheck,
   CheckCircle2,
   Coins,
-  Filter,
   Inbox,
   Megaphone,
   RefreshCw,
   Search,
   ShieldAlert,
-  Sparkles,
   Trash2,
   Trophy,
   User,
