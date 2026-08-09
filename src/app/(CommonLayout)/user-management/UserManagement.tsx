@@ -19,7 +19,6 @@ import AssignTeamsModal from './AssignTeamsModal';
 const ROLE_TABS = [
   { label: 'All Users', value: 'ALL' },
   { label: 'Pending Requests', value: 'PENDING_REQUESTS' },
-  { label: 'Parents', value: 'PARENT' },
   { label: 'Players', value: 'PLAYER' },
   { label: 'Managers', value: 'MANAGER' },
   { label: 'Clubs', value: 'CLUB' },
@@ -55,7 +54,7 @@ const UserManagement = () => {
   useEffect(() => {
     setHeaders({
       title: "User Management & Player Approval",
-      des: "Review pending player registrations, parent accounts, and member permissions."
+      des: "Review pending player registrations and member permissions."
     })
   }, [setHeaders])
 
@@ -123,12 +122,6 @@ const UserManagement = () => {
       id: "users2",
     },
     {
-      title: "Parent Accounts",
-      value: analytics.totalParents ?? 0,
-      description: "Authenticated parents",
-      id: "users3",
-    },
-    {
       title: "Player Profiles",
       value: analytics.totalPlayers ?? 0,
       description: "Registered player profiles",
@@ -162,7 +155,7 @@ const UserManagement = () => {
 
   const tableHeaderPayload = {
     title: "Member List",
-    des: "A list of all users, parents, players, and pending player requests.",
+    des: "A list of all players, managers, clubs, and pending player requests.",
     url: "#"
   }
 
@@ -173,12 +166,13 @@ const UserManagement = () => {
     const userRole = (user.role || '').toUpperCase();
     const userStatus = (user.status || '').toUpperCase();
     const isChildPlayer = !!user.parentId || user.password === null || !user.email || (userRole === 'PLAYER' && (!!user.position || !!user.dateOfBirth || !!user.ageGroup || !!user.selectTeam));
-    const isParent = !isChildPlayer && !user.parentId && !!user.email;
+    const isParent = !isChildPlayer && !user.parentId && !!user.email && !['MANAGER', 'REFEREE', 'CLUB', 'CLUBS', 'OTHER_CLUBS', 'ADMIN', 'SUPER_ADMIN'].includes(userRole) && !user.position && !user.dateOfBirth;
+
+    // Always exclude Parent accounts from User Management tables
+    if (isParent) return false;
 
     if (activeRole === 'PENDING_REQUESTS') {
       if (userStatus !== 'PENDING') return false;
-    } else if (activeRole === 'PARENT') {
-      if (!isParent) return false;
     } else if (activeRole === 'PLAYER') {
       if (!isChildPlayer) return false;
     } else if (activeRole === 'CLUB') {
