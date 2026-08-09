@@ -8,7 +8,7 @@ import { useState } from 'react'
 import CreatePackage from './CreatePackage'
 import PackageCard from './PackageCard'
 
-const userTypes = ['Player', 'Manager', 'Club', 'Referee', 'Other'];
+const userTypes = ['Player', 'Other'];
 
 const SubscribePlan = () => {
   const [activeTab, setActiveTab] = useState('Player')

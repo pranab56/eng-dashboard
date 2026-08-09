@@ -33,9 +33,6 @@ type PackageFormValues = z.infer<typeof packageSchema>
 
 const userTypeOptions = [
   { label: "Player", value: "Player" },
-  { label: "Manager", value: "Manager" },
-  { label: "Club", value: "Club" },
-  { label: "Referee", value: "Referee" },
   { label: "Other", value: "Other" },
 ]
 
