@@ -39,6 +39,15 @@ export type TUserManagement = {
   academyClubName?: string;
   isDevelopmentPlayer?: boolean;
   mediaConsent?: boolean;
+  parentId?: any;
+  ageGroup?: string;
+  dateOfBirth?: string | Date;
+  position?: string;
+  strongFoot?: string;
+  previousClub?: string;
+  rejectionReason?: string;
+  emergencyEmail?: string;
+  emergencyPhone?: string;
   createdAt?: string;
   updatedAt?: string;
 }

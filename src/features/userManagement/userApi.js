@@ -59,6 +59,14 @@ export const userApi = baseApi.injectEndpoints({
       invalidatesTags: ["user"]
     }),
 
+    getUserAnalytics: builder.query({
+      query: () => ({
+        url: `/user-management/analytics`,
+        method: "GET",
+      }),
+      providesTags: ["user"]
+    }),
+
   }),
 });
 
@@ -68,4 +76,5 @@ export const {
   useUpdateStatusMutation,
   useDeleteUserMutation,
   useUpdateUserStatusMutation,
+  useGetUserAnalyticsQuery,
 } = userApi;

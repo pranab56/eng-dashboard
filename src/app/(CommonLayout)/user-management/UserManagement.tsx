@@ -5,7 +5,7 @@ import CustomPagination from '@/components/cui/CustomPagination';
 import GeneralStateCard from '@/components/cui/GeneralStateCard';
 import TableHeader from '@/components/cui/TableHeader';
 import CustomTable from '@/components/table/CustomTable';
-import { useDeleteUserMutation, useGetUserQuery, useUpdateStatusMutation, useUpdateUserStatusMutation } from '@/features/userManagement/userApi';
+import { useDeleteUserMutation, useGetUserAnalyticsQuery, useGetUserQuery, useUpdateStatusMutation, useUpdateUserStatusMutation } from '@/features/userManagement/userApi';
 import { useHeaders } from '@/hooks/useHeaders';
 import { getUsersColumns } from '@/tableColumns/usersColumns';
 import { TUserManagement } from '@/types/columnTypes';
@@ -18,6 +18,8 @@ import AssignTeamsModal from './AssignTeamsModal';
 
 const ROLE_TABS = [
   { label: 'All Users', value: 'ALL' },
+  { label: 'Pending Requests', value: 'PENDING_REQUESTS' },
+  { label: 'Parents', value: 'PARENT' },
   { label: 'Players', value: 'PLAYER' },
   { label: 'Managers', value: 'MANAGER' },
   { label: 'Clubs', value: 'CLUB' },
@@ -39,6 +41,7 @@ const UserManagement = () => {
   const [assignTargetUser, setAssignTargetUser] = useState<TUserManagement | null>(null);
   const [isAssignModalOpen, setIsAssignModalOpen] = useState<boolean>(false);
 
+  const { data: analyticsData } = useGetUserAnalyticsQuery({});
   const { data: userData, isLoading } = useGetUserQuery({
     pageNumber: page,
     searchValue: searchTerm,
@@ -51,8 +54,8 @@ const UserManagement = () => {
 
   useEffect(() => {
     setHeaders({
-      title: "User Management",
-      des: "Manage ecosystem permissions and member access levels."
+      title: "User Management & Player Approval",
+      des: "Review pending player registrations, parent accounts, and member permissions."
     })
   }, [setHeaders])
 
@@ -103,56 +106,89 @@ const UserManagement = () => {
     }
   };
 
+  const analytics = analyticsData?.data || {};
+  const pendingCount = analytics.pendingRequests ?? userData?.data?.filter((u: any) => (u.status || '').toUpperCase() === 'PENDING').length ?? 0;
+
   const items = [
     {
-      title: "Total Users",
-      value: userData?.pagination?.total || 0,
-      description: "Registered members in ecosystem",
+      title: "Total Members",
+      value: analytics.totalUsers ?? userData?.pagination?.total ?? 0,
+      description: "Total ecosystem users",
       id: "users1",
     },
     {
-      title: "Active Players",
-      value: userData?.data?.filter((u: any) => u.role === 'PLAYER').length || 0,
-      description: "Currently active players",
+      title: "Pending Requests",
+      value: pendingCount,
+      description: "Awaiting admin approval",
       id: "users2",
     },
     {
-      title: "Verified Users",
-      value: userData?.data?.filter((u: any) => u.verified).length || 0,
-      description: "Users with verified status",
+      title: "Parent Accounts",
+      value: analytics.totalParents ?? 0,
+      description: "Authenticated parents",
       id: "users3",
     },
     {
-      title: "Pending Users",
-      value: userData?.data?.filter((u: any) => !u.verified).length || 0,
-      description: "Users awaiting verification",
+      title: "Player Profiles",
+      value: analytics.totalPlayers ?? 0,
+      description: "Registered player profiles",
       id: "users4",
+    },
+    {
+      title: "Managers",
+      value: analytics.totalManagers ?? 0,
+      description: "Assigned team managers",
+      id: "users5",
+    },
+    {
+      title: "Clubs",
+      value: analytics.totalClubs ?? 0,
+      description: "Registered club accounts",
+      id: "users6",
+    },
+    {
+      title: "Referees",
+      value: analytics.totalReferees ?? 0,
+      description: "Registered match referees",
+      id: "users7",
+    },
+    {
+      title: "Verified Users",
+      value: analytics.verifiedUsers ?? 0,
+      description: "Users with verified status",
+      id: "users8",
     },
   ];
 
   const tableHeaderPayload = {
     title: "Member List",
-    des: "A list of all users and their respective roles and status.",
+    des: "A list of all users, parents, players, and pending player requests.",
     url: "#"
   }
 
-  const columns = getUsersColumns(handleToggleStatus, handleUpdateUserStatus, handleDeleteUser, handleViewUser, handleAssignTeams);
+  const columns = getUsersColumns(handleToggleStatus, handleUpdateUserStatus, handleDeleteUser, handleViewUser, handleAssignTeams, activeRole);
 
-  // Flexible client-side fallback filtering
+  // Filter users by active tab
   const filteredUsers = (userData?.data || []).filter((user: any) => {
-    if (activeRole !== 'ALL') {
-      const userRole = (user.role || '').toUpperCase();
-      if (activeRole === 'OTHER') {
-        if (['PLAYER', 'MANAGER', 'CLUB', 'CLUBS', 'OTHER_CLUBS', 'REFEREE'].includes(userRole)) {
-          return false;
-        }
-      } else if (activeRole === 'CLUB') {
-        if (!['CLUB', 'CLUBS', 'OTHER_CLUBS'].includes(userRole)) {
-          return false;
-        }
-      } else if (userRole !== activeRole && !userRole.includes(activeRole)) {
+    const userRole = (user.role || '').toUpperCase();
+    const userStatus = (user.status || '').toUpperCase();
+    const isChildPlayer = !!user.parentId || user.password === null || !user.email || (userRole === 'PLAYER' && (!!user.position || !!user.dateOfBirth || !!user.ageGroup || !!user.selectTeam));
+    const isParent = !isChildPlayer && !user.parentId && !!user.email;
+
+    if (activeRole === 'PENDING_REQUESTS') {
+      if (userStatus !== 'PENDING') return false;
+    } else if (activeRole === 'PARENT') {
+      if (!isParent) return false;
+    } else if (activeRole === 'PLAYER') {
+      if (!isChildPlayer) return false;
+    } else if (activeRole === 'CLUB') {
+      if (!['CLUB', 'CLUBS', 'OTHER_CLUBS'].includes(userRole)) return false;
+    } else if (activeRole === 'OTHER') {
+      if (['PLAYER', 'MANAGER', 'CLUB', 'CLUBS', 'OTHER_CLUBS', 'REFEREE', 'PARENT'].includes(userRole) || isParent || isChildPlayer) {
         return false;
       }
+    } else if (activeRole !== 'ALL') {
+      if (userRole !== activeRole && !userRole.includes(activeRole)) return false;
     }
 
     if (searchTerm.trim()) {
@@ -169,30 +205,37 @@ const UserManagement = () => {
     return true;
   });
 
+  // Sort PENDING requests to the top (Newest pending first)
+  const sortedUsers = [...filteredUsers].sort((a: any, b: any) => {
+    const statusA = (a.status || '').toUpperCase();
+    const statusB = (b.status || '').toUpperCase();
+    if (statusA === 'PENDING' && statusB !== 'PENDING') return -1;
+    if (statusA !== 'PENDING' && statusB === 'PENDING') return 1;
+    return new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime();
+  });
+
   return (
     <div className='py-10 px-8 space-y-6 pb-16'>
       <GeneralStateCard items={items} className='grid-cols-4' />
 
-      <div className="bg-white rounded-md py-4 flex flex-col space-y-4">
+      <div className="bg-white rounded-md py-4 flex flex-col space-y-4 shadow-sm border border-gray-100">
         {/* Table Header and Search Bar */}
         <div className="px-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
           <TableHeader payload={tableHeaderPayload} />
 
-          {/* Search Input */}
-          <div className="relative w-full md:w-80">
-            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 size-4" />
+          <div className="relative w-full md:w-72">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 size-4" />
             <input
               type="text"
+              placeholder="Search by name, email or phone..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              placeholder="Search by name, email, or role..."
-              className="w-full pl-10 pr-9 py-2 bg-gray-50 border border-gray-200 rounded-xl text-sm text-gray-900 placeholder:text-gray-400 outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
+              className="w-full pl-9 pr-8 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:border-blue-500 transition-colors"
             />
             {searchTerm && (
               <button
-                type="button"
                 onClick={() => setSearchTerm('')}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 cursor-pointer"
+                className="absolute right-2.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
               >
                 <X className="size-4" />
               </button>
@@ -200,47 +243,57 @@ const UserManagement = () => {
           </div>
         </div>
 
-        {/* Filter Tabs matching provided design */}
-        <div className="px-6">
-          <div className="inline-flex items-center gap-1.5 p-1.5 bg-gray-100/80 rounded-xl border border-gray-100 flex-wrap">
-            {ROLE_TABS.map((tab) => {
-              const isActive = activeRole === tab.value;
-              return (
-                <button
-                  key={tab.value}
-                  type="button"
-                  onClick={() => setActiveRole(tab.value)}
-                  className={`px-5 py-2 text-sm font-semibold rounded-lg transition-all cursor-pointer ${isActive
-                    ? 'bg-white text-blue-600 shadow-sm border border-gray-100 font-medium'
-                    : 'text-gray-500 hover:text-gray-900 font-medium'
-                    }`}
-                >
-                  {tab.label}
-                </button>
-              );
-            })}
+        {/* Role Tabs */}
+        <div className="px-6 border-b border-gray-100 pb-3">
+          <div className="flex items-center gap-2 overflow-x-auto">
+            {ROLE_TABS.map((tab) => (
+              <button
+                key={tab.value}
+                onClick={() => setActiveRole(tab.value)}
+                className={`px-4 py-2 text-xs font-bold rounded-lg transition-all whitespace-nowrap cursor-pointer flex items-center gap-1.5 ${
+                  activeRole === tab.value
+                    ? 'bg-blue-600 text-white shadow-md shadow-blue-600/20'
+                    : tab.value === 'PENDING_REQUESTS' && pendingCount > 0
+                    ? 'bg-amber-50 text-amber-700 hover:bg-amber-100 border border-amber-300 font-extrabold'
+                    : 'bg-gray-50 text-gray-600 hover:bg-gray-100 hover:text-gray-900 border border-gray-200/60'
+                }`}
+              >
+                {tab.label}
+                {tab.value === 'PENDING_REQUESTS' && pendingCount > 0 && (
+                  <span className="px-1.5 py-0.5 rounded-full bg-amber-500 text-white text-[10px] font-black">
+                    {pendingCount}
+                  </span>
+                )}
+              </button>
+            ))}
           </div>
         </div>
 
-        <div className="flex-1">
-          <div className="pt-2 px-4">
-            {isLoading ? (
-              <div className="flex justify-center items-center h-48 text-gray-500 font-medium">Loading users...</div>
-            ) : filteredUsers.length === 0 ? (
-              <div className="flex flex-col justify-center items-center h-48 text-gray-400 space-y-2">
-                <p className="text-sm font-semibold">No users found</p>
-                <p className="text-xs">Try selecting another category tab or clearing your search.</p>
-              </div>
-            ) : (
-              <CustomTable<TUserManagement> columns={columns} data={filteredUsers} />
-            )}
-          </div>
+        {/* Table Section */}
+        <div className="px-6">
+          <CustomTable
+            columns={columns}
+            data={sortedUsers}
+            isLoading={isLoading}
+          />
         </div>
-        <div className='pt-8 px-4'>
-          <CustomPagination TOTAL_PAGES={userData?.pagination?.totalPage || 1} qryName="userPage" />
+
+        {/* Pagination Section */}
+        <div className="px-6 pt-4 flex justify-between items-center border-t border-gray-100">
+          <p className="text-xs text-gray-500 font-medium">
+            Showing <span className="font-semibold text-gray-900">{sortedUsers.length}</span> entries
+          </p>
+
+          {userData?.pagination && (
+            <CustomPagination
+              TOTAL_PAGES={userData.pagination.totalPage || 1}
+              qryName="userPage"
+            />
+          )}
         </div>
       </div>
 
+      {/* Verification / Detail Modal */}
       <UserVerificationModal
         user={selectedUser}
         isOpen={isVerificationModalOpen}
@@ -253,6 +306,7 @@ const UserManagement = () => {
         isUpdating={isUpdatingUserStatus}
       />
 
+      {/* Assign Teams Modal */}
       <AssignTeamsModal
         user={assignTargetUser}
         isOpen={isAssignModalOpen}
@@ -262,7 +316,7 @@ const UserManagement = () => {
         }}
       />
     </div>
-  )
-}
+  );
+};
 
-export default UserManagement
+export default UserManagement;

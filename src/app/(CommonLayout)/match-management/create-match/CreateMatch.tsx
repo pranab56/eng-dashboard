@@ -185,10 +185,13 @@ const CreateMatch = () => {
     value: item.league._id,
   }));
 
-  const refereeOptions = (refereeData?.data || []).map((r: any) => ({
-    label: r.userName,
-    value: r._id,
-  }));
+  const refereeOptions = (refereeData?.data || []).map((r: any) => {
+    const displayName = r.displayName || r.name || r.userName || (r.firstName ? `${r.firstName} ${r.lastName || ''}`.trim() : r.email || "Referee");
+    return {
+      label: displayName,
+      value: r._id,
+    };
+  });
 
   const venueOptions = venueCategories.map((v: any) => ({
     label: v.name,
