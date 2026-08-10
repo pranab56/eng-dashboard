@@ -15,15 +15,17 @@ import { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import UserVerificationModal from './UserVerificationModal';
 import AssignTeamsModal from './AssignTeamsModal';
+import DeleteConfirmationModal from './DeleteConfirmationModal';
+import UserEditProfileModal from './UserEditProfileModal';
 
 const ROLE_TABS = [
   { label: 'All Users', value: 'ALL' },
   { label: 'Pending Requests', value: 'PENDING_REQUESTS' },
   { label: 'Players', value: 'PLAYER' },
+  { label: 'Trial Players', value: 'OTHER_CLUBS' },
+  { label: 'Tournament Players', value: 'TOURNAMENT_PLAYER' },
   { label: 'Managers', value: 'MANAGER' },
-  { label: 'Clubs', value: 'CLUB' },
   { label: 'Referees', value: 'REFEREE' },
-  { label: 'Others', value: 'OTHER' },
 ];
 
 const UserManagement = () => {
@@ -39,6 +41,13 @@ const UserManagement = () => {
 
   const [assignTargetUser, setAssignTargetUser] = useState<TUserManagement | null>(null);
   const [isAssignModalOpen, setIsAssignModalOpen] = useState<boolean>(false);
+
+  const [deleteTargetUser, setDeleteTargetUser] = useState<TUserManagement | null>(null);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState<boolean>(false);
+  const [isDeletingUser, setIsDeletingUser] = useState<boolean>(false);
+
+  const [editTargetUser, setEditTargetUser] = useState<TUserManagement | null>(null);
+  const [isEditModalOpen, setIsEditModalOpen] = useState<boolean>(false);
 
   const { data: analyticsData } = useGetUserAnalyticsQuery({});
   const { data: userData, isLoading } = useGetUserQuery({
@@ -94,14 +103,25 @@ const UserManagement = () => {
     await handleUpdateUserStatus(id, "REJECTED");
   };
 
-  const handleDeleteUser = async (id: string) => {
-    if (confirm("Are you sure you want to delete this user?")) {
-      try {
-        await deleteUser({ id }).unwrap();
-        toast.success("User deleted successfully");
-      } catch (error: any) {
-        toast.error(error?.data?.message || "Failed to delete user");
-      }
+  const handleDeleteUserClick = (id: string) => {
+    const target = (userData?.data || []).find((u: any) => u._id === id);
+    if (target) {
+      setDeleteTargetUser(target);
+    } else {
+      setDeleteTargetUser({ _id: id } as any);
+    }
+    setIsDeleteModalOpen(true);
+  };
+
+  const handleConfirmDeleteUser = async (id: string) => {
+    try {
+      setIsDeletingUser(true);
+      await deleteUser({ id }).unwrap();
+      toast.success("User deleted successfully");
+    } catch (error: any) {
+      toast.error(error?.data?.message || "Failed to delete user");
+    } finally {
+      setIsDeletingUser(false);
     }
   };
 
@@ -128,16 +148,22 @@ const UserManagement = () => {
       id: "users4",
     },
     {
+      title: "Trial Players",
+      value: analytics.totalTrialPlayers ?? analytics.totalClubs ?? 0,
+      description: "Other clubs & trialist players",
+      id: "users6",
+    },
+    {
+      title: "Tournament Players",
+      value: analytics.totalTournamentPlayers ?? 0,
+      description: "Tournament player profiles",
+      id: "users9",
+    },
+    {
       title: "Managers",
       value: analytics.totalManagers ?? 0,
       description: "Assigned team managers",
       id: "users5",
-    },
-    {
-      title: "Clubs",
-      value: analytics.totalClubs ?? 0,
-      description: "Registered club accounts",
-      id: "users6",
     },
     {
       title: "Referees",
@@ -155,11 +181,16 @@ const UserManagement = () => {
 
   const tableHeaderPayload = {
     title: "Member List",
-    des: "A list of all players, managers, clubs, and pending player requests.",
+    des: "A list of all players, trial players, tournament players, managers, and pending player requests.",
     url: "#"
   }
 
-  const columns = getUsersColumns(handleToggleStatus, handleUpdateUserStatus, handleDeleteUser, handleViewUser, handleAssignTeams, activeRole);
+  const handleEditProfile = (user: TUserManagement) => {
+    setEditTargetUser(user);
+    setIsEditModalOpen(true);
+  };
+
+  const columns = getUsersColumns(handleToggleStatus, handleUpdateUserStatus, handleDeleteUserClick, handleViewUser, handleAssignTeams, activeRole, handleEditProfile);
 
   // Filter users by active tab
   const filteredUsers = (userData?.data || []).filter((user: any) => {
@@ -174,13 +205,11 @@ const UserManagement = () => {
     if (activeRole === 'PENDING_REQUESTS') {
       if (userStatus !== 'PENDING') return false;
     } else if (activeRole === 'PLAYER') {
-      if (!isChildPlayer) return false;
-    } else if (activeRole === 'CLUB') {
-      if (!['CLUB', 'CLUBS', 'OTHER_CLUBS'].includes(userRole)) return false;
-    } else if (activeRole === 'OTHER') {
-      if (['PLAYER', 'MANAGER', 'CLUB', 'CLUBS', 'OTHER_CLUBS', 'REFEREE', 'PARENT'].includes(userRole) || isParent || isChildPlayer) {
-        return false;
-      }
+      if (!isChildPlayer && userRole !== 'PLAYER') return false;
+    } else if (activeRole === 'OTHER_CLUBS') {
+      if (userRole !== 'OTHER_CLUBS' && userRole !== 'CLUB' && userRole !== 'CLUBS') return false;
+    } else if (activeRole === 'TOURNAMENT_PLAYER') {
+      if (userRole !== 'TOURNAMENT_PLAYER') return false;
     } else if (activeRole !== 'ALL') {
       if (userRole !== activeRole && !userRole.includes(activeRole)) return false;
     }
@@ -307,6 +336,28 @@ const UserManagement = () => {
         onClose={() => {
           setIsAssignModalOpen(false);
           setAssignTargetUser(null);
+        }}
+      />
+
+      {/* Delete Confirmation Modal */}
+      <DeleteConfirmationModal
+        user={deleteTargetUser}
+        isOpen={isDeleteModalOpen}
+        onClose={() => {
+          setIsDeleteModalOpen(false);
+          setDeleteTargetUser(null);
+        }}
+        onConfirm={handleConfirmDeleteUser}
+        isDeleting={isDeletingUser}
+      />
+
+      {/* Edit Profile Picture & Details Modal */}
+      <UserEditProfileModal
+        user={editTargetUser}
+        isOpen={isEditModalOpen}
+        onClose={() => {
+          setIsEditModalOpen(false);
+          setEditTargetUser(null);
         }}
       />
     </div>

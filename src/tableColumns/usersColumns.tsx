@@ -4,7 +4,7 @@ import React from 'react';
 import { ColumnDef } from "@tanstack/react-table";
 import { TUserManagement } from "@/types/columnTypes";
 import { HiOutlineTrash } from "react-icons/hi";
-import { FiEye } from "react-icons/fi";
+import { FiEye, FiEdit } from "react-icons/fi";
 import { formatImagePath } from "@/utils/formatImagePath";
 import Image from "next/image";
 import { Shield } from "lucide-react";
@@ -15,7 +15,8 @@ export const getUsersColumns = (
   onDeleteUser: (id: string) => void,
   onViewUser: (user: TUserManagement) => void,
   onAssignTeams: (user: TUserManagement) => void,
-  activeRole?: string
+  activeRole?: string,
+  onEditProfile?: (user: TUserManagement) => void
 ): ColumnDef<TUserManagement>[] => [
   {
     accessorKey: "userName",
@@ -139,6 +140,16 @@ export const getUsersColumns = (
             title="Inspect Details & Verification Documents"
           >
             <FiEye className="size-4" />
+          </button>
+        )}
+        {onEditProfile && (
+          <button
+            type="button"
+            onClick={() => onEditProfile(row.original)}
+            className="flex items-center justify-center h-8 w-8 rounded-md bg-indigo-50 hover:bg-indigo-100 text-indigo-600 transition-colors duration-200 cursor-pointer"
+            title="Edit Profile Picture & Details"
+          >
+            <FiEdit className="size-4" />
           </button>
         )}
         {onAssignTeams && row.original.role === "MANAGER" && (

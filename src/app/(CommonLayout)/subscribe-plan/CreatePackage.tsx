@@ -20,11 +20,11 @@ const featureItemSchema = z.object({
 const packageSchema = z.object({
   title: z.string().min(1, "Title is required"),
   description: z.string().min(1, "Description is required"),
-  userType: z.enum(['Player', 'Manager', 'Club', 'Referee', 'Other']),
+  userType: z.enum(['Player', 'Other', 'Manager', 'Club', 'Referee', 'Tournament Player', 'Trial Player', 'OTHER_CLUBS']),
   price: z.number().min(0, "Price must be at least 0"),
   duration: z.enum(['1 month', '3 months', '6 months', '1 year']),
   paymentType: z.string().min(1, "Payment type is required"),
-  packageType: z.enum(['Semi Pro', 'Professional', 'Other']),
+  packageType: z.enum(['Semi Pro', 'Professional']),
   credit: z.number().min(0, "Credit must be at least 0"),
   features: z.array(featureItemSchema),
 })
@@ -32,8 +32,9 @@ const packageSchema = z.object({
 type PackageFormValues = z.infer<typeof packageSchema>
 
 const userTypeOptions = [
-  { label: "Player", value: "Player" },
-  { label: "Other", value: "Other" },
+  { label: "Regular Player", value: "Player" },
+  { label: "Tournament Player", value: "Tournament Player" },
+  { label: "Trial Player", value: "Trial Player" },
 ]
 
 const paymentTypeOptions = [
@@ -46,7 +47,6 @@ const paymentTypeOptions = [
 const packageTypeOptions = [
   { label: "Semi Pro", value: "Semi Pro" },
   { label: "Professional", value: "Professional" },
-  { label: "Other", value: "Other" },
 ]
 
 const durationOptions = [

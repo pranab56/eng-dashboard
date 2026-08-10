@@ -8,7 +8,11 @@ import { useState } from 'react'
 import CreatePackage from './CreatePackage'
 import PackageCard from './PackageCard'
 
-const userTypes = ['Player', 'Other'];
+const userTypes = [
+  { label: 'Regular Players', value: 'Player' },
+  { label: 'Tournament Players', value: 'Tournament Player' },
+  { label: 'Trial Players', value: 'Trial Player' },
+];
 
 const SubscribePlan = () => {
   const [activeTab, setActiveTab] = useState('Player')
@@ -60,14 +64,14 @@ const SubscribePlan = () => {
       <div className="flex items-center gap-2 p-1 bg-gray-100 rounded-sm border border-gray-100 w-fit">
         {userTypes.map((type) => (
           <button
-            key={type}
-            onClick={() => setActiveTab(type)}
-            className={`px-6 py-2.5 rounded-sm text-sm cursor-pointer font-medium transition-all ${activeTab === type
+            key={type.value}
+            onClick={() => setActiveTab(type.value)}
+            className={`px-6 py-2.5 rounded-sm text-sm cursor-pointer font-medium transition-all ${activeTab === type.value
               ? "bg-white text-blue-600"
               : "text-gray-500 hover:text-gray-700"
               }`}
           >
-            {type}s
+            {type.label}
           </button>
         ))}
       </div>
