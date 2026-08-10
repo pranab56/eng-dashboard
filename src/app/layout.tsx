@@ -24,9 +24,10 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="h-full overflow-hidden hide-scrollbar">
+    <html lang="en" className="h-full overflow-hidden hide-scrollbar" suppressHydrationWarning>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased h-full overflow-hidden hide-scrollbar`}
+        suppressHydrationWarning
       >
         <ClientLayout>
           {children}

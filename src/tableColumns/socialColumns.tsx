@@ -19,7 +19,7 @@ const getPlatformIcon = (platformName: string, iconUrl?: string) => {
     if (formattedUrl) {
       return (
         <div className="relative w-7 h-7 rounded-lg overflow-hidden border border-gray-200 bg-gray-50 flex-shrink-0">
-          <Image src={formattedUrl} alt="icon" fill className="object-cover" />
+          <Image src={formattedUrl} alt="icon" fill sizes="28px" className="object-cover" />
         </div>
       );
     }

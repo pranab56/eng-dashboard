@@ -33,6 +33,7 @@ export const getUsersColumns = (
                 src={profileUrl}
                 alt={name}
                 fill
+                sizes="40px"
                 className="object-cover"
               />
             ) : (
