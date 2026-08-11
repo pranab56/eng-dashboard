@@ -13,13 +13,18 @@ import { formatImagePath } from '../utils/formatImagePath';
 const statusStyle = (status: string): string => {
   switch (status?.toLowerCase()) {
     case "finished":
-      return "bg-green-100 text-green-500";
+      return "bg-green-100 text-green-700";
     case "upcoming":
-      return "bg-blue-100 text-blue-500";
+    case "scheduled":
+      return "bg-blue-100 text-blue-700";
     case "live":
-      return "bg-red-100 text-red-500";
+      return "bg-red-100 text-red-700 animate-pulse";
+    case "half_time":
+      return "bg-amber-100 text-amber-700";
+    case "cancelled":
+      return "bg-gray-100 text-gray-700";
     default:
-      return "bg-gray-100 text-gray-500";
+      return "bg-gray-100 text-gray-600";
   }
 };
 
@@ -62,11 +67,11 @@ export const getMatchColumns = (
     accessorKey: "matchDate",
     header: () => <div className="">Date & Time</div>,
     cell: ({ row }) => {
-      const date = dayjs(row.original.matchDate).tz("Europe/London");
+      const date = dayjs(row.original.matchDate || row.original.scheduledAt).tz("Europe/London");
       return (
         <div>
           <div className="font-semibold">{date.format("DD/MM/YYYY")}</div>
-          <div className="text-gray-500">Kick-off: {date.format("HH:mm a")}</div>
+          <div className="text-gray-500 text-xs">Kick-off: {date.format("HH:mm a")}</div>
         </div>
       );
     },
@@ -75,7 +80,7 @@ export const getMatchColumns = (
     accessorKey: "score",
     header: () => <div className="">Score</div>,
     cell: ({ row }) => (
-      <div className="bg-[#080808] text-white rounded-md px-4 py-2 inline-block font-semibold">
+      <div className="bg-[#080808] text-white rounded-md px-4 py-1.5 inline-block font-bold text-xs shadow-xs">
         {row.original.homeScore ?? 0} - {row.original.awayScore ?? 0}
       </div>
     ),
@@ -85,17 +90,32 @@ export const getMatchColumns = (
     header: () => <div className="">Status</div>,
     cell: ({ row }) => {
       const match = row.original;
+      const displayStatus = match.status === "scheduled" ? "upcoming" : match.status;
       return (
         <button
           type="button"
           onClick={() => onUpdateStatus && onUpdateStatus(match)}
-          className={`${statusStyle(row.getValue("status"))} inline-flex items-center gap-1.5 px-3 py-1 rounded-md capitalize font-bold hover:opacity-80 transition-all cursor-pointer shadow-2xs group`}
-          title="Click to Change Match Status"
+          className={`${statusStyle(match.status)} inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md capitalize font-bold text-xs hover:opacity-80 transition-all cursor-pointer shadow-2xs group`}
+          title="Click to Edit Match Status & Timing"
         >
-          <span>{row.getValue("status")}</span>
+          <span>{displayStatus}</span>
           <span className="text-[10px] text-gray-400 group-hover:text-gray-600 transition-colors">✏️</span>
         </button>
       );
+    },
+  },
+  {
+    accessorKey: "period",
+    header: () => <div className="">Period</div>,
+    cell: ({ row }) => {
+      const period = row.original.period;
+      if (period === "first_half") {
+        return <span className="bg-blue-50 text-blue-700 px-2.5 py-1 rounded-md font-bold text-xs border border-blue-200/50">1st Half</span>;
+      }
+      if (period === "second_half") {
+        return <span className="bg-purple-50 text-purple-700 px-2.5 py-1 rounded-md font-bold text-xs border border-purple-200/50">2nd Half</span>;
+      }
+      return <span className="text-gray-400 text-xs font-medium">-</span>;
     },
   },
   {
@@ -106,7 +126,7 @@ export const getMatchColumns = (
         <button
           onClick={() => onView(row.original)}
           className="flex items-center justify-center h-9 w-9 rounded-sm bg-[#F3F3F3] hover:bg-gray-200 transition-colors duration-300 cursor-pointer"
-          title="View Match"
+          title="View Match Details & Timing"
         >
           <FiEye className="size-5 font-medium text-gray-800" />
         </button>
@@ -115,7 +135,7 @@ export const getMatchColumns = (
             type="button"
             onClick={() => onUpdateStatus(row.original)}
             className="flex items-center justify-center h-9 w-9 rounded-sm bg-[#F3F3F3] hover:bg-blue-50 hover:text-blue-600 transition-colors duration-300 cursor-pointer"
-            title="Change Match Status"
+            title="Change Match Status & Timing"
           >
             <svg className="size-5 text-gray-800 hover:text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />

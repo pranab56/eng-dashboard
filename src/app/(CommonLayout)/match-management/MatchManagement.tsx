@@ -551,6 +551,23 @@ const MatchManagement = () => {
   );
 };
 
+import dayjs from "dayjs";
+import utc from "dayjs/plugin/utc";
+import timezone from "dayjs/plugin/timezone";
+
+dayjs.extend(utc);
+dayjs.extend(timezone);
+
+const formatForInput = (d: any) => {
+  if (!d) return "";
+  return dayjs(d).tz("Europe/London").format("YYYY-MM-DDTHH:mm");
+};
+
+const parseFromInput = (str: string) => {
+  if (!str) return null;
+  return dayjs.tz(str, "Europe/London").utc().toISOString();
+};
+
 const UpdateStatusModal = ({
   isOpen,
   onClose,
@@ -560,12 +577,38 @@ const UpdateStatusModal = ({
   onClose: () => void;
   match: any;
 }) => {
-  const [selectedStatus, setSelectedStatus] = useState<string>("upcoming");
+  const [selectedStatus, setSelectedStatus] = useState<string>("scheduled");
+  const [selectedPeriod, setSelectedPeriod] = useState<string>("first_half");
+
+  const [scheduledAt, setScheduledAt] = useState<string>("");
+  const [startedAt, setStartedAt] = useState<string>("");
+  const [firstHalfStartedAt, setFirstHalfStartedAt] = useState<string>("");
+  const [halfTimeAt, setHalfTimeAt] = useState<string>("");
+  const [secondHalfStartedAt, setSecondHalfStartedAt] = useState<string>("");
+  const [finishedAt, setFinishedAt] = useState<string>("");
+
+  const [showAdvancedTimestamps, setShowAdvancedTimestamps] = useState<boolean>(false);
   const [updateMatchStatus, { isLoading }] = useUpdateMatchStatusMutation();
 
   useEffect(() => {
     if (match) {
-      setSelectedStatus(match.status || "upcoming");
+      const currentStatus = match.status === "upcoming" ? "scheduled" : (match.status || "scheduled");
+      setSelectedStatus(currentStatus);
+      setSelectedPeriod(
+        match.period ||
+          (currentStatus === "half_time"
+            ? "first_half"
+            : currentStatus === "finished"
+            ? "second_half"
+            : "first_half")
+      );
+
+      setScheduledAt(formatForInput(match.scheduledAt || match.matchDate));
+      setStartedAt(formatForInput(match.startedAt));
+      setFirstHalfStartedAt(formatForInput(match.firstHalfStartedAt));
+      setHalfTimeAt(formatForInput(match.halfTimeAt));
+      setSecondHalfStartedAt(formatForInput(match.secondHalfStartedAt));
+      setFinishedAt(formatForInput(match.finishedAt));
     }
   }, [match]);
 
@@ -573,33 +616,101 @@ const UpdateStatusModal = ({
 
   const handleSaveStatus = async () => {
     try {
-      const res = await updateMatchStatus({
+      const payload: any = {
         id: match._id || match.id,
         status: selectedStatus,
-      }).unwrap();
+        period: selectedPeriod || null,
+      };
+
+      if (showAdvancedTimestamps) {
+        payload.scheduledAt = parseFromInput(scheduledAt);
+        payload.startedAt = parseFromInput(startedAt);
+        payload.firstHalfStartedAt = parseFromInput(firstHalfStartedAt);
+        payload.halfTimeAt = parseFromInput(halfTimeAt);
+        payload.secondHalfStartedAt = parseFromInput(secondHalfStartedAt);
+        payload.finishedAt = parseFromInput(finishedAt);
+      }
+
+      const res = await updateMatchStatus(payload).unwrap();
       if (res.success) {
-        toast.success(res.message || "Match status updated successfully");
+        toast.success(res.message || "Match status & timing updated successfully");
         onClose();
       }
     } catch (err: any) {
-      toast.error(getErrorMessage(err, "Failed to update match status"));
+      toast.error(getErrorMessage(err, "Failed to update match status & timing"));
     }
   };
 
-  const statusOptions = [
-    { value: "upcoming", label: "Upcoming (Scheduled Match)", color: "bg-blue-100 text-blue-700" },
-    { value: "live", label: "Live (Broadcast In-Progress)", color: "bg-red-100 text-red-700" },
-    { value: "half_time", label: "Half Time (Interval)", color: "bg-amber-100 text-amber-700" },
-    { value: "finished", label: "Finished (Completed Match)", color: "bg-green-100 text-green-700" },
-    { value: "cancelled", label: "Cancelled (Match Called Off)", color: "bg-gray-100 text-gray-700" },
+  const presetOptions = [
+    {
+      id: "upcoming",
+      status: "upcoming",
+      period: null,
+      label: "Upcoming",
+      subLabel: "Match planned for future date",
+      badgeColor: "bg-blue-100 text-blue-700",
+    },
+    {
+      id: "live_1st_half",
+      status: "live",
+      period: "first_half",
+      label: "Live - 1st Half",
+      subLabel: "Match is live in First Half",
+      badgeColor: "bg-red-100 text-red-700",
+    },
+    {
+      id: "half_time",
+      status: "half_time",
+      period: "first_half",
+      label: "Half Time",
+      subLabel: "15 minute interval break",
+      badgeColor: "bg-amber-100 text-amber-700",
+    },
+    {
+      id: "live_2nd_half",
+      status: "live",
+      period: "second_half",
+      label: "Live - 2nd Half",
+      subLabel: "Match is live in Second Half",
+      badgeColor: "bg-purple-100 text-purple-700",
+    },
+    {
+      id: "finished",
+      status: "finished",
+      period: "second_half",
+      label: "Finished",
+      subLabel: "Match fully completed",
+      badgeColor: "bg-green-100 text-green-700",
+    },
+    {
+      id: "cancelled",
+      status: "cancelled",
+      period: null,
+      label: "Cancelled",
+      subLabel: "Match called off",
+      badgeColor: "bg-gray-100 text-gray-700",
+    },
   ];
+
+  const currentPresetId =
+    selectedStatus === "upcoming" || selectedStatus === "scheduled"
+      ? "upcoming"
+      : selectedStatus === "half_time"
+      ? "half_time"
+      : selectedStatus === "finished"
+      ? "finished"
+      : selectedStatus === "cancelled"
+      ? "cancelled"
+      : selectedPeriod === "second_half"
+      ? "live_2nd_half"
+      : "live_1st_half";
 
   return (
     <div className="fixed inset-0 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 z-50 animate-in fade-in duration-200">
-      <div className="bg-white rounded-2xl max-w-md w-full p-6 space-y-6 shadow-2xl border border-gray-100">
+      <div className="bg-white rounded-2xl max-w-lg w-full p-6 space-y-5 shadow-2xl border border-gray-100 max-h-[90vh] overflow-y-auto custom-scrollbar">
         <div className="flex items-center justify-between pb-3 border-b border-gray-100">
           <div>
-            <h3 className="text-lg font-bold text-gray-900">Update Match Status</h3>
+            <h3 className="text-lg font-bold text-gray-900">Update Match Status & Stage</h3>
             <p className="text-xs text-gray-500 font-medium mt-0.5">
               {match?.homeTeam?.teamName} vs {match?.awayTeam?.teamName}
             </p>
@@ -613,44 +724,123 @@ const UpdateStatusModal = ({
         </div>
 
         <div className="space-y-4">
-          <label className="block text-xs font-bold text-gray-700">
-            Select New Match Status
-          </label>
-          <div className="space-y-2">
-            {statusOptions.map((opt) => (
-              <label
-                key={opt.value}
-                onClick={() => setSelectedStatus(opt.value)}
-                className={`flex items-center justify-between p-3 rounded-xl border transition-all cursor-pointer ${
-                  selectedStatus === opt.value
-                    ? "border-blue-500 bg-blue-50/40 ring-2 ring-blue-500/20"
-                    : "border-gray-200 hover:border-gray-300 hover:bg-gray-50"
-                }`}
-              >
-                <div className="flex items-center gap-3">
-                  <input
-                    type="radio"
-                    name="matchStatus"
-                    value={opt.value}
-                    checked={selectedStatus === opt.value}
-                    onChange={() => setSelectedStatus(opt.value)}
-                    className="w-4 h-4 text-blue-600 focus:ring-blue-500 cursor-pointer"
-                  />
-                  <span className="text-xs font-bold text-gray-800">{opt.label}</span>
-                </div>
-                <span className={`text-[10px] font-bold px-2 py-0.5 rounded capitalize ${opt.color}`}>
-                  {opt.value}
-                </span>
-              </label>
-            ))}
+          <div>
+            <label className="block text-xs font-bold text-gray-700 mb-2">
+              Select Match State
+            </label>
+            <div className="space-y-2">
+              {presetOptions.map((opt) => {
+                const isSelected = currentPresetId === opt.id;
+                return (
+                  <label
+                    key={opt.id}
+                    onClick={() => {
+                      setSelectedStatus(opt.status);
+                      setSelectedPeriod(opt.period as any);
+                    }}
+                    className={`flex items-center justify-between p-3 rounded-xl border transition-all cursor-pointer ${
+                      isSelected
+                        ? "border-blue-500 bg-blue-50/40 ring-2 ring-blue-500/20 shadow-xs"
+                        : "border-gray-200 hover:border-gray-300 hover:bg-gray-50"
+                    }`}
+                  >
+                    <div className="flex items-center gap-3">
+                      <input
+                        type="radio"
+                        name="matchStatePreset"
+                        checked={isSelected}
+                        onChange={() => {
+                          setSelectedStatus(opt.status);
+                          setSelectedPeriod(opt.period as any);
+                        }}
+                        className="w-4 h-4 text-blue-600 focus:ring-blue-500 cursor-pointer"
+                      />
+                      <div>
+                        <span className="text-xs font-bold text-gray-800 block">{opt.label}</span>
+                        <span className="text-[10px] text-gray-400 font-medium">{opt.subLabel}</span>
+                      </div>
+                    </div>
+                    <span className={`text-[10px] font-bold px-2 py-0.5 rounded capitalize ${opt.badgeColor}`}>
+                      {opt.label}
+                    </span>
+                  </label>
+                );
+              })}
+            </div>
           </div>
 
-          {(selectedStatus === "live" || selectedStatus === "finished") && (
-            <div className="bg-blue-50 border border-blue-100 p-3 rounded-xl text-[11px] text-blue-800 flex items-start gap-2">
-              <span className="text-blue-600 font-bold shrink-0">ℹ️</span>
-              <span>
-                Setting status to <strong className="capitalize">{selectedStatus}</strong> will automatically trigger live match broadcast notifications to participating players and update rankings.
+          {/* Toggle Advanced Timestamp Correction */}
+          <div className="pt-2">
+            <button
+              type="button"
+              onClick={() => setShowAdvancedTimestamps(!showAdvancedTimestamps)}
+              className="text-xs font-bold text-blue-600 hover:text-blue-700 underline flex items-center gap-1.5 cursor-pointer"
+            >
+              <span>{showAdvancedTimestamps ? "Hide" : "Edit"} Advanced Match Timestamps (UK Time)</span>
+            </button>
+          </div>
+
+          {showAdvancedTimestamps && (
+            <div className="bg-slate-50 border border-slate-200 p-4 rounded-xl space-y-3 animate-in fade-in duration-200">
+              <span className="text-[11px] font-extrabold text-slate-700 block">
+                Manual Timestamp Overwrite (Europe/London UK Time)
               </span>
+              <div className="grid grid-cols-2 gap-3 text-xs">
+                <div>
+                  <label className="block font-semibold text-gray-600 text-[10px] mb-1">Scheduled At</label>
+                  <input
+                    type="datetime-local"
+                    value={scheduledAt}
+                    onChange={(e) => setScheduledAt(e.target.value)}
+                    className="w-full px-2.5 py-1.5 border border-gray-300 rounded-lg text-xs bg-white"
+                  />
+                </div>
+                <div>
+                  <label className="block font-semibold text-gray-600 text-[10px] mb-1">Started At</label>
+                  <input
+                    type="datetime-local"
+                    value={startedAt}
+                    onChange={(e) => setStartedAt(e.target.value)}
+                    className="w-full px-2.5 py-1.5 border border-gray-300 rounded-lg text-xs bg-white"
+                  />
+                </div>
+                <div>
+                  <label className="block font-semibold text-gray-600 text-[10px] mb-1">1st Half Started</label>
+                  <input
+                    type="datetime-local"
+                    value={firstHalfStartedAt}
+                    onChange={(e) => setFirstHalfStartedAt(e.target.value)}
+                    className="w-full px-2.5 py-1.5 border border-gray-300 rounded-lg text-xs bg-white"
+                  />
+                </div>
+                <div>
+                  <label className="block font-semibold text-gray-600 text-[10px] mb-1">Half Time At</label>
+                  <input
+                    type="datetime-local"
+                    value={halfTimeAt}
+                    onChange={(e) => setHalfTimeAt(e.target.value)}
+                    className="w-full px-2.5 py-1.5 border border-gray-300 rounded-lg text-xs bg-white"
+                  />
+                </div>
+                <div>
+                  <label className="block font-semibold text-gray-600 text-[10px] mb-1">2nd Half Started</label>
+                  <input
+                    type="datetime-local"
+                    value={secondHalfStartedAt}
+                    onChange={(e) => setSecondHalfStartedAt(e.target.value)}
+                    className="w-full px-2.5 py-1.5 border border-gray-300 rounded-lg text-xs bg-white"
+                  />
+                </div>
+                <div>
+                  <label className="block font-semibold text-gray-600 text-[10px] mb-1">Finished At</label>
+                  <input
+                    type="datetime-local"
+                    value={finishedAt}
+                    onChange={(e) => setFinishedAt(e.target.value)}
+                    className="w-full px-2.5 py-1.5 border border-gray-300 rounded-lg text-xs bg-white"
+                  />
+                </div>
+              </div>
             </div>
           )}
         </div>
@@ -670,7 +860,7 @@ const UpdateStatusModal = ({
             className="px-5 py-2 text-xs font-bold text-white bg-blue-600 hover:bg-blue-700 disabled:opacity-50 rounded-xl transition-all cursor-pointer shadow-md shadow-blue-500/20 flex items-center gap-2"
           >
             {isLoading && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
-            Save Status
+            Save Status & Timings
           </button>
         </div>
       </div>

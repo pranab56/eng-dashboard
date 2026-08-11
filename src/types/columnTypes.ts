@@ -58,15 +58,23 @@ export type TUserManagement = {
 export type MatchStatus = "Completed" | "Scheduled" | "On Going";
 
 export type TMatch = {
-  id: number;
-  team_a_logo: string;
-  team_b_logo: string;
-  teams_matchup: string;
-  venue: string;
-  date: string;
-  time: string;
-  score: string;
-  status: MatchStatus;
+  _id?: string;
+  id?: number | string;
+  team_a_logo?: string;
+  team_b_logo?: string;
+  teams_matchup?: string;
+  venue?: string;
+  date?: string;
+  time?: string;
+  score?: string;
+  status?: string;
+  period?: 'first_half' | 'second_half' | null;
+  scheduledAt?: string | Date | null;
+  startedAt?: string | Date | null;
+  firstHalfStartedAt?: string | Date | null;
+  halfTimeAt?: string | Date | null;
+  secondHalfStartedAt?: string | Date | null;
+  finishedAt?: string | Date | null;
 }
 
 export type TTable = {

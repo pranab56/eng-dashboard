@@ -138,6 +138,58 @@ const MatchViewModal = ({ match, isOpen, onClose }: MatchViewModalProps) => {
             </div>
           </div>
 
+          {/* Match Timestamps Timeline */}
+          <div className="bg-slate-50 border border-slate-200/80 p-4 rounded-2xl space-y-2">
+            <div className="flex items-center justify-between border-b border-slate-200/60 pb-2">
+              <span className="text-[11px] font-extrabold text-slate-800 tracking-wide flex items-center gap-1.5">
+                <Clock className="w-3.5 h-3.5 text-blue-600" /> Match Timeline & Timestamps (UK Time)
+              </span>
+              {match.period && (
+                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-blue-100 text-blue-700 capitalize">
+                  {match.period.replace('_', ' ')}
+                </span>
+              )}
+            </div>
+            <div className="grid grid-cols-2 gap-2 pt-1 text-xs">
+              <div className="flex flex-col">
+                <span className="text-[10px] font-semibold text-gray-500">Scheduled At:</span>
+                <span className="font-bold text-gray-800 text-[11px]">
+                  {match.scheduledAt || match.matchDate ? dayjs(match.scheduledAt || match.matchDate).tz("Europe/London").format("DD MMM YYYY, HH:mm:ss") : "N/A"}
+                </span>
+              </div>
+              <div className="flex flex-col">
+                <span className="text-[10px] font-semibold text-gray-500">Started At:</span>
+                <span className="font-bold text-gray-800 text-[11px]">
+                  {match.startedAt ? dayjs(match.startedAt).tz("Europe/London").format("DD MMM YYYY, HH:mm:ss") : "Not Started"}
+                </span>
+              </div>
+              <div className="flex flex-col">
+                <span className="text-[10px] font-semibold text-gray-500">1st Half Started:</span>
+                <span className="font-bold text-gray-800 text-[11px]">
+                  {match.firstHalfStartedAt ? dayjs(match.firstHalfStartedAt).tz("Europe/London").format("DD MMM YYYY, HH:mm:ss") : "-"}
+                </span>
+              </div>
+              <div className="flex flex-col">
+                <span className="text-[10px] font-semibold text-gray-500">Half Time At:</span>
+                <span className="font-bold text-gray-800 text-[11px]">
+                  {match.halfTimeAt ? dayjs(match.halfTimeAt).tz("Europe/London").format("DD MMM YYYY, HH:mm:ss") : "-"}
+                </span>
+              </div>
+              <div className="flex flex-col">
+                <span className="text-[10px] font-semibold text-gray-500">2nd Half Started:</span>
+                <span className="font-bold text-gray-800 text-[11px]">
+                  {match.secondHalfStartedAt ? dayjs(match.secondHalfStartedAt).tz("Europe/London").format("DD MMM YYYY, HH:mm:ss") : "-"}
+                </span>
+              </div>
+              <div className="flex flex-col">
+                <span className="text-[10px] font-semibold text-gray-500">Finished At:</span>
+                <span className="font-bold text-gray-800 text-[11px]">
+                  {match.finishedAt ? dayjs(match.finishedAt).tz("Europe/London").format("DD MMM YYYY, HH:mm:ss") : "-"}
+                </span>
+              </div>
+            </div>
+          </div>
+
           {match.notes && (
             <div className="bg-amber-50/80 border border-amber-100 p-4 rounded-2xl space-y-1">
               <span className="text-[10px] font-extrabold text-amber-700 . tracking-widest flex items-center gap-1">
