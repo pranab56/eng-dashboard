@@ -40,9 +40,9 @@ const addRefreshSubscriber = (cb) => {
 const baseQueryWithReauth = async (args, api, extraOptions) => {
   let result = await rawBaseQuery(args, api, extraOptions);
 
-  // Check for 401 Unauthorized or 403 Forbidden
-  if (result.error && (result.error.status === 401 || result.error.status === 403)) {
-    // Avoid infinite loop if the refresh-token request itself returns 401/403
+  // Check for 401 Unauthorized (Token invalid/expired)
+  if (result.error && result.error.status === 401) {
+    // Avoid infinite loop if the refresh-token request itself returns 401
     const isRefreshReq = typeof args === "string" ? args.includes("refresh-token") : args?.url?.includes("refresh-token");
     if (isRefreshReq) {
       return result;

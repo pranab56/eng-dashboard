@@ -277,47 +277,69 @@ const UserVerificationModal: React.FC<UserVerificationModalProps> = ({
                   <p className="text-xs font-bold text-slate-900">{user.lastName || 'N/A'}</p>
                 </div>
 
-                <div>
-                  <p className="text-[11px] font-semibold text-slate-500">Date of Birth</p>
-                  <p className="text-xs font-bold text-slate-800 flex items-center gap-1">
-                    <Calendar className="w-3.5 h-3.5 text-slate-500 shrink-0" />
-                    {user.dateOfBirth ? dayjs(user.dateOfBirth).format('DD MMM YYYY') : 'N/A'}
-                  </p>
-                </div>
+                {user.email && (
+                  <div>
+                    <p className="text-[11px] font-semibold text-slate-500">Email Address</p>
+                    <p className="text-xs font-bold text-slate-900 truncate">{user.email}</p>
+                  </div>
+                )}
 
-                <div>
-                  <p className="text-[11px] font-semibold text-slate-500">Age Group</p>
-                  <p className="text-xs font-bold text-blue-700 bg-blue-50 px-2 py-0.5 rounded-md border border-blue-200 inline-block">
-                    {user.ageGroup || 'N/A'}
-                  </p>
-                </div>
+                {user.phone && (
+                  <div>
+                    <p className="text-[11px] font-semibold text-slate-500">Phone Number</p>
+                    <p className="text-xs font-bold text-slate-900">{user.phone}</p>
+                  </div>
+                )}
 
-                <div>
-                  <p className="text-[11px] font-semibold text-slate-500">Position</p>
-                  <p className="text-xs font-bold text-slate-900">{user.position || 'N/A'}</p>
-                </div>
+                {/* Date of Birth: Show for Player, Manager, Referee, or if available */}
+                {(isPlayer || user.role === 'MANAGER' || user.role === 'REFEREE' || user.dateOfBirth) && (
+                  <div>
+                    <p className="text-[11px] font-semibold text-slate-500">Date of Birth</p>
+                    <p className="text-xs font-bold text-slate-800 flex items-center gap-1">
+                      <Calendar className="w-3.5 h-3.5 text-slate-500 shrink-0" />
+                      {user.dateOfBirth ? dayjs(user.dateOfBirth).format('DD MMM YYYY') : 'N/A'}
+                    </p>
+                  </div>
+                )}
 
-                <div>
-                  <p className="text-[11px] font-semibold text-slate-500">Strong Foot</p>
-                  <p className="text-xs font-bold text-slate-900">{user.strongFoot || 'N/A'}</p>
-                </div>
+                {/* Player-Only Fields */}
+                {isPlayer && (
+                  <>
+                    <div>
+                      <p className="text-[11px] font-semibold text-slate-500">Age Group</p>
+                      <p className="text-xs font-bold text-blue-700 bg-blue-50 px-2 py-0.5 rounded-md border border-blue-200 inline-block">
+                        {user.ageGroup || 'N/A'}
+                      </p>
+                    </div>
 
-                <div>
-                  <p className="text-[11px] font-semibold text-slate-500">ENG Coins</p>
-                  <p className="text-xs font-bold text-amber-600 flex items-center gap-1">
-                    <Coins className="w-3.5 h-3.5 text-amber-500" />
-                    {coins} Coins
-                  </p>
-                </div>
+                    <div>
+                      <p className="text-[11px] font-semibold text-slate-500">Position</p>
+                      <p className="text-xs font-bold text-slate-900">{user.position || 'N/A'}</p>
+                    </div>
 
-                <div>
-                  <p className="text-[11px] font-semibold text-slate-500">Market Value</p>
-                  <p className="text-xs font-bold text-emerald-600">
-                    £{marketValue.toLocaleString()}
-                  </p>
-                </div>
+                    <div>
+                      <p className="text-[11px] font-semibold text-slate-500">Strong Foot</p>
+                      <p className="text-xs font-bold text-slate-900">{user.strongFoot || 'N/A'}</p>
+                    </div>
 
-                {user.previousClub && (
+                    <div>
+                      <p className="text-[11px] font-semibold text-slate-500">ENG Coins</p>
+                      <p className="text-xs font-bold text-amber-600 flex items-center gap-1">
+                        <Coins className="w-3.5 h-3.5 text-amber-500" />
+                        {coins} Coins
+                      </p>
+                    </div>
+
+                    <div>
+                      <p className="text-[11px] font-semibold text-slate-500">Market Value</p>
+                      <p className="text-xs font-bold text-emerald-600">
+                        £{marketValue.toLocaleString()}
+                      </p>
+                    </div>
+                  </>
+                )}
+
+                {isPlayer && user.previousClub && (
                   <div className="col-span-2 sm:col-span-4 pt-2 border-t border-slate-200/60">
                     <p className="text-[11px] font-semibold text-slate-500">Previous Club / Team</p>
                     <p className="text-xs font-bold text-slate-900">{user.previousClub}</p>

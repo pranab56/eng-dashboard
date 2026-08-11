@@ -43,7 +43,7 @@ const createMatchSchema = z.object({
   subVenue: z.string().optional(),
   pitch: z.string().optional(),
   league: z.string().min(1, "League is required"),
-  referee: z.string().min(1, "Referee is required"),
+  referee: z.string().optional(),
   durationMinutes: z.string().min(1, "Duration is required"),
   formation: z.string().min(1, "Formation is required"),
   date: z.string().min(1, "Date is required"),
@@ -453,8 +453,11 @@ const CreateMatch = () => {
         formation: formData.formation,
         venueName: formData.venue, // venue category ID
         pitch: selectedSubCategoryVal, // subcategory ID sent as pitch
-        referee: formData.referee,
       };
+
+      if (formData.referee) {
+        payload.referee = formData.referee;
+      }
 
       if (selectedSubCategoryVal) {
         payload.subVenue = selectedSubCategoryVal;
@@ -575,11 +578,11 @@ const CreateMatch = () => {
                   />
                   <SelectField
                     name="referee"
-                    label="Referee"
+                    label="Referee (Optional)"
                     control={control}
                     error={errors.referee}
                     options={refereeOptions}
-                    placeholder="Select your referee"
+                    placeholder="Select referee (optional)"
                   />
                 </div>
 
