@@ -6,7 +6,6 @@ import SubmitButton from '@/components/buttons/SubmitButton'
 import ImageUploadField, { ImageChildrenComponent } from '@/components/form/ImageUploadField'
 import InputField from '@/components/form/InputField'
 import SelectField from '@/components/form/SelectField'
-import TextareaField from '@/components/form/TextareaField'
 import { newsTypeOptions, publishStatusOptions } from '@/constants/selectData'
 import { useHeaders } from '@/hooks/useHeaders'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -17,8 +16,29 @@ import * as z from 'zod'
 import CustomDatePicker from '@/components/ui/CustomDatePicker'
 import CustomTimePicker from '@/components/ui/CustomTimePicker'
 
-import { useCreateNewsMutation, useGetSingleNewsQuery, useUpdateNewsMutation } from '@/features/news/newsApi'
-import { useGetAllNewsCategoryQuery } from '@/features/categoryManagement/categoryApi'
+import dynamic from 'next/dynamic';
+
+const JoditEditor = dynamic(() => import("jodit-react"), { ssr: false });
+
+const joditConfig = {
+  height: 400,
+  readonly: false,
+  placeholder: 'Draft your article content here...',
+  buttons: [
+    "bold", "italic", "underline", "strikethrough", "|",
+    "ul", "ol", "outdent", "indent", "|",
+    "font", "fontsize", "brush", "|",
+    "align", "|",
+    "link", "table", "|",
+    "hr", "|",
+    "undo", "redo", "fullsize"
+  ],
+  showCharsCounter: true,
+  showWordsCounter: true,
+  theme: "default",
+};
+import { useCreateNewsMutation, useGetSingleNewsQuery, useUpdateNewsMutation } from '@/features/news/newsApi';
+import { useGetAllNewsCategoryQuery } from '@/features/categoryManagement/categoryApi';
 import dayjs from 'dayjs'
 import { useRouter, useSearchParams } from 'next/navigation'
 
@@ -156,7 +176,25 @@ const CreateNews = () => {
             <div className="space-y-8">
               <InputField name="title" title="Headline" placeholder="Enter a compelling headline" register={register} error={errors.title} />
               <SelectField name="category" label="Article Category" control={control} error={errors.category} options={dynamicNewsCategoryOptions} placeholder="Select news category" scrollable />
-              <TextareaField name="description" title="Article Body" placeholder="Draft your content here..." register={register} error={errors.description} />
+              <div className="space-y-3">
+                <label className="block text-xs font-bold text-gray-700">Article Body</label>
+                <Controller
+                  name="description"
+                  control={control}
+                  render={({ field }) => (
+                    <div className="rounded-xl overflow-hidden border border-gray-200 focus-within:ring-2 focus-within:ring-blue-500/20">
+                      <JoditEditor
+                        value={field.value || ""}
+                        config={joditConfig}
+                        onBlur={(newContent) => field.onChange(newContent)}
+                      />
+                    </div>
+                  )}
+                />
+                {errors.description && (
+                  <p className="text-xs font-semibold text-red-500 px-1">{errors.description.message}</p>
+                )}
+              </div>
             </div>
           </section>
 

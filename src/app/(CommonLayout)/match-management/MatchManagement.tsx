@@ -8,11 +8,12 @@ import TableHeader from "@/components/cui/TableHeader";
 import CustomTable from "@/components/table/CustomTable";
 import { useGetAllVenueCategoryQuery } from "@/features/categoryManagement/categoryApi";
 import { useGetAllLeagueTeamQuery } from "@/features/leagueTeam/leagueTeamApi";
-import { useDeleteMatchMutation, useGetAllMatchQuery } from "@/features/match/matchApi";
+import { useDeleteMatchMutation, useGetAllMatchQuery, useUpdateMatchStatusMutation } from "@/features/match/matchApi";
 import { useHeaders } from "@/hooks/useHeaders";
 import { getMatchColumns } from "@/tableColumns/matchColumns";
 import { formatImagePath } from "@/utils/formatImagePath";
-import { Check, ChevronDown, Filter, RefreshCw, Search, X } from "lucide-react";
+import { getErrorMessage } from "@/utils/getErrorMessage";
+import { Check, ChevronDown, Filter, Loader2, RefreshCw, Search, X } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
@@ -296,6 +297,9 @@ const MatchManagement = () => {
   const [isScoreModalOpen, setIsScoreModalOpen] = useState(false);
   const [scoreModifyingMatch, setScoreModifyingMatch] = useState<any>(null);
 
+  const [isStatusModalOpen, setIsStatusModalOpen] = useState(false);
+  const [statusUpdatingMatch, setStatusUpdatingMatch] = useState<any>(null);
+
   useEffect(() => {
     setHeaders({
       title: "Matches",
@@ -324,6 +328,11 @@ const MatchManagement = () => {
   const handleModifyScore = (match: any) => {
     setScoreModifyingMatch(match);
     setIsScoreModalOpen(true);
+  };
+
+  const handleUpdateStatus = (match: any) => {
+    setStatusUpdatingMatch(match);
+    setIsStatusModalOpen(true);
   };
 
   const handleDelete = (id: string) => {
@@ -496,7 +505,7 @@ const MatchManagement = () => {
           <TableHeader payload={tableHeaderPayload} />
           <div className="pt-4">
             <CustomTable<any>
-              columns={getMatchColumns(handleView, handleDelete, handleModifyScore)}
+              columns={getMatchColumns(handleView, handleDelete, handleModifyScore, handleUpdateStatus)}
               data={matchData?.data || []}
               isLoading={isLoading}
             />
@@ -523,12 +532,148 @@ const MatchManagement = () => {
         match={scoreModifyingMatch}
       />
 
+      <UpdateStatusModal
+        isOpen={isStatusModalOpen}
+        onClose={() => {
+          setIsStatusModalOpen(false);
+          setStatusUpdatingMatch(null);
+        }}
+        match={statusUpdatingMatch}
+      />
+
       <DeleteConfirmModal
         isOpen={isDeleteModalOpen}
         onClose={() => setIsDeleteModalOpen(false)}
         onConfirm={handleConfirmDelete}
         isLoading={isDeleting}
       />
+    </div>
+  );
+};
+
+const UpdateStatusModal = ({
+  isOpen,
+  onClose,
+  match,
+}: {
+  isOpen: boolean;
+  onClose: () => void;
+  match: any;
+}) => {
+  const [selectedStatus, setSelectedStatus] = useState<string>("upcoming");
+  const [updateMatchStatus, { isLoading }] = useUpdateMatchStatusMutation();
+
+  useEffect(() => {
+    if (match) {
+      setSelectedStatus(match.status || "upcoming");
+    }
+  }, [match]);
+
+  if (!isOpen || !match) return null;
+
+  const handleSaveStatus = async () => {
+    try {
+      const res = await updateMatchStatus({
+        id: match._id || match.id,
+        status: selectedStatus,
+      }).unwrap();
+      if (res.success) {
+        toast.success(res.message || "Match status updated successfully");
+        onClose();
+      }
+    } catch (err: any) {
+      toast.error(getErrorMessage(err, "Failed to update match status"));
+    }
+  };
+
+  const statusOptions = [
+    { value: "upcoming", label: "Upcoming (Scheduled Match)", color: "bg-blue-100 text-blue-700" },
+    { value: "live", label: "Live (Broadcast In-Progress)", color: "bg-red-100 text-red-700" },
+    { value: "half_time", label: "Half Time (Interval)", color: "bg-amber-100 text-amber-700" },
+    { value: "finished", label: "Finished (Completed Match)", color: "bg-green-100 text-green-700" },
+    { value: "cancelled", label: "Cancelled (Match Called Off)", color: "bg-gray-100 text-gray-700" },
+  ];
+
+  return (
+    <div className="fixed inset-0 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 z-50 animate-in fade-in duration-200">
+      <div className="bg-white rounded-2xl max-w-md w-full p-6 space-y-6 shadow-2xl border border-gray-100">
+        <div className="flex items-center justify-between pb-3 border-b border-gray-100">
+          <div>
+            <h3 className="text-lg font-bold text-gray-900">Update Match Status</h3>
+            <p className="text-xs text-gray-500 font-medium mt-0.5">
+              {match?.homeTeam?.teamName} vs {match?.awayTeam?.teamName}
+            </p>
+          </div>
+          <button
+            onClick={onClose}
+            className="text-gray-400 hover:text-gray-600 transition-colors p-1 rounded-lg hover:bg-gray-100 cursor-pointer"
+          >
+            <X className="w-5 h-5" />
+          </button>
+        </div>
+
+        <div className="space-y-4">
+          <label className="block text-xs font-bold text-gray-700">
+            Select New Match Status
+          </label>
+          <div className="space-y-2">
+            {statusOptions.map((opt) => (
+              <label
+                key={opt.value}
+                onClick={() => setSelectedStatus(opt.value)}
+                className={`flex items-center justify-between p-3 rounded-xl border transition-all cursor-pointer ${
+                  selectedStatus === opt.value
+                    ? "border-blue-500 bg-blue-50/40 ring-2 ring-blue-500/20"
+                    : "border-gray-200 hover:border-gray-300 hover:bg-gray-50"
+                }`}
+              >
+                <div className="flex items-center gap-3">
+                  <input
+                    type="radio"
+                    name="matchStatus"
+                    value={opt.value}
+                    checked={selectedStatus === opt.value}
+                    onChange={() => setSelectedStatus(opt.value)}
+                    className="w-4 h-4 text-blue-600 focus:ring-blue-500 cursor-pointer"
+                  />
+                  <span className="text-xs font-bold text-gray-800">{opt.label}</span>
+                </div>
+                <span className={`text-[10px] font-bold px-2 py-0.5 rounded capitalize ${opt.color}`}>
+                  {opt.value}
+                </span>
+              </label>
+            ))}
+          </div>
+
+          {(selectedStatus === "live" || selectedStatus === "finished") && (
+            <div className="bg-blue-50 border border-blue-100 p-3 rounded-xl text-[11px] text-blue-800 flex items-start gap-2">
+              <span className="text-blue-600 font-bold shrink-0">ℹ️</span>
+              <span>
+                Setting status to <strong className="capitalize">{selectedStatus}</strong> will automatically trigger live match broadcast notifications to participating players and update rankings.
+              </span>
+            </div>
+          )}
+        </div>
+
+        <div className="flex items-center justify-end gap-3 pt-3 border-t border-gray-100">
+          <button
+            type="button"
+            onClick={onClose}
+            className="px-4 py-2 text-xs font-bold text-gray-600 bg-gray-100 hover:bg-gray-200 rounded-xl transition-colors cursor-pointer"
+          >
+            Cancel
+          </button>
+          <button
+            type="button"
+            onClick={handleSaveStatus}
+            disabled={isLoading}
+            className="px-5 py-2 text-xs font-bold text-white bg-blue-600 hover:bg-blue-700 disabled:opacity-50 rounded-xl transition-all cursor-pointer shadow-md shadow-blue-500/20 flex items-center gap-2"
+          >
+            {isLoading && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
+            Save Status
+          </button>
+        </div>
+      </div>
     </div>
   );
 };

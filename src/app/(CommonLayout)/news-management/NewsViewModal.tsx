@@ -89,9 +89,10 @@ const NewsViewModal = ({ news, isOpen, onClose }: NewsViewModalProps) => {
             <h4 className="text-[11px] font-extrabold text-blue-600 . tracking-widest flex items-center gap-1.5">
               <Newspaper className="w-3.5 h-3.5" /> Article Overview
             </h4>
-            <div className="bg-gray-50/80 rounded-2xl p-5 border border-gray-100/80 text-sm font-medium text-gray-700 leading-relaxed max-h-60 overflow-y-auto">
-              {news.description || 'No article content provided.'}
-            </div>
+            <div
+              className="bg-gray-50/80 rounded-2xl p-5 border border-gray-100/80 text-sm font-medium text-gray-700 leading-relaxed max-h-60 overflow-y-auto prose max-w-none"
+              dangerouslySetInnerHTML={{ __html: news.description || 'No article content provided.' }}
+            />
           </div>
 
           {/* Metadata Footer */}

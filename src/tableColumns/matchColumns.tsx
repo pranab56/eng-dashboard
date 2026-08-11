@@ -26,7 +26,8 @@ const statusStyle = (status: string): string => {
 export const getMatchColumns = (
   onView: (match: any) => void,
   onDelete: (id: string) => void,
-  onModifyScore: (match: any) => void
+  onModifyScore: (match: any) => void,
+  onUpdateStatus?: (match: any) => void
 ): ColumnDef<any>[] => [
   {
     accessorKey: "homeTeam",
@@ -82,11 +83,20 @@ export const getMatchColumns = (
   {
     accessorKey: "status",
     header: () => <div className="">Status</div>,
-    cell: ({ row }) => (
-      <div className={`${statusStyle(row.getValue("status"))} inline-block px-2 py-1 rounded-md capitalize font-semibold`}>
-        {row.getValue("status")}
-      </div>
-    ),
+    cell: ({ row }) => {
+      const match = row.original;
+      return (
+        <button
+          type="button"
+          onClick={() => onUpdateStatus && onUpdateStatus(match)}
+          className={`${statusStyle(row.getValue("status"))} inline-flex items-center gap-1.5 px-3 py-1 rounded-md capitalize font-bold hover:opacity-80 transition-all cursor-pointer shadow-2xs group`}
+          title="Click to Change Match Status"
+        >
+          <span>{row.getValue("status")}</span>
+          <span className="text-[10px] text-gray-400 group-hover:text-gray-600 transition-colors">✏️</span>
+        </button>
+      );
+    },
   },
   {
     id: "action",
@@ -100,6 +110,18 @@ export const getMatchColumns = (
         >
           <FiEye className="size-5 font-medium text-gray-800" />
         </button>
+        {onUpdateStatus && (
+          <button
+            type="button"
+            onClick={() => onUpdateStatus(row.original)}
+            className="flex items-center justify-center h-9 w-9 rounded-sm bg-[#F3F3F3] hover:bg-blue-50 hover:text-blue-600 transition-colors duration-300 cursor-pointer"
+            title="Change Match Status"
+          >
+            <svg className="size-5 text-gray-800 hover:text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+            </svg>
+          </button>
+        )}
         <button
           onClick={() => onModifyScore(row.original)}
           className="flex items-center justify-center h-9 w-9 rounded-sm bg-[#F3F3F3] hover:bg-emerald-50 hover:text-emerald-600 transition-colors duration-300 cursor-pointer"
@@ -124,4 +146,4 @@ export const getMatchColumns = (
       </div>
     ),
   }
-]
+];

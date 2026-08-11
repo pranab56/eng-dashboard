@@ -72,6 +72,15 @@ export const matchApi = baseApi.injectEndpoints({
       invalidatesTags: ["match"]
     }),
 
+    updateMatchStatus: builder.mutation({
+      query: ({ id, status }) => ({
+        url: `/match/${id}/status`,
+        method: "PATCH",
+        body: { status },
+      }),
+      invalidatesTags: ["match"]
+    }),
+
   }),
 });
 
@@ -83,4 +92,5 @@ export const {
   useGetSingleMatchQuery,
   useDeleteMatchMutation,
   useModifyScoreMutation,
+  useUpdateMatchStatusMutation,
 } = matchApi;
