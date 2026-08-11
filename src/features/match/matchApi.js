@@ -23,11 +23,27 @@ export const matchApi = baseApi.injectEndpoints({
     }),
 
     getAllMatch: builder.query({
-      query: (pageNumber) => ({
-        url: `/match?page=${pageNumber}`,
-        method: "GET",
-      }),
-      providesTags: ["match"]
+      query: (params) => {
+        let url = "/match";
+        if (typeof params === "object" && params !== null) {
+          const queryParts = [];
+          Object.keys(params).forEach((key) => {
+            if (params[key] !== undefined && params[key] !== null && params[key] !== "") {
+              queryParts.push(`${key}=${encodeURIComponent(params[key])}`);
+            }
+          });
+          if (queryParts.length > 0) {
+            url += `?${queryParts.join("&")}`;
+          }
+        } else if (params) {
+          url += `?page=${params}`;
+        }
+        return {
+          url,
+          method: "GET",
+        };
+      },
+      providesTags: ["match"],
     }),
 
     getSingleMatch: builder.query({
