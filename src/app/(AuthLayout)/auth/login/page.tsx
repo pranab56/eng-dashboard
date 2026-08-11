@@ -27,6 +27,7 @@ import { useState } from "react";
 import { toast } from 'sonner';
 import { useDispatch } from 'react-redux';
 import { setAuthCookie } from '../../../actions/auth';
+import { decodeRoleFromToken } from "@/components/layout/AdminGuard";
 
 // Schema
 const contactUsFormSchema = z
@@ -79,6 +80,13 @@ const Login = () => {
 
       if (!accessToken) {
         toast.error(res?.message || "Login failed: Token not received from server");
+        return;
+      }
+
+      // 🛑 Role check: strictly allow ADMIN & SUPER_ADMIN only
+      const userRole = decodeRoleFromToken(accessToken) || (res?.data?.role || res?.role || '').toUpperCase();
+      if (userRole && userRole !== 'ADMIN' && userRole !== 'SUPER_ADMIN') {
+        toast.error("Access Denied: Only Administrator and Super Admin accounts can access the dashboard.");
         return;
       }
 
