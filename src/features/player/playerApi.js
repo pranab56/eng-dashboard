@@ -35,7 +35,7 @@ export const playerApi = baseApi.injectEndpoints({
         method: "PATCH",
         body: data,
       }),
-      invalidatesTags: ["player"]
+      invalidatesTags: ["player", "user"]
     }),
 
     updatePlayer: builder.mutation({

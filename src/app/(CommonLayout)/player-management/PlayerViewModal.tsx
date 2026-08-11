@@ -104,7 +104,7 @@ const PlayerViewModal = ({ player, isOpen, onClose }: PlayerViewModalProps) => {
                 <DollarSign className="w-3 h-3 text-emerald-500" /> Market Value
               </span>
               <span className="text-gray-900 font-black text-lg">
-                {player.marketValue ? `$${player.marketValue.toLocaleString()}` : 'N/A'}
+                £{(Number(player.marketValue) || (Number((player as any).engCoine ?? (player as any).coin ?? 0) * 100)).toLocaleString()}
               </span>
             </div>
 
@@ -113,7 +113,7 @@ const PlayerViewModal = ({ player, isOpen, onClose }: PlayerViewModalProps) => {
                 <Coins className="w-3 h-3 text-amber-500" /> ENG Coins
               </span>
               <span className="text-gray-900 font-black text-lg flex items-center gap-1">
-                🪙 {((player.engCoine ?? player.engCoin ?? player.coin) ?? 0).toLocaleString()}
+                🪙 {(Number((player as any).engCoine ?? (player as any).coin) || 0).toLocaleString()}
               </span>
             </div>
           </div>

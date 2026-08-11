@@ -35,6 +35,8 @@ import {
 import { Loader2 } from 'lucide-react';
 import dayjs from 'dayjs';
 import toast from 'react-hot-toast';
+import { useUpdateEngCoinBudgetMutation } from '@/features/player/playerApi';
+import { getErrorMessage } from '@/utils/getErrorMessage';
 
 interface UserVerificationModalProps {
   user: TUserManagement | null;
@@ -56,6 +58,39 @@ const UserVerificationModal: React.FC<UserVerificationModalProps> = ({
   const [previewImage, setPreviewImage] = useState<string | null>(null);
   const [copiedField, setCopiedField] = useState<string | null>(null);
 
+  const [updateEngCoinBudget] = useUpdateEngCoinBudgetMutation();
+  const [isEditingEconomy, setIsEditingEconomy] = useState(false);
+  const [editCoinsInput, setEditCoinsInput] = useState<number | string>("");
+  const [isSavingEconomy, setIsSavingEconomy] = useState(false);
+
+  React.useEffect(() => {
+    if (user) {
+      setEditCoinsInput(Number((user as any).engCoine ?? (user as any).coin ?? (user as any).coins) || 0);
+    }
+  }, [user]);
+
+  const handleSaveEconomy = async () => {
+    if (!user) return;
+    try {
+      setIsSavingEconomy(true);
+      const newCoins = Number(editCoinsInput) || 0;
+      const newMarketValue = newCoins * 100;
+      const res = await updateEngCoinBudget({
+        id: (user as any)._id || (user as any).id,
+        data: { engCoine: newCoins, marketValue: newMarketValue },
+      }).unwrap();
+
+      if (res.success) {
+        toast.success(res.message || "ENG Coins & Market Value updated successfully");
+        setIsEditingEconomy(false);
+      }
+    } catch (err: any) {
+      toast.error(getErrorMessage(err, "Failed to update ENG Coins"));
+    } finally {
+      setIsSavingEconomy(false);
+    }
+  };
+
   if (!user) return null;
 
   const profileUrl = formatImagePath(user.profile || user.profilePic);
@@ -65,7 +100,13 @@ const UserVerificationModal: React.FC<UserVerificationModalProps> = ({
 
   const initials = fullName.charAt(0).toUpperCase();
   const currentStatus = (user.status || 'PENDING').toUpperCase();
-  const isPlayer = user.role === 'PLAYER';
+  const userRoleUpper = (user.role || '').toString().trim().toUpperCase();
+  const isPlayer =
+    userRoleUpper === 'PLAYER' ||
+    userRoleUpper === 'TOURNAMENT_PLAYER' ||
+    Boolean(user.parentId) ||
+    Boolean(user.position) ||
+    !['MANAGER', 'REFEREE', 'ADMIN', 'SUPER_ADMIN'].includes(userRoleUpper);
 
   // Parent Info Extraction
   const parentObj = typeof user.parentId === 'object' && user.parentId ? (user.parentId as any) : null;
@@ -75,7 +116,7 @@ const UserVerificationModal: React.FC<UserVerificationModalProps> = ({
   const parentEmail = parentObj?.email || null;
   const parentPhone = parentObj?.phone || null;
 
-  const coins = Number((user as any).engCoine) || 0;
+  const coins = Number((user as any).engCoine ?? (user as any).coin ?? (user as any).coins) || 0;
   const marketValue = Number((user as any).marketValue) || (coins * 100);
 
   // Extract Document List
@@ -324,17 +365,47 @@ const UserVerificationModal: React.FC<UserVerificationModalProps> = ({
                     </div>
 
                     <div>
-                      <p className="text-[11px] font-semibold text-slate-500">ENG Coins</p>
-                      <p className="text-xs font-bold text-amber-600 flex items-center gap-1">
-                        <Coins className="w-3.5 h-3.5 text-amber-500" />
-                        {coins} Coins
-                      </p>
+                      <div className="flex items-center justify-between">
+                        <p className="text-[11px] font-semibold text-slate-500">ENG Coins</p>
+                        <button
+                          type="button"
+                          onClick={() => setIsEditingEconomy(!isEditingEconomy)}
+                          className="text-[10px] text-blue-600 hover:text-blue-800 font-bold underline cursor-pointer"
+                        >
+                          {isEditingEconomy ? "Cancel" : "Edit Coins"}
+                        </button>
+                      </div>
+                      {isEditingEconomy ? (
+                        <div className="flex items-center gap-1.5 mt-1">
+                          <input
+                            type="number"
+                            min="0"
+                            value={editCoinsInput}
+                            onChange={(e) => setEditCoinsInput(e.target.value)}
+                            className="w-20 px-2 py-1 text-xs border border-slate-300 rounded-lg bg-white font-bold text-amber-700"
+                          />
+                          <button
+                            type="button"
+                            onClick={handleSaveEconomy}
+                            disabled={isSavingEconomy}
+                            className="px-2 py-1 bg-amber-500 text-white font-bold text-[10px] rounded-lg hover:bg-amber-600 disabled:opacity-50 cursor-pointer shadow-xs flex items-center gap-1"
+                          >
+                            {isSavingEconomy && <Loader2 className="w-3 h-3 animate-spin" />}
+                            Save
+                          </button>
+                        </div>
+                      ) : (
+                        <p className="text-xs font-bold text-amber-600 flex items-center gap-1">
+                          <Coins className="w-3.5 h-3.5 text-amber-500" />
+                          {coins} Coins
+                        </p>
+                      )}
                     </div>
 
                     <div>
                       <p className="text-[11px] font-semibold text-slate-500">Market Value</p>
                       <p className="text-xs font-bold text-emerald-600">
-                        £{marketValue.toLocaleString()}
+                        £{isEditingEconomy ? ((Number(editCoinsInput) || 0) * 100).toLocaleString() : marketValue.toLocaleString()}
                       </p>
                     </div>
                   </>
