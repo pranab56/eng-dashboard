@@ -28,11 +28,13 @@ dayjs.extend(timezone);
 import { Calendar, Clock, Loader2, MapPin, Pencil, Trash2 } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
-import { useForm } from "react-hook-form";
+import { useForm, Controller } from "react-hook-form";
 import { toast } from "sonner";
 import * as z from "zod";
 import InputField from "../../../../components/form/InputField";
 import { useGetAllLeagueTeamQuery } from "../../../../features/leagueTeam/leagueTeamApi";
+import CustomDatePicker from "@/components/ui/CustomDatePicker";
+import CustomTimePicker from "@/components/ui/CustomTimePicker";
 import { TeamCard } from "./MatchupSelector";
 
 // Form Validation Schema
@@ -632,114 +634,33 @@ const CreateMatch = () => {
                 </div>
 
                 <div className="space-y-6">
-                  {/* Match Date Picker */}
-                  <div className="space-y-2">
-                    <label className="block text-xs font-bold text-gray-700">
-                      Match Date
-                    </label>
-                    <div className="relative">
-                      <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
-                        <Calendar className="w-4 h-4 text-blue-600" />
-                      </div>
-                      <input
-                        {...register("date")}
-                        type="date"
-                        className={`w-full pl-10 pr-4 py-2.5 text-xs font-semibold bg-gray-50 border rounded-xl focus:bg-white focus:outline-none focus:ring-2 transition-all ${
-                          errors.date
-                            ? "border-red-400 focus:ring-red-200 bg-red-50/20"
-                            : "border-gray-300 focus:ring-blue-500/20 focus:border-blue-500"
-                        }`}
+                  {/* Custom Popup Date Picker */}
+                  <Controller
+                    name="date"
+                    control={control}
+                    render={({ field }) => (
+                      <CustomDatePicker
+                        label="Match Date"
+                        value={field.value}
+                        onChange={field.onChange}
+                        error={errors.date?.message}
                       />
-                    </div>
-                    {errors.date && (
-                      <p className="text-xs text-red-500 mt-1">{errors.date.message}</p>
                     )}
+                  />
 
-                    {/* Quick Date Pills */}
-                    <div className="flex flex-wrap gap-1.5 pt-1">
-                      <button
-                        type="button"
-                        onClick={() => setValue("date", dayjs().format("YYYY-MM-DD"))}
-                        className="text-[10px] font-bold px-2 py-1 rounded-md bg-gray-100 hover:bg-blue-100 hover:text-blue-700 text-gray-600 transition-colors cursor-pointer"
-                      >
-                        Today
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => setValue("date", dayjs().add(1, "day").format("YYYY-MM-DD"))}
-                        className="text-[10px] font-bold px-2 py-1 rounded-md bg-gray-100 hover:bg-blue-100 hover:text-blue-700 text-gray-600 transition-colors cursor-pointer"
-                      >
-                        Tomorrow
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => {
-                          const Sat = dayjs().day(6);
-                          const target = Sat.isBefore(dayjs(), "day") ? Sat.add(1, "week") : Sat;
-                          setValue("date", target.format("YYYY-MM-DD"));
-                        }}
-                        className="text-[10px] font-bold px-2 py-1 rounded-md bg-gray-100 hover:bg-blue-100 hover:text-blue-700 text-gray-600 transition-colors cursor-pointer"
-                      >
-                        Saturday
-                      </button>
-                    </div>
-
-                    {/* Live Formatted Date Badge */}
-                    {watch("date") && (
-                      <div className="text-[11px] font-semibold text-blue-700 bg-blue-50/80 p-2 rounded-lg border border-blue-100/80 flex items-center gap-1.5">
-                        <Calendar className="w-3.5 h-3.5 text-blue-600 shrink-0" />
-                        <span>{dayjs(watch("date")).format("dddd, DD MMMM YYYY")}</span>
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Kick-off Time Picker */}
-                  <div className="space-y-2">
-                    <label className="block text-xs font-bold text-gray-700">
-                      Kick-off Time
-                    </label>
-                    <div className="relative">
-                      <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
-                        <Clock className="w-4 h-4 text-amber-600" />
-                      </div>
-                      <input
-                        {...register("time")}
-                        type="time"
-                        className={`w-full pl-10 pr-4 py-2.5 text-xs font-semibold bg-gray-50 border rounded-xl focus:bg-white focus:outline-none focus:ring-2 transition-all ${
-                          errors.time
-                            ? "border-red-400 focus:ring-red-200 bg-red-50/20"
-                            : "border-gray-300 focus:ring-blue-500/20 focus:border-blue-500"
-                        }`}
+                  {/* Custom Popup Time Picker */}
+                  <Controller
+                    name="time"
+                    control={control}
+                    render={({ field }) => (
+                      <CustomTimePicker
+                        label="Kick-off Time"
+                        value={field.value}
+                        onChange={field.onChange}
+                        error={errors.time?.message}
                       />
-                    </div>
-                    {errors.time && (
-                      <p className="text-xs text-red-500 mt-1">{errors.time.message}</p>
                     )}
-
-                    {/* Quick Time Pills */}
-                    <div className="flex flex-wrap gap-1.5 pt-1">
-                      {["14:00", "15:00", "18:00", "20:00"].map((t) => (
-                        <button
-                          key={t}
-                          type="button"
-                          onClick={() => setValue("time", t)}
-                          className="text-[10px] font-bold px-2.5 py-1 rounded-md bg-gray-100 hover:bg-amber-100 hover:text-amber-800 text-gray-600 transition-colors cursor-pointer"
-                        >
-                          {t}
-                        </button>
-                      ))}
-                    </div>
-
-                    {/* Live Formatted Time Badge */}
-                    {watch("time") && (
-                      <div className="text-[11px] font-semibold text-amber-800 bg-amber-50/80 p-2 rounded-lg border border-amber-100/80 flex items-center gap-1.5">
-                        <Clock className="w-3.5 h-3.5 text-amber-600 shrink-0" />
-                        <span>
-                          Kick-off at {dayjs(`2000-01-01 ${watch("time")}`).format("hh:mm A")} (UK Time)
-                        </span>
-                      </div>
-                    )}
-                  </div>
+                  />
 
                   {/* Match Duration */}
                   <SelectField

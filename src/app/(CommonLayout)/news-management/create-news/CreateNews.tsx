@@ -11,9 +11,11 @@ import { newsTypeOptions, publishStatusOptions } from '@/constants/selectData'
 import { useHeaders } from '@/hooks/useHeaders'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useEffect } from 'react'
-import { useForm } from 'react-hook-form'
+import { useForm, Controller } from 'react-hook-form'
 import { toast } from 'sonner'
 import * as z from 'zod'
+import CustomDatePicker from '@/components/ui/CustomDatePicker'
+import CustomTimePicker from '@/components/ui/CustomTimePicker'
 
 import { useCreateNewsMutation, useGetSingleNewsQuery, useUpdateNewsMutation } from '@/features/news/newsApi'
 import { useGetAllNewsCategoryQuery } from '@/features/categoryManagement/categoryApi'
@@ -184,8 +186,30 @@ const CreateNews = () => {
             <div className="space-y-8">
               <SelectField name="status" label="Publishing Status" control={control} error={errors.status} options={publishStatusOptions} />
               <div className="space-y-4">
-                <InputField name="pubDate" type='date' title="Release Date" register={register} error={errors.pubDate} />
-                <InputField name="pubTime" type='time' title="Release Time" register={register} error={errors.pubTime} />
+                <Controller
+                  name="pubDate"
+                  control={control}
+                  render={({ field }) => (
+                    <CustomDatePicker
+                      label="Release Date"
+                      value={field.value}
+                      onChange={field.onChange}
+                      error={errors.pubDate?.message}
+                    />
+                  )}
+                />
+                <Controller
+                  name="pubTime"
+                  control={control}
+                  render={({ field }) => (
+                    <CustomTimePicker
+                      label="Release Time"
+                      value={field.value}
+                      onChange={field.onChange}
+                      error={errors.pubTime?.message}
+                    />
+                  )}
+                />
               </div>
             </div>
           </section>

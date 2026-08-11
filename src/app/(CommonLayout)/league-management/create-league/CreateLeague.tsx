@@ -5,9 +5,10 @@ import InputField from '@/components/form/InputField';
 import { useHeaders } from '@/hooks/useHeaders';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useEffect } from 'react';
-import { useForm } from 'react-hook-form';
+import { useForm, Controller } from 'react-hook-form';
 import { toast } from 'sonner';
 import * as z from 'zod';
+import CustomDatePicker from '@/components/ui/CustomDatePicker';
 
 import SubmitButton from '@/components/buttons/SubmitButton';
 import { useCreateLeagueMutation, useGetSingleLeagueQuery, useUpdateLeagueMutation } from '@/features/leagueManagement/leagueApi';
@@ -36,6 +37,7 @@ const CreateLeague = () => {
   const {
     register,
     handleSubmit,
+    control,
     reset,
     formState: { errors },
   } = useForm<LeagueFormValues>({
@@ -133,21 +135,29 @@ const CreateLeague = () => {
           />
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <InputField
+            <Controller
               name="startDate"
-              type="date"
-              title="Start Date"
-              placeholder="YYYY-MM-DD"
-              register={register}
-              error={errors.startDate}
+              control={control}
+              render={({ field }) => (
+                <CustomDatePicker
+                  label="Start Date"
+                  value={field.value}
+                  onChange={field.onChange}
+                  error={errors.startDate?.message}
+                />
+              )}
             />
-            <InputField
+            <Controller
               name="endDate"
-              type="date"
-              title="End Date"
-              placeholder="YYYY-MM-DD"
-              register={register}
-              error={errors.endDate}
+              control={control}
+              render={({ field }) => (
+                <CustomDatePicker
+                  label="End Date"
+                  value={field.value}
+                  onChange={field.onChange}
+                  error={errors.endDate?.message}
+                />
+              )}
             />
           </div>
         </div>

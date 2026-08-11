@@ -14,6 +14,7 @@ import { TTournament, TPositionReward } from "@/types/columnTypes";
 import dayjs from "dayjs";
 import { Trophy, Plus, Trash2, Loader2, Sparkles, Check, ChevronsUpDown } from "lucide-react";
 import React, { useEffect, useState } from "react";
+import CustomDatePicker from "@/components/ui/CustomDatePicker";
 
 interface TournamentFormModalProps {
   isOpen: boolean;
@@ -221,31 +222,17 @@ export default function TournamentFormModal({
 
           {/* Dates & Status Grid */}
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            <div className="space-y-2">
-              <label className="block text-sm font-semibold text-gray-800">
-                Start Date <span className="text-red-500">*</span>
-              </label>
-              <input
-                type="date"
-                value={startDate}
-                onChange={(e) => setStartDate(e.target.value)}
-                disabled={isLoading}
-                className="w-full h-11 px-3.5 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-black transition-colors font-medium text-gray-800"
-              />
-            </div>
+            <CustomDatePicker
+              label="Start Date"
+              value={startDate}
+              onChange={setStartDate}
+            />
 
-            <div className="space-y-2">
-              <label className="block text-sm font-semibold text-gray-800">
-                End Date <span className="text-red-500">*</span>
-              </label>
-              <input
-                type="date"
-                value={endDate}
-                onChange={(e) => setEndDate(e.target.value)}
-                disabled={isLoading}
-                className="w-full h-11 px-3.5 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-black transition-colors font-medium text-gray-800"
-              />
-            </div>
+            <CustomDatePicker
+              label="End Date"
+              value={endDate}
+              onChange={setEndDate}
+            />
 
             <div className="space-y-2">
               <label className="block text-sm font-semibold text-gray-800">
