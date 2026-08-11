@@ -48,6 +48,9 @@ export type TUserManagement = {
   rejectionReason?: string;
   emergencyEmail?: string;
   emergencyPhone?: string;
+  isPaid?: boolean;
+  subscription?: any;
+  activeSubscription?: any;
   createdAt?: string;
   updatedAt?: string;
 }
