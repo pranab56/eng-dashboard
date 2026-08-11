@@ -8,6 +8,11 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import dayjs from 'dayjs';
+import utc from 'dayjs/plugin/utc';
+import timezone from 'dayjs/plugin/timezone';
+
+dayjs.extend(utc);
+dayjs.extend(timezone);
 import Image from 'next/image';
 import { formatImagePath } from '../../../utils/formatImagePath';
 import { X, MapPin, Calendar, UserCheck, Clock, FileText } from 'lucide-react';
@@ -109,10 +114,10 @@ const MatchViewModal = ({ match, isOpen, onClose }: MatchViewModalProps) => {
               <Calendar className="w-4 h-4 text-blue-600 mb-0.5" />
               <span className="text-[10px] font-extrabold text-blue-600 . tracking-widest">Date & Time</span>
               <span className="text-gray-900 font-medium text-xs leading-tight">
-                {match.matchDate ? dayjs(match.matchDate).format("DD MMM, YYYY") : "N/A"}
+                {match.matchDate ? dayjs(match.matchDate).tz("Europe/London").format("DD MMM, YYYY") : "N/A"}
               </span>
               <span className="text-[9px] text-gray-400 font-medium .">
-                {match.matchDate ? dayjs(match.matchDate).format("hh:mm A") : ""}
+                {match.matchDate ? dayjs(match.matchDate).tz("Europe/London").format("hh:mm A") : ""}
               </span>
             </div>
 

@@ -20,6 +20,11 @@ import { formatImagePath } from "@/utils/formatImagePath";
 import { getErrorMessage } from "@/utils/getErrorMessage";
 import { zodResolver } from "@hookform/resolvers/zod";
 import dayjs from "dayjs";
+import utc from "dayjs/plugin/utc";
+import timezone from "dayjs/plugin/timezone";
+
+dayjs.extend(utc);
+dayjs.extend(timezone);
 import { Calendar, Clock, Loader2, MapPin, Pencil, Trash2 } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -276,7 +281,7 @@ const CreateMatch = () => {
   useEffect(() => {
     if (matchData?.data) {
       const match = matchData.data;
-      const date = dayjs(match.matchDate);
+      const date = dayjs(match.matchDate).tz("Europe/London");
 
       const venueVal = typeof match.venueName === "object" ? match.venueName?._id : match.venueName || "";
       const subVal = typeof match.subVenue === "object" ? match.subVenue?._id : match.subVenue || typeof match.pitch === "object" ? match.pitch?._id : match.pitch || "";
@@ -423,7 +428,10 @@ const CreateMatch = () => {
     }
 
     try {
-      const matchDate = `${formData.date}T${formData.time}:00Z`;
+      const matchDate = dayjs
+        .tz(`${formData.date} ${formData.time}`, "Europe/London")
+        .utc()
+        .toISOString();
 
       const selectedSubCategoryVal = formData.subVenue || formData.pitch || "";
 

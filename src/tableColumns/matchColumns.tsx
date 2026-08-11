@@ -1,5 +1,10 @@
 import { ColumnDef } from "@tanstack/react-table";
 import dayjs from "dayjs";
+import utc from "dayjs/plugin/utc";
+import timezone from "dayjs/plugin/timezone";
+
+dayjs.extend(utc);
+dayjs.extend(timezone);
 import Image from "next/image";
 import Link from "next/link";
 import { FiEdit, FiEye, FiTrash2 } from "react-icons/fi";
@@ -56,7 +61,7 @@ export const getMatchColumns = (
     accessorKey: "matchDate",
     header: () => <div className="">Date & Time</div>,
     cell: ({ row }) => {
-      const date = dayjs(row.original.matchDate);
+      const date = dayjs(row.original.matchDate).tz("Europe/London");
       return (
         <div>
           <div className="font-semibold">{date.format("DD/MM/YYYY")}</div>
