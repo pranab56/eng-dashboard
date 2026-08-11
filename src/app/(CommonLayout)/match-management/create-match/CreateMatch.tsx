@@ -620,37 +620,137 @@ const CreateMatch = () => {
 
             {/* Schedule Card */}
             <div className="w-4/12 space-y-4">
-              <section className="bg-white rounded-xl p-8 md:p-10 border border-gray-50 shadow-xl shadow-gray-200/50">
-                <h2 className="text-2xl font-medium text-gray-900 mb-8">
-                  Schedule
-                </h2>
+              <section className="bg-white rounded-2xl p-6 md:p-8 border border-gray-100 shadow-xl shadow-gray-200/50 space-y-6">
+                <div className="flex items-center justify-between pb-3 border-b border-gray-100">
+                  <h2 className="text-xl font-bold text-gray-900 flex items-center gap-2">
+                    <Calendar className="w-5 h-5 text-blue-600" />
+                    Match Schedule
+                  </h2>
+                  <span className="text-[10px] font-bold bg-blue-50 text-blue-600 px-2.5 py-1 rounded-full border border-blue-100">
+                    UK Time (Europe/London)
+                  </span>
+                </div>
 
-                <div className="space-y-8">
-                  <div className="grid grid-cols-1 gap-4">
-                    <InputField
-                      name="date"
-                      type="date"
-                      title="Match Date"
-                      register={register}
-                      error={errors.date}
-                    />
-                    <InputField
-                      name="time"
-                      type="time"
-                      title="Kick-off Time"
-                      register={register}
-                      error={errors.time}
-                    />
-                    <SelectField
-                      name="durationMinutes"
-                      label="Duration"
-                      control={control}
-                      error={errors.durationMinutes}
-                      options={durationOptions}
-                      placeholder="Select duration"
-                      scrollable
-                    />
+                <div className="space-y-6">
+                  {/* Match Date Picker */}
+                  <div className="space-y-2">
+                    <label className="block text-xs font-bold text-gray-700">
+                      Match Date
+                    </label>
+                    <div className="relative">
+                      <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
+                        <Calendar className="w-4 h-4 text-blue-600" />
+                      </div>
+                      <input
+                        {...register("date")}
+                        type="date"
+                        className={`w-full pl-10 pr-4 py-2.5 text-xs font-semibold bg-gray-50 border rounded-xl focus:bg-white focus:outline-none focus:ring-2 transition-all ${
+                          errors.date
+                            ? "border-red-400 focus:ring-red-200 bg-red-50/20"
+                            : "border-gray-300 focus:ring-blue-500/20 focus:border-blue-500"
+                        }`}
+                      />
+                    </div>
+                    {errors.date && (
+                      <p className="text-xs text-red-500 mt-1">{errors.date.message}</p>
+                    )}
+
+                    {/* Quick Date Pills */}
+                    <div className="flex flex-wrap gap-1.5 pt-1">
+                      <button
+                        type="button"
+                        onClick={() => setValue("date", dayjs().format("YYYY-MM-DD"))}
+                        className="text-[10px] font-bold px-2 py-1 rounded-md bg-gray-100 hover:bg-blue-100 hover:text-blue-700 text-gray-600 transition-colors cursor-pointer"
+                      >
+                        Today
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setValue("date", dayjs().add(1, "day").format("YYYY-MM-DD"))}
+                        className="text-[10px] font-bold px-2 py-1 rounded-md bg-gray-100 hover:bg-blue-100 hover:text-blue-700 text-gray-600 transition-colors cursor-pointer"
+                      >
+                        Tomorrow
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const Sat = dayjs().day(6);
+                          const target = Sat.isBefore(dayjs(), "day") ? Sat.add(1, "week") : Sat;
+                          setValue("date", target.format("YYYY-MM-DD"));
+                        }}
+                        className="text-[10px] font-bold px-2 py-1 rounded-md bg-gray-100 hover:bg-blue-100 hover:text-blue-700 text-gray-600 transition-colors cursor-pointer"
+                      >
+                        Saturday
+                      </button>
+                    </div>
+
+                    {/* Live Formatted Date Badge */}
+                    {watch("date") && (
+                      <div className="text-[11px] font-semibold text-blue-700 bg-blue-50/80 p-2 rounded-lg border border-blue-100/80 flex items-center gap-1.5">
+                        <Calendar className="w-3.5 h-3.5 text-blue-600 shrink-0" />
+                        <span>{dayjs(watch("date")).format("dddd, DD MMMM YYYY")}</span>
+                      </div>
+                    )}
                   </div>
+
+                  {/* Kick-off Time Picker */}
+                  <div className="space-y-2">
+                    <label className="block text-xs font-bold text-gray-700">
+                      Kick-off Time
+                    </label>
+                    <div className="relative">
+                      <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
+                        <Clock className="w-4 h-4 text-amber-600" />
+                      </div>
+                      <input
+                        {...register("time")}
+                        type="time"
+                        className={`w-full pl-10 pr-4 py-2.5 text-xs font-semibold bg-gray-50 border rounded-xl focus:bg-white focus:outline-none focus:ring-2 transition-all ${
+                          errors.time
+                            ? "border-red-400 focus:ring-red-200 bg-red-50/20"
+                            : "border-gray-300 focus:ring-blue-500/20 focus:border-blue-500"
+                        }`}
+                      />
+                    </div>
+                    {errors.time && (
+                      <p className="text-xs text-red-500 mt-1">{errors.time.message}</p>
+                    )}
+
+                    {/* Quick Time Pills */}
+                    <div className="flex flex-wrap gap-1.5 pt-1">
+                      {["14:00", "15:00", "18:00", "20:00"].map((t) => (
+                        <button
+                          key={t}
+                          type="button"
+                          onClick={() => setValue("time", t)}
+                          className="text-[10px] font-bold px-2.5 py-1 rounded-md bg-gray-100 hover:bg-amber-100 hover:text-amber-800 text-gray-600 transition-colors cursor-pointer"
+                        >
+                          {t}
+                        </button>
+                      ))}
+                    </div>
+
+                    {/* Live Formatted Time Badge */}
+                    {watch("time") && (
+                      <div className="text-[11px] font-semibold text-amber-800 bg-amber-50/80 p-2 rounded-lg border border-amber-100/80 flex items-center gap-1.5">
+                        <Clock className="w-3.5 h-3.5 text-amber-600 shrink-0" />
+                        <span>
+                          Kick-off at {dayjs(`2000-01-01 ${watch("time")}`).format("hh:mm A")} (UK Time)
+                        </span>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Match Duration */}
+                  <SelectField
+                    name="durationMinutes"
+                    label="Duration"
+                    control={control}
+                    error={errors.durationMinutes}
+                    options={durationOptions}
+                    placeholder="Select duration"
+                    scrollable
+                  />
                 </div>
               </section>
             </div>

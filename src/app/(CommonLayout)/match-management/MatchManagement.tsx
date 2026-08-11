@@ -246,7 +246,7 @@ const MatchManagement = () => {
   ];
 
   const matchDateStatusOptions: OptionItem[] = [
-    { label: "Match Date Status : All", value: "ALL" },
+    { label: "Match Date : All", value: "ALL" },
     { label: "Today's Matches", value: "today" },
     { label: "This Week's Matches", value: "this_week" },
     { label: "Upcoming Matches", value: "upcoming" },
