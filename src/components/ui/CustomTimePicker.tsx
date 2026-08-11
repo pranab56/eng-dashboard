@@ -2,7 +2,7 @@
 
 import React, { useState, useRef, useEffect } from "react";
 import dayjs from "dayjs";
-import { Clock, Check, X } from "lucide-react";
+import { Clock, Check } from "lucide-react";
 
 interface CustomTimePickerProps {
   value: string; // HH:mm format e.g. "15:00"

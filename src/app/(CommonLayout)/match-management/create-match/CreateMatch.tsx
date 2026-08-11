@@ -31,7 +31,6 @@ import { useEffect, useState } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { toast } from "sonner";
 import * as z from "zod";
-import InputField from "../../../../components/form/InputField";
 import { useGetAllLeagueTeamQuery } from "../../../../features/leagueTeam/leagueTeamApi";
 import CustomDatePicker from "@/components/ui/CustomDatePicker";
 import CustomTimePicker from "@/components/ui/CustomTimePicker";
@@ -110,7 +109,6 @@ const CreateMatch = () => {
   const [isHydrated, setIsHydrated] = useState(false);
 
   const {
-    register,
     handleSubmit,
     control,
     reset,
