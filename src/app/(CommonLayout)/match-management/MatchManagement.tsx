@@ -187,7 +187,6 @@ const MatchManagement = () => {
   const [venueFilter, setVenueFilter] = useState<string>("ALL");
   const [teamFilter, setTeamFilter] = useState<string>("ALL");
   const [unplayedOnly, setUnplayedOnly] = useState<boolean>(false);
-  const [liveOnly, setLiveOnly] = useState<boolean>(false);
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [debouncedSearchTerm, setDebouncedSearchTerm] = useState<string>("");
 
@@ -282,7 +281,6 @@ const MatchManagement = () => {
     ...(venueFilter !== "ALL" && { venue: venueFilter }),
     ...(teamFilter !== "ALL" && { team: teamFilter }),
     ...(unplayedOnly && { unplayedOnly: "true" }),
-    ...(liveOnly && { liveOnly: "true" }),
     ...(debouncedSearchTerm.trim() && { searchTerm: debouncedSearchTerm.trim() }),
   };
 
@@ -313,7 +311,6 @@ const MatchManagement = () => {
     setVenueFilter("ALL");
     setTeamFilter("ALL");
     setUnplayedOnly(false);
-    setLiveOnly(false);
     setSearchTerm("");
     setDebouncedSearchTerm("");
     toast.info("Filters reset to default");
