@@ -34,7 +34,7 @@ import {
 } from 'lucide-react';
 import { Loader2 } from 'lucide-react';
 import dayjs from 'dayjs';
-import toast from 'react-hot-toast';
+import { toast } from 'sonner';
 import { useUpdateEngCoinBudgetMutation } from '@/features/player/playerApi';
 import { getErrorMessage } from '@/utils/getErrorMessage';
 
@@ -146,12 +146,43 @@ const UserVerificationModal: React.FC<UserVerificationModalProps> = ({
   const documentList = getDocumentList();
   const selectedTeam = user.selectTeam;
 
-  const handleCopyText = (text: string, label: string) => {
+  const handleCopyText = async (text: string, label: string) => {
     if (!text) return;
-    navigator.clipboard.writeText(text);
-    setCopiedField(label);
-    toast.success(`${label} copied to clipboard`);
-    setTimeout(() => setCopiedField(null), 2000);
+    let copied = false;
+    try {
+      if (typeof navigator !== 'undefined' && navigator.clipboard && navigator.clipboard.writeText) {
+        await navigator.clipboard.writeText(text);
+        copied = true;
+      }
+    } catch (e) {
+      copied = false;
+    }
+
+    if (!copied) {
+      try {
+        const textArea = document.createElement('textarea');
+        textArea.value = text;
+        textArea.style.position = 'fixed';
+        textArea.style.opacity = '0';
+        textArea.style.top = '0';
+        textArea.style.left = '0';
+        document.body.appendChild(textArea);
+        textArea.focus();
+        textArea.select();
+        copied = document.execCommand('copy');
+        document.body.removeChild(textArea);
+      } catch (err) {
+        copied = false;
+      }
+    }
+
+    if (copied) {
+      setCopiedField(label);
+      toast.success(`${label} copied to clipboard`);
+      setTimeout(() => setCopiedField(null), 2000);
+    } else {
+      toast.error(`Failed to copy ${label}`);
+    }
   };
 
   const handleApproveAction = async () => {
@@ -270,7 +301,7 @@ const UserVerificationModal: React.FC<UserVerificationModalProps> = ({
                         <button
                           type="button"
                           onClick={() => handleCopyText(parentEmail, 'Parent Email')}
-                          className="p-1 text-slate-400 hover:text-slate-700 transition-colors"
+                          className="p-1 text-slate-400 hover:text-slate-700 transition-colors cursor-pointer"
                           title="Copy Email"
                         >
                           {copiedField === 'Parent Email' ? <Check className="w-3 h-3 text-emerald-600" /> : <Copy className="w-3 h-3" />}
@@ -290,7 +321,7 @@ const UserVerificationModal: React.FC<UserVerificationModalProps> = ({
                         <button
                           type="button"
                           onClick={() => handleCopyText(parentPhone, 'Parent Phone')}
-                          className="p-1 text-slate-400 hover:text-slate-700 transition-colors"
+                          className="p-1 text-slate-400 hover:text-slate-700 transition-colors cursor-pointer"
                           title="Copy Phone"
                         >
                           {copiedField === 'Parent Phone' ? <Check className="w-3 h-3 text-emerald-600" /> : <Copy className="w-3 h-3" />}

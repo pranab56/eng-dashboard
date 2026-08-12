@@ -4,10 +4,18 @@ import { baseApi } from "../../utils/apiBaseQuery";
 export const playerApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
     getAllPlayer: builder.query({
-      query: ({ pageNumber }) => ({
-        url: `/player?page=${pageNumber}`,
-        method: "GET",
-      }),
+      query: (params = {}) => {
+        const queryParams = new URLSearchParams();
+        if (params.pageNumber || params.page) queryParams.append("page", params.pageNumber || params.page);
+        if (params.searchValue || params.searchTerm) queryParams.append("searchTerm", params.searchValue || params.searchTerm);
+        if (params.role && params.role !== "ALL") queryParams.append("role", params.role);
+        if (params.status && params.status !== "ALL") queryParams.append("status", params.status);
+        const qStr = queryParams.toString();
+        return {
+          url: qStr ? `/player?${qStr}` : `/player`,
+          method: "GET",
+        };
+      },
       providesTags: ["player"]
     }),
 
@@ -28,7 +36,6 @@ export const playerApi = baseApi.injectEndpoints({
       providesTags: ["player"]
     }),
 
-
     updateEngCoinBudget: builder.mutation({
       query: ({ id, data }) => ({
         url: `/user/${id}/economy`,
@@ -47,7 +54,13 @@ export const playerApi = baseApi.injectEndpoints({
       invalidatesTags: ["player"]
     }),
 
-
+    deletePlayer: builder.mutation({
+      query: ({ id }) => ({
+        url: `/player/${id}`,
+        method: "DELETE",
+      }),
+      invalidatesTags: ["player", "user"]
+    }),
   }),
 });
 
@@ -58,4 +71,5 @@ export const {
   useGetPlayerEconomyQuery,
   useUpdateEngCoinBudgetMutation,
   useUpdatePlayerMutation,
+  useDeletePlayerMutation,
 } = playerApi;

@@ -2,6 +2,7 @@ import React from "react";
 import Image from "next/image";
 import { ColumnDef } from "@tanstack/react-table";
 import { FiEdit2, FiEye } from "react-icons/fi";
+import { HiOutlineTrash } from "react-icons/hi";
 import { TPlayer } from "@/types/columnTypes";
 import { formatImagePath } from "@/utils/formatImagePath";
 
@@ -27,7 +28,7 @@ export const PlayerNameCell: React.FC<{ player: TPlayer }> = ({ player }) => {
   const initials = `${player.firstName?.[0] ?? "P"}${player.lastName?.[0] ?? ""}`;
 
   return (
-    <div className="flex items-center gap-2 sm:gap-3.5 py-0.5 max-w-[140px] sm:max-w-none">
+    <div className="flex items-center gap-2 sm:gap-3.5 py-0.5 max-w-[160px] sm:max-w-none">
       <div className="relative h-8 w-8 sm:h-10 sm:w-10 shrink-0 overflow-hidden rounded-full border border-slate-200/80 bg-slate-100 flex items-center justify-center shadow-xs">
         {player.profile ? (
           <Image
@@ -46,6 +47,9 @@ export const PlayerNameCell: React.FC<{ player: TPlayer }> = ({ player }) => {
       <div className="flex flex-col min-w-0">
         <span className="font-semibold text-slate-900 text-xs sm:text-sm tracking-tight truncate group-hover:text-blue-600 transition-colors">
           {fullName}
+        </span>
+        <span className="text-[11px] text-slate-400 truncate">
+          {player.email || (player.role ? player.role.replace(/_/g, ' ') : "Player")}
         </span>
       </div>
     </div>
@@ -118,7 +122,8 @@ export const PlayerActionCell: React.FC<{
   player: TPlayer;
   onView: (player: TPlayer) => void;
   onEdit?: (player: TPlayer) => void;
-}> = ({ player, onView, onEdit }) => {
+  onDelete?: (player: TPlayer) => void;
+}> = ({ player, onView, onEdit, onDelete }) => {
   const fullName = getPlayerFullName(player);
 
   return (
@@ -144,6 +149,18 @@ export const PlayerActionCell: React.FC<{
           <FiEdit2 className="h-3.5 w-3.5 sm:h-4 sm:w-4" aria-hidden="true" />
         </button>
       )}
+
+      {onDelete && (
+        <button
+          type="button"
+          onClick={() => onDelete(player)}
+          aria-label={`Delete ${fullName}`}
+          title="Delete Player"
+          className="flex h-7.5 w-7.5 sm:h-8.5 sm:w-8.5 items-center justify-center rounded-lg bg-red-50 hover:bg-red-100 text-red-600 hover:text-red-700 transition-all cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-400 active:scale-95"
+        >
+          <HiOutlineTrash className="h-4 w-4 sm:h-5 sm:w-5" aria-hidden="true" />
+        </button>
+      )}
     </div>
   );
 };
@@ -155,13 +172,24 @@ export const PlayerActionCell: React.FC<{
 export const getPlayerColumns = (
   onView: (player: TPlayer) => void,
   onEditCoin?: (player: TPlayer) => void,
-  onEdit?: (player: TPlayer) => void
+  onEdit?: (player: TPlayer) => void,
+  onDelete?: (player: TPlayer) => void
 ): ColumnDef<TPlayer>[] => [
   {
     id: "name",
     header: "Player Name",
     accessorFn: (row) => `${row.firstName ?? ""} ${row.lastName ?? ""}`.trim(),
     cell: ({ row }) => <PlayerNameCell player={row.original} />,
+  },
+  {
+    id: "role",
+    header: "Player Type",
+    accessorKey: "role",
+    cell: ({ row }) => (
+      <span className="text-xs font-semibold text-slate-700 bg-slate-100 px-2.5 py-1 rounded-full border border-slate-200">
+        {row.original.role ? row.original.role.replace(/_/g, " ") : "PLAYER"}
+      </span>
+    ),
   },
   {
     id: "team",
@@ -179,6 +207,28 @@ export const getPlayerColumns = (
     ),
   },
   {
+    id: "status",
+    header: "Status",
+    accessorKey: "status",
+    cell: ({ row }) => {
+      const status = (row.original.status || "APPROVED").toUpperCase();
+      const isApproved = status === "APPROVED";
+      return (
+        <span
+          className={`text-xs font-semibold px-2.5 py-1 rounded-full border ${
+            isApproved
+              ? "text-emerald-700 bg-emerald-50 border-emerald-200"
+              : status === "REJECTED"
+              ? "text-rose-700 bg-rose-50 border-rose-200"
+              : "text-amber-700 bg-amber-50 border-amber-200"
+          }`}
+        >
+          {status}
+        </span>
+      );
+    },
+  },
+  {
     id: "coins",
     header: "Coin Balance",
     accessorFn: (row) => getPlayerCoinBalance(row),
@@ -189,7 +239,12 @@ export const getPlayerColumns = (
     header: "Actions",
     enableSorting: false,
     cell: ({ row }) => (
-      <PlayerActionCell player={row.original} onView={onView} onEdit={onEdit} />
+      <PlayerActionCell
+        player={row.original}
+        onView={onView}
+        onEdit={onEdit}
+        onDelete={onDelete}
+      />
     ),
   },
 ];
