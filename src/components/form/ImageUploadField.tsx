@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { useRef } from "react";
+
+import { useEffect, useRef, useState } from "react";
 import { Controller, Control, FieldError } from "react-hook-form";
 import { CloudUpload, X } from "lucide-react";
 import Image from "next/image";
@@ -11,6 +12,7 @@ type ImageUploadFieldProps = {
   control: Control<any>;
   error?: FieldError;
   maxSizeMB?: number | null;
+  accept?: string;
   children?: React.ReactNode;
 };
 
@@ -20,9 +22,11 @@ const ImageUploadField = ({
   control,
   error,
   maxSizeMB,
+  accept = "image/*",
   children,
 }: ImageUploadFieldProps) => {
   const inputRef = useRef<HTMLInputElement>(null);
+  const [preview, setPreview] = useState<string | null>(null);
 
   return (
     <div className="space-y-3">
@@ -36,14 +40,34 @@ const ImageUploadField = ({
         name={name}
         control={control}
         render={({ field }) => {
+          useEffect(() => {
+            if (!field.value) {
+              setPreview(null);
+              return;
+            }
 
-          const preview = field.value ? typeof field.value === "string" ? field.value : URL.createObjectURL(field.value) : null;
+            if (typeof field.value === "string") {
+              setPreview(field.value);
+              return;
+            }
+
+            if (field.value instanceof File) {
+              const objectUrl = URL.createObjectURL(field.value);
+              setPreview(objectUrl);
+
+              return () => {
+                URL.revokeObjectURL(objectUrl);
+              };
+            }
+
+            setPreview(null);
+          }, [field.value]);
 
           return (
             <>
               <div
                 onClick={() => inputRef.current?.click()}
-                className={`group relative border-2 border-dashed rounded-xl px-2 pt-4 flex flex-col items-center justify-center space-y-5 cursor-pointer transition-all border-gray-300 hover:border-black/20`}
+                className="group relative border-2 border-dashed rounded-xl px-2 pt-4 flex flex-col items-center justify-center space-y-5 cursor-pointer transition-all border-gray-300 hover:border-black/20"
               >
                 {preview ? (
                   <div className="relative w-full max-w-[400px] aspect-[2/1] bg-white rounded-lg overflow-hidden shadow-sm border border-gray-100 animate-in zoom-in-95 duration-300">
@@ -53,12 +77,17 @@ const ImageUploadField = ({
                       fill
                       className="object-contain p-4"
                     />
+
                     <button
                       type="button"
                       onClick={(e) => {
                         e.stopPropagation();
+
                         field.onChange(null);
-                        if (inputRef.current) inputRef.current.value = "";
+
+                        if (inputRef.current) {
+                          inputRef.current.value = "";
+                        }
                       }}
                       className="absolute top-3 right-3 p-2 bg-black/80 text-white rounded-full hover:bg-black transition-colors z-10"
                     >
@@ -72,21 +101,29 @@ const ImageUploadField = ({
                 <input
                   ref={inputRef}
                   type="file"
-                  accept="image/*"
+                  accept={accept}
                   className="hidden"
                   onChange={(e) => {
                     const file = e.target.files?.[0];
-                    if (!file) return;
 
-                    if (maxSizeMB && maxSizeMB > 0 && file.size > maxSizeMB * 1024 * 1024) {
-                      toast.error(`File size must be less than ${maxSizeMB}MB`);
+                    if (!file) {
                       return;
                     }
-                    const reader = new FileReader();
-                    reader.onloadend = () => {
-                      field.onChange(file);
-                    };
-                    reader.readAsDataURL(file);
+
+                    if (
+                      maxSizeMB &&
+                      maxSizeMB > 0 &&
+                      file.size > maxSizeMB * 1024 * 1024
+                    ) {
+                      toast.error(
+                        `File size must be less than ${maxSizeMB}MB`
+                      );
+
+                      e.target.value = "";
+                      return;
+                    }
+
+                    field.onChange(file);
                   }}
                 />
               </div>
@@ -104,23 +141,30 @@ const ImageUploadField = ({
   );
 };
 
-
-export const ImageChildrenComponent = ({ maxSizeMB }: { maxSizeMB?: number | string }) => {
+export const ImageChildrenComponent = ({
+  maxSizeMB,
+}: {
+  maxSizeMB?: number | string;
+}) => {
   return (
     <div className="flex flex-col items-center justify-center space-y-5">
       <div className="bg-[#0f0f0f] p-4 rounded-lg shadow-lg ring-4 ring-black/5 group-hover:scale-110 transition-transform duration-300">
         <CloudUpload className="w-8 h-8 text-yellow-500" />
       </div>
+
       <div className="text-center space-y-1">
         <p className="text-[17px] font-medium text-gray-900">
           Upload Image Here
         </p>
+
         <p className="text-[13px] font-medium text-gray-400">
-          {maxSizeMB ? `SVG, PNG, JPG or GIF (max. ${maxSizeMB}MB)` : 'SVG, PNG, JPG or GIF (Any size / No limit)'}
+          {maxSizeMB
+            ? `SVG, PNG, JPG or GIF (max. ${maxSizeMB}MB)`
+            : "SVG, PNG, JPG or GIF (Any size / No limit)"}
         </p>
       </div>
     </div>
   );
-}
+};
 
 export default ImageUploadField;

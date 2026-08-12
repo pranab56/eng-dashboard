@@ -222,7 +222,7 @@ const AddTeam = () => {
               <ImageUploadField
                 name="logo"
                 control={control}
-                error={errors.logo}
+                error={errors.logo as import('react-hook-form').FieldError | undefined}
                 accept="image/*"
               >
                 <ImageChildrenComponent />
