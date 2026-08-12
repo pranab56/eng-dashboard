@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { Controller, Control, FieldError } from "react-hook-form";
 import { CloudUpload, X } from "lucide-react";
 import Image from "next/image";
@@ -40,28 +40,11 @@ const ImageUploadField = ({
         name={name}
         control={control}
         render={({ field }) => {
-          useEffect(() => {
-            if (!field.value) {
-              setPreview(null);
-              return;
-            }
+          const currentValue = field.value;
 
-            if (typeof field.value === "string") {
-              setPreview(field.value);
-              return;
-            }
-
-            if (field.value instanceof File) {
-              const objectUrl = URL.createObjectURL(field.value);
-              setPreview(objectUrl);
-
-              return () => {
-                URL.revokeObjectURL(objectUrl);
-              };
-            }
-
-            setPreview(null);
-          }, [field.value]);
+          const currentPreview =
+            preview ||
+            (typeof currentValue === "string" ? currentValue : null);
 
           return (
             <>
@@ -69,10 +52,10 @@ const ImageUploadField = ({
                 onClick={() => inputRef.current?.click()}
                 className="group relative border-2 border-dashed rounded-xl px-2 pt-4 flex flex-col items-center justify-center space-y-5 cursor-pointer transition-all border-gray-300 hover:border-black/20"
               >
-                {preview ? (
+                {currentPreview ? (
                   <div className="relative w-full max-w-[400px] aspect-[2/1] bg-white rounded-lg overflow-hidden shadow-sm border border-gray-100 animate-in zoom-in-95 duration-300">
                     <Image
-                      src={preview}
+                      src={currentPreview}
                       alt="Logo Preview"
                       fill
                       className="object-contain p-4"
@@ -84,6 +67,7 @@ const ImageUploadField = ({
                         e.stopPropagation();
 
                         field.onChange(null);
+                        setPreview(null);
 
                         if (inputRef.current) {
                           inputRef.current.value = "";
@@ -123,7 +107,19 @@ const ImageUploadField = ({
                       return;
                     }
 
-                    field.onChange(file);
+                    const reader = new FileReader();
+
+                    reader.onloadend = () => {
+                      const result = reader.result;
+
+                      if (typeof result === "string") {
+                        setPreview(result);
+                      }
+
+                      field.onChange(file);
+                    };
+
+                    reader.readAsDataURL(file);
                   }}
                 />
               </div>
