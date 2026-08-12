@@ -207,6 +207,26 @@ export const getPlayerColumns = (
     ),
   },
   {
+    id: "subscription",
+    header: "Subscription",
+    cell: ({ row }) => {
+      const sub = (row.original as any).subscription;
+      if (!sub) {
+        return (
+          <span className="text-[11px] font-semibold text-slate-400 bg-slate-100 px-2.5 py-1 rounded-full border border-slate-200">
+            Free Plan
+          </span>
+        );
+      }
+      return (
+        <span className="inline-flex items-center gap-1 text-[11px] font-bold text-emerald-800 bg-emerald-50 px-2.5 py-1 rounded-full border border-emerald-200 shadow-2xs">
+          <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+          {sub.packageName || 'Active Plan'} • £{sub.price}
+        </span>
+      );
+    },
+  },
+  {
     id: "status",
     header: "Status",
     accessorKey: "status",
@@ -214,17 +234,24 @@ export const getPlayerColumns = (
       const status = (row.original.status || "APPROVED").toUpperCase();
       const isApproved = status === "APPROVED";
       return (
-        <span
-          className={`text-xs font-semibold px-2.5 py-1 rounded-full border ${
-            isApproved
-              ? "text-emerald-700 bg-emerald-50 border-emerald-200"
-              : status === "REJECTED"
-              ? "text-rose-700 bg-rose-50 border-rose-200"
-              : "text-amber-700 bg-amber-50 border-amber-200"
-          }`}
-        >
-          {status}
-        </span>
+        <div className="flex flex-col gap-0.5">
+          <span
+            className={`text-xs font-semibold px-2.5 py-1 rounded-full border w-fit ${
+              isApproved
+                ? "text-emerald-700 bg-emerald-50 border-emerald-200"
+                : status === "REJECTED"
+                ? "text-rose-700 bg-rose-50 border-rose-200"
+                : "text-amber-700 bg-amber-50 border-amber-200"
+            }`}
+          >
+            {status}
+          </span>
+          {status === "REJECTED" && (row.original as any).rejectionReason && (
+            <span className="text-[10px] text-rose-600 font-medium truncate max-w-[120px]" title={(row.original as any).rejectionReason}>
+              Reason: {(row.original as any).rejectionReason}
+            </span>
+          )}
+        </div>
       );
     },
   },

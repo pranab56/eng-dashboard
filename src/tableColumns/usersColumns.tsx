@@ -73,6 +73,7 @@ export const getUsersColumns = (
       </span>
     ),
   },
+
   {
     accessorKey: "status",
     header: () => <div className="">Approval Status</div>,
@@ -113,17 +114,24 @@ export const getUsersColumns = (
 
       // For roles requiring approval (REFEREE, MANAGER, CLUB, PLAYER): display actual status
       return (
-        <span
-          className={`text-xs font-semibold px-2.5 py-1 rounded-full border ${
-            isApproved
-              ? 'text-emerald-700 bg-emerald-50 border-emerald-200'
-              : currentStatus === 'REJECTED'
-              ? 'text-rose-700 bg-rose-50 border-rose-200'
-              : 'text-amber-700 bg-amber-50 border-amber-200'
-          }`}
-        >
-          {currentStatus}
-        </span>
+        <div className="flex flex-col gap-0.5">
+          <span
+            className={`text-xs font-semibold px-2.5 py-1 rounded-full border w-fit ${
+              isApproved
+                ? 'text-emerald-700 bg-emerald-50 border-emerald-200'
+                : currentStatus === 'REJECTED'
+                ? 'text-rose-700 bg-rose-50 border-rose-200'
+                : 'text-amber-700 bg-amber-50 border-amber-200'
+            }`}
+          >
+            {currentStatus}
+          </span>
+          {currentStatus === 'REJECTED' && (row.original as any).rejectionReason && (
+            <span className="text-[10px] text-rose-600 font-medium truncate max-w-[120px]" title={(row.original as any).rejectionReason}>
+              Reason: {(row.original as any).rejectionReason}
+            </span>
+          )}
+        </div>
       );
     },
   },

@@ -25,15 +25,17 @@ import {
   Sparkles,
   Check,
   Copy,
-  MapPin,
-  Compass,
   AlertCircle,
+  CreditCard,
+  Edit3,
 } from 'lucide-react';
 import { Loader2 } from 'lucide-react';
 import dayjs from 'dayjs';
 import { toast } from 'sonner';
-import { useUpdateEngCoinBudgetMutation } from '@/features/player/playerApi';
+import { useUpdateEngCoinBudgetMutation, useUpdatePlayerMutation } from '@/features/player/playerApi';
+import { useGetAllTeamQuery } from '@/features/teamManagement/teamApi';
 import { getErrorMessage } from '@/utils/getErrorMessage';
+import { TeamSelectDropdown } from '@/components/dropdowns/TeamSelectDropdown';
 
 interface PlayerViewModalProps {
   player: TPlayer | null;
@@ -49,6 +51,15 @@ const PlayerViewModal: React.FC<PlayerViewModalProps> = ({
   const [previewImage, setPreviewImage] = useState<string | null>(null);
   const [copiedField, setCopiedField] = useState<string | null>(null);
 
+  // Team Selection States
+  const [isEditingTeam, setIsEditingTeam] = useState(false);
+  const [selectedTeamIdInput, setSelectedTeamIdInput] = useState<string>('');
+  const [isSavingTeam, setIsSavingTeam] = useState(false);
+
+  const { data: teamData } = useGetAllTeamQuery({ limit: 100 });
+  const allTeams = teamData?.data?.result || teamData?.data || [];
+
+  const [updatePlayer] = useUpdatePlayerMutation();
   const [updateEngCoinBudget] = useUpdateEngCoinBudgetMutation();
   const [isEditingEconomy, setIsEditingEconomy] = useState(false);
   const [editCoinsInput, setEditCoinsInput] = useState<number | string>("");
@@ -57,6 +68,8 @@ const PlayerViewModal: React.FC<PlayerViewModalProps> = ({
   React.useEffect(() => {
     if (player) {
       setEditCoinsInput(Number((player as any).engCoine ?? (player as any).coin ?? 0));
+      const curTeamId = (player as any).selectTeam?._id || (player as any).selectTeam || '';
+      setSelectedTeamIdInput(typeof curTeamId === 'string' ? curTeamId : (curTeamId as any)?._id || '');
     }
   }, [player]);
 
@@ -82,6 +95,27 @@ const PlayerViewModal: React.FC<PlayerViewModalProps> = ({
     }
   };
 
+  const handleSaveTeam = async () => {
+    if (!player) return;
+    try {
+      setIsSavingTeam(true);
+      const playerId = (player as any)._id || (player as any).id;
+      const res = await updatePlayer({
+        id: playerId,
+        data: { selectTeam: selectedTeamIdInput || null },
+      }).unwrap();
+
+      if (res.success) {
+        toast.success("Player team updated successfully");
+        setIsEditingTeam(false);
+      }
+    } catch (err: any) {
+      toast.error(getErrorMessage(err, "Failed to update player team"));
+    } finally {
+      setIsSavingTeam(false);
+    }
+  };
+
   if (!player) return null;
 
   const profileUrl = formatImagePath(player.profile || (player as any).profilePic);
@@ -102,6 +136,7 @@ const PlayerViewModal: React.FC<PlayerViewModalProps> = ({
 
   const coins = Number((player as any).engCoine ?? (player as any).coin ?? 0);
   const marketValue = Number((player as any).marketValue) || (coins * 100);
+  const sub = (player as any).subscription;
 
   // Extract Document List
   const getDocumentList = (): string[] => {
@@ -202,7 +237,7 @@ const PlayerViewModal: React.FC<PlayerViewModalProps> = ({
               <div>
                 <DialogTitle className="text-xl font-bold text-slate-900 flex items-center gap-2">
                   {fullName}
-                  {(player as any).verified && (
+                  {((player as any).verified ?? true) && (
                     <ShieldCheck className="w-5 h-5 text-emerald-600 shrink-0" />
                   )}
                 </DialogTitle>
@@ -245,6 +280,19 @@ const PlayerViewModal: React.FC<PlayerViewModalProps> = ({
 
           {/* Modal Body Container */}
           <div className="p-6 space-y-5 overflow-y-auto max-h-[68vh] hide-scrollbar text-slate-800">
+
+            {/* Rejection Reason Alert Banner (if status is REJECTED) */}
+            {currentStatus === 'REJECTED' && (
+              <div className="bg-rose-50 border border-rose-200 rounded-2xl p-4 flex items-start gap-3">
+                <AlertCircle className="w-5 h-5 text-rose-600 shrink-0 mt-0.5" />
+                <div>
+                  <h4 className="text-xs font-bold text-rose-900 uppercase">Player Registration Rejected</h4>
+                  <p className="text-xs text-rose-700 font-medium mt-0.5">
+                    Reason: {(player as any).rejectionReason || 'Profile did not meet required verification criteria.'}
+                  </p>
+                </div>
+              </div>
+            )}
 
             {/* Parent / Account Owner Details Card */}
             {(parentName || parentEmail || parentPhone) && (
@@ -307,6 +355,47 @@ const PlayerViewModal: React.FC<PlayerViewModalProps> = ({
               </div>
             )}
 
+            {/* Subscription Details Card */}
+            <div className="bg-emerald-50/50 border border-emerald-200/80 rounded-2xl p-4 space-y-2.5">
+              <div className="flex items-center justify-between">
+                <h3 className="text-xs font-bold text-emerald-950 uppercase tracking-wider flex items-center gap-1.5">
+                  <CreditCard className="w-4 h-4 text-emerald-600" /> Active Subscription Plan
+                </h3>
+                <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase border ${sub ? 'bg-emerald-100 text-emerald-800 border-emerald-300' : 'bg-slate-100 text-slate-600 border-slate-200'}`}>
+                  {sub ? 'Active Subscription' : 'No Active Plan'}
+                </span>
+              </div>
+
+              {sub ? (
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-1">
+                  <div>
+                    <p className="text-[11px] font-semibold text-slate-500">Package</p>
+                    <p className="text-xs font-bold text-slate-900 flex items-center gap-1">
+                      <Sparkles className="w-3.5 h-3.5 text-emerald-600" />
+                      {sub.packageName || 'ENG Plan'}
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-[11px] font-semibold text-slate-500">Price Paid</p>
+                    <p className="text-xs font-bold text-slate-900">£{sub.price}</p>
+                  </div>
+                  <div>
+                    <p className="text-[11px] font-semibold text-slate-500">Status</p>
+                    <p className="text-xs font-bold text-emerald-700 uppercase">{sub.status || 'Active'}</p>
+                  </div>
+                  <div>
+                    <p className="text-[11px] font-semibold text-slate-500">Valid Until</p>
+                    <p className="text-xs font-bold text-slate-800 flex items-center gap-1">
+                      <Calendar className="w-3.5 h-3.5 text-slate-500 shrink-0" />
+                      {sub.currentPeriodEnd ? dayjs(sub.currentPeriodEnd).format('DD MMM YYYY') : 'N/A'}
+                    </p>
+                  </div>
+                </div>
+              ) : (
+                <p className="text-xs text-slate-500 font-medium">Free registered profile / No active package</p>
+              )}
+            </div>
+
             {/* Primary Details Card */}
             <div className="bg-slate-50/60 border border-slate-200/80 rounded-2xl p-4 space-y-3">
               <h3 className="text-xs font-bold text-slate-900 uppercase tracking-wider flex items-center gap-1.5">
@@ -316,7 +405,7 @@ const PlayerViewModal: React.FC<PlayerViewModalProps> = ({
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                 <div>
                   <p className="text-[11px] font-semibold text-slate-500">First Name</p>
-                  <p className="text-xs font-bold text-slate-900">{player.firstName || 'N/A'}</p>
+                  <p className="text-xs font-bold text-slate-900">{player.firstName || (player as any).userName || 'N/A'}</p>
                 </div>
 
                 <div>
@@ -324,25 +413,18 @@ const PlayerViewModal: React.FC<PlayerViewModalProps> = ({
                   <p className="text-xs font-bold text-slate-900">{player.lastName || 'N/A'}</p>
                 </div>
 
-                {(player as any).email && (
-                  <div>
-                    <p className="text-[11px] font-semibold text-slate-500">Email Address</p>
-                    <p className="text-xs font-bold text-slate-900 truncate">{(player as any).email}</p>
-                  </div>
-                )}
-
-                {(player as any).phone && (
-                  <div>
-                    <p className="text-[11px] font-semibold text-slate-500">Phone Number</p>
-                    <p className="text-xs font-bold text-slate-900">{(player as any).phone}</p>
-                  </div>
-                )}
-
                 <div>
                   <p className="text-[11px] font-semibold text-slate-500">Date of Birth</p>
                   <p className="text-xs font-bold text-slate-800 flex items-center gap-1">
                     <Calendar className="w-3.5 h-3.5 text-slate-500 shrink-0" />
-                    {(player as any).dateOfBirth ? dayjs((player as any).dateOfBirth).format('DD MMM YYYY') : 'N/A'}
+                    {player.dateOfBirth ? dayjs(player.dateOfBirth).format('DD MMM YYYY') : 'N/A'}
+                  </p>
+                </div>
+
+                <div>
+                  <p className="text-[11px] font-semibold text-slate-500">Age Group</p>
+                  <p className="text-xs font-bold text-blue-700 bg-blue-50 px-2 py-0.5 rounded-md border border-blue-200 inline-block">
+                    {player.ageGroup || 'N/A'}
                   </p>
                 </div>
 
@@ -352,184 +434,244 @@ const PlayerViewModal: React.FC<PlayerViewModalProps> = ({
                 </div>
 
                 <div>
-                  <p className="text-[11px] font-semibold text-slate-500">Strong Foot</p>
-                  <p className="text-xs font-bold text-slate-900 flex items-center gap-1">
-                    <Compass className="w-3.5 h-3.5 text-slate-500 shrink-0" />
-                    {(player as any).strongFoot || 'N/A'}
-                  </p>
+                  <p className="text-[11px] font-semibold text-slate-500">Preferred Foot</p>
+                  <p className="text-xs font-bold text-slate-900">{player.strongFoot || 'N/A'}</p>
                 </div>
 
                 <div>
-                  <p className="text-[11px] font-semibold text-slate-500">Location / City</p>
-                  <p className="text-xs font-bold text-slate-900 flex items-center gap-1">
-                    <MapPin className="w-3.5 h-3.5 text-slate-500 shrink-0" />
-                    {(player as any).location || 'N/A'}
-                  </p>
-                </div>
-
-                <div>
-                  <p className="text-[11px] font-semibold text-slate-500">Previous Club</p>
-                  <p className="text-xs font-bold text-slate-900">{(player as any).previousClub || 'None'}</p>
-                </div>
-
-                <div>
-                  <p className="text-[11px] font-semibold text-slate-500">Academy Player</p>
-                  <p className="text-xs font-bold text-slate-900">
-                    {(player as any).playForAcademy ? `Yes (${(player as any).academyClubName || 'Academy'})` : 'No'}
-                  </p>
-                </div>
-
-                {(player as any).emergencyEmail && (
-                  <div>
-                    <p className="text-[11px] font-semibold text-slate-500">Emergency Email</p>
-                    <p className="text-xs font-bold text-slate-900 truncate">{(player as any).emergencyEmail}</p>
-                  </div>
-                )}
-
-                {(player as any).emergencyPhone && (
-                  <div>
-                    <p className="text-[11px] font-semibold text-slate-500">Emergency Phone</p>
-                    <p className="text-xs font-bold text-slate-900">{(player as any).emergencyPhone}</p>
-                  </div>
-                )}
-              </div>
-            </div>
-
-            {/* Assigned Team Card */}
-            <div className="bg-slate-50/60 border border-slate-200/80 rounded-2xl p-4 space-y-2">
-              <h3 className="text-xs font-bold text-slate-900 uppercase tracking-wider flex items-center gap-1.5">
-                <Building2 className="w-4 h-4 text-slate-600" /> Assigned Club / Team
-              </h3>
-
-              {selectedTeam || player.teamName ? (
-                <div className="flex items-center gap-3 bg-white p-3 rounded-xl border border-slate-200 shadow-2xs">
-                  <div className="relative w-11 h-11 rounded-lg bg-slate-50 border border-slate-200 overflow-hidden flex items-center justify-center shrink-0">
-                    {selectedTeam?.teamLogo || player.teamLogo ? (
-                      <Image
-                        src={formatImagePath(selectedTeam?.teamLogo || player.teamLogo)}
-                        alt={selectedTeam?.teamName || player.teamName || 'Team'}
-                        fill
-                        className="object-contain p-1"
-                      />
-                    ) : (
-                      <Building2 className="w-5 h-5 text-slate-400" />
+                  <div className="flex items-center justify-between">
+                    <p className="text-[11px] font-semibold text-slate-500">ENG Coin</p>
+                    {!isEditingEconomy && (
+                      <button
+                        type="button"
+                        onClick={() => setIsEditingEconomy(true)}
+                        className="text-[10px] text-amber-600 hover:text-amber-700 font-bold underline cursor-pointer"
+                      >
+                        Edit
+                      </button>
                     )}
                   </div>
-                  <div>
-                    <p className="text-xs font-bold text-slate-900">{selectedTeam?.teamName || player.teamName}</p>
-                    <p className="text-[11px] font-medium text-slate-500">
-                      {selectedTeam?.shortName || player.shortName ? `Tag: ${selectedTeam?.shortName || player.shortName}` : 'Registered Team'}
+
+                  {isEditingEconomy ? (
+                    <div className="flex items-center gap-1.5 mt-1">
+                      <input
+                        type="number"
+                        value={editCoinsInput}
+                        onChange={(e) => setEditCoinsInput(e.target.value)}
+                        className="w-20 px-2 py-1 text-xs font-bold border border-amber-300 rounded-lg bg-amber-50/50 focus:outline-none focus:ring-1 focus:ring-amber-500"
+                        placeholder="Coins"
+                        autoFocus
+                      />
+                      <button
+                        type="button"
+                        onClick={handleSaveEconomy}
+                        disabled={isSavingEconomy}
+                        className="px-2 py-1 bg-amber-500 text-white font-bold text-[10px] rounded-lg hover:bg-amber-600 disabled:opacity-50 cursor-pointer shadow-xs flex items-center gap-1"
+                      >
+                        {isSavingEconomy && <Loader2 className="w-3 h-3 animate-spin" />}
+                        Save
+                      </button>
+                    </div>
+                  ) : (
+                    <p className="text-xs font-bold text-amber-600 flex items-center gap-1">
+                      <Coins className="w-3.5 h-3.5 text-amber-500" />
+                      {coins} Coins
                     </p>
-                  </div>
+                  )}
                 </div>
-              ) : (
-                <p className="text-xs font-medium text-slate-500 italic">No club or team currently assigned (Free Agent).</p>
-              )}
+
+                <div>
+                  <p className="text-[11px] font-semibold text-slate-500">Market Value</p>
+                  <p className="text-xs font-bold text-emerald-600">
+                    £{isEditingEconomy ? ((Number(editCoinsInput) || 0) * 100).toLocaleString() : marketValue.toLocaleString()}
+                  </p>
+                </div>
+
+                {player.previousClub && (
+                  <div className="col-span-2 sm:col-span-4 pt-2 border-t border-slate-200/60">
+                    <p className="text-[11px] font-semibold text-slate-500">Previous Club / Team</p>
+                    <p className="text-xs font-bold text-slate-900">{player.previousClub}</p>
+                  </div>
+                )}
+              </div>
             </div>
 
-            {/* Economy Card */}
-            <div className="bg-amber-50/40 border border-amber-200/70 rounded-2xl p-4 space-y-3">
-              <div className="flex items-center justify-between">
-                <h3 className="text-xs font-bold text-amber-900 uppercase tracking-wider flex items-center gap-1.5">
-                  <Coins className="w-4 h-4 text-amber-600" /> Player Economy & ENG Coins
-                </h3>
-                {!isEditingEconomy ? (
+            {/* Club & Academy Credentials Section */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+
+              {/* Team Card with Admin Change Dropdown */}
+              <div className="bg-slate-50/60 border border-slate-200/80 rounded-2xl p-4 space-y-2.5">
+                <div className="flex items-center justify-between">
+                  <h3 className="text-xs font-bold text-slate-900 uppercase tracking-wider flex items-center gap-1.5">
+                    <Building2 className="w-4 h-4 text-slate-600" /> Assigned Club / Team
+                  </h3>
                   <button
                     type="button"
-                    onClick={() => setIsEditingEconomy(true)}
-                    className="px-2.5 py-1 text-[11px] font-semibold text-amber-800 bg-amber-100 hover:bg-amber-200/80 rounded-lg transition-colors cursor-pointer"
+                    onClick={() => setIsEditingTeam(!isEditingTeam)}
+                    className="text-[11px] font-bold text-indigo-600 hover:text-indigo-800 flex items-center gap-1 cursor-pointer"
                   >
-                    Edit Coins
+                    <Edit3 className="w-3 h-3" />
+                    {isEditingTeam ? "Cancel" : "Change Team"}
                   </button>
+                </div>
+
+                {isEditingTeam ? (
+                    <div className="space-y-2 p-3 bg-white border border-indigo-200 rounded-xl shadow-xs">
+                      <label className="text-[11px] font-bold text-slate-700 block">Select Team to Assign:</label>
+                      <TeamSelectDropdown
+                        teams={allTeams}
+                        selectedTeamId={selectedTeamIdInput}
+                        onChange={(teamId) => setSelectedTeamIdInput(teamId)}
+                        placeholder="Search & choose a team..."
+                      />
+                      <div className="flex justify-end gap-2 pt-1">
+                        <button
+                          type="button"
+                          onClick={() => setIsEditingTeam(false)}
+                          className="px-2.5 py-1 text-xs font-semibold text-slate-500 hover:text-slate-800 cursor-pointer"
+                        >
+                          Cancel
+                        </button>
+                        <button
+                          type="button"
+                          onClick={handleSaveTeam}
+                          disabled={isSavingTeam}
+                          className="px-3 py-1 bg-indigo-600 text-white text-xs font-bold rounded-lg hover:bg-indigo-700 disabled:opacity-50 cursor-pointer flex items-center gap-1 shadow-xs"
+                        >
+                          {isSavingTeam && <Loader2 className="w-3 h-3 animate-spin" />}
+                          Save Team
+                        </button>
+                      </div>
+                    </div>
+                ) : selectedTeam && (selectedTeam.teamName || selectedTeam.shortName) ? (
+                  <div className="flex items-center gap-3 p-2.5 bg-white border border-slate-200 rounded-xl">
+                    <div className="relative w-10 h-10 rounded-lg bg-slate-50 border border-slate-200 flex items-center justify-center overflow-hidden shrink-0">
+                      {selectedTeam.teamLogo ? (
+                        <Image
+                          src={formatImagePath(selectedTeam.teamLogo)}
+                          alt={selectedTeam.teamName || 'team logo'}
+                          fill
+                          className="object-contain p-1"
+                        />
+                      ) : (
+                        <Building2 className="w-5 h-5 text-slate-400" />
+                      )}
+                    </div>
+
+                    <div>
+                      <h4 className="text-xs font-bold text-slate-900">
+                        {selectedTeam.teamName || 'Unassigned Team'}
+                      </h4>
+                      {selectedTeam.shortName && (
+                        <span className="px-1.5 py-0.5 rounded bg-blue-50 text-blue-700 text-[10px] font-semibold border border-blue-200 uppercase">
+                          {selectedTeam.shortName}
+                        </span>
+                      )}
+                    </div>
+                  </div>
                 ) : (
-                  <button
-                    type="button"
-                    onClick={() => setIsEditingEconomy(false)}
-                    className="px-2.5 py-1 text-[11px] font-semibold text-slate-600 bg-slate-200/80 hover:bg-slate-300 rounded-lg transition-colors cursor-pointer"
-                  >
-                    Cancel
-                  </button>
+                  <p className="text-xs text-slate-400 italic">No associated club assigned yet</p>
                 )}
               </div>
 
-              {!isEditingEconomy ? (
-                <div className="grid grid-cols-2 gap-3">
-                  <div className="bg-white p-3 rounded-xl border border-amber-200/60 shadow-2xs">
-                    <p className="text-[11px] font-semibold text-slate-500">ENG Coin Balance</p>
-                    <p className="text-base font-bold text-amber-900 flex items-center gap-1.5 mt-0.5">
-                      <Sparkles className="w-4 h-4 text-amber-500" /> {coins.toLocaleString()}
-                    </p>
-                  </div>
-                  <div className="bg-white p-3 rounded-xl border border-amber-200/60 shadow-2xs">
-                    <p className="text-[11px] font-semibold text-slate-500">Market Value</p>
-                    <p className="text-base font-bold text-emerald-700 mt-0.5">
-                      £{marketValue.toLocaleString()}
-                    </p>
-                  </div>
-                </div>
-              ) : (
-                <div className="bg-white p-3.5 rounded-xl border border-amber-300 space-y-3">
-                  <div>
-                    <label className="text-[11px] font-bold text-slate-700 block mb-1">
-                      Update ENG Coin Amount
-                    </label>
-                    <input
-                      type="number"
-                      value={editCoinsInput}
-                      onChange={(e) => setEditCoinsInput(e.target.value)}
-                      className="w-full text-xs font-semibold px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500"
-                      placeholder="Enter new coins value..."
-                    />
-                    <p className="text-[10px] text-slate-400 mt-1">
-                      Market Value will automatically update to: £{((Number(editCoinsInput) || 0) * 100).toLocaleString()}
-                    </p>
+              {/* Academy & Consent Status Card */}
+              <div className="bg-slate-50/60 border border-slate-200/80 rounded-2xl p-4 space-y-2.5">
+                <h3 className="text-xs font-bold text-slate-900 uppercase tracking-wider flex items-center gap-1.5">
+                  <Sparkles className="w-4 h-4 text-amber-500" /> Academy & Consent Status
+                </h3>
+
+                <div className="space-y-1.5 text-xs">
+                  <div className="flex justify-between items-center bg-white p-2 rounded-lg border border-slate-200">
+                    <span className="font-medium text-slate-600">Plays for CAT 1-3 Academy?</span>
+                    <span className={`px-2 py-0.5 rounded text-[10px] font-semibold ${(player as any).playForAcademy ? 'bg-amber-50 text-amber-700 border border-amber-200' : 'bg-slate-100 text-slate-500'}`}>
+                      {(player as any).playForAcademy ? `Yes (${(player as any).academyClubName || 'Club'})` : 'No'}
+                    </span>
                   </div>
 
-                  <div className="flex justify-end gap-2">
-                    <button
-                      type="button"
-                      disabled={isSavingEconomy}
-                      onClick={handleSaveEconomy}
-                      className="px-3.5 py-1.5 bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold rounded-lg transition-colors flex items-center gap-1.5 disabled:opacity-50 cursor-pointer"
-                    >
-                      {isSavingEconomy ? <Loader2 className="w-3 h-3 animate-spin" /> : <Check className="w-3 h-3" />}
-                      Save Economy
-                    </button>
+                  <div className="flex justify-between items-center bg-white p-2 rounded-lg border border-slate-200">
+                    <span className="font-medium text-slate-600">Development Player?</span>
+                    <span className={`px-2 py-0.5 rounded text-[10px] font-semibold ${(player as any).isDevelopmentPlayer ? 'bg-amber-50 text-amber-700 border border-amber-200' : 'bg-slate-100 text-slate-500'}`}>
+                      {(player as any).isDevelopmentPlayer ? 'Yes' : 'No'}
+                    </span>
+                  </div>
+
+                  <div className="flex justify-between items-center bg-white p-2 rounded-lg border border-slate-200">
+                    <span className="font-medium text-slate-600">Filming & Media Consent?</span>
+                    <span className={`px-2 py-0.5 rounded text-[10px] font-semibold ${(player as any).mediaConsent ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-rose-50 text-rose-700 border border-rose-200'}`}>
+                      {(player as any).mediaConsent ? 'Granted' : 'Not Granted'}
+                    </span>
                   </div>
                 </div>
-              )}
+              </div>
             </div>
 
-            {/* Uploaded Documents & ID Proofs */}
-            <div className="bg-slate-50/60 border border-slate-200/80 rounded-2xl p-4 space-y-3">
-              <h3 className="text-xs font-bold text-slate-900 uppercase tracking-wider flex items-center gap-1.5">
-                <FileText className="w-4 h-4 text-slate-600" /> Uploaded ID & Verification Documents ({documentList.length})
-              </h3>
+            {/* Emergency Contacts Card */}
+            {((player as any).emergencyEmail || (player as any).emergencyPhone) && (
+              <div className="bg-slate-50/60 border border-slate-200/80 rounded-2xl p-4 space-y-2.5">
+                <h3 className="text-xs font-bold text-slate-900 uppercase tracking-wider flex items-center gap-1.5">
+                  <Phone className="w-4 h-4 text-rose-500" /> Emergency Contact Details
+                </h3>
 
-              {documentList.length > 0 ? (
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+                  {(player as any).emergencyEmail && (
+                    <div>
+                      <p className="text-[11px] font-semibold text-slate-500">Emergency Email</p>
+                      <p className="font-bold text-slate-800">{(player as any).emergencyEmail}</p>
+                    </div>
+                  )}
+
+                  {(player as any).emergencyPhone && (
+                    <div>
+                      <p className="text-[11px] font-semibold text-slate-500">Emergency Phone</p>
+                      <p className="font-bold text-slate-800">{(player as any).emergencyPhone}</p>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {/* Uploaded Documents Preview Section */}
+            <div className="space-y-3">
+              <div className="flex items-center justify-between">
+                <h3 className="text-xs font-bold text-slate-900 uppercase tracking-wider flex items-center gap-1.5">
+                  <FileText className="w-4 h-4 text-slate-600" /> Uploaded Player Documents
+                </h3>
+                <span className="text-xs font-semibold text-slate-500">
+                  {documentList.length} {documentList.length === 1 ? 'file' : 'files'} attached
+                </span>
+              </div>
+
+              {documentList.length === 0 ? (
+                <div className="text-center py-6 bg-slate-50 rounded-2xl border border-slate-100">
+                  <FileText className="w-8 h-8 text-slate-300 mx-auto mb-1" />
+                  <p className="text-xs font-semibold text-slate-500">No documents uploaded for this player</p>
+                </div>
+              ) : (
                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
                   {documentList.map((docUrl, idx) => (
                     <div
                       key={idx}
-                      onClick={() => setPreviewImage(docUrl)}
-                      className="group relative h-28 bg-white border border-slate-200 rounded-xl overflow-hidden shadow-2xs hover:shadow-md hover:border-blue-400 transition-all cursor-pointer flex items-center justify-center"
+                      className="group relative rounded-xl border border-slate-200 overflow-hidden bg-slate-50 aspect-video flex items-center justify-center shadow-xs"
                     >
                       <Image
                         src={docUrl}
                         alt={`Document ${idx + 1}`}
                         fill
-                        className="object-cover group-hover:scale-105 transition-transform duration-200"
+                        className="object-cover group-hover:scale-105 transition-transform duration-300"
                       />
-                      <div className="absolute inset-0 bg-slate-950/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white gap-1.5 text-xs font-semibold backdrop-blur-[1px]">
-                        <ZoomIn className="w-4 h-4" /> View
+
+                      <div className="absolute inset-0 bg-slate-950/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
+                        <button
+                          type="button"
+                          onClick={() => setPreviewImage(docUrl)}
+                          className="p-1.5 rounded-full bg-white/90 text-slate-800 hover:bg-white transition-colors cursor-pointer"
+                          title="View Full Size"
+                        >
+                          <ZoomIn className="w-4 h-4" />
+                        </button>
                       </div>
                     </div>
                   ))}
-                </div>
-              ) : (
-                <div className="flex items-center gap-2 text-xs font-medium text-slate-400 bg-white p-3 rounded-xl border border-slate-200">
-                  <AlertCircle className="w-4 h-4 text-slate-400 shrink-0" />
-                  No verification documents or ID proof uploaded for this player profile.
                 </div>
               )}
             </div>
@@ -537,49 +679,39 @@ const PlayerViewModal: React.FC<PlayerViewModalProps> = ({
           </div>
 
           {/* Modal Footer */}
-          <div className="p-4 bg-slate-50 border-t border-slate-100 flex items-center justify-between">
-            <div className="text-xs text-slate-500 font-medium">
-              Player ID: <span className="font-mono text-[11px] text-slate-700">{player._id || (player as any).id}</span>
-            </div>
+          <div className="bg-slate-50 p-4 border-t border-slate-100 flex justify-end">
             <button
               type="button"
               onClick={onClose}
-              className="px-5 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold transition-all cursor-pointer shadow-sm"
+              className="px-5 py-2.5 rounded-xl border border-slate-200 text-xs font-semibold text-slate-700 hover:bg-slate-100 transition-colors cursor-pointer"
             >
-              Close Details
+              Close Window
             </button>
           </div>
-
         </DialogContent>
       </Dialog>
 
-      {/* Full-Screen Image Preview Lightbox */}
-      {previewImage && (
-        <div
-          onClick={() => setPreviewImage(null)}
-          className="fixed inset-0 z-60 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4 animate-in fade-in duration-200"
-        >
-          <div
-            className="relative max-w-4xl max-h-[90vh] bg-transparent rounded-2xl overflow-hidden flex flex-col items-center"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <button
-              onClick={() => setPreviewImage(null)}
-              className="absolute top-3 right-3 z-10 p-2 bg-slate-900/80 hover:bg-slate-900 text-white rounded-full transition-all cursor-pointer"
-            >
-              <X className="w-5 h-5" />
-            </button>
-            <div className="relative w-[85vw] max-w-3xl h-[80vh]">
+      {/* Full-Screen Image Preview Modal */}
+      <Dialog open={!!previewImage} onOpenChange={() => setPreviewImage(null)}>
+        <DialogContent className="sm:max-w-2xl bg-white rounded-3xl p-5 border-none shadow-2xl z-[100]">
+          <DialogHeader className="pb-2 border-b border-slate-100">
+            <DialogTitle className="text-sm font-bold text-slate-900 flex items-center gap-2">
+              <FileText className="w-4 h-4 text-slate-500" /> Document Preview
+            </DialogTitle>
+          </DialogHeader>
+
+          {previewImage && (
+            <div className="relative w-full h-[65vh] bg-slate-50 rounded-xl overflow-hidden border border-slate-100 mt-2 flex items-center justify-center p-2">
               <Image
                 src={previewImage}
-                alt="Document Full Preview"
+                alt="Document Preview"
                 fill
-                className="object-contain rounded-xl"
+                className="object-contain"
               />
             </div>
-          </div>
-        </div>
-      )}
+          )}
+        </DialogContent>
+      </Dialog>
     </>
   );
 };

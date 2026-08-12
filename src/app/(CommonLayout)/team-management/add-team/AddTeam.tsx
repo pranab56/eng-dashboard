@@ -12,6 +12,7 @@ import * as z from 'zod'
 
 import { useCreateTeamMutation, useGetSingleTeamQuery, useUpdateTeamMutation } from '@/features/teamManagement/teamApi'
 import { useAssignTeamManagerMutation, useRemoveTeamManagerMutation, useGetAllManagerTeamQuery } from '@/features/managerTeam/managerTeamApi'
+import { useGetAllLeagueQuery } from '@/features/leagueManagement/leagueApi'
 import { baseURL } from '@/utils/BaseURL'
 import { getErrorMessage } from '@/utils/getErrorMessage'
 import { useRouter, useSearchParams } from 'next/navigation'
@@ -24,6 +25,7 @@ const addTeamSchema = z.object({
   teamName: z.string().min(1, "Team Name is required"),
   shortName: z.string().min(1, "Short Name is required"),
   teamType: z.string().min(1, "Team Type is required"),
+  league: z.string().optional(),
   manager: z.string().optional(),
   stadiumName: z.string().min(1, "Stadium Name is required"),
   city: z.string().min(1, "City is required"),
@@ -36,7 +38,6 @@ const teamTypeOptions = [
   { label: "Football", value: "Football" },
   { label: "Cricket", value: "Cricket" },
 ]
-
 
 const AddTeam = () => {
   const { setHeaders } = useHeaders()
@@ -51,10 +52,16 @@ const AddTeam = () => {
   const [removeTeamManager, { isLoading: isRemoving }] = useRemoveTeamManagerMutation()
   const { data: teamData, isFetching } = useGetSingleTeamQuery(teamId, { skip: !isEditMode })
   const { data: managersData } = useGetAllManagerTeamQuery(undefined)
+  const { data: leagueData } = useGetAllLeagueQuery({ limit: 100 })
 
   const managerOptions = (managersData?.data ?? []).map((m: any) => ({
-    label: `${m.firstName} ${m.lastName}`,
+    label: `${m.firstName} ${m.lastName || ''}`.trim() || m.userName,
     value: m._id,
+  }))
+
+  const leagueOptions = (leagueData?.data?.result || leagueData?.data || []).map((l: any) => ({
+    label: l.leagueName || l.name,
+    value: l._id || l.id,
   }))
 
   const {
@@ -70,6 +77,7 @@ const AddTeam = () => {
       teamName: "",
       shortName: "",
       teamType: "Football",
+      league: "",
       manager: "",
       stadiumName: "",
       city: "",
@@ -91,28 +99,33 @@ const AddTeam = () => {
         teamName: team.teamName,
         shortName: team.shortName,
         teamType: team.teamType,
+        league: team.league?._id || team.league || "",
         manager: team.managers?.[0]?.manager?._id || "",
-        stadiumName: team.stadiumName,
-        city: team.city,
-        country: team.country,
+        stadiumName: team.stadiumName || team.stadium || "",
+        city: team.city || team.location || "",
+        country: team.country || "",
         logo: team.teamLogo ? `${baseURL}${team.teamLogo}` : undefined,
       });
     }
   }, [teamData, reset])
 
-  // Re-set manager after options load to ensure Radix Select renders the correct label
+  // Re-set manager and league after options load
   useEffect(() => {
-    if (isEditMode && teamData?.data && managersData?.data) {
-      setValue("manager", teamData.data.managers?.[0]?.manager?._id || "");
+    if (isEditMode && teamData?.data) {
+      if (managersData?.data) {
+        setValue("manager", teamData.data.managers?.[0]?.manager?._id || "");
+      }
+      if (teamData.data.league) {
+        setValue("league", teamData.data.league?._id || teamData.data.league || "");
+      }
     }
   }, [isEditMode, teamData, managersData, setValue])
-
 
   const onSubmit = async (data: AddTeamFormValues) => {
     try {
       const formData = new FormData();
 
-      const jsonData = {
+      const jsonData: any = {
         teamName: data.teamName,
         shortName: data.shortName,
         teamType: data.teamType,
@@ -120,6 +133,10 @@ const AddTeam = () => {
         city: data.city,
         country: data.country
       };
+
+      if (data.league && data.league.trim() !== "") {
+        jsonData.league = data.league;
+      }
 
       formData.append("data", JSON.stringify(jsonData));
 
@@ -157,13 +174,11 @@ const AddTeam = () => {
     return <div className="flex items-center justify-center min-h-[400px]">Loading team data...</div>
   }
 
-
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className=" py-5 px-6 space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
+    <form onSubmit={handleSubmit(onSubmit)} className="py-5 px-6 space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
       <div className='flex items-center justify-between'>
         <BackButton />
-
-        <div className="">
+        <div>
           <SubmitButton isSubmitting={isCreating || isUpdating || isAssigning || isRemoving} title={isEditMode ? "Update Team" : "Create Team"} />
         </div>
       </div>
@@ -178,9 +193,10 @@ const AddTeam = () => {
                 <InputField name="teamName" type="string" title="Team Name" placeholder="e.g. Manchester Kings" register={register} error={errors.teamName} />
                 <InputField name="shortName" type="string" title="Short Name" placeholder="MKFC" register={register} error={errors.shortName} />
               </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                 <SelectField name="teamType" label="Team Type" control={control} error={errors.teamType} options={teamTypeOptions} />
-                <SelectField name="manager" label="Manager (Optional)" placeholder="Select a manager (optional)" control={control} error={errors.manager} options={managerOptions} scrollable />
+                <SelectField name="league" label="Associated League (Optional)" placeholder="Select a league" control={control} error={errors.league} options={leagueOptions} scrollable />
+                <SelectField name="manager" label="Manager (Optional)" placeholder="Select a manager" control={control} error={errors.manager} options={managerOptions} scrollable />
               </div>
             </div>
           </section>
@@ -188,29 +204,28 @@ const AddTeam = () => {
           {/* Location Details Card */}
           <section className="bg-white rounded-xl p-8 md:p-10 border border-gray-50 shadow-xl shadow-gray-200/50 text-gray-800">
             <h2 className="text-2xl font-medium text-gray-900 mb-8">Location & Stadium</h2>
-
             <div className="space-y-8">
-              <InputField name="stadiumName" title="Stadium Name" placeholder="Enter stadium name" register={register} error={errors.stadiumName} />
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                <InputField name="city" title="City" placeholder="Enter city" register={register} error={errors.city} />
-                <InputField name="country" type="string" title="Country" placeholder="Enter country" register={register} error={errors.country} />
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <InputField name="stadiumName" type="string" title="Stadium Name" placeholder="e.g. Wembley Arena" register={register} error={errors.stadiumName} />
+                <InputField name="city" type="string" title="City" placeholder="e.g. London" register={register} error={errors.city} />
+                <InputField name="country" type="string" title="Country" placeholder="e.g. United Kingdom" register={register} error={errors.country} />
               </div>
             </div>
           </section>
-
-          {/* Form Actions */}
-
         </div>
 
-        {/* Right Side - Media */}
-        <div className='basis-[30%] space-y-4'>
-          <section className="bg-white rounded-xl p-8 md:p-10 border border-gray-50 shadow-xl shadow-gray-200/50 text-gray-800">
-            <h2 className="text-2xl font-medium text-gray-900 mb-8">Team Brand</h2>
-
-            {/* Logo Upload */}
-            <div className="w-full">
-              <ImageUploadField name="logo" label="Team Logo" control={control} error={errors.logo as any}>
-                <ImageChildrenComponent maxSizeMB={5} />
+        {/* Brand Identity / Logo Card */}
+        <div className='w-[400px]'>
+          <section className="bg-white rounded-xl p-8 md:p-10 border border-gray-50 shadow-xl shadow-gray-200/50 h-full text-gray-800 flex flex-col">
+            <h2 className="text-2xl font-medium text-gray-900 mb-8">Team Crest</h2>
+            <div className="flex-1 flex flex-col justify-center">
+              <ImageUploadField
+                name="logo"
+                control={control}
+                error={errors.logo}
+                accept="image/*"
+              >
+                <ImageChildrenComponent />
               </ImageUploadField>
             </div>
           </section>
@@ -220,4 +235,4 @@ const AddTeam = () => {
   )
 }
 
-export default AddTeam;
+export default AddTeam

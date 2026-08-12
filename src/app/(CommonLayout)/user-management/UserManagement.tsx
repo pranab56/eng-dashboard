@@ -76,9 +76,9 @@ const UserManagement = () => {
     }
   };
 
-  const handleUpdateUserStatus = async (id: string, status: "APPROVED" | "REJECTED") => {
+  const handleUpdateUserStatus = async (id: string, status: "APPROVED" | "REJECTED", rejectionReason?: string) => {
     try {
-      await updateUserStatus({ id, data: { status } }).unwrap();
+      await updateUserStatus({ id, data: { status, rejectionReason } }).unwrap();
       toast.success(`User status updated to ${status}`);
     } catch (error: any) {
       toast.error(error?.data?.message || "Failed to update user status");
@@ -99,8 +99,8 @@ const UserManagement = () => {
     await handleUpdateUserStatus(id, "APPROVED");
   };
 
-  const handleRejectVerification = async (id: string) => {
-    await handleUpdateUserStatus(id, "REJECTED");
+  const handleRejectVerification = async (id: string, rejectionReason?: string) => {
+    await handleUpdateUserStatus(id, "REJECTED", rejectionReason);
   };
 
   const handleDeleteUserClick = (id: string) => {
@@ -125,8 +125,52 @@ const UserManagement = () => {
     }
   };
 
+  // Filter users by active tab
+  const filteredUsers = (userData?.data || []).filter((user: any) => {
+    const userRole = (user.role || '').toUpperCase();
+    const userStatus = (user.status || '').toUpperCase();
+    const isChildPlayer = !!user.parentId || user.password === null || !user.email || (userRole === 'PLAYER' && (!!user.position || !!user.dateOfBirth || !!user.ageGroup || !!user.selectTeam));
+    const isParent = !isChildPlayer && !user.parentId && !!user.email && !['MANAGER', 'REFEREE', 'CLUB', 'CLUBS', 'OTHER_CLUBS', 'ADMIN', 'SUPER_ADMIN'].includes(userRole) && !user.position && !user.dateOfBirth;
+
+    // Always exclude Parent accounts from User Management tables
+    if (isParent) return false;
+
+    if (activeRole === 'PENDING_REQUESTS') {
+      if (userStatus !== 'PENDING') return false;
+    } else if (activeRole === 'PLAYER') {
+      if (!isChildPlayer && userRole !== 'PLAYER') return false;
+    } else if (activeRole === 'OTHER_CLUBS') {
+      if (userRole !== 'OTHER_CLUBS' && userRole !== 'CLUB' && userRole !== 'CLUBS') return false;
+    } else if (activeRole === 'TOURNAMENT_PLAYER') {
+      if (userRole !== 'TOURNAMENT_PLAYER') return false;
+    } else if (activeRole !== 'ALL') {
+      if (userRole !== activeRole && !userRole.includes(activeRole)) return false;
+    }
+
+    if (searchTerm.trim()) {
+      const q = searchTerm.toLowerCase().trim();
+      const fullName = (user.userName || user.name || `${user.firstName || ''} ${user.lastName || ''}`).toLowerCase();
+      const emailMatch = (user.email || '').toLowerCase().includes(q);
+      const roleMatch = (user.role || '').toLowerCase().includes(q);
+      const phoneMatch = (user.phone || user.phoneNumber || '').toLowerCase().includes(q);
+      if (!fullName.includes(q) && !emailMatch && !roleMatch && !phoneMatch) {
+        return false;
+      }
+    }
+
+    return true;
+  });
+
   const analytics = analyticsData?.data || {};
-  const pendingCount = analytics.pendingRequests ?? userData?.data?.filter((u: any) => (u.status || '').toUpperCase() === 'PENDING').length ?? 0;
+  const pendingCount = activeRole === 'PENDING_REQUESTS'
+    ? filteredUsers.length
+    : (analytics.pendingRequests ?? (userData?.data || []).filter((u: any) => {
+        const userRole = (u.role || '').toUpperCase();
+        const userStatus = (u.status || '').toUpperCase();
+        const isChildPlayer = !!u.parentId || u.password === null || !u.email || (userRole === 'PLAYER' && (!!u.position || !!u.dateOfBirth || !!u.ageGroup || !!u.selectTeam));
+        const isParent = !isChildPlayer && !u.parentId && !!u.email && !['MANAGER', 'REFEREE', 'CLUB', 'CLUBS', 'OTHER_CLUBS', 'ADMIN', 'SUPER_ADMIN'].includes(userRole) && !u.position && !u.dateOfBirth;
+        return !isParent && userStatus === 'PENDING';
+      }).length);
 
   const items = [
     {
@@ -191,42 +235,6 @@ const UserManagement = () => {
   };
 
   const columns = getUsersColumns(handleToggleStatus, handleUpdateUserStatus, handleDeleteUserClick, handleViewUser, handleAssignTeams, activeRole, handleEditProfile);
-
-  // Filter users by active tab
-  const filteredUsers = (userData?.data || []).filter((user: any) => {
-    const userRole = (user.role || '').toUpperCase();
-    const userStatus = (user.status || '').toUpperCase();
-    const isChildPlayer = !!user.parentId || user.password === null || !user.email || (userRole === 'PLAYER' && (!!user.position || !!user.dateOfBirth || !!user.ageGroup || !!user.selectTeam));
-    const isParent = !isChildPlayer && !user.parentId && !!user.email && !['MANAGER', 'REFEREE', 'CLUB', 'CLUBS', 'OTHER_CLUBS', 'ADMIN', 'SUPER_ADMIN'].includes(userRole) && !user.position && !user.dateOfBirth;
-
-    // Always exclude Parent accounts from User Management tables
-    if (isParent) return false;
-
-    if (activeRole === 'PENDING_REQUESTS') {
-      if (userStatus !== 'PENDING') return false;
-    } else if (activeRole === 'PLAYER') {
-      if (!isChildPlayer && userRole !== 'PLAYER') return false;
-    } else if (activeRole === 'OTHER_CLUBS') {
-      if (userRole !== 'OTHER_CLUBS' && userRole !== 'CLUB' && userRole !== 'CLUBS') return false;
-    } else if (activeRole === 'TOURNAMENT_PLAYER') {
-      if (userRole !== 'TOURNAMENT_PLAYER') return false;
-    } else if (activeRole !== 'ALL') {
-      if (userRole !== activeRole && !userRole.includes(activeRole)) return false;
-    }
-
-    if (searchTerm.trim()) {
-      const q = searchTerm.toLowerCase().trim();
-      const fullName = (user.userName || user.name || `${user.firstName || ''} ${user.lastName || ''}`).toLowerCase();
-      const emailMatch = (user.email || '').toLowerCase().includes(q);
-      const roleMatch = (user.role || '').toLowerCase().includes(q);
-      const phoneMatch = (user.phone || user.phoneNumber || '').toLowerCase().includes(q);
-      if (!fullName.includes(q) && !emailMatch && !roleMatch && !phoneMatch) {
-        return false;
-      }
-    }
-
-    return true;
-  });
 
   // Sort PENDING requests to the top (Newest pending first)
   const sortedUsers = [...filteredUsers].sort((a: any, b: any) => {

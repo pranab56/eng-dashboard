@@ -76,12 +76,47 @@ export const userApi = baseApi.injectEndpoints({
       invalidatesTags: ["user"]
     }),
 
+    getAllParents: builder.query({
+      query: (params) => {
+        let pageNumber = 1;
+        let searchValue = "";
+
+        if (typeof params === "object" && params !== null) {
+          pageNumber = params.pageNumber || params.page || 1;
+          searchValue = params.searchValue || params.searchTerm || "";
+        } else if (params) {
+          pageNumber = params;
+        }
+
+        let url = `/user-management/parents?page=${pageNumber}`;
+        if (searchValue) {
+          url += `&searchTerm=${encodeURIComponent(searchValue)}`;
+        }
+        return {
+          url,
+          method: "GET",
+        };
+      },
+      providesTags: ["user", "parent"]
+    }),
+
+    assignTeamToUser: builder.mutation({
+      query: ({ id, data }) => ({
+        url: `/user-management/assign-team/${id}`,
+        method: "PATCH",
+        body: data,
+      }),
+      invalidatesTags: ["user", "player"]
+    }),
+
   }),
 });
 
 // Export hooks
 export const {
   useGetUserQuery,
+  useGetAllParentsQuery,
+  useAssignTeamToUserMutation,
   useUpdateStatusMutation,
   useDeleteUserMutation,
   useUpdateUserStatusMutation,

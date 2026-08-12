@@ -31,19 +31,23 @@ import {
   Check,
   Copy,
   CreditCard,
+  Edit3,
 } from 'lucide-react';
 import { Loader2 } from 'lucide-react';
 import dayjs from 'dayjs';
 import { toast } from 'sonner';
 import { useUpdateEngCoinBudgetMutation } from '@/features/player/playerApi';
+import { useGetAllTeamQuery } from '@/features/teamManagement/teamApi';
+import { useUpdateUserStatusMutation, useAssignTeamToUserMutation } from '@/features/userManagement/userApi';
 import { getErrorMessage } from '@/utils/getErrorMessage';
+import { TeamSelectDropdown } from '@/components/dropdowns/TeamSelectDropdown';
 
 interface UserVerificationModalProps {
   user: TUserManagement | null;
   isOpen: boolean;
   onClose: () => void;
   onApprove: (id: string) => Promise<void>;
-  onReject: (id: string) => Promise<void>;
+  onReject: (id: string, rejectionReason?: string) => Promise<void>;
   isUpdating?: boolean;
 }
 
@@ -58,6 +62,21 @@ const UserVerificationModal: React.FC<UserVerificationModalProps> = ({
   const [previewImage, setPreviewImage] = useState<string | null>(null);
   const [copiedField, setCopiedField] = useState<string | null>(null);
 
+  // Reject Reason Prompt States
+  const [isRejectReasonModalOpen, setIsRejectReasonModalOpen] = useState(false);
+  const [rejectionReasonInput, setRejectionReasonInput] = useState('');
+  const [isSubmittingReject, setIsSubmittingReject] = useState(false);
+
+  // Team Selection States
+  const [isEditingTeam, setIsEditingTeam] = useState(false);
+  const [selectedTeamIdInput, setSelectedTeamIdInput] = useState<string>('');
+  const [isSavingTeam, setIsSavingTeam] = useState(false);
+
+  const { data: teamData } = useGetAllTeamQuery({ limit: 100 });
+  const allTeams = teamData?.data?.result || teamData?.data || [];
+
+  const [assignTeamToUser] = useAssignTeamToUserMutation();
+  const [updateUserStatus] = useUpdateUserStatusMutation();
   const [updateEngCoinBudget] = useUpdateEngCoinBudgetMutation();
   const [isEditingEconomy, setIsEditingEconomy] = useState(false);
   const [editCoinsInput, setEditCoinsInput] = useState<number | string>("");
@@ -66,6 +85,8 @@ const UserVerificationModal: React.FC<UserVerificationModalProps> = ({
   React.useEffect(() => {
     if (user) {
       setEditCoinsInput(Number((user as any).engCoine ?? (user as any).coin ?? (user as any).coins) || 0);
+      const curTeamId = (user.selectTeam as any)?._id || user.selectTeam || '';
+      setSelectedTeamIdInput(typeof curTeamId === 'string' ? curTeamId : (curTeamId as any)?._id || '');
     }
   }, [user]);
 
@@ -91,6 +112,26 @@ const UserVerificationModal: React.FC<UserVerificationModalProps> = ({
     }
   };
 
+  const handleSaveTeam = async () => {
+    if (!user) return;
+    try {
+      setIsSavingTeam(true);
+      const res = await assignTeamToUser({
+        id: user._id,
+        data: { selectTeam: selectedTeamIdInput || null },
+      }).unwrap();
+
+      if (res.success) {
+        toast.success("Team assigned successfully");
+        setIsEditingTeam(false);
+      }
+    } catch (err: any) {
+      toast.error(getErrorMessage(err, "Failed to update team"));
+    } finally {
+      setIsSavingTeam(false);
+    }
+  };
+
   if (!user) return null;
 
   const profileUrl = formatImagePath(user.profile || user.profilePic);
@@ -99,14 +140,8 @@ const UserVerificationModal: React.FC<UserVerificationModalProps> = ({
     : (user.userName || user.name || 'Member Profile');
 
   const initials = fullName.charAt(0).toUpperCase();
+  const isPlayer = !!user.parentId || user.role === 'PLAYER' || !!user.position || !!user.ageGroup;
   const currentStatus = (user.status || 'PENDING').toUpperCase();
-  const userRoleUpper = (user.role || '').toString().trim().toUpperCase();
-  const isPlayer =
-    userRoleUpper === 'PLAYER' ||
-    userRoleUpper === 'TOURNAMENT_PLAYER' ||
-    Boolean(user.parentId) ||
-    Boolean(user.position) ||
-    !['MANAGER', 'REFEREE', 'ADMIN', 'SUPER_ADMIN'].includes(userRoleUpper);
 
   // Parent Info Extraction
   const parentObj = typeof user.parentId === 'object' && user.parentId ? (user.parentId as any) : null;
@@ -118,6 +153,7 @@ const UserVerificationModal: React.FC<UserVerificationModalProps> = ({
 
   const coins = Number((user as any).engCoine ?? (user as any).coin ?? (user as any).coins) || 0;
   const marketValue = Number((user as any).marketValue) || (coins * 100);
+  const sub = user.subscription;
 
   // Extract Document List
   const getDocumentList = (): string[] => {
@@ -144,7 +180,7 @@ const UserVerificationModal: React.FC<UserVerificationModalProps> = ({
   };
 
   const documentList = getDocumentList();
-  const selectedTeam = user.selectTeam;
+  const selectedTeam = user.selectTeam as any;
 
   const handleCopyText = async (text: string, label: string) => {
     if (!text) return;
@@ -190,9 +226,22 @@ const UserVerificationModal: React.FC<UserVerificationModalProps> = ({
     onClose();
   };
 
-  const handleRejectAction = async () => {
-    await onReject(user._id);
-    onClose();
+  const handleOpenRejectModal = () => {
+    setRejectionReasonInput(user.rejectionReason || '');
+    setIsRejectReasonModalOpen(true);
+  };
+
+  const handleConfirmReject = async () => {
+    try {
+      setIsSubmittingReject(true);
+      await onReject(user._id, rejectionReasonInput.trim() || 'Profile did not meet verification criteria.');
+      setIsRejectReasonModalOpen(false);
+      onClose();
+    } catch (err: any) {
+      toast.error(getErrorMessage(err, "Failed to reject user"));
+    } finally {
+      setIsSubmittingReject(false);
+    }
   };
 
   return (
@@ -272,6 +321,19 @@ const UserVerificationModal: React.FC<UserVerificationModalProps> = ({
           {/* Modal Body Container */}
           <div className="p-6 space-y-5 overflow-y-auto max-h-[68vh] hide-scrollbar text-slate-800">
 
+            {/* Rejection Reason Alert Banner (if status is REJECTED) */}
+            {currentStatus === 'REJECTED' && (
+              <div className="bg-rose-50 border border-rose-200 rounded-2xl p-4 flex items-start gap-3">
+                <AlertCircle className="w-5 h-5 text-rose-600 shrink-0 mt-0.5" />
+                <div>
+                  <h4 className="text-xs font-bold text-rose-900 uppercase">Profile Rejected by Admin</h4>
+                  <p className="text-xs text-rose-700 font-medium mt-0.5">
+                    Reason: {user.rejectionReason || 'Profile did not meet required verification criteria.'}
+                  </p>
+                </div>
+              </div>
+            )}
+
             {/* Parent / Account Owner Details Card (If viewing a Player) */}
             {isPlayer && (parentName || parentEmail || parentPhone) && (
               <div className="bg-indigo-50/40 border border-indigo-100 rounded-2xl p-4 space-y-2.5">
@@ -333,6 +395,47 @@ const UserVerificationModal: React.FC<UserVerificationModalProps> = ({
               </div>
             )}
 
+            {/* Subscription Details Card */}
+            <div className="bg-emerald-50/50 border border-emerald-200/80 rounded-2xl p-4 space-y-2.5">
+              <div className="flex items-center justify-between">
+                <h3 className="text-xs font-bold text-emerald-950 uppercase tracking-wider flex items-center gap-1.5">
+                  <CreditCard className="w-4 h-4 text-emerald-600" /> Active Subscription Plan
+                </h3>
+                <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase border ${sub ? 'bg-emerald-100 text-emerald-800 border-emerald-300' : 'bg-slate-100 text-slate-600 border-slate-200'}`}>
+                  {sub ? 'Active Subscription' : 'No Active Plan'}
+                </span>
+              </div>
+
+              {sub ? (
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-1">
+                  <div>
+                    <p className="text-[11px] font-semibold text-slate-500">Package</p>
+                    <p className="text-xs font-bold text-slate-900 flex items-center gap-1">
+                      <Sparkles className="w-3.5 h-3.5 text-emerald-600" />
+                      {sub.packageName || 'ENG Plan'}
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-[11px] font-semibold text-slate-500">Price Paid</p>
+                    <p className="text-xs font-bold text-slate-900">£{sub.price}</p>
+                  </div>
+                  <div>
+                    <p className="text-[11px] font-semibold text-slate-500">Status</p>
+                    <p className="text-xs font-bold text-emerald-700 uppercase">{sub.status || 'Active'}</p>
+                  </div>
+                  <div>
+                    <p className="text-[11px] font-semibold text-slate-500">Valid Until</p>
+                    <p className="text-xs font-bold text-slate-800 flex items-center gap-1">
+                      <Calendar className="w-3.5 h-3.5 text-slate-500 shrink-0" />
+                      {sub.currentPeriodEnd ? dayjs(sub.currentPeriodEnd).format('DD MMM YYYY') : 'N/A'}
+                    </p>
+                  </div>
+                </div>
+              ) : (
+                <p className="text-xs text-slate-500 font-medium">Free registered profile / No active package</p>
+              )}
+            </div>
+
             {/* Primary Details Card */}
             <div className="bg-slate-50/60 border border-slate-200/80 rounded-2xl p-4 space-y-3">
               <h3 className="text-xs font-bold text-slate-900 uppercase tracking-wider flex items-center gap-1.5">
@@ -391,29 +494,33 @@ const UserVerificationModal: React.FC<UserVerificationModalProps> = ({
                     </div>
 
                     <div>
-                      <p className="text-[11px] font-semibold text-slate-500">Strong Foot</p>
+                      <p className="text-[11px] font-semibold text-slate-500">Preferred Foot</p>
                       <p className="text-xs font-bold text-slate-900">{user.strongFoot || 'N/A'}</p>
                     </div>
 
                     <div>
                       <div className="flex items-center justify-between">
-                        <p className="text-[11px] font-semibold text-slate-500">ENG Coins</p>
-                        <button
-                          type="button"
-                          onClick={() => setIsEditingEconomy(!isEditingEconomy)}
-                          className="text-[10px] text-blue-600 hover:text-blue-800 font-bold underline cursor-pointer"
-                        >
-                          {isEditingEconomy ? "Cancel" : "Edit Coins"}
-                        </button>
+                        <p className="text-[11px] font-semibold text-slate-500">ENG Coin</p>
+                        {!isEditingEconomy && (
+                          <button
+                            type="button"
+                            onClick={() => setIsEditingEconomy(true)}
+                            className="text-[10px] text-amber-600 hover:text-amber-700 font-bold underline cursor-pointer"
+                          >
+                            Edit
+                          </button>
+                        )}
                       </div>
+
                       {isEditingEconomy ? (
                         <div className="flex items-center gap-1.5 mt-1">
                           <input
                             type="number"
-                            min="0"
                             value={editCoinsInput}
                             onChange={(e) => setEditCoinsInput(e.target.value)}
-                            className="w-20 px-2 py-1 text-xs border border-slate-300 rounded-lg bg-white font-bold text-amber-700"
+                            className="w-20 px-2 py-1 text-xs font-bold border border-amber-300 rounded-lg bg-amber-50/50 focus:outline-none focus:ring-1 focus:ring-amber-500"
+                            placeholder="Coins"
+                            autoFocus
                           />
                           <button
                             type="button"
@@ -452,16 +559,54 @@ const UserVerificationModal: React.FC<UserVerificationModalProps> = ({
             </div>
 
             {/* Club & Academy Credentials Section */}
-            {(isPlayer || selectedTeam) && (
+            {(isPlayer || selectedTeam || user.role === 'MANAGER') && (
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
 
-                {/* Team Card */}
+                {/* Team Card with Admin Change Dropdown */}
                 <div className="bg-slate-50/60 border border-slate-200/80 rounded-2xl p-4 space-y-2.5">
-                  <h3 className="text-xs font-bold text-slate-900 uppercase tracking-wider flex items-center gap-1.5">
-                    <Building2 className="w-4 h-4 text-slate-600" /> Associated Team / Club
-                  </h3>
+                  <div className="flex items-center justify-between">
+                    <h3 className="text-xs font-bold text-slate-900 uppercase tracking-wider flex items-center gap-1.5">
+                      <Building2 className="w-4 h-4 text-slate-600" /> Associated Team / Club
+                    </h3>
+                    <button
+                      type="button"
+                      onClick={() => setIsEditingTeam(!isEditingTeam)}
+                      className="text-[11px] font-bold text-indigo-600 hover:text-indigo-800 flex items-center gap-1 cursor-pointer"
+                    >
+                      <Edit3 className="w-3 h-3" />
+                      {isEditingTeam ? "Cancel" : "Change Team"}
+                    </button>
+                  </div>
 
-                  {selectedTeam && (selectedTeam.teamName || selectedTeam.shortName) ? (
+                  {isEditingTeam ? (
+                    <div className="space-y-2 p-3 bg-white border border-indigo-200 rounded-xl shadow-xs">
+                      <label className="text-[11px] font-bold text-slate-700 block">Select Team to Assign:</label>
+                      <TeamSelectDropdown
+                        teams={allTeams}
+                        selectedTeamId={selectedTeamIdInput}
+                        onChange={(teamId) => setSelectedTeamIdInput(teamId)}
+                        placeholder="Search & choose a team..."
+                      />
+                      <div className="flex justify-end gap-2 pt-1">
+                        <button
+                          type="button"
+                          onClick={() => setIsEditingTeam(false)}
+                          className="px-2.5 py-1 text-xs font-semibold text-slate-500 hover:text-slate-800 cursor-pointer"
+                        >
+                          Cancel
+                        </button>
+                        <button
+                          type="button"
+                          onClick={handleSaveTeam}
+                          disabled={isSavingTeam}
+                          className="px-3 py-1 bg-indigo-600 text-white text-xs font-bold rounded-lg hover:bg-indigo-700 disabled:opacity-50 cursor-pointer flex items-center gap-1 shadow-xs"
+                        >
+                          {isSavingTeam && <Loader2 className="w-3 h-3 animate-spin" />}
+                          Save Team
+                        </button>
+                      </div>
+                    </div>
+                  ) : selectedTeam && (selectedTeam.teamName || selectedTeam.shortName) ? (
                     <div className="flex items-center gap-3 p-2.5 bg-white border border-slate-200 rounded-xl">
                       <div className="relative w-10 h-10 rounded-lg bg-slate-50 border border-slate-200 flex items-center justify-center overflow-hidden shrink-0">
                         {selectedTeam.teamLogo ? (
@@ -523,159 +668,93 @@ const UserVerificationModal: React.FC<UserVerificationModalProps> = ({
                     </div>
                   </div>
                 )}
-
               </div>
             )}
 
-            {/* Subscription & Membership Card */}
-            {(isPlayer || user.subscription || user.activeSubscription || user.isPaid) && (
-              <div className="bg-gradient-to-r from-slate-50 to-blue-50/40 border border-blue-200/80 rounded-2xl p-4 space-y-3">
-                <div className="flex items-center justify-between">
-                  <h3 className="text-xs font-bold text-slate-900 uppercase tracking-wider flex items-center gap-1.5">
-                    <CreditCard className="w-4 h-4 text-blue-600" /> Subscription & Membership Plan
-                  </h3>
-                  <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold ${
-                    user.subscription?.status === 'active' || user.activeSubscription || user.isPaid
-                      ? 'bg-emerald-100 text-emerald-800 border border-emerald-300'
-                      : 'bg-amber-100 text-amber-800 border border-amber-300'
-                  }`}>
-                    {user.subscription?.status === 'active' || user.activeSubscription || user.isPaid ? 'Active Paid Member' : 'No Active Subscription'}
-                  </span>
+            {/* Emergency Contacts Card */}
+            {(user.emergencyEmail || user.emergencyPhone) && (
+              <div className="bg-slate-50/60 border border-slate-200/80 rounded-2xl p-4 space-y-2.5">
+                <h3 className="text-xs font-bold text-slate-900 uppercase tracking-wider flex items-center gap-1.5">
+                  <Phone className="w-4 h-4 text-rose-500" /> Emergency Contact Details
+                </h3>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+                  {user.emergencyEmail && (
+                    <div>
+                      <p className="text-[11px] font-semibold text-slate-500">Emergency Email</p>
+                      <p className="font-bold text-slate-800">{user.emergencyEmail}</p>
+                    </div>
+                  )}
+
+                  {user.emergencyPhone && (
+                    <div>
+                      <p className="text-[11px] font-semibold text-slate-500">Emergency Phone</p>
+                      <p className="font-bold text-slate-800">{user.emergencyPhone}</p>
+                    </div>
+                  )}
                 </div>
-
-                {user.subscription || user.activeSubscription ? (
-                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 bg-white p-3.5 rounded-xl border border-slate-200">
-                    <div>
-                      <p className="text-[11px] font-semibold text-slate-500">Plan Name</p>
-                      <p className="text-xs font-bold text-slate-900 truncate">
-                        {user.subscription?.packageName || user.subscription?.package?.title || user.activeSubscription?.package?.title || 'Standard Plan'}
-                      </p>
-                    </div>
-                    <div>
-                      <p className="text-[11px] font-semibold text-slate-500">Package Price</p>
-                      <p className="text-xs font-bold text-emerald-600">
-                        £{user.subscription?.price || user.activeSubscription?.price || user.subscription?.package?.price || '0'}
-                      </p>
-                    </div>
-                    <div>
-                      <p className="text-[11px] font-semibold text-slate-500">Transaction ID</p>
-                      <p className="text-xs font-mono font-semibold text-slate-700 truncate">
-                        {user.subscription?.trxId || user.subscription?.subscriptionId || user.activeSubscription?.trxId || 'N/A'}
-                      </p>
-                    </div>
-                    <div>
-                      <p className="text-[11px] font-semibold text-slate-500">Period / Expiry</p>
-                      <p className="text-xs font-bold text-slate-800 flex items-center gap-1">
-                        <Calendar className="w-3 h-3 text-slate-400 shrink-0" />
-                        {user.subscription?.currentPeriodEnd || user.activeSubscription?.currentPeriodEnd
-                          ? dayjs(user.subscription?.currentPeriodEnd || user.activeSubscription?.currentPeriodEnd).format('DD MMM YYYY')
-                          : 'N/A'}
-                      </p>
-                    </div>
-                  </div>
-                ) : (
-                  <div className="p-3 bg-white border border-slate-200 rounded-xl flex items-center gap-2">
-                    <AlertCircle className="w-4 h-4 text-amber-500 shrink-0" />
-                    <p className="text-xs text-slate-600">No active subscription plan attached to this player account.</p>
-                  </div>
-                )}
               </div>
             )}
 
-            {/* Verification Documents Section */}
-            <div className="bg-slate-50/60 border border-slate-200/80 rounded-2xl p-4 space-y-3">
+            {/* Uploaded Documents Preview Section */}
+            <div className="space-y-3">
               <div className="flex items-center justify-between">
                 <h3 className="text-xs font-bold text-slate-900 uppercase tracking-wider flex items-center gap-1.5">
-                  <FileText className="w-4 h-4 text-slate-600" /> Submitted Proof of Age / Identity Documents
+                  <FileText className="w-4 h-4 text-slate-600" /> Uploaded Verification Documents
                 </h3>
-                <span className="text-[10px] font-semibold text-slate-600 bg-slate-200/70 px-2.5 py-0.5 rounded-full">
-                  {documentList.length} File(s) Attached
+                <span className="text-xs font-semibold text-slate-500">
+                  {documentList.length} {documentList.length === 1 ? 'file' : 'files'} attached
                 </span>
               </div>
 
-              {documentList.length > 0 ? (
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  {documentList.map((docUrl, idx) => {
-                    const isPdf = docUrl.toLowerCase().endsWith('.pdf');
-
-                    if (isPdf) {
-                      return (
-                        <div
-                          key={idx}
-                          className="bg-white border border-slate-200 rounded-xl p-3 flex flex-col justify-between space-y-2 shadow-xs hover:border-slate-300 transition-all"
-                        >
-                          <div className="flex items-center gap-2.5">
-                            <div className="w-8 h-8 rounded-lg bg-rose-50 border border-rose-200 text-rose-600 flex items-center justify-center font-bold text-xs shrink-0">
-                              PDF
-                            </div>
-                            <div className="flex-1 min-w-0">
-                              <p className="text-xs font-bold text-slate-900 truncate">
-                                Document {idx + 1}
-                              </p>
-                              <p className="text-[10px] text-slate-400 truncate">
-                                {docUrl.split('/').pop() || 'document.pdf'}
-                              </p>
-                            </div>
-                          </div>
-
-                          <a
-                            href={docUrl}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="w-full py-1.5 bg-slate-50 border border-slate-200 hover:bg-slate-100 text-slate-700 rounded-lg text-xs font-semibold transition-all flex items-center justify-center gap-1.5"
-                          >
-                            <ExternalLink className="w-3.5 h-3.5" /> View PDF Document
-                          </a>
-                        </div>
-                      );
-                    }
-
-                    return (
-                      <div
-                        key={idx}
-                        className="group relative bg-white border border-slate-200 rounded-xl overflow-hidden shadow-xs hover:border-slate-300 transition-all"
-                      >
-                        <div className="relative h-40 w-full bg-slate-100 flex items-center justify-center overflow-hidden">
-                          <Image
-                            src={docUrl}
-                            alt={`Document ${idx + 1}`}
-                            fill
-                            className="object-contain p-2 group-hover:scale-105 transition-transform duration-300"
-                          />
-                          <div className="absolute inset-0 bg-slate-900/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                            <button
-                              type="button"
-                              onClick={() => setPreviewImage(docUrl)}
-                              className="px-3 py-1.5 bg-white text-slate-900 rounded-lg font-semibold text-xs shadow-md flex items-center gap-1.5 hover:bg-slate-50 cursor-pointer"
-                            >
-                              <ZoomIn className="w-3.5 h-3.5 text-slate-700" /> Preview
-                            </button>
-                          </div>
-                        </div>
-                        <div className="p-2 bg-slate-50 border-t border-slate-100 text-center">
-                          <p className="text-xs font-semibold text-slate-700">
-                            Proof Document {idx + 1}
-                          </p>
-                        </div>
-                      </div>
-                    );
-                  })}
+              {documentList.length === 0 ? (
+                <div className="text-center py-6 bg-slate-50 rounded-2xl border border-slate-100">
+                  <FileText className="w-8 h-8 text-slate-300 mx-auto mb-1" />
+                  <p className="text-xs font-semibold text-slate-500">No documents uploaded for this member</p>
                 </div>
               ) : (
-                <div className="flex flex-col items-center justify-center p-5 bg-white border border-amber-200 rounded-xl text-center space-y-1">
-                  <AlertCircle className="w-6 h-6 text-amber-500" />
-                  <p className="text-xs font-bold text-amber-800">No Documents Uploaded</p>
-                  <p className="text-[11px] text-slate-500 max-w-xs">
-                    This profile was submitted without attaching identity verification documents.
-                  </p>
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                  {documentList.map((docUrl, idx) => (
+                    <div
+                      key={idx}
+                      className="group relative rounded-xl border border-slate-200 overflow-hidden bg-slate-50 aspect-video flex items-center justify-center shadow-xs"
+                    >
+                      <Image
+                        src={docUrl}
+                        alt={`Document ${idx + 1}`}
+                        fill
+                        className="object-cover group-hover:scale-105 transition-transform duration-300"
+                      />
+
+                      <div className="absolute inset-0 bg-slate-950/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
+                        <button
+                          type="button"
+                          onClick={() => setPreviewImage(docUrl)}
+                          className="p-1.5 rounded-full bg-white/90 text-slate-800 hover:bg-white transition-colors cursor-pointer"
+                          title="View Full Size"
+                        >
+                          <ZoomIn className="w-4 h-4" />
+                        </button>
+                        <a
+                          href={docUrl}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="p-1.5 rounded-full bg-white/90 text-slate-800 hover:bg-white transition-colors cursor-pointer"
+                          title="Open in New Tab"
+                        >
+                          <ExternalLink className="w-4 h-4" />
+                        </a>
+                      </div>
+                    </div>
+                  ))}
                 </div>
               )}
             </div>
 
           </div>
 
-          {/* Action Footer */}
-          <div className="p-4 px-6 bg-slate-50 border-t border-slate-100 flex items-center justify-between gap-3">
+          {/* Modal Footer Controls */}
+          <div className="bg-slate-50 p-4 sm:p-5 border-t border-slate-100 flex items-center justify-between">
             <button
               type="button"
               onClick={onClose}
@@ -688,9 +767,9 @@ const UserVerificationModal: React.FC<UserVerificationModalProps> = ({
               <div className="flex items-center gap-2.5">
                 <button
                   type="button"
-                  onClick={handleRejectAction}
+                  onClick={handleOpenRejectModal}
                   disabled={isUpdating}
-                  className="flex items-center gap-1.5 px-5 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-semibold transition-all cursor-pointer disabled:opacity-50"
+                  className="flex items-center gap-1.5 px-5 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-semibold transition-all cursor-pointer disabled:opacity-50 shadow-xs"
                 >
                   {isUpdating ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <XCircle className="w-3.5 h-3.5" />}
                   Reject Profile
@@ -700,7 +779,7 @@ const UserVerificationModal: React.FC<UserVerificationModalProps> = ({
                   type="button"
                   onClick={handleApproveAction}
                   disabled={isUpdating}
-                  className="flex items-center gap-1.5 px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold transition-all cursor-pointer disabled:opacity-50"
+                  className="flex items-center gap-1.5 px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold transition-all cursor-pointer disabled:opacity-50 shadow-xs"
                 >
                   {isUpdating ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <CheckCircle2 className="w-3.5 h-3.5" />}
                   Approve Profile
@@ -719,6 +798,51 @@ const UserVerificationModal: React.FC<UserVerificationModalProps> = ({
                 </span>
               </div>
             )}
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Reject Reason Input Dialog */}
+      <Dialog open={isRejectReasonModalOpen} onOpenChange={() => setIsRejectReasonModalOpen(false)}>
+        <DialogContent className="sm:max-w-md bg-white rounded-3xl p-6 border-none shadow-2xl z-[110]">
+          <DialogHeader className="pb-2 border-b border-slate-100">
+            <DialogTitle className="text-base font-bold text-slate-900 flex items-center gap-2 text-rose-600">
+              <XCircle className="w-5 h-5" /> Specify Rejection Reason
+            </DialogTitle>
+          </DialogHeader>
+
+          <div className="space-y-3 py-2">
+            <p className="text-xs text-slate-600 font-medium">
+              Please enter the reason for rejecting <strong className="text-slate-900">{fullName}</strong>. This reason will be recorded and communicated to the user.
+            </p>
+
+            <textarea
+              rows={4}
+              value={rejectionReasonInput}
+              onChange={(e) => setRejectionReasonInput(e.target.value)}
+              placeholder="e.g. Uploaded documents are unclear, date of birth mismatch, missing player credentials..."
+              className="w-full text-xs p-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-rose-500 focus:outline-none resize-none"
+              autoFocus
+            />
+          </div>
+
+          <div className="flex justify-end gap-2 pt-2 border-t border-slate-100">
+            <button
+              type="button"
+              onClick={() => setIsRejectReasonModalOpen(false)}
+              className="px-4 py-2 rounded-xl text-xs font-semibold text-slate-600 hover:bg-slate-100 cursor-pointer"
+            >
+              Cancel
+            </button>
+            <button
+              type="button"
+              onClick={handleConfirmReject}
+              disabled={isSubmittingReject}
+              className="px-5 py-2 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold transition-colors cursor-pointer disabled:opacity-50 flex items-center gap-1.5 shadow-xs"
+            >
+              {isSubmittingReject && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
+              Confirm Rejection
+            </button>
           </div>
         </DialogContent>
       </Dialog>

@@ -1,12 +1,12 @@
 "use client"
 
-
 import CreateButton from '@/components/buttons/CreateButton';
 import CustomPagination from '@/components/cui/CustomPagination';
 import GeneralStateCard from '@/components/cui/GeneralStateCard';
 import CustomTable from '@/components/table/CustomTable';
 import TableTitle from '@/components/titles/TableTitle';
 import { useDeleteTeamMutation, useGetAllTeamQuery, useUpdateTeamCoinBudgetMutation } from '@/features/teamManagement/teamApi';
+import { useGetAllLeagueQuery } from '@/features/leagueManagement/leagueApi';
 import { useHeaders } from '@/hooks/useHeaders';
 import { getTeamColumns } from '@/tableColumns/teamColumns';
 import Link from 'next/link';
@@ -16,22 +16,26 @@ import { toast } from 'sonner';
 import DeleteConfirmModal from '../match-management/DeleteConfirmModal';
 import TeamViewModal from './TeamViewModal';
 import { UpdateCoinModal } from '@/components/modals/UpdateCoinModal';
-import { Search } from 'lucide-react';
-
+import { Search, Filter, X, Trophy } from 'lucide-react';
+import { LeagueSelectDropdown } from '@/components/dropdowns/LeagueSelectDropdown';
 
 const TeamManagement = () => {
-
   const { setHeaders } = useHeaders();
   const searchParams = useSearchParams();
   const page = searchParams.get("teamPage") || "1";
 
   const [searchTerm, setSearchTerm] = useState("");
+  const [selectedLeagueId, setSelectedLeagueId] = useState<string>("ALL");
 
   const { data: teamData, isLoading } = useGetAllTeamQuery({
     page,
     limit: 10,
     searchTerm,
   });
+
+  const { data: leagueData } = useGetAllLeagueQuery({ limit: 100 });
+  const allLeagues = leagueData?.data?.result || leagueData?.data || [];
+
   const [deleteTeam, { isLoading: isDeleting }] = useDeleteTeamMutation();
   const [updateTeamCoinBudget, { isLoading: isUpdatingCoin }] = useUpdateTeamCoinBudgetMutation();
 
@@ -47,9 +51,9 @@ const TeamManagement = () => {
   useEffect(() => {
     setHeaders({
       title: "Teams",
-      des: "Manage and monitor registered squads and team identities."
-    })
-  }, [setHeaders])
+      des: "Manage and monitor registered squads, league associations, and team identities."
+    });
+  }, [setHeaders]);
 
   const handleView = (team: any) => {
     setSelectedTeam(team);
@@ -98,66 +102,102 @@ const TeamManagement = () => {
     }
   };
 
-  const items = [
-    {
-      title: "Total Teams",
-      value: teamData?.pagination?.total || 0,
-      id: "table1",
-      description: "Total registered teams"
-    }
-  ];
-
-
   const filteredTeams = useMemo(() => {
     const list = teamData?.data || [];
-    if (!searchTerm.trim()) return list;
-    const q = searchTerm.toLowerCase().trim();
-    return list.filter(
-      (t: any) =>
+    return list.filter((t: any) => {
+      // Filter by League
+      if (selectedLeagueId !== "ALL") {
+        const teamLeagueId = t.league?._id || t.league || t.leagueId;
+        if (teamLeagueId !== selectedLeagueId) return false;
+      }
+
+      // Filter by Search Query
+      if (!searchTerm.trim()) return true;
+      const q = searchTerm.toLowerCase().trim();
+      return (
         (t.teamName || "").toLowerCase().includes(q) ||
         (t.stadium || "").toLowerCase().includes(q) ||
         (t.shortName || "").toLowerCase().includes(q) ||
         (t.location || "").toLowerCase().includes(q)
-    );
-  }, [teamData, searchTerm]);
+      );
+    });
+  }, [teamData, searchTerm, selectedLeagueId]);
+
+  const items = [
+    {
+      title: "Total Teams",
+      value: teamData?.pagination?.total || (teamData?.data || []).length,
+      id: "table1",
+      description: "Total registered squads in database"
+    },
+    {
+      title: "Available Leagues",
+      value: allLeagues.length,
+      id: "table2",
+      description: "Registered competition tiers"
+    }
+  ];
 
   return (
     <div className='py-10 px-8 space-y-6 pb-16'>
-      <div className='flex items-end'>
-        <div className='w-9/12 '>
-          <GeneralStateCard items={items} className='grid-cols-3' />
+      <div className='flex flex-col md:flex-row items-end gap-4'>
+        <div className='w-full md:w-9/12'>
+          <GeneralStateCard items={items} className='grid-cols-1 sm:grid-cols-2' />
         </div>
-        <div className='w-3/12 '>
-          <Link href="/team-management/budget_economay" className='w-full' >
-            <CreateButton text="Edit Club Budget & Economay" className='py-4' />
+        <div className='w-full md:w-3/12'>
+          <Link href="/team-management/budget_economay" className='w-full block'>
+            <CreateButton text="Edit Club Budget & Economy" className='py-4 w-full justify-center' />
           </Link>
         </div>
       </div>
 
-      <div className=" bg-white rounded-md py-4 flex flex-col ">
+      <div className="bg-white rounded-xl shadow-xs border border-gray-100 py-4 flex flex-col">
         <div className='flex-1'>
-          <div className="flex items-center justify-between px-6 py-1">
+          <div className="flex flex-col lg:flex-row lg:items-center justify-between px-6 py-2 gap-4 border-b border-gray-100 pb-4">
             <TableTitle payload={{ title: "Squad Registry" }} />
-            <div className='flex items-center gap-3'>
-              <div className="relative w-64 md:w-80">
+
+            {/* Search & Filter Toolbar */}
+            <div className='flex flex-wrap items-center gap-3'>
+              {/* League Filter Dropdown */}
+              <LeagueSelectDropdown
+                leagues={allLeagues}
+                selectedLeagueId={selectedLeagueId}
+                onChange={(lgId) => setSelectedLeagueId(lgId)}
+                placeholder="All Leagues"
+              />
+
+              {/* Search Box */}
+              <div className="relative w-64 md:w-72">
                 <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
                 <input
                   type="text"
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  placeholder="Search by team name or location..."
-                  className="w-full pl-10 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-sm font-medium text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-black/10 focus:border-black transition-all"
+                  placeholder="Search team name, acronym, city..."
+                  className="w-full pl-10 pr-8 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-xs sm:text-sm font-medium text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-black/10 focus:border-black transition-all"
                 />
+                {searchTerm && (
+                  <button
+                    type="button"
+                    onClick={() => setSearchTerm('')}
+                    className="absolute right-2.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-700 p-0.5"
+                  >
+                    <X className="w-3.5 h-3.5" />
+                  </button>
+                )}
               </div>
+
               <Link href="/team-management/add-team">
                 <CreateButton text="Add Team" />
               </Link>
             </div>
           </div>
+
           <div className="pt-4">
             <CustomTable<any> columns={getTeamColumns(handleView, handleDelete, handleEditCoin)} data={filteredTeams} isLoading={isLoading} />
           </div>
         </div>
+
         <div className='pt-8 px-4'>
           <CustomPagination TOTAL_PAGES={teamData?.pagination?.totalPage || 1} qryName="teamPage" />
         </div>
@@ -191,7 +231,7 @@ const TeamManagement = () => {
         isLoading={isUpdatingCoin}
       />
     </div>
-  )
-}
+  );
+};
 
 export default TeamManagement;

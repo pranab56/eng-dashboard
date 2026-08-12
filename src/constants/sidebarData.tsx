@@ -97,6 +97,12 @@ export const sidebarData: TMenuItem[] = [
     label: "/player-management",
   },
   {
+    id: 71,
+    icon: Users,
+    title: "Parent Management",
+    label: "/parent-management",
+  },
+  {
     id: 8,
     icon: TransferIcon,
     title: "Transfer Management",
