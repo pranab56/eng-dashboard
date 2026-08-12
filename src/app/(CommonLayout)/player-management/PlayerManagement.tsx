@@ -20,27 +20,16 @@ import PlayerEditModal from './PlayerEditModal';
 import { UpdateCoinModal } from '@/components/modals/UpdateCoinModal';
 import DeleteConfirmationModal from '../user-management/DeleteConfirmationModal';
 
-const PLAYER_ROLE_TABS = [
-  { label: 'All Players', value: 'ALL' },
-  { label: 'Regular Players', value: 'PLAYER' },
-  { label: 'Trial Players', value: 'OTHER_CLUBS' },
-  { label: 'Tournament Players', value: 'TOURNAMENT_PLAYER' },
-  { label: 'Pending Approval', value: 'PENDING' },
-];
-
 const PlayerManagement = () => {
   const { setHeaders } = useHeaders();
   const searchParams = useSearchParams();
   const pageNumber = searchParams.get("userPage") || "1";
 
-  const [activeTab, setActiveTab] = useState<string>('ALL');
   const [searchTerm, setSearchTerm] = useState<string>('');
 
   const { data: playerData, isLoading } = useGetAllPlayerQuery({
     pageNumber: Number(pageNumber),
     searchValue: searchTerm,
-    role: activeTab === 'PENDING' ? undefined : activeTab,
-    status: activeTab === 'PENDING' ? 'PENDING' : undefined,
   });
 
   const [updateEngCoinBudget, { isLoading: isUpdatingCoin }] = useUpdateEngCoinBudgetMutation();
@@ -119,15 +108,37 @@ const PlayerManagement = () => {
     url: "https://example.com/export-users"
   };
 
-  const players = playerData?.data?.players || [];
-  const pagination = playerData?.data?.pagination || { totalPage: 1, total: 0 };
+  const rawPlayers = playerData?.data?.players || [];
+  const pagination = playerData?.data?.pagination || { totalPage: 1, total: rawPlayers.length };
+
+  const players = rawPlayers.filter((player: any) => {
+    if (!searchTerm.trim()) return true;
+    const q = searchTerm.toLowerCase().trim();
+    const fullName = `${player.firstName || ''} ${player.lastName || ''}`.toLowerCase();
+    const userName = (player.userName || '').toLowerCase();
+    const email = (player.email || '').toLowerCase();
+    const position = (player.position || '').toLowerCase();
+    const teamName = (player.teamName || '').toLowerCase();
+    const location = (player.location || '').toLowerCase();
+    const role = (player.role || '').toLowerCase();
+
+    return (
+      fullName.includes(q) ||
+      userName.includes(q) ||
+      email.includes(q) ||
+      position.includes(q) ||
+      teamName.includes(q) ||
+      location.includes(q) ||
+      role.includes(q)
+    );
+  });
 
   const summaryItems = [
     {
       title: "Total Players",
       value: pagination.total || 0,
       id: "total_players",
-      description: "Total players matching selected criteria"
+      description: "Total registered active players"
     }
   ];
 
@@ -145,47 +156,27 @@ const PlayerManagement = () => {
 
       {/* Main Table Container */}
       <div className="bg-white rounded-xl shadow-xs border border-gray-100 py-3 sm:py-4 flex flex-col">
-        {/* Search & Tabs Controls */}
-        <div className="px-4 sm:px-6 pt-2 pb-4 space-y-4 border-b border-gray-100">
-          <div className="flex flex-col md:flex-row gap-4 justify-between items-start md:items-center">
-            {/* Search Box */}
-            <div className="relative w-full md:w-80">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 size-4" />
+        {/* Search Toolbar */}
+        <div className="px-4 sm:px-6 pt-2 pb-4 border-b border-gray-100">
+          <div className="flex items-center justify-between gap-4">
+            <div className="relative w-full max-w-md">
+              <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 size-4" />
               <input
                 type="text"
-                placeholder="Search by player name, email, position..."
+                placeholder="Search players by name, email, position, city..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-9 pr-8 py-2 text-xs sm:text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all placeholder:text-gray-400"
+                className="w-full pl-10 pr-9 py-2.5 text-xs sm:text-sm border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all placeholder:text-gray-400 bg-slate-50/50 hover:bg-white focus:bg-white"
               />
               {searchTerm && (
                 <button
                   onClick={() => setSearchTerm('')}
-                  className="absolute right-2.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 p-0.5 rounded-full"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-slate-700 p-0.5 rounded-full cursor-pointer"
+                  title="Clear search"
                 >
-                  <X className="size-3.5" />
+                  <X className="size-4" />
                 </button>
               )}
-            </div>
-
-            {/* Filter Tabs */}
-            <div className="flex items-center gap-1.5 overflow-x-auto w-full md:w-auto pb-2 md:pb-0 scrollbar-none">
-              {PLAYER_ROLE_TABS.map((tab) => {
-                const isActive = activeTab === tab.value;
-                return (
-                  <button
-                    key={tab.value}
-                    onClick={() => setActiveTab(tab.value)}
-                    className={`px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition-all cursor-pointer ${
-                      isActive
-                        ? 'bg-blue-600 text-white shadow-xs'
-                        : 'bg-gray-100/80 text-gray-600 hover:bg-gray-200/70'
-                    }`}
-                  >
-                    {tab.label}
-                  </button>
-                );
-              })}
             </div>
           </div>
         </div>
