@@ -103,6 +103,9 @@ export type TPlayer = {
   _id?: string;
   firstName: string;
   lastName: string;
+  email?: string;
+  role?: string;
+  status?: string;
   profile: string | null;
   position: string | null;
   location?: string | null;
@@ -114,6 +117,7 @@ export type TPlayer = {
   coin?: number;
   marketValue?: number;
   goals?: number;
+  parentId?: any;
 }
 
 export type TTransfer = {

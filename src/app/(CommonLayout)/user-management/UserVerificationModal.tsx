@@ -154,7 +154,7 @@ const UserVerificationModal: React.FC<UserVerificationModalProps> = ({
         await navigator.clipboard.writeText(text);
         copied = true;
       }
-    } catch (e) {
+    } catch {
       copied = false;
     }
 
@@ -171,7 +171,7 @@ const UserVerificationModal: React.FC<UserVerificationModalProps> = ({
         textArea.select();
         copied = document.execCommand('copy');
         document.body.removeChild(textArea);
-      } catch (err) {
+      } catch {
         copied = false;
       }
     }

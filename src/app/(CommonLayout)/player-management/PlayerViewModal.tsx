@@ -93,7 +93,7 @@ const PlayerViewModal: React.FC<PlayerViewModalProps> = ({
   const currentStatus = ((player as any).status || 'APPROVED').toUpperCase();
 
   // Parent Info Extraction
-  const parentObj = typeof player.parentId === 'object' && player.parentId ? (player.parentId as any) : null;
+  const parentObj = typeof (player as any).parentId === 'object' && (player as any).parentId ? ((player as any).parentId as any) : null;
   const parentName = parentObj
     ? `${parentObj.firstName || ''} ${parentObj.lastName || ''}`.trim() || parentObj.userName || 'Parent Account Owner'
     : null;
@@ -138,7 +138,7 @@ const PlayerViewModal: React.FC<PlayerViewModalProps> = ({
         await navigator.clipboard.writeText(text);
         copied = true;
       }
-    } catch (e) {
+    } catch {
       copied = false;
     }
 
@@ -155,7 +155,7 @@ const PlayerViewModal: React.FC<PlayerViewModalProps> = ({
         textArea.select();
         copied = document.execCommand('copy');
         document.body.removeChild(textArea);
-      } catch (err) {
+      } catch {
         copied = false;
       }
     }
