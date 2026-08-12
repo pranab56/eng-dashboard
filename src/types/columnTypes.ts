@@ -120,6 +120,15 @@ export type TPlayer = {
   marketValue?: number;
   goals?: number;
   parentId?: any;
+  dateOfBirth?: string | Date | null;
+  ageGroup?: string | null;
+  strongFoot?: string | null;
+  previousClub?: string | null;
+  selectTeam?: any;
+  userName?: string;
+  verified?: boolean;
+  subscription?: any;
+  isPaid?: boolean;
 }
 
 export type TTransfer = {

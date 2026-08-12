@@ -54,6 +54,14 @@ const Home = () => {
       textColor: "text-blue-900"
     },
     {
+      title: "Pending Players",
+      value: stats.users?.totalPendingPlayers || 0,
+      icon: <MdPendingActions className="text-3xl text-yellow-600" />,
+      gradient: "from-yellow-50 to-yellow-100",
+      border: "border-yellow-200",
+      textColor: "text-yellow-900"
+    },
+    {
       title: "Total Managers",
       value: stats.users?.totalManagers || 0,
       icon: <PiUserGear className="text-3xl text-emerald-600" />,
@@ -70,12 +78,28 @@ const Home = () => {
       textColor: "text-amber-900"
     },
     {
+      title: "Parent Accounts",
+      value: stats.users?.totalParents || 0,
+      icon: <PiUsersThree className="text-3xl text-pink-600" />,
+      gradient: "from-pink-50 to-pink-100",
+      border: "border-pink-200",
+      textColor: "text-pink-900"
+    },
+    {
       title: "Outclub Players",
       value: stats.users?.totalOutclubPlayers || 0,
       icon: <PiUserPlus className="text-3xl text-purple-600" />,
       gradient: "from-purple-50 to-purple-100",
       border: "border-purple-200",
       textColor: "text-purple-900"
+    },
+    {
+      title: "Active Subscriptions",
+      value: stats.users?.activeSubscriptions || 0,
+      icon: <PiUserCheck className="text-3xl text-teal-600" />,
+      gradient: "from-teal-50 to-teal-100",
+      border: "border-teal-200",
+      textColor: "text-teal-900"
     },
     {
       title: "Total Teams",
@@ -107,6 +131,7 @@ const Home = () => {
     { name: 'Players', value: stats.users?.totalPlayers || 0, color: '#3B82F6' },
     { name: 'Managers', value: stats.users?.totalManagers || 0, color: '#10B981' },
     { name: 'Referees', value: stats.users?.totalReferees || 0, color: '#F59E0B' },
+    { name: 'Parents', value: stats.users?.totalParents || 0, color: '#EC4899' },
     { name: 'Outclub', value: stats.users?.totalOutclubPlayers || 0, color: '#8B5CF6' },
   ];
 
@@ -114,6 +139,7 @@ const Home = () => {
     { name: 'Teams', count: stats.teams?.totalTeams || 0, color: '#F43F5E' },
     { name: 'Matches', count: stats.matches?.totalMatches || 0, color: '#6366F1' },
     { name: 'Pending', count: stats.matches?.pendingMatches || 0, color: '#F97316' },
+    { name: 'Active Subs', count: stats.users?.activeSubscriptions || 0, color: '#0D9488' },
   ];
 
   return (
