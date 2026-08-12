@@ -38,7 +38,7 @@ import dayjs from 'dayjs';
 import { toast } from 'sonner';
 import { useUpdateEngCoinBudgetMutation } from '@/features/player/playerApi';
 import { useGetAllTeamQuery } from '@/features/teamManagement/teamApi';
-import { useUpdateUserStatusMutation, useAssignTeamToUserMutation } from '@/features/userManagement/userApi';
+import { useAssignTeamToUserMutation } from '@/features/userManagement/userApi';
 import { getErrorMessage } from '@/utils/getErrorMessage';
 import { TeamSelectDropdown } from '@/components/dropdowns/TeamSelectDropdown';
 
