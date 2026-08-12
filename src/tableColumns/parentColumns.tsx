@@ -7,7 +7,7 @@ import { HiOutlineTrash } from "react-icons/hi";
 import { FiEye } from "react-icons/fi";
 import { formatImagePath } from "@/utils/formatImagePath";
 import Image from "next/image";
-import { Users, Sparkles, Calendar } from "lucide-react";
+import { Users, Sparkles } from "lucide-react";
 import dayjs from "dayjs";
 
 export const getParentColumns = (

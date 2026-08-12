@@ -51,6 +51,8 @@ export type TUserManagement = {
   isPaid?: boolean;
   subscription?: any;
   activeSubscription?: any;
+  myPlayers?: any[];
+  children?: any[];
   createdAt?: string;
   updatedAt?: string;
 }

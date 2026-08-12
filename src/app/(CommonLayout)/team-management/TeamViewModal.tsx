@@ -10,7 +10,7 @@ import {
 import { formatImagePath } from '@/utils/formatImagePath';
 import Image from 'next/image';
 import dayjs from 'dayjs';
-import { X, Building2, MapPin, Calendar, Users, Shield, Trophy, Coins, UserCheck } from 'lucide-react';
+import { X, Building2, MapPin, Calendar, Users, Shield, Trophy, Coins, UserCheck, TrendingUp } from 'lucide-react';
 
 interface TeamViewModalProps {
   team: any;
@@ -22,7 +22,23 @@ const TeamViewModal = ({ team, isOpen, onClose }: TeamViewModalProps) => {
   if (!team) return null;
   const logoUrl = formatImagePath(team.teamLogo);
   const league = team.league;
-  const manager = team.manager;
+
+  // Extract all managers reliably
+  const managersList: any[] = [];
+  if (Array.isArray(team.managers)) {
+    team.managers.forEach((m: any) => {
+      const mgr = m.manager || m;
+      if (mgr && typeof mgr === 'object') {
+        managersList.push(mgr);
+      }
+    });
+  } else if (team.managers && typeof team.managers === 'object') {
+    managersList.push(team.managers);
+  } else if (team.manager && typeof team.manager === 'object') {
+    managersList.push(team.manager);
+  }
+
+  const marketValue = team.marketValue || (team.coin ? team.coin * 100 : 0);
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -81,16 +97,29 @@ const TeamViewModal = ({ team, isOpen, onClose }: TeamViewModalProps) => {
               </div>
             </div>
 
-            {/* Assigned Manager */}
+            {/* Assigned Manager(s) */}
             <div className="bg-indigo-50/70 border border-indigo-200/80 p-3.5 rounded-2xl flex items-center gap-3">
               <div className="p-2.5 rounded-xl bg-indigo-500/10 text-indigo-600 shrink-0">
                 <UserCheck className="w-5 h-5" />
               </div>
-              <div className="min-w-0">
-                <p className="text-[10px] font-bold text-indigo-800 uppercase tracking-wider">Team Manager</p>
-                <p className="text-xs font-bold text-slate-900 truncate">
-                  {manager?.firstName ? `${manager.firstName} ${manager.lastName || ''}`.trim() : (manager?.userName || 'No Manager Assigned')}
+              <div className="min-w-0 flex-1">
+                <p className="text-[10px] font-bold text-indigo-800 uppercase tracking-wider">
+                  {managersList.length > 1 ? `Team Managers (${managersList.length})` : 'Team Manager'}
                 </p>
+                {managersList.length === 0 ? (
+                  <p className="text-xs font-semibold text-slate-400">No Manager Assigned</p>
+                ) : (
+                  <div className="space-y-0.5">
+                    {managersList.map((m: any, idx: number) => {
+                      const name = m.firstName ? `${m.firstName} ${m.lastName || ''}`.trim() : (m.userName || `Manager ${idx + 1}`);
+                      return (
+                        <p key={m._id || idx} className="text-xs font-bold text-slate-900 truncate">
+                          {name}
+                        </p>
+                      );
+                    })}
+                  </div>
+                )}
               </div>
             </div>
           </div>
@@ -123,28 +152,33 @@ const TeamViewModal = ({ team, isOpen, onClose }: TeamViewModalProps) => {
             </div>
           </div>
 
-          {/* Squad Strength & Coin Balance Grid */}
-          <div className="grid grid-cols-2 gap-3">
-            <div className="bg-blue-50/60 border border-blue-100 rounded-2xl p-4 flex items-center justify-between">
-              <div>
-                <span className="text-blue-600 font-bold text-[10px] uppercase tracking-wider flex items-center gap-1.5">
-                  <Users className="w-3.5 h-3.5" /> Squad Members
-                </span>
-                <h4 className="text-xl font-black text-indigo-950 mt-0.5">
-                  {team.totalMembers || (team.players ? team.players.length : 0)} <span className="text-xs font-medium text-indigo-500">Players</span>
-                </h4>
-              </div>
+          {/* Squad Strength, Coin Balance & Market Value Grid */}
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <div className="bg-blue-50/60 border border-blue-100 rounded-2xl p-3.5 flex flex-col justify-between">
+              <span className="text-blue-600 font-bold text-[10px] uppercase tracking-wider flex items-center gap-1.5">
+                <Users className="w-3.5 h-3.5" /> Squad Members
+              </span>
+              <h4 className="text-lg font-black text-indigo-950 mt-1">
+                {team.totalMembers || (team.players ? team.players.length : 0)} <span className="text-xs font-medium text-indigo-500">Players</span>
+              </h4>
             </div>
 
-            <div className="bg-amber-50/60 border border-amber-100 rounded-2xl p-4 flex items-center justify-between">
-              <div>
-                <span className="text-amber-700 font-bold text-[10px] uppercase tracking-wider flex items-center gap-1.5">
-                  <Coins className="w-3.5 h-3.5" /> Coin Budget
-                </span>
-                <h4 className="text-xl font-black text-amber-950 mt-0.5">
-                  {(team.coin || 0).toLocaleString()} <span className="text-xs font-medium text-amber-600">Coins</span>
-                </h4>
-              </div>
+            <div className="bg-amber-50/60 border border-amber-100 rounded-2xl p-3.5 flex flex-col justify-between">
+              <span className="text-amber-700 font-bold text-[10px] uppercase tracking-wider flex items-center gap-1.5">
+                <Coins className="w-3.5 h-3.5" /> Coin Budget
+              </span>
+              <h4 className="text-lg font-black text-amber-950 mt-1">
+                {(team.coin || 0).toLocaleString()} <span className="text-xs font-medium text-amber-600">Coins</span>
+              </h4>
+            </div>
+
+            <div className="bg-emerald-50/60 border border-emerald-100 rounded-2xl p-3.5 flex flex-col justify-between">
+              <span className="text-emerald-700 font-bold text-[10px] uppercase tracking-wider flex items-center gap-1.5">
+                <TrendingUp className="w-3.5 h-3.5" /> Market Value
+              </span>
+              <h4 className="text-lg font-black text-emerald-950 mt-1">
+                £{marketValue.toLocaleString()}
+              </h4>
             </div>
           </div>
 

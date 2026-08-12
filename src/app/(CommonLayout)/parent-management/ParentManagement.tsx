@@ -8,7 +8,7 @@ import CustomTable from '@/components/table/CustomTable';
 import { useHeaders } from '@/hooks/useHeaders';
 import { getParentColumns } from '@/tableColumns/parentColumns';
 import { TUserManagement } from '@/types/columnTypes';
-import { Search, X, Users } from 'lucide-react';
+import { Search, X } from 'lucide-react';
 import { useSearchParams } from 'next/navigation';
 import { toast } from 'sonner';
 import { useDeleteUserMutation, useGetAllParentsQuery } from '@/features/userManagement/userApi';

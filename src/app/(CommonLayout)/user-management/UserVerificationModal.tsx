@@ -76,7 +76,6 @@ const UserVerificationModal: React.FC<UserVerificationModalProps> = ({
   const allTeams = teamData?.data?.result || teamData?.data || [];
 
   const [assignTeamToUser] = useAssignTeamToUserMutation();
-  const [updateUserStatus] = useUpdateUserStatusMutation();
   const [updateEngCoinBudget] = useUpdateEngCoinBudgetMutation();
   const [isEditingEconomy, setIsEditingEconomy] = useState(false);
   const [editCoinsInput, setEditCoinsInput] = useState<number | string>("");

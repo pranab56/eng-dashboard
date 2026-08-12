@@ -14,14 +14,12 @@ import {
   Mail,
   User,
   ShieldCheck,
-  Calendar,
   Phone,
   X,
   Users,
   Sparkles,
   Check,
   Copy,
-  CreditCard,
   Building2,
   Coins,
 } from 'lucide-react';
@@ -50,7 +48,6 @@ const ParentViewModal: React.FC<ParentViewModalProps> = ({
 
   const initials = fullName.charAt(0).toUpperCase();
   const children = parent.myPlayers || (parent as any).children || [];
-  const sub = parent.subscription;
 
   const handleCopyText = async (text: string, label: string) => {
     if (!text) return;
