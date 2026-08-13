@@ -135,6 +135,11 @@ const UserManagement = () => {
     // Always exclude Parent accounts from User Management tables
     if (isParent) return false;
 
+    // Require active subscription / paid access for player profiles (PLAYER, OTHER_CLUBS, TOURNAMENT_PLAYER)
+    const isPlayerRole = ['PLAYER', 'OTHER_CLUBS', 'CLUB', 'CLUBS', 'TOURNAMENT_PLAYER'].includes(userRole) || isChildPlayer;
+    const isPaid = Boolean(user.subscription || user.activeSubscription || user.isPaid);
+    if (isPlayerRole && !isPaid) return false;
+
     if (activeRole === 'PENDING_REQUESTS') {
       if (userStatus !== 'PENDING') return false;
     } else if (activeRole === 'PLAYER') {
@@ -162,15 +167,7 @@ const UserManagement = () => {
   });
 
   const analytics = analyticsData?.data || {};
-  const pendingCount = activeRole === 'PENDING_REQUESTS'
-    ? filteredUsers.length
-    : (analytics.pendingRequests ?? (userData?.data || []).filter((u: any) => {
-        const userRole = (u.role || '').toUpperCase();
-        const userStatus = (u.status || '').toUpperCase();
-        const isChildPlayer = !!u.parentId || u.password === null || !u.email || (userRole === 'PLAYER' && (!!u.position || !!u.dateOfBirth || !!u.ageGroup || !!u.selectTeam));
-        const isParent = !isChildPlayer && !u.parentId && !!u.email && !['MANAGER', 'REFEREE', 'CLUB', 'CLUBS', 'OTHER_CLUBS', 'ADMIN', 'SUPER_ADMIN'].includes(userRole) && !u.position && !u.dateOfBirth;
-        return !isParent && userStatus === 'PENDING';
-      }).length);
+  const pendingCount = analytics.pendingRequests ?? (userData?.pagination?.total ?? userData?.meta?.total ?? (userData?.data || []).filter((u: any) => (u.status || '').toUpperCase() === 'PENDING').length);
 
   const items = [
     {
