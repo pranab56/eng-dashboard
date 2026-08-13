@@ -210,18 +210,20 @@ export const getPlayerColumns = (
     id: "subscription",
     header: "Subscription",
     cell: ({ row }) => {
-      const sub = (row.original as any).subscription;
-      if (!sub) {
+      const rawSub = (row.original as any).subscription || (row.original as any).activeSubscription;
+      if (!rawSub) {
         return (
           <span className="text-[11px] font-semibold text-slate-400 bg-slate-100 px-2.5 py-1 rounded-full border border-slate-200">
             Free Plan
           </span>
         );
       }
+      const pkgName = rawSub.packageName || rawSub.package?.title || rawSub.package?.packageName || rawSub.package?.name || 'Active Plan';
+      const pkgPrice = rawSub.price ?? rawSub.package?.price ?? 0;
       return (
         <span className="inline-flex items-center gap-1 text-[11px] font-bold text-emerald-800 bg-emerald-50 px-2.5 py-1 rounded-full border border-emerald-200 shadow-2xs">
           <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
-          {sub.packageName || 'Active Plan'} • £{sub.price}
+          {pkgName} • £{pkgPrice}
         </span>
       );
     },

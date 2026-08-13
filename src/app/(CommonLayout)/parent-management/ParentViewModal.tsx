@@ -274,15 +274,23 @@ const ParentViewModal: React.FC<ParentViewModalProps> = ({
                           <Sparkles className="w-3 h-3 text-emerald-600" />
                           Plan:
                         </span>
-                        {child.subscription ? (
-                          <span className="font-bold text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200 text-[10px]">
-                            {child.subscription.packageName || 'Active Plan'} • £{child.subscription.price}
-                          </span>
-                        ) : (
-                          <span className="font-medium text-slate-400 bg-white px-2 py-0.5 rounded border border-slate-200 text-[10px]">
-                            Free / Unsubscribed
-                          </span>
-                        )}
+                        {(() => {
+                          const childSub = child.subscription || child.activeSubscription;
+                          if (!childSub) {
+                            return (
+                              <span className="font-medium text-slate-400 bg-white px-2 py-0.5 rounded border border-slate-200 text-[10px]">
+                                Free / Unsubscribed
+                              </span>
+                            );
+                          }
+                          const pName = childSub.packageName || childSub.package?.title || childSub.package?.packageName || childSub.package?.name || 'Active Plan';
+                          const pPrice = childSub.price ?? childSub.package?.price ?? 0;
+                          return (
+                            <span className="font-bold text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200 text-[10px]">
+                              {pName} • £{pPrice}
+                            </span>
+                          );
+                        })()}
                       </div>
 
                       <div className="pt-1.5 border-t border-slate-100 grid grid-cols-2 gap-2 text-[11px]">

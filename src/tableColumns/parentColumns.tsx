@@ -65,7 +65,7 @@ export const getParentColumns = (
         <div className="flex flex-col gap-1.5 max-w-sm">
           {children.map((child: any, idx: number) => {
             const childName = child.firstName ? `${child.firstName} ${child.lastName || ''}`.trim() : (child.userName || `Player ${idx + 1}`);
-            const childSub = child.subscription;
+            const childSub = child.subscription || child.activeSubscription;
 
             return (
               <div
@@ -102,8 +102,8 @@ export const getParentColumns = (
     header: () => <div>Subscription Status</div>,
     cell: ({ row }) => {
       const children = row.original.myPlayers || (row.original as any).children || [];
-      const paidChildren = children.filter((c: any) => Boolean(c.subscription || c.isPaid));
-      const parentDirectSub = row.original.subscription;
+      const paidChildren = children.filter((c: any) => Boolean(c.subscription || c.activeSubscription || c.isPaid));
+      const parentDirectSub = row.original.subscription || (row.original as any).activeSubscription;
 
       if (paidChildren.length === 0 && !parentDirectSub) {
         return (
@@ -120,7 +120,7 @@ export const getParentColumns = (
             {paidChildren.length} {paidChildren.length === 1 ? 'Player Subscribed' : 'Players Subscribed'}
           </span>
           <span className="text-[10px] text-slate-500 font-medium">
-            {paidChildren.map((c: any) => `${c.firstName || 'Player'}: £${c.subscription?.price ?? 10}`).join(' • ')}
+            {paidChildren.map((c: any) => `${c.firstName || 'Player'}: £${(c.subscription || c.activeSubscription)?.price ?? 10}`).join(' • ')}
           </span>
         </div>
       );

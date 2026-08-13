@@ -136,7 +136,18 @@ const PlayerViewModal: React.FC<PlayerViewModalProps> = ({
 
   const coins = Number((player as any).engCoine ?? (player as any).coin ?? 0);
   const marketValue = Number((player as any).marketValue) || (coins * 100);
-  const sub = (player as any).subscription;
+  const rawSub = (player as any).subscription || (player as any).activeSubscription;
+  const sub = rawSub ? {
+    _id: rawSub._id,
+    status: rawSub.status || 'Active',
+    price: rawSub.price ?? rawSub.package?.price ?? 0,
+    trxId: rawSub.trxId,
+    subscriptionId: rawSub.subscriptionId,
+    currentPeriodStart: rawSub.currentPeriodStart,
+    currentPeriodEnd: rawSub.currentPeriodEnd,
+    packageName: rawSub.packageName || rawSub.package?.title || rawSub.package?.packageName || rawSub.package?.name || 'ENG Plan',
+    package: rawSub.package || rawSub.packageDetails || null,
+  } : null;
 
   // Extract Document List
   const getDocumentList = (): string[] => {

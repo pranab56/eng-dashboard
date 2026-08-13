@@ -152,7 +152,18 @@ const UserVerificationModal: React.FC<UserVerificationModalProps> = ({
 
   const coins = Number((user as any).engCoine ?? (user as any).coin ?? (user as any).coins) || 0;
   const marketValue = Number((user as any).marketValue) || (coins * 100);
-  const sub = user.subscription;
+  const rawSub = user.subscription || (user as any).activeSubscription;
+  const sub = rawSub ? {
+    _id: rawSub._id,
+    status: rawSub.status || 'Active',
+    price: rawSub.price ?? rawSub.package?.price ?? 0,
+    trxId: rawSub.trxId,
+    subscriptionId: rawSub.subscriptionId,
+    currentPeriodStart: rawSub.currentPeriodStart,
+    currentPeriodEnd: rawSub.currentPeriodEnd,
+    packageName: rawSub.packageName || rawSub.package?.title || rawSub.package?.packageName || rawSub.package?.name || 'ENG Plan',
+    package: rawSub.package || rawSub.packageDetails || null,
+  } : null;
 
   // Extract Document List
   const getDocumentList = (): string[] => {
