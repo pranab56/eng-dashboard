@@ -23,19 +23,19 @@ export const teamApi = baseApi.injectEndpoints({
 
     getAllTeam: builder.query({
       query: (params) => {
-        let page = 1;
-        let limit = 10;
-        let searchTerm = "";
+        let url = "/team";
         if (typeof params === "object" && params !== null) {
-          page = params?.page || 1;
-          limit = params?.limit || 10;
-          searchTerm = params?.searchTerm || params?.search || "";
+          const queryParts = [];
+          Object.keys(params).forEach((key) => {
+            if (params[key] !== undefined && params[key] !== null && params[key] !== "" && params[key] !== "ALL") {
+              queryParts.push(`${key}=${encodeURIComponent(params[key])}`);
+            }
+          });
+          if (queryParts.length > 0) {
+            url += `?${queryParts.join("&")}`;
+          }
         } else if (params) {
-          page = params;
-        }
-        let url = `/team?page=${page}&limit=${limit}`;
-        if (searchTerm) {
-          url += `&searchTerm=${encodeURIComponent(searchTerm)}`;
+          url += `?page=${params}`;
         }
         return {
           url,

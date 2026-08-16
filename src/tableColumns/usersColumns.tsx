@@ -76,11 +76,20 @@ export const getUsersColumns = (
 
   {
     accessorKey: "status",
-    header: () => <div className="">Approval Status</div>,
+    header: () => <div className="">{activeRole === "INCOMPLETE" ? "Incomplete Reason" : "Approval Status"}</div>,
     cell: ({ row }) => {
-      const role = (row.original.role || "").toUpperCase();
-      const requiresApproval = ["PLAYER", "MANAGER", "REFEREE", "OTHER_CLUBS", "CLUB"].includes(role) || !!row.original.parentId;
-      const currentStatus = (row.original.status || (requiresApproval ? "PENDING" : "APPROVED")).toUpperCase();
+      if (activeRole === "INCOMPLETE") {
+        const reason = (row.original as any).incompleteReason || "Incomplete Registration Setup";
+        return (
+          <span className="text-xs font-bold text-rose-700 bg-rose-50 px-2.5 py-1 rounded-full border border-rose-200">
+            {reason}
+          </span>
+        );
+      }
+
+      const role = (row.original as any).role || "";
+      const requiresApproval = ["PLAYER", "MANAGER", "REFEREE", "OTHER_CLUBS", "CLUB"].includes(role.toUpperCase()) || !!row.original.parentId;
+      const currentStatus = ((row.original as any).status || (requiresApproval ? "PENDING" : "APPROVED")).toUpperCase();
       const isApproved = currentStatus === "APPROVED";
 
       // Show interactive approval toggle ONLY under PENDING_REQUESTS tab

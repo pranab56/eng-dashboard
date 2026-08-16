@@ -77,16 +77,10 @@ const UserEditProfileModal: React.FC<UserEditProfileModalProps> = ({
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-md bg-white rounded-3xl p-6 border-none shadow-2xl z-50">
-        <DialogHeader className="pb-3 border-b border-slate-100 flex flex-row items-center justify-between">
+        <DialogHeader className="pb-3 border-b border-slate-100">
           <DialogTitle className="text-base font-bold text-slate-900 flex items-center gap-2">
-            <UserIcon className="w-5 h-5 text-indigo-600" /> Change Player Profile Picture & Details
+            <UserIcon className="w-5 h-5 text-indigo-600" /> Change User Profile & Details
           </DialogTitle>
-          <button
-            onClick={onClose}
-            className="p-1 rounded-full text-slate-400 hover:bg-slate-100 transition-colors"
-          >
-            <X className="w-5 h-5" />
-          </button>
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-4 mt-3">

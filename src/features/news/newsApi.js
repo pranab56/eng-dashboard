@@ -47,6 +47,14 @@ export const newsApi = baseApi.injectEndpoints({
       invalidatesTags: ["news"]
     }),
 
+    rearrangeNews: builder.mutation({
+      query: (data) => ({
+        url: "/news/reorder",
+        method: "PATCH",
+        body: data,
+      }),
+      invalidatesTags: ["news"]
+    }),
 
   }),
 });
@@ -58,4 +66,5 @@ export const {
   useGetAllNewsQuery,
   useGetSingleNewsQuery,
   useDeleteNewsMutation,
+  useRearrangeNewsMutation,
 } = newsApi;

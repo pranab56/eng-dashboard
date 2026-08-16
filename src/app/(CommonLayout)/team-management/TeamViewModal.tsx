@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client"
-import React from 'react';
+import React, { useState } from 'react';
 import {
   Dialog,
   DialogContent,
@@ -10,7 +10,17 @@ import {
 import { formatImagePath } from '@/utils/formatImagePath';
 import Image from 'next/image';
 import dayjs from 'dayjs';
-import { X, Building2, MapPin, Calendar, Users, Shield, Trophy, Coins, UserCheck, TrendingUp } from 'lucide-react';
+import {
+  X,
+  MapPin,
+  Users,
+  Shield,
+  Trophy,
+  Coins,
+  UserCheck,
+  TrendingUp,
+  Search,
+} from 'lucide-react';
 
 interface TeamViewModalProps {
   team: any;
@@ -19,6 +29,8 @@ interface TeamViewModalProps {
 }
 
 const TeamViewModal = ({ team, isOpen, onClose }: TeamViewModalProps) => {
+  const [memberSearch, setMemberSearch] = useState('');
+
   if (!team) return null;
   const logoUrl = formatImagePath(team.teamLogo);
   const league = team.league;
@@ -39,83 +51,158 @@ const TeamViewModal = ({ team, isOpen, onClose }: TeamViewModalProps) => {
   }
 
   const marketValue = team.marketValue || (team.coin ? team.coin * 100 : 0);
+  const rawMembers: any[] = Array.isArray(team.members) ? team.members : [];
+
+  const filteredMembers = rawMembers.filter((member: any) => {
+    if (!memberSearch.trim()) return true;
+    const q = memberSearch.toLowerCase().trim();
+    const fullName = `${member.firstName || ''} ${member.lastName || ''}`.toLowerCase();
+    const email = (member.email || '').toLowerCase();
+    const pos = (member.position || '').toLowerCase();
+    const uname = (member.userName || '').toLowerCase();
+    return fullName.includes(q) || email.includes(q) || pos.includes(q) || uname.includes(q);
+  });
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent showCloseButton={false} className="max-w-xl bg-white rounded-3xl p-0 overflow-hidden border-none shadow-2xl animate-in zoom-in-95 duration-200">
-
-        {/* Header Banner */}
-        <DialogHeader className="bg-gradient-to-br from-indigo-950 via-blue-900 to-slate-950 p-7 text-white relative overflow-hidden">
+      <DialogContent
+        showCloseButton={false}
+        className="sm:max-w-3xl md:max-w-4xl bg-white rounded-3xl p-0 overflow-hidden border-none shadow-2xl max-h-[92vh] flex flex-col"
+      >
+        {/* Clean Light Header Banner - Matching UserVerificationModal & ParentViewModal */}
+        <DialogHeader className="bg-slate-50/90 p-5 sm:p-6 border-b border-slate-100 relative">
           <button
             type="button"
             onClick={onClose}
-            className="absolute top-5 right-5 p-2 rounded-full bg-white/10 hover:bg-white/20 text-white transition-all cursor-pointer z-20 backdrop-blur-md"
+            className="absolute top-4 right-4 p-2 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 hover:text-slate-900 transition-all cursor-pointer z-30"
+            title="Close Modal"
           >
             <X className="w-4 h-4" />
           </button>
 
-          {/* Background Decorative Blur */}
-          <div className="absolute top-0 right-0 w-48 h-48 bg-blue-500/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
-          <div className="absolute bottom-0 left-0 w-36 h-36 bg-indigo-500/10 rounded-full blur-2xl translate-y-1/2 -translate-x-1/2" />
-
-          <div className="flex flex-col items-center justify-center space-y-3 relative z-10 pt-1">
-            <div className="relative w-24 h-24 bg-white/10 backdrop-blur-md rounded-2xl p-2.5 border-2 border-white/20 shadow-2xl flex items-center justify-center group">
+          <div className="flex items-center gap-4">
+            <div className="relative w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-white border border-slate-200 p-2 overflow-hidden flex items-center justify-center shrink-0 shadow-xs">
               {logoUrl ? (
-                <Image src={logoUrl} alt="logo" fill className="object-contain p-1.5 group-hover:scale-105 transition-transform duration-300 drop-shadow-lg" />
+                <Image
+                  src={logoUrl}
+                  alt={team.teamName || 'Team Logo'}
+                  fill
+                  className="object-contain p-1"
+                />
               ) : (
-                <Shield className="w-10 h-10 text-white/40" />
+                <Shield className="w-8 h-8 text-slate-400" />
               )}
             </div>
-            <div className="text-center space-y-1">
-              <DialogTitle className="text-2xl font-black text-white tracking-tight">{team.teamName}</DialogTitle>
-              <div className="flex items-center justify-center gap-2">
-                <span className="px-3 py-0.5 rounded-full text-[10px] font-extrabold tracking-widest bg-blue-500/20 border border-blue-400/30 text-blue-200">
-                  {team.shortName || "CLUB"}
+
+            <div className="min-w-0 flex-1">
+              <DialogTitle className="text-xl sm:text-2xl font-bold text-slate-900 flex items-center gap-2 truncate">
+                {team.teamName}
+              </DialogTitle>
+
+              <p className="text-xs text-slate-500 font-medium mt-0.5 flex flex-wrap items-center gap-2">
+                <span>{team.stadiumName || team.stadium || 'Home Stadium N/A'}</span>
+                {(team.city || team.location) && (
+                  <>
+                    <span>•</span>
+                    <span>{team.city || team.location}, {team.country || 'Worldwide'}</span>
+                  </>
+                )}
+                {team.createdAt && (
+                  <>
+                    <span>•</span>
+                    <span>Registered {dayjs(team.createdAt).format('MMM DD, YYYY')}</span>
+                  </>
+                )}
+              </p>
+
+              <div className="flex flex-wrap items-center gap-2 mt-2">
+                <span className="px-2.5 py-0.5 rounded-full text-[10px] font-semibold uppercase bg-blue-50 text-blue-700 border border-blue-200">
+                  {team.shortName || 'CLUB'}
                 </span>
-                <span className="px-3 py-0.5 rounded-full text-[10px] font-extrabold tracking-widest bg-indigo-500/20 border border-indigo-400/30 text-indigo-200">
-                  {team.teamType || "PRO SQUAD"}
+                <span className="px-2.5 py-0.5 rounded-full text-[10px] font-semibold uppercase bg-slate-100 text-slate-700 border border-slate-200">
+                  {team.teamType || 'PRO SQUAD'}
                 </span>
+                {league?.leagueName || team.leagueName ? (
+                  <span className="px-2.5 py-0.5 rounded-full text-[10px] font-semibold uppercase bg-amber-50 text-amber-800 border border-amber-200">
+                    {league?.leagueName || team.leagueName}
+                  </span>
+                ) : null}
               </div>
             </div>
           </div>
         </DialogHeader>
 
-        <div className="p-6 space-y-4 text-slate-800">
+        {/* Modal Body Container - Clean Light Style */}
+        <div className="p-6 space-y-5 overflow-y-auto max-h-[75vh] custom-scrollbar text-slate-800">
+          {/* Key Metrics Cards (3 Columns) */}
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <div className="bg-indigo-50/50 border border-indigo-100 rounded-2xl p-4 space-y-1">
+              <div className="flex items-center justify-between">
+                <span className="text-[11px] font-semibold text-slate-500">Squad Members</span>
+                <Users className="w-4 h-4 text-indigo-600" />
+              </div>
+              <p className="text-xl font-bold text-slate-900">
+                {rawMembers.length || team.totalMembers || 0} <span className="text-xs font-normal text-slate-500">Players</span>
+              </p>
+            </div>
+
+            <div className="bg-amber-50/50 border border-amber-100 rounded-2xl p-4 space-y-1">
+              <div className="flex items-center justify-between">
+                <span className="text-[11px] font-semibold text-slate-500">Coin Budget</span>
+                <Coins className="w-4 h-4 text-amber-600" />
+              </div>
+              <p className="text-xl font-bold text-slate-900">
+                {(team.coin || 0).toLocaleString()} <span className="text-xs font-normal text-slate-500">Coins</span>
+              </p>
+            </div>
+
+            <div className="bg-emerald-50/50 border border-emerald-100 rounded-2xl p-4 space-y-1">
+              <div className="flex items-center justify-between">
+                <span className="text-[11px] font-semibold text-slate-500">Market Value</span>
+                <TrendingUp className="w-4 h-4 text-emerald-600" />
+              </div>
+              <p className="text-xl font-bold text-slate-900">
+                £{marketValue.toLocaleString()}
+              </p>
+            </div>
+          </div>
 
           {/* Associated League & Manager Cards */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            {/* Associated League */}
-            <div className="bg-amber-50/70 border border-amber-200/80 p-3.5 rounded-2xl flex items-center gap-3">
-              <div className="p-2.5 rounded-xl bg-amber-500/10 text-amber-600 shrink-0">
-                <Trophy className="w-5 h-5" />
-              </div>
-              <div className="min-w-0">
-                <p className="text-[10px] font-bold text-amber-800 uppercase tracking-wider">Associated League</p>
-                <p className="text-xs font-bold text-slate-900 truncate">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+            {/* Associated League Card */}
+            <div className="bg-slate-50/80 border border-slate-200/80 rounded-2xl p-4 space-y-2">
+              <h3 className="text-xs font-bold text-slate-900 uppercase tracking-wider flex items-center gap-1.5">
+                <Trophy className="w-4 h-4 text-amber-600" /> Associated League
+              </h3>
+              <div className="pt-1">
+                <p className="text-sm font-bold text-slate-900">
                   {league?.leagueName || league?.name || team.leagueName || 'Independent / Unassigned'}
+                </p>
+                <p className="text-xs text-slate-500 font-medium mt-0.5">
+                  Ground: {team.stadiumName || team.stadium || 'N/A'}
                 </p>
               </div>
             </div>
 
-            {/* Assigned Manager(s) */}
-            <div className="bg-indigo-50/70 border border-indigo-200/80 p-3.5 rounded-2xl flex items-center gap-3">
-              <div className="p-2.5 rounded-xl bg-indigo-500/10 text-indigo-600 shrink-0">
-                <UserCheck className="w-5 h-5" />
-              </div>
-              <div className="min-w-0 flex-1">
-                <p className="text-[10px] font-bold text-indigo-800 uppercase tracking-wider">
-                  {managersList.length > 1 ? `Team Managers (${managersList.length})` : 'Team Manager'}
-                </p>
+            {/* Team Manager Card */}
+            <div className="bg-slate-50/80 border border-slate-200/80 rounded-2xl p-4 space-y-2">
+              <h3 className="text-xs font-bold text-slate-900 uppercase tracking-wider flex items-center gap-1.5">
+                <UserCheck className="w-4 h-4 text-indigo-600" /> Team Manager
+              </h3>
+              <div className="pt-1">
                 {managersList.length === 0 ? (
-                  <p className="text-xs font-semibold text-slate-400">No Manager Assigned</p>
+                  <p className="text-xs text-slate-400 font-medium">No Manager Assigned</p>
                 ) : (
                   <div className="space-y-0.5">
                     {managersList.map((m: any, idx: number) => {
-                      const name = m.firstName ? `${m.firstName} ${m.lastName || ''}`.trim() : (m.userName || `Manager ${idx + 1}`);
+                      const name = m.firstName
+                        ? `${m.firstName} ${m.lastName || ''}`.trim()
+                        : m.userName || `Manager ${idx + 1}`;
                       return (
-                        <p key={m._id || idx} className="text-xs font-bold text-slate-900 truncate">
-                          {name}
-                        </p>
+                        <div key={m._id || idx}>
+                          <p className="text-sm font-bold text-slate-900">{name}</p>
+                          {m.email && <p className="text-xs text-slate-500 font-medium">{m.email}</p>}
+                        </div>
                       );
                     })}
                   </div>
@@ -124,74 +211,92 @@ const TeamViewModal = ({ team, isOpen, onClose }: TeamViewModalProps) => {
             </div>
           </div>
 
-          {/* Main Info Grid */}
-          <div className="grid grid-cols-3 gap-3">
-            <div className="bg-gray-50/80 border border-gray-100 p-3.5 rounded-2xl flex flex-col items-center text-center space-y-1">
-              <Building2 className="w-4 h-4 text-blue-600 mb-0.5" />
-              <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Stadium</span>
-              <span className="text-gray-900 font-semibold text-xs leading-tight truncate max-w-full" title={team.stadiumName || team.stadium || "N/A"}>
-                {team.stadiumName || team.stadium || "N/A"}
-              </span>
+          {/* Squad Members / Players List Section */}
+          <div className="bg-slate-50/60 border border-slate-200/80 rounded-2xl p-4 space-y-3">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
+              <h3 className="text-xs font-bold text-slate-900 uppercase tracking-wider flex items-center gap-1.5">
+                <Users className="w-4 h-4 text-blue-600" /> Squad Members ({filteredMembers.length})
+              </h3>
+
+              {rawMembers.length > 0 && (
+                <div className="relative w-full sm:w-56">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400" />
+                  <input
+                    type="text"
+                    value={memberSearch}
+                    onChange={(e) => setMemberSearch(e.target.value)}
+                    placeholder="Search player name..."
+                    className="w-full pl-9 pr-7 py-1.5 bg-white border border-slate-200 rounded-xl text-xs font-medium text-slate-800 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
+                  />
+                  {memberSearch && (
+                    <button
+                      type="button"
+                      onClick={() => setMemberSearch('')}
+                      className="absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 p-0.5"
+                    >
+                      <X className="w-3 h-3" />
+                    </button>
+                  )}
+                </div>
+              )}
             </div>
 
-            <div className="bg-gray-50/80 border border-gray-100 p-3.5 rounded-2xl flex flex-col items-center text-center space-y-1">
-              <MapPin className="w-4 h-4 text-blue-600 mb-0.5" />
-              <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Location</span>
-              <span className="text-gray-900 font-semibold text-xs leading-tight truncate max-w-full" title={team.city || team.location || "N/A"}>
-                {team.city || team.location || "N/A"}
-              </span>
-              <span className="text-[9px] text-gray-400 font-medium">{team.country || "Worldwide"}</span>
-            </div>
+            {filteredMembers.length > 0 ? (
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 max-h-64 overflow-y-auto pr-1 custom-scrollbar">
+                {filteredMembers.map((member: any, index: number) => {
+                  const name = member.firstName
+                    ? `${member.firstName} ${member.lastName || ''}`.trim()
+                    : member.userName || `Player ${index + 1}`;
+                  const profileImg = formatImagePath(member.profile);
 
-            <div className="bg-gray-50/80 border border-gray-100 p-3.5 rounded-2xl flex flex-col items-center text-center space-y-1">
-              <Calendar className="w-4 h-4 text-blue-600 mb-0.5" />
-              <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Registered</span>
-              <span className="text-gray-900 font-semibold text-xs leading-tight">
-                {team.createdAt ? dayjs(team.createdAt).format("DD MMM YYYY") : "N/A"}
-              </span>
-            </div>
-          </div>
+                  return (
+                    <div
+                      key={member._id || index}
+                      className="flex items-center gap-3 p-2.5 bg-white border border-slate-200/80 rounded-xl hover:border-slate-300 transition-all shadow-2xs"
+                    >
+                      <div className="relative w-9 h-9 rounded-full bg-slate-100 border border-slate-200 overflow-hidden flex items-center justify-center shrink-0">
+                        {profileImg ? (
+                          <Image
+                            src={profileImg}
+                            alt={name}
+                            fill
+                            className="object-cover"
+                          />
+                        ) : (
+                          <span className="text-xs font-bold text-slate-600">
+                            {name.charAt(0).toUpperCase()}
+                          </span>
+                        )}
+                      </div>
 
-          {/* Squad Strength, Coin Balance & Market Value Grid */}
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-            <div className="bg-blue-50/60 border border-blue-100 rounded-2xl p-3.5 flex flex-col justify-between">
-              <span className="text-blue-600 font-bold text-[10px] uppercase tracking-wider flex items-center gap-1.5">
-                <Users className="w-3.5 h-3.5" /> Squad Members
-              </span>
-              <h4 className="text-lg font-black text-indigo-950 mt-1">
-                {team.totalMembers || (team.players ? team.players.length : 0)} <span className="text-xs font-medium text-indigo-500">Players</span>
-              </h4>
-            </div>
+                      <div className="min-w-0 flex-1">
+                        <p className="text-xs font-bold text-slate-900 truncate">{name}</p>
+                        <p className="text-[11px] text-slate-500 truncate">
+                          {member.email || member.phone || 'Player'}
+                        </p>
+                      </div>
 
-            <div className="bg-amber-50/60 border border-amber-100 rounded-2xl p-3.5 flex flex-col justify-between">
-              <span className="text-amber-700 font-bold text-[10px] uppercase tracking-wider flex items-center gap-1.5">
-                <Coins className="w-3.5 h-3.5" /> Coin Budget
-              </span>
-              <h4 className="text-lg font-black text-amber-950 mt-1">
-                {(team.coin || 0).toLocaleString()} <span className="text-xs font-medium text-amber-600">Coins</span>
-              </h4>
-            </div>
-
-            <div className="bg-emerald-50/60 border border-emerald-100 rounded-2xl p-3.5 flex flex-col justify-between">
-              <span className="text-emerald-700 font-bold text-[10px] uppercase tracking-wider flex items-center gap-1.5">
-                <TrendingUp className="w-3.5 h-3.5" /> Market Value
-              </span>
-              <h4 className="text-lg font-black text-emerald-950 mt-1">
-                £{marketValue.toLocaleString()}
-              </h4>
-            </div>
-          </div>
-
-          {/* Type & Identity Footer */}
-          <div className="flex items-center justify-between p-3.5 bg-slate-900 rounded-2xl text-white shadow-md">
-            <div>
-              <p className="text-[9px] text-slate-400 font-bold uppercase tracking-wider">Team Category</p>
-              <p className="font-medium text-xs">{team.teamType || "Club Squad"}</p>
-            </div>
-            <div className="text-right">
-              <p className="text-[9px] text-slate-400 font-bold uppercase tracking-wider">Team ID</p>
-              <p className="font-mono text-[10px] text-blue-300">{team._id}</p>
-            </div>
+                      <div className="flex items-center gap-1.5 shrink-0">
+                        {member.position && (
+                          <span className="px-2 py-0.5 text-[10px] font-medium bg-slate-100 text-slate-700 rounded-md">
+                            {member.position}
+                          </span>
+                        )}
+                        {member.engCoine !== undefined && (
+                          <span className="px-2 py-0.5 text-[10px] font-semibold bg-amber-50 text-amber-700 border border-amber-200/60 rounded-md">
+                            {member.engCoine} C
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            ) : (
+              <div className="py-6 text-center text-xs text-slate-400 font-medium">
+                {memberSearch ? 'No players match your search.' : 'No squad members registered in this team.'}
+              </div>
+            )}
           </div>
         </div>
       </DialogContent>

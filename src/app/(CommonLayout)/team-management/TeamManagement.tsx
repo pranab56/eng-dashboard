@@ -5,7 +5,7 @@ import GeneralStateCard from '@/components/cui/GeneralStateCard';
 import CustomPagination from '@/components/cui/CustomPagination';
 import CustomTable from '@/components/table/CustomTable';
 import TableTitle from '@/components/titles/TableTitle';
-import { useDeleteTeamMutation, useGetAllTeamQuery, useUpdateTeamCoinBudgetMutation } from '@/features/teamManagement/teamApi';
+import { useDeleteTeamMutation, useGetAllTeamQuery, useGetSingleTeamQuery, useUpdateTeamCoinBudgetMutation } from '@/features/teamManagement/teamApi';
 import { useGetAllLeagueQuery } from '@/features/leagueManagement/leagueApi';
 import { useGetAllManagerTeamQuery } from '@/features/managerTeam/managerTeamApi';
 import { useHeaders } from '@/hooks/useHeaders';
@@ -32,11 +32,16 @@ const TeamManagement = () => {
   const [selectedManagerId, setSelectedManagerId] = useState<string>("ALL");
   const [selectedTeamType, setSelectedTeamType] = useState<string>("ALL");
 
-  const { data: teamData, isLoading } = useGetAllTeamQuery({
+  const queryParams = useMemo(() => ({
     page,
     limit: 10,
-    searchTerm,
-  });
+    ...(selectedLeagueId !== "ALL" && { leagueId: selectedLeagueId }),
+    ...(selectedManagerId !== "ALL" && { managerId: selectedManagerId }),
+    ...(selectedTeamType !== "ALL" && { teamType: selectedTeamType }),
+    ...(searchTerm.trim() && { searchTerm: searchTerm.trim() }),
+  }), [page, selectedLeagueId, selectedManagerId, selectedTeamType, searchTerm]);
+
+  const { data: teamData, isLoading } = useGetAllTeamQuery(queryParams);
 
   const { data: leagueData } = useGetAllLeagueQuery({ limit: 100 });
   const allLeagues = leagueData?.data?.result || leagueData?.data || [];
@@ -49,6 +54,10 @@ const TeamManagement = () => {
 
   const [selectedTeam, setSelectedTeam] = useState<any>(null);
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
+
+  const { data: singleTeamData } = useGetSingleTeamQuery(selectedTeam?._id, {
+    skip: !selectedTeam?._id || !isViewModalOpen,
+  });
 
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [deletingId, setDeletingId] = useState<string | null>(null);
@@ -125,7 +134,7 @@ const TeamManagement = () => {
 
   // Available unique team types
   const uniqueTeamTypes = useMemo(() => {
-    const rawList = teamData?.data || [];
+    const rawList = teamData?.data?.result || teamData?.data || [];
     const typesSet = new Set<string>(["Football", "Cricket"]);
     rawList.forEach((t: any) => {
       if (t.teamType) typesSet.add(t.teamType);
@@ -133,70 +142,18 @@ const TeamManagement = () => {
     return Array.from(typesSet);
   }, [teamData]);
 
-  const filteredTeams = useMemo(() => {
-    const list = teamData?.data || [];
-    return list.filter((t: any) => {
-      // 1. Filter by League
-      if (selectedLeagueId !== "ALL") {
-        const directLeagueId = t.league?._id || t.league || t.leagueId;
-        const matchesDirect = directLeagueId === selectedLeagueId;
-        const matchesArray = Array.isArray(t.leagues) && t.leagues.some((l: any) => (l?._id || l?.id || l) === selectedLeagueId);
-        if (!matchesDirect && !matchesArray) return false;
-      }
-
-      // 2. Filter by Manager
-      if (selectedManagerId !== "ALL") {
-        if (selectedManagerId === "UNASSIGNED") {
-          const hasManagers = (Array.isArray(t.managers) && t.managers.length > 0) || Boolean(t.manager);
-          if (hasManagers) return false;
-        } else {
-          const managersArray = Array.isArray(t.managers)
-            ? t.managers
-            : t.managers
-            ? [t.managers]
-            : t.manager
-            ? [t.manager]
-            : [];
-
-          const matchesManager = managersArray.some((m: any) => {
-            const mId = m?._id || m?.id || m?.manager?._id || m?.manager || m;
-            return mId === selectedManagerId;
-          });
-
-          if (!matchesManager) return false;
-        }
-      }
-
-      // 3. Filter by Team Type
-      if (selectedTeamType !== "ALL") {
-        const typeMatch = (t.teamType || "").toLowerCase() === selectedTeamType.toLowerCase();
-        if (!typeMatch) return false;
-      }
-
-      // 4. Filter by Search Query
-      if (!searchTerm.trim()) return true;
-      const q = searchTerm.toLowerCase().trim();
-      return (
-        (t.teamName || "").toLowerCase().includes(q) ||
-        (t.stadiumName || t.stadium || "").toLowerCase().includes(q) ||
-        (t.shortName || "").toLowerCase().includes(q) ||
-        (t.city || t.location || "").toLowerCase().includes(q) ||
-        (t.country || "").toLowerCase().includes(q)
-      );
-    });
-  }, [teamData, searchTerm, selectedLeagueId, selectedManagerId, selectedTeamType]);
+  const displayedTeams = teamData?.data?.result || teamData?.data || [];
+  const totalPages = teamData?.pagination?.totalPage || teamData?.meta?.totalPage || 1;
 
   const items = [
     {
-      title: "Total Teams",
-      value: teamData?.pagination?.total || (teamData?.data || []).length,
-      id: "table1",
-      description: "Total registered squads in database"
+      title: "Total Registered Squads",
+      value: (teamData?.pagination?.total || teamData?.meta?.total || displayedTeams.length || 0).toString(),
+      description: "Active teams across competitions"
     },
     {
-      title: "Available Leagues",
-      value: allLeagues.length,
-      id: "table2",
+      title: "Leagues Covered",
+      value: (allLeagues.length || 0).toString(),
       description: "Registered competition tiers"
     }
   ];
@@ -286,19 +243,22 @@ const TeamManagement = () => {
           </div>
 
           <div className="pt-4">
-            <CustomTable<any> columns={getTeamColumns(handleView, handleDelete, handleEditCoin)} data={filteredTeams} isLoading={isLoading} />
+            <CustomTable<any> columns={getTeamColumns(handleView, handleDelete, handleEditCoin)} data={displayedTeams} isLoading={isLoading} />
           </div>
         </div>
 
         <div className='pt-8 px-4'>
-          <CustomPagination TOTAL_PAGES={teamData?.pagination?.totalPage || 1} qryName="teamPage" />
+          <CustomPagination TOTAL_PAGES={totalPages} qryName="teamPage" />
         </div>
       </div>
 
       <TeamViewModal
         isOpen={isViewModalOpen}
-        onClose={() => setIsViewModalOpen(false)}
-        team={selectedTeam}
+        onClose={() => {
+          setIsViewModalOpen(false);
+          setSelectedTeam(null);
+        }}
+        team={singleTeamData?.data || selectedTeam}
       />
 
       <DeleteConfirmModal

@@ -100,6 +100,30 @@ export const userApi = baseApi.injectEndpoints({
       providesTags: ["user", "parent"]
     }),
 
+    getIncompleteUsers: builder.query({
+      query: (params) => {
+        let pageNumber = 1;
+        let searchValue = "";
+
+        if (typeof params === "object" && params !== null) {
+          pageNumber = params.pageNumber || params.page || 1;
+          searchValue = params.searchValue || params.searchTerm || "";
+        } else if (params) {
+          pageNumber = params;
+        }
+
+        let url = `/user-management/incomplete?page=${pageNumber}`;
+        if (searchValue) {
+          url += `&searchTerm=${encodeURIComponent(searchValue)}`;
+        }
+        return {
+          url,
+          method: "GET",
+        };
+      },
+      providesTags: ["user"]
+    }),
+
     assignTeamToUser: builder.mutation({
       query: ({ id, data }) => ({
         url: `/user-management/assign-team/${id}`,
@@ -116,6 +140,7 @@ export const userApi = baseApi.injectEndpoints({
 export const {
   useGetUserQuery,
   useGetAllParentsQuery,
+  useGetIncompleteUsersQuery,
   useAssignTeamToUserMutation,
   useUpdateStatusMutation,
   useDeleteUserMutation,

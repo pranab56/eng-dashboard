@@ -5,7 +5,7 @@ import CreateButton from '@/components/buttons/CreateButton';
 import CustomPagination from '@/components/cui/CustomPagination';
 import TableHeader from '@/components/cui/TableHeader';
 import CustomTable from '@/components/table/CustomTable';
-import { useDeleteNewsMutation, useGetAllNewsQuery } from '@/features/news/newsApi';
+import { useDeleteNewsMutation, useGetAllNewsQuery, useRearrangeNewsMutation } from '@/features/news/newsApi';
 import { useHeaders } from '@/hooks/useHeaders';
 import { getNewsColumns } from '@/tableColumns/newsColumns';
 import Link from 'next/link';
@@ -24,7 +24,9 @@ const NewsManagement = () => {
 
   const { data: newsData, isLoading } = useGetAllNewsQuery(page);
   const [deleteNews, { isLoading: isDeleting }] = useDeleteNewsMutation();
+  const [rearrangeNews] = useRearrangeNewsMutation();
 
+  const [localNews, setLocalNews] = useState<any[]>([]);
   const [selectedNews, setSelectedNews] = useState<any>(null);
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
 
@@ -32,11 +34,44 @@ const NewsManagement = () => {
   const [deletingId, setDeletingId] = useState<string | null>(null);
 
   useEffect(() => {
+    if (newsData?.data) {
+      setLocalNews(newsData.data);
+    }
+  }, [newsData]);
+
+  useEffect(() => {
     setHeaders({
       title: "News Management",
       des: "Distribute official club updates and press releases across the digital network."
     })
   }, [])
+
+  const handleDragEnd = async (startIndex: number, endIndex: number) => {
+    const updatedNews = [...localNews];
+    const [removed] = updatedNews.splice(startIndex, 1);
+    updatedNews.splice(endIndex, 0, removed);
+
+    setLocalNews(updatedNews);
+
+    const limit = newsData?.pagination?.limit || 10;
+    const pageNum = Number(page) || 1;
+    const offset = (pageNum - 1) * limit;
+
+    const reorderedPayload = updatedNews.map((article: any, index: number) => ({
+      id: article._id,
+      order: offset + index + 1,
+    }));
+
+    try {
+      await rearrangeNews({ news: reorderedPayload }).unwrap();
+      toast.success("News articles reordered successfully");
+    } catch (error: any) {
+      toast.error(error?.data?.message || "Failed to reorder news articles");
+      if (newsData?.data) {
+        setLocalNews(newsData.data);
+      }
+    }
+  };
 
   const handleView = (news: any) => {
     setSelectedNews(news);
@@ -81,7 +116,13 @@ const NewsManagement = () => {
             <TableHeader payload={tableHeaderPayload} />
           </>
           <div className="pt-4">
-            <CustomTable<any> columns={getNewsColumns(handleView, handleDelete)} data={newsData?.data || []} isLoading={isLoading} />
+            <CustomTable<any>
+              columns={getNewsColumns(handleView, handleDelete)}
+              data={localNews}
+              isLoading={isLoading}
+              isSortable={true}
+              onDragEnd={handleDragEnd}
+            />
           </div>
         </div>
         <div className='pt-8 px-4'>

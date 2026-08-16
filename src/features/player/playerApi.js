@@ -7,9 +7,15 @@ export const playerApi = baseApi.injectEndpoints({
       query: (params = {}) => {
         const queryParams = new URLSearchParams();
         if (params.pageNumber || params.page) queryParams.append("page", params.pageNumber || params.page);
+        if (params.limit) queryParams.append("limit", params.limit);
         if (params.searchValue || params.searchTerm) queryParams.append("searchTerm", params.searchValue || params.searchTerm);
         if (params.role && params.role !== "ALL") queryParams.append("role", params.role);
         if (params.status && params.status !== "ALL") queryParams.append("status", params.status);
+        if (params.ageGroup && params.ageGroup !== "ALL") queryParams.append("ageGroup", params.ageGroup);
+        if (params.position && params.position !== "ALL") queryParams.append("position", params.position);
+        if (params.selectTeam && params.selectTeam !== "ALL") queryParams.append("selectTeam", params.selectTeam);
+        if (params.sort || params.sortBy) queryParams.append("sort", params.sort || params.sortBy);
+
         const qStr = queryParams.toString();
         return {
           url: qStr ? `/player?${qStr}` : `/player`,
