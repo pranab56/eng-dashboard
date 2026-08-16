@@ -37,11 +37,28 @@ export const LeagueSelectDropdown: React.FC<LeagueSelectDropdownProps> = ({
     (l) => (l._id || l.id) === selectedLeagueId
   );
 
-  const filteredLeagues = leagues.filter((l) => {
-    if (!searchTerm.trim()) return true;
+  const [displayCount, setDisplayCount] = useState(40);
+
+  const filteredLeagues = React.useMemo(() => {
+    if (!searchTerm.trim()) return leagues;
     const q = searchTerm.toLowerCase().trim();
-    return (l.leagueName || l.name || '').toLowerCase().includes(q);
-  });
+    return leagues.filter((l) => (l.leagueName || l.name || '').toLowerCase().includes(q));
+  }, [leagues, searchTerm]);
+
+  useEffect(() => {
+    setDisplayCount(40);
+  }, [searchTerm, isOpen]);
+
+  const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
+    const { scrollTop, scrollHeight, clientHeight } = e.currentTarget;
+    if (scrollHeight - scrollTop - clientHeight < 60) {
+      if (displayCount < filteredLeagues.length) {
+        setDisplayCount((prev) => Math.min(prev + 40, filteredLeagues.length));
+      }
+    }
+  };
+
+  const displayedLeagues = filteredLeagues.slice(0, displayCount);
 
   return (
     <div className="relative" ref={dropdownRef}>
@@ -86,7 +103,7 @@ export const LeagueSelectDropdown: React.FC<LeagueSelectDropdownProps> = ({
       {isOpen && (
         <div className="absolute top-full left-0 mt-1.5 w-64 sm:w-72 bg-white border border-gray-200 rounded-2xl shadow-xl z-[150] overflow-hidden animate-in fade-in zoom-in-95 duration-150">
           {/* Search Box */}
-          <div className="p-2.5 border-b border-gray-100 bg-gray-50/70">
+          <div className="p-2.5 border-b border-gray-100 bg-gray-50/70 space-y-1">
             <div className="relative">
               <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400" />
               <input
@@ -101,16 +118,23 @@ export const LeagueSelectDropdown: React.FC<LeagueSelectDropdownProps> = ({
                 <button
                   type="button"
                   onClick={() => setSearchTerm('')}
-                  className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 p-0.5"
+                  className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 p-0.5 cursor-pointer"
                 >
                   <X className="w-3 h-3" />
                 </button>
               )}
             </div>
+            <div className="flex items-center justify-between px-1 text-[10px] text-gray-400 font-semibold">
+              <span>{filteredLeagues.length} leagues available</span>
+              {displayCount < filteredLeagues.length && <span>Scroll for more</span>}
+            </div>
           </div>
 
-          {/* Scrollable League List */}
-          <div className="max-h-56 overflow-y-auto p-1.5 divide-y divide-gray-50 scrollbar-thin scrollbar-thumb-gray-200">
+          {/* Scrollable League List with Infinite Scroll */}
+          <div
+            onScroll={handleScroll}
+            className="max-h-56 overflow-y-auto p-1.5 divide-y divide-gray-50 scrollbar-thin scrollbar-thumb-gray-200"
+          >
             {/* All Leagues Option */}
             <button
               type="button"
@@ -131,40 +155,48 @@ export const LeagueSelectDropdown: React.FC<LeagueSelectDropdownProps> = ({
               {selectedLeagueId === "ALL" && <Check className="w-3.5 h-3.5 text-amber-600" />}
             </button>
 
-            {filteredLeagues.length === 0 ? (
+            {displayedLeagues.length === 0 ? (
               <div className="py-6 text-center text-gray-400 text-xs font-medium">
                 No matching leagues found
               </div>
             ) : (
-              filteredLeagues.map((lg) => {
-                const lgId = lg._id || lg.id;
-                const isSelected = selectedLeagueId === lgId;
+              <>
+                {displayedLeagues.map((lg) => {
+                  const lgId = lg._id || lg.id;
+                  const isSelected = selectedLeagueId === lgId;
 
-                return (
-                  <button
-                    key={lgId}
-                    type="button"
-                    onClick={() => {
-                      onChange(lgId);
-                      setIsOpen(false);
-                    }}
-                    className={`w-full flex items-center justify-between p-2 rounded-xl text-left text-xs transition-colors cursor-pointer ${
-                      isSelected
-                        ? 'bg-amber-50 text-amber-950 font-bold'
-                        : 'text-gray-800 hover:bg-gray-50 hover:text-amber-700 font-medium'
-                    }`}
-                  >
-                    <div className="flex items-center gap-2 truncate">
-                      <div className="w-5 h-5 rounded-md bg-amber-50 border border-amber-200/60 flex items-center justify-center shrink-0">
-                        <Trophy className="w-3 h-3 text-amber-600" />
+                  return (
+                    <button
+                      key={lgId}
+                      type="button"
+                      onClick={() => {
+                        onChange(lgId);
+                        setIsOpen(false);
+                      }}
+                      className={`w-full flex items-center justify-between p-2 rounded-xl text-left text-xs transition-colors cursor-pointer ${
+                        isSelected
+                          ? 'bg-amber-50 text-amber-950 font-bold'
+                          : 'text-gray-800 hover:bg-gray-50 hover:text-amber-700 font-medium'
+                      }`}
+                    >
+                      <div className="flex items-center gap-2 truncate">
+                        <div className="w-5 h-5 rounded-md bg-amber-50 border border-amber-200/60 flex items-center justify-center shrink-0">
+                          <Trophy className="w-3 h-3 text-amber-600" />
+                        </div>
+                        <span className="truncate">{lg.leagueName || lg.name}</span>
                       </div>
-                      <span className="truncate">{lg.leagueName || lg.name}</span>
-                    </div>
 
-                    {isSelected && <Check className="w-3.5 h-3.5 text-amber-600 shrink-0" />}
-                  </button>
-                );
-              })
+                      {isSelected && <Check className="w-3.5 h-3.5 text-amber-600 shrink-0" />}
+                    </button>
+                  );
+                })}
+
+                {displayCount < filteredLeagues.length && (
+                  <div className="py-1.5 text-center text-[10px] text-amber-600 font-semibold animate-pulse">
+                    Loading more leagues ({filteredLeagues.length - displayCount} remaining)...
+                  </div>
+                )}
+              </>
             )}
           </div>
         </div>

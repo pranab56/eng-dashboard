@@ -25,15 +25,17 @@ export const leagueApi = baseApi.injectEndpoints({
     getAllLeague: builder.query({
       query: (params) => {
         let page = 1;
+        let limit = 10;
         let searchValue = "";
         if (typeof params === "object" && params !== null) {
           page = params.page || params.pageNumber || 1;
+          limit = params.limit || 10;
           searchValue = params.searchValue || params.searchTerm || "";
         } else if (params) {
           page = params;
         }
 
-        let url = `/league?page=${page}`;
+        let url = `/league?page=${page}&limit=${limit}`;
         if (searchValue) {
           url += `&searchTerm=${encodeURIComponent(searchValue)}`;
         }

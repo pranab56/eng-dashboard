@@ -37,15 +37,32 @@ export const TeamSelectDropdown: React.FC<TeamSelectDropdownProps> = ({
 
   const selectedTeam = teams.find((t) => (t._id || t.id) === selectedTeamId);
 
-  const filteredTeams = teams.filter((t) => {
-    if (!searchTerm.trim()) return true;
+  const [displayCount, setDisplayCount] = useState(40);
+
+  const filteredTeams = React.useMemo(() => {
+    if (!searchTerm.trim()) return teams;
     const q = searchTerm.toLowerCase().trim();
-    return (
+    return teams.filter((t) => (
       (t.teamName || '').toLowerCase().includes(q) ||
       (t.shortName || '').toLowerCase().includes(q) ||
       (t.location || '').toLowerCase().includes(q)
-    );
-  });
+    ));
+  }, [teams, searchTerm]);
+
+  useEffect(() => {
+    setDisplayCount(40);
+  }, [searchTerm, isOpen]);
+
+  const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
+    const { scrollTop, scrollHeight, clientHeight } = e.currentTarget;
+    if (scrollHeight - scrollTop - clientHeight < 60) {
+      if (displayCount < filteredTeams.length) {
+        setDisplayCount((prev) => Math.min(prev + 40, filteredTeams.length));
+      }
+    }
+  };
+
+  const displayedTeams = filteredTeams.slice(0, displayCount);
 
   return (
     <div className="relative w-full" ref={dropdownRef}>
@@ -90,7 +107,7 @@ export const TeamSelectDropdown: React.FC<TeamSelectDropdownProps> = ({
       {isOpen && (
         <div className="absolute top-full left-0 mt-1.5 w-full bg-white border border-slate-200 rounded-2xl shadow-xl z-[150] overflow-hidden animate-in fade-in zoom-in-95 duration-150">
           {/* Internal Search Box */}
-          <div className="p-2 border-b border-slate-100 bg-slate-50/70">
+          <div className="p-2 border-b border-slate-100 bg-slate-50/70 space-y-1">
             <div className="relative">
               <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400" />
               <input
@@ -105,16 +122,23 @@ export const TeamSelectDropdown: React.FC<TeamSelectDropdownProps> = ({
                 <button
                   type="button"
                   onClick={() => setSearchTerm('')}
-                  className="absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 p-0.5"
+                  className="absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 p-0.5 cursor-pointer"
                 >
                   <X className="w-3 h-3" />
                 </button>
               )}
             </div>
+            <div className="flex items-center justify-between px-1 text-[10px] text-slate-400 font-semibold">
+              <span>{filteredTeams.length} teams available</span>
+              {displayCount < filteredTeams.length && <span>Scroll for more</span>}
+            </div>
           </div>
 
-          {/* Scrollable Team List */}
-          <div className="max-h-56 overflow-y-auto p-1 divide-y divide-slate-50 scrollbar-thin scrollbar-thumb-slate-200">
+          {/* Scrollable Team List with Infinite Scroll */}
+          <div
+            onScroll={handleScroll}
+            className="max-h-56 overflow-y-auto p-1 divide-y divide-slate-50 scrollbar-thin scrollbar-thumb-slate-200"
+          >
             {/* Unassign Option */}
             <button
               type="button"
@@ -130,56 +154,64 @@ export const TeamSelectDropdown: React.FC<TeamSelectDropdownProps> = ({
               {!selectedTeamId && <Check className="w-3.5 h-3.5 text-indigo-600" />}
             </button>
 
-            {filteredTeams.length === 0 ? (
+            {displayedTeams.length === 0 ? (
               <div className="py-6 text-center text-slate-400 text-xs font-medium">
                 No matching teams found
               </div>
             ) : (
-              filteredTeams.map((team) => {
-                const teamId = team._id || team.id;
-                const isSelected = selectedTeamId === teamId;
+              <>
+                {displayedTeams.map((team) => {
+                  const teamId = team._id || team.id;
+                  const isSelected = selectedTeamId === teamId;
 
-                return (
-                  <button
-                    key={teamId}
-                    type="button"
-                    onClick={() => {
-                      onChange(teamId);
-                      setIsOpen(false);
-                    }}
-                    className={`w-full flex items-center justify-between p-2 rounded-xl text-left text-xs transition-colors cursor-pointer ${
-                      isSelected
-                        ? 'bg-indigo-50 text-indigo-950 font-bold'
-                        : 'text-slate-800 hover:bg-slate-50 hover:text-indigo-600 font-medium'
-                    }`}
-                  >
-                    <div className="flex items-center gap-2.5 min-w-0">
-                      <div className="relative w-6 h-6 rounded-lg bg-slate-100 border border-slate-200 overflow-hidden flex items-center justify-center shrink-0">
-                        {team.teamLogo ? (
-                          <Image
-                            src={formatImagePath(team.teamLogo)}
-                            alt={team.teamName || 'team'}
-                            fill
-                            className="object-contain p-0.5"
-                          />
-                        ) : (
-                          <Shield className="w-3.5 h-3.5 text-slate-400" />
-                        )}
+                  return (
+                    <button
+                      key={teamId}
+                      type="button"
+                      onClick={() => {
+                        onChange(teamId);
+                        setIsOpen(false);
+                      }}
+                      className={`w-full flex items-center justify-between p-2 rounded-xl text-left text-xs transition-colors cursor-pointer ${
+                        isSelected
+                          ? 'bg-indigo-50 text-indigo-950 font-bold'
+                          : 'text-slate-800 hover:bg-slate-50 hover:text-indigo-600 font-medium'
+                      }`}
+                    >
+                      <div className="flex items-center gap-2.5 min-w-0">
+                        <div className="relative w-6 h-6 rounded-lg bg-slate-100 border border-slate-200 overflow-hidden flex items-center justify-center shrink-0">
+                          {team.teamLogo ? (
+                            <Image
+                              src={formatImagePath(team.teamLogo)}
+                              alt={team.teamName || 'team'}
+                              fill
+                              className="object-contain p-0.5"
+                            />
+                          ) : (
+                            <Shield className="w-3.5 h-3.5 text-slate-400" />
+                          )}
+                        </div>
+                        <div className="truncate">
+                          <p className="truncate font-semibold">{team.teamName}</p>
+                          {team.shortName && (
+                            <span className="text-[10px] text-slate-400 font-medium block">
+                              {team.shortName}
+                            </span>
+                          )}
+                        </div>
                       </div>
-                      <div className="truncate">
-                        <p className="truncate font-semibold">{team.teamName}</p>
-                        {team.shortName && (
-                          <span className="text-[10px] text-slate-400 font-medium block">
-                            {team.shortName}
-                          </span>
-                        )}
-                      </div>
-                    </div>
 
-                    {isSelected && <Check className="w-4 h-4 text-indigo-600 shrink-0" />}
-                  </button>
-                );
-              })
+                      {isSelected && <Check className="w-4 h-4 text-indigo-600 shrink-0" />}
+                    </button>
+                  );
+                })}
+
+                {displayCount < filteredTeams.length && (
+                  <div className="py-1.5 text-center text-[10px] text-indigo-600 font-semibold animate-pulse">
+                    Loading more teams ({filteredTeams.length - displayCount} remaining)...
+                  </div>
+                )}
+              </>
             )}
           </div>
         </div>

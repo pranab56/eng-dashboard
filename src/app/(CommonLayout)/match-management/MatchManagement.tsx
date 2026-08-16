@@ -9,6 +9,7 @@ import CustomTable from "@/components/table/CustomTable";
 import { useGetAllVenueCategoryQuery } from "@/features/categoryManagement/categoryApi";
 import { useGetAllLeagueQuery } from "@/features/leagueManagement/leagueApi";
 import { useGetAllLeagueTeamQuery } from "@/features/leagueTeam/leagueTeamApi";
+import { useGetAllTeamQuery } from "@/features/teamManagement/teamApi";
 import { useDeleteMatchMutation, useGetAllMatchQuery, useUpdateMatchStatusMutation } from "@/features/match/matchApi";
 import { useHeaders } from "@/hooks/useHeaders";
 import { getMatchColumns } from "@/tableColumns/matchColumns";
@@ -18,7 +19,7 @@ import { Check, ChevronDown, Filter, Loader2, RefreshCw, Search, X } from "lucid
 import Image from "next/image";
 import Link from "next/link";
 import { useSearchParams, usePathname, useRouter } from "next/navigation";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useMemo } from "react";
 import { toast } from "sonner";
 import DeleteConfirmModal from "./DeleteConfirmModal";
 import MatchViewModal from "./MatchViewModal";
@@ -49,7 +50,9 @@ const CustomSearchableSelect = ({
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [query, setQuery] = useState("");
+  const [displayCount, setDisplayCount] = useState(40);
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const listRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -61,11 +64,30 @@ const CustomSearchableSelect = ({
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  const selectedOption = options.find((opt) => opt.value === value);
+  // Filter across ALL options by search query
+  const filteredOptions = useMemo(() => {
+    if (!query.trim()) return options;
+    const q = query.toLowerCase().trim();
+    return options.filter((opt) => opt.label.toLowerCase().includes(q));
+  }, [options, query]);
 
-  const filteredOptions = options.filter((opt) =>
-    opt.label.toLowerCase().includes(query.toLowerCase())
-  );
+  // Reset display count when query changes or modal opens
+  useEffect(() => {
+    setDisplayCount(40);
+  }, [query, isOpen]);
+
+  // Handle scroll inside dropdown to load +40 more items on demand (Infinite Scroll Pagination)
+  const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
+    const { scrollTop, scrollHeight, clientHeight } = e.currentTarget;
+    if (scrollHeight - scrollTop - clientHeight < 60) {
+      if (displayCount < filteredOptions.length) {
+        setDisplayCount((prev) => Math.min(prev + 40, filteredOptions.length));
+      }
+    }
+  };
+
+  const selectedOption = options.find((opt) => opt.value === value);
+  const displayedOptions = filteredOptions.slice(0, displayCount);
 
   return (
     <div className={`relative ${className}`} ref={dropdownRef}>
@@ -100,70 +122,92 @@ const CustomSearchableSelect = ({
             {selectedOption ? selectedOption.label : placeholder}
           </span>
         </div>
-        <ChevronDown className={`w-3.5 h-3.5 text-gray-500 transition-transform duration-200 shrink-0 ${isOpen ? "rotate-180" : ""}`} />
+        <ChevronDown
+          className={`w-3.5 h-3.5 text-gray-500 transition-transform duration-200 shrink-0 ${
+            isOpen ? "rotate-180" : ""
+          }`}
+        />
       </button>
 
       {/* Dropdown Menu */}
       {isOpen && (
-        <div className="absolute z-50 mt-1 w-full min-w-[220px] bg-white border border-gray-200 rounded-xl shadow-xl p-2 space-y-2 animate-in fade-in-50 slide-in-from-top-1 duration-150">
-          {/* Search Bar */}
-          <div className="relative">
-            <Search className="w-3.5 h-3.5 text-gray-400 absolute left-2.5 top-2.5" />
-            <input
-              type="text"
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              placeholder="Search..."
-              className="w-full pl-8 pr-7 py-1.5 text-xs border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gray-50"
-              autoFocus
-            />
-            {query && (
-              <button
-                type="button"
-                onClick={() => setQuery("")}
-                className="absolute right-2 top-2 text-gray-400 hover:text-gray-600"
-              >
-                <X className="w-3.5 h-3.5" />
-              </button>
-            )}
+        <div className="absolute z-50 mt-1 w-full min-w-[240px] bg-white border border-gray-200 rounded-xl shadow-xl p-2 space-y-2 animate-in fade-in-50 slide-in-from-top-1 duration-150">
+          {/* Search Bar & Total Items Badge */}
+          <div className="space-y-1">
+            <div className="relative">
+              <Search className="w-3.5 h-3.5 text-gray-400 absolute left-2.5 top-2.5" />
+              <input
+                type="text"
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                placeholder="Search..."
+                className="w-full pl-8 pr-7 py-1.5 text-xs border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gray-50 font-medium text-gray-900"
+                autoFocus
+              />
+              {query && (
+                <button
+                  type="button"
+                  onClick={() => setQuery("")}
+                  className="absolute right-2 top-2 text-gray-400 hover:text-gray-600 cursor-pointer"
+                >
+                  <X className="w-3.5 h-3.5" />
+                </button>
+              )}
+            </div>
+            <div className="flex items-center justify-between px-1 text-[10px] text-gray-400 font-semibold">
+              <span>{filteredOptions.length} available</span>
+              {displayCount < filteredOptions.length && <span>Scroll for more</span>}
+            </div>
           </div>
 
-          {/* Scrollable Options List */}
-          <div className="max-h-56 overflow-y-auto space-y-0.5 custom-scrollbar pr-1">
-            {filteredOptions.length > 0 ? (
-              filteredOptions.map((opt) => {
-                const isSelected = opt.value === value;
-                return (
-                  <button
-                    key={opt.value}
-                    type="button"
-                    onClick={() => {
-                      onChange(opt.value);
-                      setIsOpen(false);
-                      setQuery("");
-                    }}
-                    className={`w-full flex items-center justify-between px-2.5 py-1.5 text-xs rounded-md transition-colors text-left cursor-pointer ${
-                      isSelected
-                        ? "bg-blue-50 text-blue-700 font-bold"
-                        : "hover:bg-gray-100 text-gray-700"
-                    }`}
-                  >
-                    <div className="flex items-center gap-2 truncate">
-                      {opt.logo && (
-                        <Image
-                          src={formatImagePath(opt.logo)}
-                          alt="logo"
-                          width={16}
-                          height={16}
-                          className="w-4 h-4 rounded-full object-cover shrink-0"
-                        />
-                      )}
-                      <span className="truncate">{opt.label}</span>
-                    </div>
-                    {isSelected && <Check className="w-3.5 h-3.5 text-blue-600 shrink-0" />}
-                  </button>
-                );
-              })
+          {/* Scrollable Infinite Options List */}
+          <div
+            ref={listRef}
+            onScroll={handleScroll}
+            className="max-h-60 overflow-y-auto space-y-0.5 custom-scrollbar pr-1"
+          >
+            {displayedOptions.length > 0 ? (
+              <>
+                {displayedOptions.map((opt) => {
+                  const isSelected = opt.value === value;
+                  return (
+                    <button
+                      key={opt.value}
+                      type="button"
+                      onClick={() => {
+                        onChange(opt.value);
+                        setIsOpen(false);
+                        setQuery("");
+                      }}
+                      className={`w-full flex items-center justify-between px-2.5 py-1.5 text-xs rounded-md transition-colors text-left cursor-pointer ${
+                        isSelected
+                          ? "bg-blue-50 text-blue-700 font-bold"
+                          : "hover:bg-gray-100 text-gray-700"
+                      }`}
+                    >
+                      <div className="flex items-center gap-2 truncate">
+                        {opt.logo && (
+                          <Image
+                            src={formatImagePath(opt.logo)}
+                            alt="logo"
+                            width={16}
+                            height={16}
+                            className="w-4 h-4 rounded-full object-cover shrink-0"
+                          />
+                        )}
+                        <span className="truncate">{opt.label}</span>
+                      </div>
+                      {isSelected && <Check className="w-3.5 h-3.5 text-blue-600 shrink-0" />}
+                    </button>
+                  );
+                })}
+
+                {displayCount < filteredOptions.length && (
+                  <div className="py-1 text-center text-[10px] text-blue-600 font-semibold animate-pulse">
+                    Loading more options ({filteredOptions.length - displayCount} remaining)...
+                  </div>
+                )}
+              </>
             ) : (
               <div className="py-3 text-center text-xs text-gray-400 font-medium">
                 No matching results
@@ -247,24 +291,12 @@ const MatchManagement = () => {
 
   // Data Queries
   const { data: leagueData } = useGetAllLeagueQuery({ limit: 1000 });
-  const { data: leagueTeamData } = useGetAllLeagueTeamQuery(1);
+  const { data: teamData } = useGetAllTeamQuery({ limit: 1000 });
   const { data: venueCategoryData } = useGetAllVenueCategoryQuery({});
 
   const allLeagues: any[] = leagueData?.data?.result || leagueData?.data || [];
-  const leagueList: any[] = leagueTeamData?.data || [];
+  const allTeams: any[] = teamData?.data?.result || teamData?.data || [];
   const venueList: any[] = venueCategoryData?.data || [];
-
-  // Derive Teams
-  const allTeams: any[] = [];
-  leagueList.forEach((entry: any) => {
-    if (Array.isArray(entry.teams)) {
-      entry.teams.forEach((t: any) => {
-        if (!allTeams.some((existing) => existing._id === t._id)) {
-          allTeams.push(t);
-        }
-      });
-    }
-  });
 
   // Options arrays
   const competitionOptions: OptionItem[] = [
