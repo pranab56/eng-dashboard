@@ -59,7 +59,7 @@ const TeamViewModal = ({ team, isOpen, onClose }: TeamViewModalProps) => {
     }
   };
 
-  const handleSaveJerseyAndProfile = async () => {
+  const handleSaveJerseyNumber = async () => {
     if (!editingJerseyPlayer?._id) return;
     try {
       if (selectedImageFile) {
@@ -130,21 +130,6 @@ const TeamViewModal = ({ team, isOpen, onClose }: TeamViewModalProps) => {
       toast.error(err?.data?.message || "Failed to remove player from team");
     } finally {
       setRemovingPlayerId(null);
-    }
-  };
-
-  const handleSaveJerseyNumber = async () => {
-    if (!editingJerseyPlayer?._id) return;
-    try {
-      await updateJerseyNumber({
-        id: editingJerseyPlayer._id,
-        data: { jerseyNumber: jerseyInput.trim() },
-      }).unwrap();
-      toast.success("Jersey number updated successfully!");
-      setIsJerseyModalOpen(false);
-      setEditingJerseyPlayer(null);
-    } catch (err: any) {
-      toast.error(err?.data?.message || "Failed to update jersey number");
     }
   };
 
@@ -509,7 +494,7 @@ const TeamViewModal = ({ team, isOpen, onClose }: TeamViewModalProps) => {
                 </button>
                 <button
                   type="button"
-                  onClick={handleSaveJerseyAndProfile}
+                  onClick={handleSaveJerseyNumber}
                   disabled={isSavingJersey}
                   className="flex items-center gap-1.5 px-4 py-1.5 text-xs font-semibold text-white bg-amber-600 hover:bg-amber-700 rounded-xl shadow-xs cursor-pointer disabled:opacity-50"
                 >
