@@ -17,7 +17,7 @@ import { getErrorMessage } from "@/utils/getErrorMessage";
 import { Check, ChevronDown, Filter, Loader2, RefreshCw, Search, X } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { useSearchParams } from "next/navigation";
+import { useSearchParams, usePathname, useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import DeleteConfirmModal from "./DeleteConfirmModal";
@@ -179,7 +179,10 @@ const CustomSearchableSelect = ({
 const MatchManagement = () => {
   const { setHeaders } = useHeaders();
   const searchParams = useSearchParams();
-  const page = searchParams.get("matchPage") || "1";
+  const router = useRouter();
+  const pathname = usePathname();
+
+  const urlPageParam = searchParams.get("matchPage");
 
   // Filter States matching client reference UI
   const [leagueFilter, setLeagueFilter] = useState<string>("ALL");
@@ -192,10 +195,49 @@ const MatchManagement = () => {
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [debouncedSearchTerm, setDebouncedSearchTerm] = useState<string>("");
 
+  const resetPageInUrl = () => {
+    if (urlPageParam && urlPageParam !== "1") {
+      const params = new URLSearchParams(searchParams.toString());
+      params.delete("matchPage");
+      router.replace(`${pathname}?${params.toString()}`);
+    }
+  };
+
+  const handleSetLeagueFilter = (val: string) => {
+    resetPageInUrl();
+    setLeagueFilter(val);
+  };
+
+  const handleSetDateFilter = (val: string) => {
+    resetPageInUrl();
+    setDateFilter(val);
+  };
+
+  const handleSetStatusFilter = (val: string) => {
+    resetPageInUrl();
+    setStatusFilter(val);
+  };
+
+  const handleSetMatchDateStatusFilter = (val: string) => {
+    resetPageInUrl();
+    setMatchDateStatusFilter(val);
+  };
+
+  const handleSetVenueFilter = (val: string) => {
+    resetPageInUrl();
+    setVenueFilter(val);
+  };
+
+  const handleSetTeamFilter = (val: string) => {
+    resetPageInUrl();
+    setTeamFilter(val);
+  };
+
   // Debounce search term to prevent API hit on every keystroke
   useEffect(() => {
     const handler = setTimeout(() => {
       setDebouncedSearchTerm(searchTerm);
+      if (searchTerm) resetPageInUrl();
     }, 500);
 
     return () => {
@@ -277,13 +319,16 @@ const MatchManagement = () => {
   // Combine query params
   const effectiveDateStatus = dateFilter !== "ALL" ? dateFilter : matchDateStatusFilter;
 
+  // Use URL matchPage parameter if available, but reset to 1 if filter is active
+  const page = urlPageParam || "1";
+
   const queryParams = {
     page,
-    ...(leagueFilter !== "ALL" && { league: leagueFilter }),
+    ...(leagueFilter !== "ALL" && { league: leagueFilter, leagueId: leagueFilter }),
     ...(statusFilter !== "ALL" && { status: statusFilter }),
     ...(effectiveDateStatus !== "ALL" && { dateStatus: effectiveDateStatus }),
     ...(venueFilter !== "ALL" && { venue: venueFilter }),
-    ...(teamFilter !== "ALL" && { team: teamFilter }),
+    ...(teamFilter !== "ALL" && { team: teamFilter, teamId: teamFilter }),
     ...(unplayedOnly && { unplayedOnly: "true" }),
     ...(debouncedSearchTerm.trim() && { searchTerm: debouncedSearchTerm.trim() }),
   };
@@ -400,7 +445,7 @@ const MatchManagement = () => {
             <label className="text-[11px] font-bold text-gray-600 block mb-1">Competition</label>
             <CustomSearchableSelect
               value={leagueFilter}
-              onChange={setLeagueFilter}
+              onChange={handleSetLeagueFilter}
               options={competitionOptions}
               placeholder="Competition : All"
             />
@@ -411,7 +456,7 @@ const MatchManagement = () => {
             <label className="text-[11px] font-bold text-gray-600 block mb-1">Date</label>
             <CustomSearchableSelect
               value={dateFilter}
-              onChange={setDateFilter}
+              onChange={handleSetDateFilter}
               options={dateOptions}
               placeholder="Date : All"
             />
@@ -422,7 +467,7 @@ const MatchManagement = () => {
             <label className="text-[11px] font-bold text-gray-600 block mb-1">Status</label>
             <CustomSearchableSelect
               value={statusFilter}
-              onChange={setStatusFilter}
+              onChange={handleSetStatusFilter}
               options={statusOptions}
               placeholder="Status : All"
             />
@@ -433,7 +478,7 @@ const MatchManagement = () => {
             <label className="text-[11px] font-bold text-gray-600 block mb-1">Match Date Status</label>
             <CustomSearchableSelect
               value={matchDateStatusFilter}
-              onChange={setMatchDateStatusFilter}
+              onChange={handleSetMatchDateStatusFilter}
               options={matchDateStatusOptions}
               placeholder="Match Date Status : All"
             />
@@ -444,7 +489,7 @@ const MatchManagement = () => {
             <label className="text-[11px] font-bold text-gray-600 block mb-1">Venue</label>
             <CustomSearchableSelect
               value={venueFilter}
-              onChange={setVenueFilter}
+              onChange={handleSetVenueFilter}
               options={venueOptions}
               placeholder="Venue : All"
             />
@@ -459,7 +504,7 @@ const MatchManagement = () => {
               label="Team Filter"
               badgeText="Select Team"
               value={teamFilter}
-              onChange={setTeamFilter}
+              onChange={handleSetTeamFilter}
               options={teamOptions}
               placeholder="Team : All"
             />
@@ -473,7 +518,10 @@ const MatchManagement = () => {
               <input
                 type="checkbox"
                 checked={unplayedOnly}
-                onChange={(e) => setUnplayedOnly(e.target.checked)}
+                onChange={(e) => {
+                  resetPageInUrl();
+                  setUnplayedOnly(e.target.checked);
+                }}
                 className="w-4 h-4 text-blue-600 rounded border-gray-300 focus:ring-blue-500 cursor-pointer"
               />
               <span>Show unplayed matches only</span>
