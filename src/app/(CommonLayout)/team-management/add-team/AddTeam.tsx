@@ -36,8 +36,7 @@ type AddTeamFormValues = z.infer<typeof addTeamSchema>
 
 const teamTypeOptions = [
   { label: "Football", value: "Football" },
-  { label: "Cricket", value: "Cricket" },
-]
+];
 
 const AddTeam = () => {
   const { setHeaders } = useHeaders()
@@ -52,7 +51,7 @@ const AddTeam = () => {
   const [removeTeamManager, { isLoading: isRemoving }] = useRemoveTeamManagerMutation()
   const { data: teamData, isFetching } = useGetSingleTeamQuery(teamId, { skip: !isEditMode })
   const { data: managersData } = useGetAllManagerTeamQuery(undefined)
-  const { data: leagueData } = useGetAllLeagueQuery({ limit: 100 })
+  const { data: leagueData } = useGetAllLeagueQuery({ limit: 1000 })
 
   const managerOptions = (managersData?.data ?? []).map((m: any) => ({
     label: `${m.firstName} ${m.lastName || ''}`.trim() || m.userName,

@@ -130,7 +130,16 @@ export const userApi = baseApi.injectEndpoints({
         method: "PATCH",
         body: data,
       }),
-      invalidatesTags: ["user", "player"]
+      invalidatesTags: ["user", "player", "team"]
+    }),
+
+    updateJerseyNumber: builder.mutation({
+      query: ({ id, data }) => ({
+        url: `/user-management/jersey-number/${id}`,
+        method: "PATCH",
+        body: data,
+      }),
+      invalidatesTags: ["user", "player", "team"]
     }),
 
   }),
@@ -142,6 +151,7 @@ export const {
   useGetAllParentsQuery,
   useGetIncompleteUsersQuery,
   useAssignTeamToUserMutation,
+  useUpdateJerseyNumberMutation,
   useUpdateStatusMutation,
   useDeleteUserMutation,
   useUpdateUserStatusMutation,

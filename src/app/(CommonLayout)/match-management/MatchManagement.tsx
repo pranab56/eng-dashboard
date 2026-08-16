@@ -7,6 +7,7 @@ import CustomPagination from "@/components/cui/CustomPagination";
 import TableHeader from "@/components/cui/TableHeader";
 import CustomTable from "@/components/table/CustomTable";
 import { useGetAllVenueCategoryQuery } from "@/features/categoryManagement/categoryApi";
+import { useGetAllLeagueQuery } from "@/features/leagueManagement/leagueApi";
 import { useGetAllLeagueTeamQuery } from "@/features/leagueTeam/leagueTeamApi";
 import { useDeleteMatchMutation, useGetAllMatchQuery, useUpdateMatchStatusMutation } from "@/features/match/matchApi";
 import { useHeaders } from "@/hooks/useHeaders";
@@ -203,9 +204,11 @@ const MatchManagement = () => {
   }, [searchTerm]);
 
   // Data Queries
+  const { data: leagueData } = useGetAllLeagueQuery({ limit: 1000 });
   const { data: leagueTeamData } = useGetAllLeagueTeamQuery(1);
   const { data: venueCategoryData } = useGetAllVenueCategoryQuery({});
 
+  const allLeagues: any[] = leagueData?.data?.result || leagueData?.data || [];
   const leagueList: any[] = leagueTeamData?.data || [];
   const venueList: any[] = venueCategoryData?.data || [];
 
@@ -224,9 +227,9 @@ const MatchManagement = () => {
   // Options arrays
   const competitionOptions: OptionItem[] = [
     { label: "Competition : All", value: "ALL" },
-    ...leagueList.map((item: any) => ({
-      label: `${item.league.leagueName} (${item.league.season})`,
-      value: item.league._id,
+    ...allLeagues.map((item: any) => ({
+      label: item.season ? `${item.leagueName} (${item.season})` : item.leagueName,
+      value: item._id,
     })),
   ];
 

@@ -56,7 +56,7 @@ const PlayerViewModal: React.FC<PlayerViewModalProps> = ({
   const [selectedTeamIdInput, setSelectedTeamIdInput] = useState<string>('');
   const [isSavingTeam, setIsSavingTeam] = useState(false);
 
-  const { data: teamData } = useGetAllTeamQuery({ limit: 100 });
+  const { data: teamData } = useGetAllTeamQuery({ limit: 1000 });
   const allTeams = teamData?.data?.result || teamData?.data || [];
 
   const [updatePlayer] = useUpdatePlayerMutation();

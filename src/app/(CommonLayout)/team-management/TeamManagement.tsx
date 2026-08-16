@@ -43,7 +43,7 @@ const TeamManagement = () => {
 
   const { data: teamData, isLoading } = useGetAllTeamQuery(queryParams);
 
-  const { data: leagueData } = useGetAllLeagueQuery({ limit: 100 });
+  const { data: leagueData } = useGetAllLeagueQuery({ limit: 1000 });
   const allLeagues = leagueData?.data?.result || leagueData?.data || [];
 
   const { data: managersData } = useGetAllManagerTeamQuery(undefined);
@@ -192,14 +192,6 @@ const TeamManagement = () => {
                 selectedManagerId={selectedManagerId}
                 onChange={(mgrId) => setSelectedManagerId(mgrId)}
                 placeholder="All Managers"
-              />
-
-              {/* Team Type Filter Dropdown */}
-              <TeamTypeSelectDropdown
-                types={uniqueTeamTypes}
-                selectedType={selectedTeamType}
-                onChange={(type) => setSelectedTeamType(type)}
-                placeholder="All Types"
               />
 
               {/* Search Box */}

@@ -72,7 +72,7 @@ const UserVerificationModal: React.FC<UserVerificationModalProps> = ({
   const [selectedTeamIdInput, setSelectedTeamIdInput] = useState<string>('');
   const [isSavingTeam, setIsSavingTeam] = useState(false);
 
-  const { data: teamData } = useGetAllTeamQuery({ limit: 100 });
+  const { data: teamData } = useGetAllTeamQuery({ limit: 1000 });
   const allTeams = teamData?.data?.result || teamData?.data || [];
 
   const [assignTeamToUser] = useAssignTeamToUserMutation();
