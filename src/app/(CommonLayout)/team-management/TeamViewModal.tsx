@@ -23,6 +23,7 @@ import {
   Hash,
   Edit3,
   Loader2,
+  Upload,
 } from 'lucide-react';
 import { useAssignTeamToUserMutation, useUpdateJerseyNumberMutation } from '@/features/userManagement/userApi';
 import { toast } from 'sonner';
@@ -39,6 +40,8 @@ const TeamViewModal = ({ team, isOpen, onClose }: TeamViewModalProps) => {
 
   const [editingJerseyPlayer, setEditingJerseyPlayer] = useState<any | null>(null);
   const [jerseyInput, setJerseyInput] = useState<string>('');
+  const [selectedImageFile, setSelectedImageFile] = useState<File | null>(null);
+  const [imagePreviewUrl, setImagePreviewUrl] = useState<string | null>(null);
   const [isJerseyModalOpen, setIsJerseyModalOpen] = useState(false);
 
   const [assignTeamToUser] = useAssignTeamToUserMutation();
@@ -47,6 +50,44 @@ const TeamViewModal = ({ team, isOpen, onClose }: TeamViewModalProps) => {
   if (!team) return null;
   const logoUrl = formatImagePath(team.teamLogo);
   const league = team.league;
+
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setSelectedImageFile(file);
+      setImagePreviewUrl(URL.createObjectURL(file));
+    }
+  };
+
+  const handleSaveJerseyAndProfile = async () => {
+    if (!editingJerseyPlayer?._id) return;
+    try {
+      if (selectedImageFile) {
+        const formData = new FormData();
+        formData.append("jerseyNumber", jerseyInput.trim());
+        formData.append("profile", selectedImageFile);
+        formData.append("image", selectedImageFile);
+
+        await updateJerseyNumber({
+          id: editingJerseyPlayer._id,
+          data: formData,
+        }).unwrap();
+      } else {
+        await updateJerseyNumber({
+          id: editingJerseyPlayer._id,
+          data: { jerseyNumber: jerseyInput.trim() },
+        }).unwrap();
+      }
+
+      toast.success("Player details updated successfully!");
+      setIsJerseyModalOpen(false);
+      setEditingJerseyPlayer(null);
+      setSelectedImageFile(null);
+      setImagePreviewUrl(null);
+    } catch (err: any) {
+      toast.error(err?.data?.message || "Failed to update player details");
+    }
+  };
 
   // Extract all managers reliably
   const managersList: any[] = [];
@@ -374,21 +415,75 @@ const TeamViewModal = ({ team, isOpen, onClose }: TeamViewModalProps) => {
         </DialogContent>
       </Dialog>
 
-      {/* Jersey Number Edit Modal */}
+      {/* Jersey Number & Profile Picture Edit Modal */}
       {editingJerseyPlayer && (
-        <Dialog open={isJerseyModalOpen} onOpenChange={setIsJerseyModalOpen}>
-          <DialogContent className="sm:max-w-xs bg-white rounded-2xl p-5 border-none shadow-2xl z-50">
-            <DialogHeader className="pb-2 border-b border-slate-100">
+        <Dialog open={isJerseyModalOpen} onOpenChange={(open) => {
+          setIsJerseyModalOpen(open);
+          if (!open) {
+            setSelectedImageFile(null);
+            setImagePreviewUrl(null);
+          }
+        }}>
+          <DialogContent className="sm:max-w-sm bg-white rounded-3xl p-6 border-none shadow-2xl z-50">
+            <DialogHeader className="pb-3 border-b border-slate-100">
               <DialogTitle className="text-sm font-bold text-slate-900 flex items-center gap-2">
-                <Hash className="w-4 h-4 text-amber-600" /> Assign Jersey Number
+                <Hash className="w-4.5 h-4.5 text-amber-600" /> Edit Player Details
               </DialogTitle>
             </DialogHeader>
 
-            <div className="space-y-3 mt-2">
-              <p className="text-xs font-medium text-slate-600">
-                Player: <span className="font-bold text-slate-900">{editingJerseyPlayer.firstName} {editingJerseyPlayer.lastName || ''}</span>
-              </p>
+            <div className="space-y-4 mt-3">
+              <div className="flex items-center gap-3 bg-slate-50 p-2.5 rounded-2xl border border-slate-100">
+                <div className="relative w-12 h-12 rounded-xl bg-slate-200 border border-slate-300 overflow-hidden shrink-0 flex items-center justify-center">
+                  <Image
+                    src={imagePreviewUrl || formatImagePath(editingJerseyPlayer.profile)}
+                    alt="Player Profile"
+                    fill
+                    className="object-cover"
+                  />
+                </div>
+                <div className="min-w-0">
+                  <p className="text-xs font-bold text-slate-900 truncate">
+                    {editingJerseyPlayer.firstName} {editingJerseyPlayer.lastName || ''}
+                  </p>
+                  <p className="text-[10px] font-semibold text-amber-600 truncate">
+                    {editingJerseyPlayer.position || 'Player'}
+                  </p>
+                </div>
+              </div>
 
+              {/* Profile Image Upload */}
+              <div>
+                <label className="text-[11px] font-bold text-slate-700 block mb-1">
+                  Upload / Update Profile Picture
+                </label>
+                <div className="flex items-center gap-2">
+                  <label className="flex-1 flex items-center justify-center gap-2 px-3 py-2 text-xs font-semibold text-slate-700 border border-dashed border-slate-300 rounded-xl hover:border-amber-500 hover:bg-amber-50/20 transition-all cursor-pointer">
+                    <Upload className="w-4 h-4 text-amber-600" />
+                    <span>{selectedImageFile ? selectedImageFile.name : "Choose Photo..."}</span>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={handleImageChange}
+                      className="hidden"
+                    />
+                  </label>
+                  {selectedImageFile && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setSelectedImageFile(null);
+                        setImagePreviewUrl(null);
+                      }}
+                      className="p-2 text-slate-400 hover:text-red-600 rounded-xl hover:bg-red-50 cursor-pointer"
+                      title="Clear photo"
+                    >
+                      <X className="w-4 h-4" />
+                    </button>
+                  )}
+                </div>
+              </div>
+
+              {/* Jersey Number */}
               <div>
                 <label className="text-[11px] font-bold text-slate-700 block mb-1">Jersey / Shirt #</label>
                 <input
@@ -400,22 +495,26 @@ const TeamViewModal = ({ team, isOpen, onClose }: TeamViewModalProps) => {
                 />
               </div>
 
-              <div className="flex items-center justify-end gap-2 pt-2">
+              <div className="flex items-center justify-end gap-2 pt-2 border-t border-slate-100">
                 <button
                   type="button"
-                  onClick={() => setIsJerseyModalOpen(false)}
-                  className="px-3 py-1.5 text-xs font-semibold text-slate-600 border border-slate-200 rounded-xl hover:bg-slate-50 cursor-pointer"
+                  onClick={() => {
+                    setIsJerseyModalOpen(false);
+                    setSelectedImageFile(null);
+                    setImagePreviewUrl(null);
+                  }}
+                  className="px-3.5 py-1.5 text-xs font-semibold text-slate-600 border border-slate-200 rounded-xl hover:bg-slate-50 cursor-pointer"
                 >
                   Cancel
                 </button>
                 <button
                   type="button"
-                  onClick={handleSaveJerseyNumber}
+                  onClick={handleSaveJerseyAndProfile}
                   disabled={isSavingJersey}
-                  className="flex items-center gap-1 px-4 py-1.5 text-xs font-semibold text-white bg-amber-600 hover:bg-amber-700 rounded-xl shadow-xs cursor-pointer disabled:opacity-50"
+                  className="flex items-center gap-1.5 px-4 py-1.5 text-xs font-semibold text-white bg-amber-600 hover:bg-amber-700 rounded-xl shadow-xs cursor-pointer disabled:opacity-50"
                 >
-                  {isSavingJersey && <Loader2 className="w-3 h-3 animate-spin" />}
-                  Save Number
+                  {isSavingJersey && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
+                  Save Details
                 </button>
               </div>
             </div>

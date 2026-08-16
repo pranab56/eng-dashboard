@@ -8,7 +8,6 @@ import TableHeader from "@/components/cui/TableHeader";
 import CustomTable from "@/components/table/CustomTable";
 import { useGetAllVenueCategoryQuery } from "@/features/categoryManagement/categoryApi";
 import { useGetAllLeagueQuery } from "@/features/leagueManagement/leagueApi";
-import { useGetAllLeagueTeamQuery } from "@/features/leagueTeam/leagueTeamApi";
 import { useGetAllTeamQuery } from "@/features/teamManagement/teamApi";
 import { useDeleteMatchMutation, useGetAllMatchQuery, useUpdateMatchStatusMutation } from "@/features/match/matchApi";
 import { useHeaders } from "@/hooks/useHeaders";
