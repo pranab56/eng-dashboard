@@ -10,7 +10,7 @@ import {
 import Image from 'next/image';
 import { TUserManagement } from '@/types/columnTypes';
 import { formatImagePath } from '@/utils/formatImagePath';
-import { Camera, Loader2, X, Save, User as UserIcon } from 'lucide-react';
+import { Camera, Loader2, Save, User as UserIcon } from 'lucide-react';
 import { useUpdateUserProfileByAdminMutation } from '@/features/userManagement/userApi';
 import toast from 'react-hot-toast';
 

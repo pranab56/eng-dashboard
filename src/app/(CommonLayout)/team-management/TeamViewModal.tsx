@@ -12,7 +12,6 @@ import Image from 'next/image';
 import dayjs from 'dayjs';
 import {
   X,
-  MapPin,
   Users,
   Shield,
   Trophy,
