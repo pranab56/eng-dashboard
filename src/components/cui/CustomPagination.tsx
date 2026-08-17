@@ -64,7 +64,9 @@ function MyPaginationSuspense({
           {/* ✅ Previous (1 step) */}
           <PaginationItem>
             <PaginationPrevious
+              isActive={currentPage === 1}
               aria-disabled={currentPage === 1}
+              className={currentPage <= 1 ? "pointer-events-none opacity-40 cursor-not-allowed" : "cursor-pointer"}
               onClick={() =>
                 currentPage > 1 &&
                 handlePageChange(currentPage - 1)
@@ -121,7 +123,9 @@ function MyPaginationSuspense({
           {/* ✅ Next (1 step) */}
           <PaginationItem>
             <PaginationNext
-              aria-disabled={currentPage === TOTAL_PAGES}
+              isActive={currentPage >= TOTAL_PAGES}
+              aria-disabled={currentPage >= TOTAL_PAGES}
+              className={currentPage >= TOTAL_PAGES ? "pointer-events-none opacity-40 cursor-not-allowed" : "cursor-pointer"}
               onClick={() =>
                 currentPage < TOTAL_PAGES &&
                 handlePageChange(currentPage + 1)

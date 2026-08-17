@@ -10,7 +10,7 @@ import { useHeaders } from '@/hooks/useHeaders';
 import { getUsersColumns } from '@/tableColumns/usersColumns';
 import { TUserManagement } from '@/types/columnTypes';
 import { Search, X } from 'lucide-react';
-import { useSearchParams } from 'next/navigation';
+import { useSearchParams, useRouter, usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import UserVerificationModal from './UserVerificationModal';
@@ -31,10 +31,22 @@ const ROLE_TABS = [
 const UserManagement = () => {
   const { setHeaders } = useHeaders();
   const searchParams = useSearchParams();
+  const router = useRouter();
+  const pathname = usePathname();
   const page = searchParams.get('userPage') || '1';
 
   const [activeRole, setActiveRole] = useState<string>('ALL');
   const [searchTerm, setSearchTerm] = useState<string>('');
+
+  // Automatically reset userPage to 1 in URL when user types in search box or switches role tabs
+  useEffect(() => {
+    const currentPageParam = searchParams.get('userPage');
+    if (currentPageParam && currentPageParam !== '1') {
+      const params = new URLSearchParams(searchParams.toString());
+      params.set('userPage', '1');
+      router.replace(`${pathname}?${params.toString()}`);
+    }
+  }, [searchTerm, activeRole]);
 
   const [selectedUser, setSelectedUser] = useState<TUserManagement | null>(null);
   const [isVerificationModalOpen, setIsVerificationModalOpen] = useState<boolean>(false);
@@ -327,7 +339,11 @@ const UserManagement = () => {
 
           {userData?.pagination && (
             <CustomPagination
-              TOTAL_PAGES={userData.pagination.totalPage || 1}
+              TOTAL_PAGES={
+                (searchTerm.trim() !== '' || activeRole !== 'ALL') && displayTableData.length < 10 && Number(page) === 1
+                  ? 1
+                  : Math.max(1, userData.pagination.totalPage || userData.pagination.totalPages || 1)
+              }
               qryName="userPage"
             />
           )}

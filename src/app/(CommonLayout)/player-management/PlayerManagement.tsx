@@ -11,6 +11,8 @@ import { useEffect, useState, useMemo } from 'react';
 import { Search, X, RotateCcw } from 'lucide-react';
 
 import { useDeletePlayerMutation, useGetAllPlayerQuery, useUpdateEngCoinBudgetMutation } from '@/features/player/playerApi';
+import { useGetAllAgeGroupQuery } from '@/features/categoryManagement/categoryApi';
+import { useGetAllTeamQuery } from '@/features/teamManagement/teamApi';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { toast } from 'sonner';
@@ -22,6 +24,7 @@ import DeleteConfirmationModal from '../user-management/DeleteConfirmationModal'
 import { AgeGroupSelectDropdown } from '@/components/dropdowns/AgeGroupSelectDropdown';
 import { PositionSelectDropdown } from '@/components/dropdowns/PositionSelectDropdown';
 import { SortSelectDropdown } from '@/components/dropdowns/SortSelectDropdown';
+import { TeamSelectDropdown } from '@/components/dropdowns/TeamSelectDropdown';
 
 const PlayerManagement = () => {
   const { setHeaders } = useHeaders();
@@ -31,6 +34,7 @@ const PlayerManagement = () => {
   const [searchTerm, setSearchTerm] = useState<string>('');
   const [selectedAgeGroup, setSelectedAgeGroup] = useState<string>('ALL');
   const [selectedPosition, setSelectedPosition] = useState<string>('ALL');
+  const [selectedTeamId, setSelectedTeamId] = useState<string>('ALL');
   const [sortBy, setSortBy] = useState<string>('newest');
 
   const queryParams = useMemo(() => ({
@@ -39,20 +43,39 @@ const PlayerManagement = () => {
     ...(searchTerm.trim() && { searchValue: searchTerm.trim() }),
     ...(selectedAgeGroup !== 'ALL' && { ageGroup: selectedAgeGroup }),
     ...(selectedPosition !== 'ALL' && { position: selectedPosition }),
+    ...(selectedTeamId !== 'ALL' && { selectTeam: selectedTeamId }),
     ...(sortBy !== 'newest' && { sort: sortBy }),
-  }), [pageNumber, searchTerm, selectedAgeGroup, selectedPosition, sortBy]);
+  }), [pageNumber, searchTerm, selectedAgeGroup, selectedPosition, selectedTeamId, sortBy]);
 
   const { data: playerData, isLoading } = useGetAllPlayerQuery(queryParams);
+
+  // Fetch dynamic Age Groups from Category Management API
+  const { data: ageGroupRes } = useGetAllAgeGroupQuery({});
+  // Fetch Teams list for Team Filter
+  const { data: teamRes } = useGetAllTeamQuery({ limit: 1000 });
+  const teamsList = useMemo(() => teamRes?.data?.result || teamRes?.data || [], [teamRes]);
 
   // Fetch all players for dynamic age groups & positions calculation
   const { data: allPlayersData } = useGetAllPlayerQuery({ limit: 1000 });
   const allPlayersList = useMemo(() => allPlayersData?.data?.players || playerData?.data?.players || [], [allPlayersData, playerData]);
 
-  // Dynamically compute unique age groups
+  // Dynamically compute unique age groups merging API categories and player data
   const dynamicAgeGroups = useMemo(() => {
     const defaultGroups = ["U7", "U8", "U9", "U10", "U11", "U12", "U13", "U14", "U15", "U16", "U17", "U18"];
     const groupsSet = new Set<string>(defaultGroups);
 
+    // Merge from Category Management API
+    const apiCats = ageGroupRes?.data?.result || ageGroupRes?.data || [];
+    if (Array.isArray(apiCats)) {
+      apiCats.forEach((cat: any) => {
+        if (cat?.name && typeof cat.name === 'string') {
+          const val = cat.name.trim();
+          if (val) groupsSet.add(val);
+        }
+      });
+    }
+
+    // Merge from actual player profiles
     allPlayersList.forEach((p: any) => {
       if (p?.ageGroup && typeof p.ageGroup === 'string') {
         const val = p.ageGroup.trim();
@@ -68,7 +91,7 @@ const PlayerManagement = () => {
       if (!isNaN(numB)) return 1;
       return a.localeCompare(b);
     });
-  }, [allPlayersList]);
+  }, [ageGroupRes, allPlayersList]);
 
   // Dynamically compute unique positions
   const dynamicPositions = useMemo(() => {
@@ -160,6 +183,7 @@ const PlayerManagement = () => {
     setSearchTerm('');
     setSelectedAgeGroup('ALL');
     setSelectedPosition('ALL');
+    setSelectedTeamId('ALL');
     setSortBy('newest');
   };
 
@@ -167,6 +191,7 @@ const PlayerManagement = () => {
     searchTerm.trim() !== '' ||
     selectedAgeGroup !== 'ALL' ||
     selectedPosition !== 'ALL' ||
+    selectedTeamId !== 'ALL' ||
     sortBy !== 'newest';
 
   const tableHeaderPayload = {
@@ -240,6 +265,16 @@ const PlayerManagement = () => {
               placeholder="All Positions"
             />
 
+            {/* Team Filter Dropdown */}
+            <div className="w-[180px] sm:w-[220px]">
+              <TeamSelectDropdown
+                teams={teamsList}
+                selectedTeamId={selectedTeamId === 'ALL' ? '' : selectedTeamId}
+                onChange={(teamId) => setSelectedTeamId(teamId || 'ALL')}
+                placeholder="All Teams"
+              />
+            </div>
+
             {/* Sort Dropdown */}
             <SortSelectDropdown
               sortBy={sortBy}
@@ -273,7 +308,11 @@ const PlayerManagement = () => {
         </div>
         <div className="pt-4 sm:pt-8 px-2 sm:px-4">
           <CustomPagination
-            TOTAL_PAGES={pagination.totalPage}
+            TOTAL_PAGES={
+              (searchTerm.trim() !== '' || selectedAgeGroup !== 'ALL' || selectedPosition !== 'ALL' || selectedTeamId !== 'ALL') && rawPlayers.length < 10 && Number(pageNumber) === 1
+                ? 1
+                : Math.max(1, pagination.totalPage || 1)
+            }
             qryName="userPage"
           />
         </div>

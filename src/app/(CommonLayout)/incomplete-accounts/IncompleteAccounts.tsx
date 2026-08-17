@@ -374,7 +374,11 @@ const IncompleteAccounts = () => {
 
           {incompleteData?.pagination && (
             <CustomPagination
-              TOTAL_PAGES={incompleteData.pagination.totalPage || 1}
+              TOTAL_PAGES={
+                (searchTerm.trim() !== '' || statusFilter !== 'ALL') && displayTableData.length < 10 && Number(page) === 1
+                  ? 1
+                  : Math.max(1, incompleteData.pagination.totalPage || incompleteData.pagination.totalPages || 1)
+              }
               qryName="userPage"
             />
           )}
