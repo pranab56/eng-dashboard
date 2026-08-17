@@ -15,6 +15,7 @@ type SelectFieldProps = {
   options: Option[];
   error?: FieldError;
   scrollable?: boolean;
+  disabled?: boolean;
 };
 
 const SelectField = ({
@@ -25,6 +26,7 @@ const SelectField = ({
   options,
   error,
   scrollable = false,
+  disabled = false,
 }: SelectFieldProps) => {
   return (
     <div className="space-y-2">
@@ -43,9 +45,11 @@ const SelectField = ({
             const selectValue = hasValidValue ? field.value : undefined;
 
             return (
-              <Select key={selectValue || 'empty'} onValueChange={field.onChange} value={selectValue}>
+              <Select key={selectValue || 'empty'} onValueChange={field.onChange} value={selectValue} disabled={disabled}>
                 <SelectTrigger
-                  className={`w-full h-11 px-4 bg-[#f8fafc] border rounded-2xl text-xs font-semibold text-gray-800 hover:bg-white focus:outline-none focus:ring-4 transition-all duration-200 cursor-pointer shadow-2xs ${
+                  className={`w-full h-11 px-4 bg-[#f8fafc] border rounded-2xl text-xs font-semibold text-gray-800 hover:bg-white focus:outline-none focus:ring-4 transition-all duration-200 shadow-2xs ${
+                    disabled ? "opacity-70 bg-gray-100/90 cursor-not-allowed border-gray-200" : "cursor-pointer"
+                  } ${
                     error
                       ? "border-red-400 focus:ring-red-100 bg-red-50/30"
                       : "border-gray-200/90 hover:border-blue-400 focus:border-blue-500 focus:ring-blue-500/10 focus:bg-white"

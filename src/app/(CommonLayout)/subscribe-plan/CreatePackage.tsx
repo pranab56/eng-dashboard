@@ -40,8 +40,8 @@ const userTypeOptions = [
 const paymentTypeOptions = [
   { label: "Monthly", value: "Monthly" },
   { label: "Quarterly", value: "Quarterly" },
+  { label: "Half-Yearly", value: "Half-Yearly" },
   { label: "Yearly", value: "Yearly" },
-  { label: "One-time", value: "One-time" },
 ]
 
 const packageTypeOptions = [
@@ -68,7 +68,7 @@ const CreatePackage = ({ initialData, onSuccess }: CreatePackageProps) => {
   const [newFeatureTitle, setNewFeatureTitle] = useState('')
   const [newFeatureIsIncluded, setNewFeatureIsIncluded] = useState(true)
 
-  const { register, handleSubmit, control, reset, watch, formState: { errors } } = useForm<PackageFormValues>({
+  const { register, handleSubmit, control, reset, watch, setValue, formState: { errors } } = useForm<PackageFormValues>({
     resolver: zodResolver(packageSchema),
     defaultValues: {
       title: "",
@@ -88,6 +88,21 @@ const CreatePackage = ({ initialData, onSuccess }: CreatePackageProps) => {
     name: "features",
   })
 
+  const selectedDuration = watch("duration")
+
+  // Auto-select paymentType based on duration to prevent user confusion
+  useEffect(() => {
+    if (selectedDuration === "1 month") {
+      setValue("paymentType", "Monthly")
+    } else if (selectedDuration === "3 months") {
+      setValue("paymentType", "Quarterly")
+    } else if (selectedDuration === "6 months") {
+      setValue("paymentType", "Half-Yearly")
+    } else if (selectedDuration === "1 year") {
+      setValue("paymentType", "Yearly")
+    }
+  }, [selectedDuration, setValue])
+
   useEffect(() => {
     if (initialData) {
       const formattedFeatures = Array.isArray(initialData.features)
@@ -98,13 +113,22 @@ const CreatePackage = ({ initialData, onSuccess }: CreatePackageProps) => {
         )
         : []
 
+      const dur = initialData.duration || "1 month"
+      let payType = initialData.paymentType || "Monthly"
+      if (payType === "One-time" || !payType) {
+        if (dur === "1 month") payType = "Monthly"
+        else if (dur === "3 months") payType = "Quarterly"
+        else if (dur === "6 months") payType = "Half-Yearly"
+        else if (dur === "1 year") payType = "Yearly"
+      }
+
       reset({
         title: initialData.title || "",
         description: initialData.description || "",
         userType: initialData.userType || "Player",
         price: initialData.price || 0,
-        duration: initialData.duration || "1 month",
-        paymentType: initialData.paymentType || "Monthly",
+        duration: dur,
+        paymentType: payType,
         packageType: initialData.packageType || "Semi Pro",
         credit: initialData.credit || 0,
         features: formattedFeatures,
@@ -144,7 +168,7 @@ const CreatePackage = ({ initialData, onSuccess }: CreatePackageProps) => {
 
       <div className="grid grid-cols-3 gap-4">
         <SelectField name="userType" label="User Type" control={control} options={userTypeOptions} error={errors.userType} />
-        <SelectField name="paymentType" label="Payment Type" control={control} options={paymentTypeOptions} error={errors.paymentType} />
+        <SelectField name="paymentType" label="Payment Type (Auto)" control={control} options={paymentTypeOptions} error={errors.paymentType} disabled={true} />
         <SelectField name="packageType" label="Package Type" control={control} options={packageTypeOptions} error={errors.packageType} />
       </div>
 

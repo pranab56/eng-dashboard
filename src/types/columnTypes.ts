@@ -278,6 +278,8 @@ export type TTournament = {
   banner?: string;
   startDate: string;
   endDate: string;
+  prizeCoins?: number;
+  rewardToken?: string;
   positionRewards: TPositionReward[];
   status: "upcoming" | "ongoing" | "completed" | string;
   createdBy?: string;

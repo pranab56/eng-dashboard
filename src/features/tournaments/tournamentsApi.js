@@ -46,6 +46,13 @@ export const tournamentsApi = baseApi.injectEndpoints({
             }),
             invalidatesTags: ["tournaments"]
         }),
+        getTournamentQrCode: builder.query({
+            query: (id) => ({
+                url: `/tournament/${id}/qr-code`,
+                method: "GET",
+            }),
+            providesTags: ["tournaments"]
+        }),
     }),
 });
 
@@ -56,4 +63,5 @@ export const {
     useCreateTourNamentsMutation,
     useUpdateTourNamentsMutation,
     useDeleteTourNamentsMutation,
+    useGetTournamentQrCodeQuery,
 } = tournamentsApi;

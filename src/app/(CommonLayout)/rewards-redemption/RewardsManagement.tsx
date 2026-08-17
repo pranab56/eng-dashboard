@@ -13,6 +13,8 @@ import Link from 'next/link';
 import { useDeleteRewordMutation, useGetAllRewordQuery } from '@/features/rewordProduct/rewordApi';
 import { useSearchParams } from 'next/navigation';
 import RewardViewModal from './RewardViewModal';
+import RewardProductQrModal from './RewardProductQrModal';
+import RewardRedeemedHistoryModal from './RewardRedeemedHistoryModal';
 import DeleteConfirmModal from '../match-management/DeleteConfirmModal';
 import { toast } from 'sonner';
 
@@ -29,6 +31,12 @@ const RewardsManagement = () => {
   const [selectedReward, setSelectedReward] = useState<any>(null);
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
 
+  const [selectedQrReward, setSelectedQrReward] = useState<any>(null);
+  const [isQrModalOpen, setIsQrModalOpen] = useState(false);
+
+  const [selectedHistoryReward, setSelectedHistoryReward] = useState<any>(null);
+  const [isHistoryModalOpen, setIsHistoryModalOpen] = useState(false);
+
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [deletingId, setDeletingId] = useState<string | null>(null);
 
@@ -42,6 +50,16 @@ const RewardsManagement = () => {
   const handleView = (reward: any) => {
     setSelectedReward(reward);
     setIsViewModalOpen(true);
+  };
+
+  const handleShowQr = (reward: any) => {
+    setSelectedQrReward(reward);
+    setIsQrModalOpen(true);
+  };
+
+  const handleShowHistory = (reward: any) => {
+    setSelectedHistoryReward(reward);
+    setIsHistoryModalOpen(true);
   };
 
   const handleDelete = (id: string) => {
@@ -94,7 +112,7 @@ const RewardsManagement = () => {
             <TableHeader payload={tableHeaderPayload} />
           </>
           <div className="pt-2">
-            <CustomTable<any> columns={getRewardsColumns(handleView, handleDelete)} data={rewardData?.data || []} isLoading={isLoading} />
+            <CustomTable<any> columns={getRewardsColumns(handleView, handleDelete, handleShowQr, handleShowHistory)} data={rewardData?.data || []} isLoading={isLoading} />
           </div>
         </div>
         <div className='pt-8 px-4'>
@@ -106,6 +124,18 @@ const RewardsManagement = () => {
         isOpen={isViewModalOpen}
         onClose={() => setIsViewModalOpen(false)}
         reward={selectedReward}
+      />
+
+      <RewardProductQrModal
+        isOpen={isQrModalOpen}
+        onClose={() => setIsQrModalOpen(false)}
+        reward={selectedQrReward}
+      />
+
+      <RewardRedeemedHistoryModal
+        isOpen={isHistoryModalOpen}
+        onClose={() => setIsHistoryModalOpen(false)}
+        reward={selectedHistoryReward}
       />
 
       <DeleteConfirmModal

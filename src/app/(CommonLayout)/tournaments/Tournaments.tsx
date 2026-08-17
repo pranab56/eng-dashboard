@@ -26,15 +26,18 @@ import {
   Loader2,
   FolderPlus,
   Award,
+  UserCheck,
+  Check,
+  ChevronsUpDown,
 } from "lucide-react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Check, ChevronsUpDown } from "lucide-react";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useState, useMemo } from "react";
 import { toast } from "sonner";
 import DeleteConfirmModal from "../match-management/DeleteConfirmModal";
 import TournamentFormModal from "./TournamentFormModal";
 import TournamentViewModal from "./TournamentViewModal";
+import TournamentRedeemedWinnersModal from "./TournamentRedeemedWinnersModal";
 
 export default function Tournaments() {
   const { setHeaders } = useHeaders();
@@ -54,6 +57,10 @@ export default function Tournaments() {
   const [selectedTournament, setSelectedTournament] =
     useState<TTournament | null>(null);
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
+
+  const [winnersTournament, setWinnersTournament] =
+    useState<TTournament | null>(null);
+  const [isWinnersModalOpen, setIsWinnersModalOpen] = useState(false);
 
   const [isFormModalOpen, setIsFormModalOpen] = useState(false);
   const [editingTournament, setEditingTournament] =
@@ -112,6 +119,11 @@ export default function Tournaments() {
     setIsViewModalOpen(true);
   };
 
+  const handleViewWinners = (tournament: TTournament) => {
+    setWinnersTournament(tournament);
+    setIsWinnersModalOpen(true);
+  };
+
   const handleOpenCreateModal = () => {
     setEditingTournament(null);
     setIsFormModalOpen(true);
@@ -134,6 +146,7 @@ export default function Tournaments() {
     startDate: string;
     endDate: string;
     status: string;
+    prizeCoins?: number;
     positionRewards: TPositionReward[];
     id?: string;
   }) => {
@@ -144,6 +157,7 @@ export default function Tournaments() {
         startDate: data.startDate,
         endDate: data.endDate,
         status: data.status,
+        prizeCoins: data.prizeCoins,
         positionRewards: data.positionRewards,
       };
 
@@ -215,7 +229,7 @@ export default function Tournaments() {
             </p>
           </div>
 
-          <div className="flex  items-center gap-3 w-4/12">
+          <div className="flex items-center gap-3 w-4/12">
             {/* Search Bar */}
             <div className="relative">
               <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
@@ -224,7 +238,7 @@ export default function Tournaments() {
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 placeholder="Search tournaments or ranks..."
-                className="w-full pl-10 pr-4 py-3.5  bg-gray-50 border border-gray-200 rounded-lg text-xs font-medium text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-black/10 focus:border-black transition-all"
+                className="w-full pl-10 pr-4 py-3.5 bg-gray-50 border border-gray-200 rounded-lg text-xs font-medium text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-black/10 focus:border-black transition-all"
               />
             </div>
 
@@ -255,10 +269,11 @@ export default function Tournaments() {
                       setStatusFilter(opt.value);
                       setStatusPopoverOpen(false);
                     }}
-                    className={`w-full px-3 py-3 text-xs rounded-lg flex items-center justify-between transition-colors cursor-pointer text-left ${statusFilter === opt.value
-                      ? "bg-black text-white font-medium"
-                      : "text-gray-700 hover:bg-gray-100"
-                      }`}
+                    className={`w-full px-3 py-3 text-xs rounded-lg flex items-center justify-between transition-colors cursor-pointer text-left ${
+                      statusFilter === opt.value
+                        ? "bg-black text-white font-medium"
+                        : "text-gray-700 hover:bg-gray-100"
+                    }`}
                   >
                     <span>{opt.label}</span>
                     {statusFilter === opt.value && (
@@ -268,9 +283,6 @@ export default function Tournaments() {
                 ))}
               </PopoverContent>
             </Popover>
-
-            {/* Tree Toggle Helpers */}
-
 
             {/* Create Tournament Button */}
             <div className="w-5/12">
@@ -368,7 +380,7 @@ export default function Tournaments() {
                             {tournament.title}
                           </h3>
                           <span
-                            className={`px-2.5 py-0.5 rounded-full text-[10px] font-medium . tracking-wider border ${badgeStyle}`}
+                            className={`px-2.5 py-0.5 rounded-full text-[10px] font-medium tracking-wider border ${badgeStyle}`}
                           >
                             {status}
                           </span>
@@ -400,9 +412,18 @@ export default function Tournaments() {
                         type="button"
                         onClick={() => handleView(tournament)}
                         className="p-2 rounded-xl text-gray-500 hover:text-blue-600 hover:bg-blue-50 border border-gray-200 transition-colors cursor-pointer"
-                        title="View Details"
+                        title="View Details & QR Codes"
                       >
                         <FiEye className="w-4 h-4" />
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => handleViewWinners(tournament)}
+                        className="p-2 rounded-xl text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50 border border-emerald-200 transition-colors cursor-pointer flex items-center gap-1 font-semibold text-xs px-2.5"
+                        title="View Redeemed Winners"
+                      >
+                        <UserCheck className="w-4 h-4" />
+                        <span className="hidden sm:inline">Winners</span>
                       </button>
                       <button
                         type="button"
@@ -429,7 +450,7 @@ export default function Tournaments() {
                       {/* Visual Tree Vertical Main Stem Connector */}
                       <div className="absolute left-10 top-6 bottom-8 w-0.5 bg-gradient-to-b from-amber-200 via-gray-200 to-transparent pointer-events-none" />
 
-                      <div className="flex items-center gap-2 text-xs font-medium text-gray-400 . tracking-wider ml-8 mb-4">
+                      <div className="flex items-center gap-2 text-xs font-medium text-gray-400 tracking-wider ml-8 mb-4">
                         <Award className="w-4 h-4 text-amber-500" />
                         <span>Position Rewards Tree Branches ({rewards.length})</span>
                       </div>
@@ -462,35 +483,26 @@ export default function Tournaments() {
                             return (
                               <div
                                 key={rIdx}
-                                className="relative flex items-center gap-4 group"
+                                className={`p-3.5 rounded-2xl border flex items-center justify-between transition-all relative ${cardStyle}`}
                               >
-                                {/* Horizontal Branch Connecting Line */}
-                                <div className="absolute -left-6 top-1/2 w-6 h-0.5 bg-gray-200 group-hover:bg-amber-400 transition-colors pointer-events-none" />
+                                {/* Tree Branch Curved Stem Connector */}
+                                <div className="absolute -left-8 top-1/2 -translate-y-1/2 w-8 h-0.5 bg-gray-200 pointer-events-none" />
 
-                                {/* Reward Leaf Node */}
-                                <div
-                                  className={`flex-1 p-3.5 px-4 rounded-xl border flex items-center justify-between transition-all duration-200 hover:shadow-sm ${cardStyle}`}
-                                >
-                                  <div className="flex items-center gap-3">
-                                    <span className="text-xl shrink-0">
-                                      {iconMark}
-                                    </span>
-                                    <div>
-                                      <h4 className="text-sm font-medium leading-snug">
-                                        {reward.positionName}
-                                      </h4>
-                                      <p className="text-[11px] text-gray-500 font-medium">
-                                        Rank #{reward.position} Placement
-                                      </p>
-                                    </div>
+                                <div className="flex items-center gap-3">
+                                  <span className="text-xl shrink-0">{iconMark}</span>
+                                  <div>
+                                    <h5 className="font-bold text-xs">
+                                      {reward.positionName}
+                                    </h5>
+                                    <p className="text-[10px] text-gray-500 font-normal">
+                                      Placement Rank Position #{reward.position}
+                                    </p>
                                   </div>
+                                </div>
 
-                                  <div
-                                    className={`px-3 py-1 rounded-lg text-xs font-black flex items-center gap-1 border ${pointsStyle}`}
-                                  >
-                                    <Sparkles className="w-3.5 h-3.5 text-amber-500" />
-                                    <span>{reward.points} Points</span>
-                                  </div>
+                                <div className={`px-3 py-1 rounded-xl text-xs font-black border flex items-center gap-1 shrink-0 ${pointsStyle}`}>
+                                  <Sparkles className="w-3.5 h-3.5 text-amber-500" />
+                                  <span>{reward.points} Points</span>
                                 </div>
                               </div>
                             );
@@ -505,20 +517,27 @@ export default function Tournaments() {
           </div>
         )}
 
-        {/* Pagination Footer */}
+        {/* Custom Pagination Footer */}
         <div className="pt-6 px-2 border-t border-gray-100">
           <CustomPagination
-            TOTAL_PAGES={tournamentRes?.pagination?.totalPage || 1}
+            TOTAL_PAGES={tournamentRes?.pagination?.totalPage || tournamentRes?.data?.meta?.totalPage || 1}
             qryName="page"
           />
         </div>
       </div>
 
-      {/* View Details Modal */}
+      {/* View Tournament Modal */}
       <TournamentViewModal
         isOpen={isViewModalOpen}
         onClose={() => setIsViewModalOpen(false)}
         tournament={selectedTournament}
+      />
+
+      {/* Redeemed Winners Modal */}
+      <TournamentRedeemedWinnersModal
+        isOpen={isWinnersModalOpen}
+        onClose={() => setIsWinnersModalOpen(false)}
+        tournament={winnersTournament}
       />
 
       {/* Create / Edit Form Modal */}

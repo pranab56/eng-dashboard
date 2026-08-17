@@ -46,7 +46,13 @@ export const rewordApi = baseApi.injectEndpoints({
       invalidatesTags: ["reword"]
     }),
 
-
+    getRewardProductQrCode: builder.query({
+      query: (id) => ({
+        url: `/reward-products/${id}/qr-code`,
+        method: "GET",
+      }),
+      providesTags: ["reword"],
+    }),
   }),
 });
 
@@ -57,4 +63,5 @@ export const {
   useGetAllRewordQuery,
   useGetSingleRewordQuery,
   useDeleteRewordMutation,
+  useGetRewardProductQrCodeQuery,
 } = rewordApi;

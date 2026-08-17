@@ -25,6 +25,7 @@ interface TournamentFormModalProps {
     startDate: string;
     endDate: string;
     status: string;
+    prizeCoins?: number;
     positionRewards: TPositionReward[];
     id?: string;
   }) => Promise<void>;
@@ -54,6 +55,8 @@ export default function TournamentFormModal({
   const [positionRewards, setPositionRewards] = useState<TPositionReward[]>(DEFAULT_REWARDS);
   const [errorMsg, setErrorMsg] = useState("");
 
+  const [prizeCoins, setPrizeCoins] = useState<number>(500);
+
   useEffect(() => {
     if (editingTournament) {
       setTitle(editingTournament.title || "");
@@ -69,6 +72,7 @@ export default function TournamentFormModal({
           : ""
       );
       setStatus(editingTournament.status || "upcoming");
+      setPrizeCoins(editingTournament.prizeCoins ?? 500);
       setPositionRewards(
         editingTournament.positionRewards && editingTournament.positionRewards.length > 0
           ? editingTournament.positionRewards
@@ -80,6 +84,7 @@ export default function TournamentFormModal({
       setStartDate(dayjs().format("YYYY-MM-DD"));
       setEndDate(dayjs().add(14, "day").format("YYYY-MM-DD"));
       setStatus("upcoming");
+      setPrizeCoins(500);
       setPositionRewards(DEFAULT_REWARDS);
     }
     setErrorMsg("");
@@ -119,7 +124,7 @@ export default function TournamentFormModal({
     } else if (field === "points") {
       updated[index].points = value === "" ? ("" as any) : Number(value);
     } else {
-      updated[index].positionName = value;
+      updated[index][field] = value as any;
     }
     setPositionRewards(updated);
   };
@@ -161,6 +166,7 @@ export default function TournamentFormModal({
       startDate: startIso,
       endDate: endIso,
       status: status,
+      prizeCoins: Number(prizeCoins) || 0,
       positionRewards: formattedRewards,
       id: editingTournament?._id || (editingTournament as any)?.id,
     });
@@ -234,47 +240,67 @@ export default function TournamentFormModal({
               onChange={setEndDate}
             />
 
-            <div className="space-y-2">
-              <label className="block text-sm font-semibold text-gray-800">
-                Status
-              </label>
-              <Popover open={statusPopoverOpen} onOpenChange={setStatusPopoverOpen}>
-                <PopoverTrigger asChild>
-                  <button
-                    type="button"
-                    disabled={isLoading}
-                    className="w-full h-11 px-3.5 bg-gray-50 border border-gray-200 rounded-lg text-sm flex items-center justify-between font-medium text-gray-800 hover:bg-gray-100/70 focus:outline-none focus:border-black transition-all cursor-pointer disabled:opacity-50"
-                  >
-                    <span className="capitalize">{status}</span>
-                    <ChevronsUpDown className="w-4 h-4 text-gray-400 shrink-0 ml-2" />
-                  </button>
-                </PopoverTrigger>
-                <PopoverContent className="w-[var(--radix-popover-trigger-width)] p-1 bg-white border border-gray-200 shadow-xl rounded-xl z-[60]">
-                  {[
-                    { label: "Upcoming", value: "upcoming" },
-                    { label: "Ongoing", value: "ongoing" },
-                    { label: "Completed", value: "completed" },
-                  ].map((opt) => (
+            {/* Status & Prize Coins */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <label className="block text-sm font-semibold text-gray-800">
+                  Status
+                </label>
+                <Popover open={statusPopoverOpen} onOpenChange={setStatusPopoverOpen}>
+                  <PopoverTrigger asChild>
                     <button
-                      key={opt.value}
                       type="button"
-                      onClick={() => {
-                        setStatus(opt.value);
-                        setStatusPopoverOpen(false);
-                      }}
-                      className={`w-full px-3.5 py-2.5 text-xs rounded-lg flex items-center justify-between transition-colors cursor-pointer text-left ${status === opt.value
-                        ? "bg-black text-white font-medium"
-                        : "text-gray-700 hover:bg-gray-100"
-                        }`}
+                      disabled={isLoading}
+                      className="w-full h-11 px-3.5 bg-gray-50 border border-gray-200 rounded-lg text-sm flex items-center justify-between font-medium text-gray-800 hover:bg-gray-100/70 focus:outline-none focus:border-black transition-all cursor-pointer disabled:opacity-50"
                     >
-                      <span>{opt.label}</span>
-                      {status === opt.value && (
-                        <Check className="w-3.5 h-3.5 text-white shrink-0" />
-                      )}
+                      <span className="capitalize">{status}</span>
+                      <ChevronsUpDown className="w-4 h-4 text-gray-400 shrink-0 ml-2" />
                     </button>
-                  ))}
-                </PopoverContent>
-              </Popover>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-[var(--radix-popover-trigger-width)] p-1 bg-white border border-gray-200 shadow-xl rounded-xl z-[60]">
+                    {[
+                      { label: "Upcoming", value: "upcoming" },
+                      { label: "Ongoing", value: "ongoing" },
+                      { label: "Completed", value: "completed" },
+                    ].map((opt) => (
+                      <button
+                        key={opt.value}
+                        type="button"
+                        onClick={() => {
+                          setStatus(opt.value);
+                          setStatusPopoverOpen(false);
+                        }}
+                        className={`w-full px-3.5 py-2.5 text-xs rounded-lg flex items-center justify-between transition-colors cursor-pointer text-left ${status === opt.value
+                          ? "bg-black text-white font-medium"
+                          : "text-gray-700 hover:bg-gray-100"
+                          }`}
+                      >
+                        <span>{opt.label}</span>
+                        {status === opt.value && (
+                          <Check className="w-3.5 h-3.5 text-white shrink-0" />
+                        )}
+                      </button>
+                    ))}
+                  </PopoverContent>
+                </Popover>
+              </div>
+
+              {/* Prize Coins Input (For QR Code Redeem) */}
+              <div className="space-y-2">
+                <label className="block text-sm font-semibold text-gray-800 flex items-center gap-1">
+                  <Sparkles className="w-3.5 h-3.5 text-amber-500" />
+                  <span>Prize Coins (QR Redeem)</span>
+                </label>
+                <input
+                  type="number"
+                  min={0}
+                  placeholder="e.g. 500"
+                  value={prizeCoins}
+                  onChange={(e) => setPrizeCoins(Number(e.target.value))}
+                  disabled={isLoading}
+                  className="w-full h-11 px-3.5 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-black transition-colors font-medium text-gray-800"
+                />
+              </div>
             </div>
           </div>
 

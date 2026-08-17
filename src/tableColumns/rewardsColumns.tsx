@@ -2,9 +2,15 @@ import { ColumnDef } from "@tanstack/react-table";
 import Image from "next/image";
 import Link from "next/link";
 import { FiEdit, FiEye, FiTrash2 } from "react-icons/fi";
+import { QrCode, Users } from "lucide-react";
 import { formatImagePath } from '../utils/formatImagePath';
 
-export const getRewardsColumns = (onView: (reward: any) => void, onDelete: (id: string) => void): ColumnDef<any>[] => [
+export const getRewardsColumns = (
+  onView: (reward: any) => void,
+  onDelete: (id: string) => void,
+  onShowQr?: (reward: any) => void,
+  onShowHistory?: (reward: any) => void
+): ColumnDef<any>[] => [
   {
     accessorKey: "brand",
     header: () => <div className="">Reward Details</div>,
@@ -49,10 +55,28 @@ export const getRewardsColumns = (onView: (reward: any) => void, onDelete: (id: 
   },
   {
     id: "action",
-    size: 100,
+    size: 150,
     header: () => <div className="text-right">Action</div>,
     cell: ({ row }) => (
       <div className="flex items-center justify-end gap-2">
+        {onShowQr && row.original.productType === "Coffee" && (
+          <button
+            onClick={() => onShowQr(row.original)}
+            title="View Coffee QR Code"
+            className="flex items-center justify-center h-9 w-9 rounded-sm bg-amber-50 hover:bg-amber-100 text-amber-700 transition-colors duration-300 cursor-pointer border border-amber-200"
+          >
+            <QrCode className="size-4 text-amber-600" />
+          </button>
+        )}
+        {onShowHistory && row.original.productType === "Coffee" && (
+          <button
+            onClick={() => onShowHistory(row.original)}
+            title="View Redeemed Users History"
+            className="flex items-center justify-center h-9 w-9 rounded-sm bg-blue-50 hover:bg-blue-100 text-blue-700 transition-colors duration-300 cursor-pointer border border-blue-200"
+          >
+            <Users className="size-4 text-blue-600" />
+          </button>
+        )}
         <button
           onClick={() => onView(row.original)}
           className="flex items-center justify-center h-9 w-9 rounded-sm bg-[#F3F3F3] hover:bg-gray-200 transition-colors duration-300 cursor-pointer text-gray-800"
