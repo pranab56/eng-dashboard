@@ -1,0 +1,15 @@
+import React, { Suspense } from 'react';
+import IncompleteAccounts from './IncompleteAccounts';
+
+
+export const dynamic = 'force-dynamic';
+
+const page = () => {
+  return (
+    <Suspense fallback={<div className="flex items-center justify-center p-10 text-gray-500 font-medium">Loading Incomplete Accounts...</div>}>
+      <IncompleteAccounts />
+    </Suspense>
+  );
+};
+
+export default page;

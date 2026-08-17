@@ -19,6 +19,9 @@ import PlayerViewModal from './PlayerViewModal';
 import PlayerEditModal from './PlayerEditModal';
 import { UpdateCoinModal } from '@/components/modals/UpdateCoinModal';
 import DeleteConfirmationModal from '../user-management/DeleteConfirmationModal';
+import { AgeGroupSelectDropdown } from '@/components/dropdowns/AgeGroupSelectDropdown';
+import { PositionSelectDropdown } from '@/components/dropdowns/PositionSelectDropdown';
+import { SortSelectDropdown } from '@/components/dropdowns/SortSelectDropdown';
 
 const PlayerManagement = () => {
   const { setHeaders } = useHeaders();
@@ -40,6 +43,47 @@ const PlayerManagement = () => {
   }), [pageNumber, searchTerm, selectedAgeGroup, selectedPosition, sortBy]);
 
   const { data: playerData, isLoading } = useGetAllPlayerQuery(queryParams);
+
+  // Fetch all players for dynamic age groups & positions calculation
+  const { data: allPlayersData } = useGetAllPlayerQuery({ limit: 1000 });
+  const allPlayersList = useMemo(() => allPlayersData?.data?.players || playerData?.data?.players || [], [allPlayersData, playerData]);
+
+  // Dynamically compute unique age groups
+  const dynamicAgeGroups = useMemo(() => {
+    const defaultGroups = ["U7", "U8", "U9", "U10", "U11", "U12", "U13", "U14", "U15", "U16", "U17", "U18"];
+    const groupsSet = new Set<string>(defaultGroups);
+
+    allPlayersList.forEach((p: any) => {
+      if (p?.ageGroup && typeof p.ageGroup === 'string') {
+        const val = p.ageGroup.trim();
+        if (val) groupsSet.add(val);
+      }
+    });
+
+    return Array.from(groupsSet).sort((a, b) => {
+      const numA = parseInt(a.replace(/\D/g, ''), 10);
+      const numB = parseInt(b.replace(/\D/g, ''), 10);
+      if (!isNaN(numA) && !isNaN(numB)) return numA - numB;
+      if (!isNaN(numA)) return -1;
+      if (!isNaN(numB)) return 1;
+      return a.localeCompare(b);
+    });
+  }, [allPlayersList]);
+
+  // Dynamically compute unique positions
+  const dynamicPositions = useMemo(() => {
+    const defaultPositions = ["Goalkeeper", "Defender", "Midfielder", "Forward", "Striker", "Winger"];
+    const posSet = new Set<string>(defaultPositions);
+
+    allPlayersList.forEach((p: any) => {
+      if (p?.position && typeof p.position === 'string') {
+        const val = p.position.trim();
+        if (val) posSet.add(val);
+      }
+    });
+
+    return Array.from(posSet);
+  }, [allPlayersList]);
 
   const [updateEngCoinBudget, { isLoading: isUpdatingCoin }] = useUpdateEngCoinBudgetMutation();
   const [deletePlayer, { isLoading: isDeletingPlayer }] = useDeletePlayerMutation();
@@ -180,56 +224,27 @@ const PlayerManagement = () => {
               )}
             </div>
 
-            {/* Age Group Filter */}
-            <select
-              value={selectedAgeGroup}
-              onChange={(e) => setSelectedAgeGroup(e.target.value)}
-              className="px-3 py-2 border border-gray-200 rounded-xl text-xs font-semibold text-slate-700 bg-slate-50/50 hover:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 cursor-pointer"
-            >
-              <option value="ALL">All Age Groups</option>
-              <option value="U7">U7</option>
-              <option value="U8">U8</option>
-              <option value="U9">U9</option>
-              <option value="U10">U10</option>
-              <option value="U11">U11</option>
-              <option value="U12">U12</option>
-              <option value="U13">U13</option>
-              <option value="U14">U14</option>
-              <option value="U15">U15</option>
-              <option value="U16">U16</option>
-              <option value="U17">U17</option>
-              <option value="U18">U18</option>
-              <option value="Senior">Senior</option>
-            </select>
+            {/* Dynamic Age Group Filter Dropdown */}
+            <AgeGroupSelectDropdown
+              groups={dynamicAgeGroups}
+              selectedGroup={selectedAgeGroup}
+              onChange={(group) => setSelectedAgeGroup(group)}
+              placeholder="All Age Groups"
+            />
 
-            {/* Position Filter */}
-            <select
-              value={selectedPosition}
-              onChange={(e) => setSelectedPosition(e.target.value)}
-              className="px-3 py-2 border border-gray-200 rounded-xl text-xs font-semibold text-slate-700 bg-slate-50/50 hover:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 cursor-pointer"
-            >
-              <option value="ALL">All Positions</option>
-              <option value="Goalkeeper">Goalkeeper</option>
-              <option value="Defender">Defender</option>
-              <option value="Midfielder">Midfielder</option>
-              <option value="Forward">Forward</option>
-              <option value="Striker">Striker</option>
-              <option value="Winger">Winger</option>
-            </select>
+            {/* Dynamic Position Filter Dropdown */}
+            <PositionSelectDropdown
+              positions={dynamicPositions}
+              selectedPosition={selectedPosition}
+              onChange={(pos) => setSelectedPosition(pos)}
+              placeholder="All Positions"
+            />
 
-            {/* Sorting Dropdown */}
-            <select
-              value={sortBy}
-              onChange={(e) => setSortBy(e.target.value)}
-              className="px-3 py-2 border border-gray-200 rounded-xl text-xs font-semibold text-slate-700 bg-slate-50/50 hover:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 cursor-pointer"
-            >
-              <option value="newest">Sort: Newest First</option>
-              <option value="oldest">Sort: Oldest First</option>
-              <option value="name_asc">Sort: Name (A to Z)</option>
-              <option value="name_desc">Sort: Name (Z to A)</option>
-              <option value="coins_desc">Sort: Coins (High to Low)</option>
-              <option value="coins_asc">Sort: Coins (Low to High)</option>
-            </select>
+            {/* Sort Dropdown */}
+            <SortSelectDropdown
+              sortBy={sortBy}
+              onChange={(sort) => setSortBy(sort)}
+            />
 
             {/* Reset Filters */}
             {hasActiveFilters && (

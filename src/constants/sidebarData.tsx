@@ -127,6 +127,12 @@ export const sidebarData: TMenuItem[] = [
     label: "/user-management",
   },
   {
+    id: 111,
+    icon: HiOutlineUser,
+    title: "Incomplete Accounts",
+    label: "/incomplete-accounts",
+  },
+  {
     id: 12,
     icon: Calendar,
     title: "Event Management",

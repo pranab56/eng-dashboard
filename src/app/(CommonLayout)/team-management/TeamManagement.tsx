@@ -135,7 +135,7 @@ const TeamManagement = () => {
   // Available unique team types
   const uniqueTeamTypes = useMemo(() => {
     const rawList = teamData?.data?.result || teamData?.data || [];
-    const typesSet = new Set<string>(["Football", "Cricket"]);
+    const typesSet = new Set<string>(["Football"]);
     rawList.forEach((t: any) => {
       if (t.teamType) typesSet.add(t.teamType);
     });

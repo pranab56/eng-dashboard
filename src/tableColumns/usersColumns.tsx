@@ -76,14 +76,33 @@ export const getUsersColumns = (
 
   {
     accessorKey: "status",
-    header: () => <div className="">{activeRole === "INCOMPLETE" ? "Incomplete Reason" : "Approval Status"}</div>,
+    header: () => <div className="">{activeRole === "INCOMPLETE" ? "Status & Reason" : "Approval Status"}</div>,
     cell: ({ row }) => {
       if (activeRole === "INCOMPLETE") {
+        const rawStatus = ((row.original as any).status || "").toUpperCase();
+        const isVerified = row.original.verified;
+        const currentStatus = rawStatus || (isVerified ? "PENDING" : "UNVERIFIED");
         const reason = (row.original as any).incompleteReason || "Incomplete Registration Setup";
+
         return (
-          <span className="text-xs font-bold text-rose-700 bg-rose-50 px-2.5 py-1 rounded-full border border-rose-200">
-            {reason}
-          </span>
+          <div className="flex flex-col gap-1 items-start">
+            <span
+              className={`text-[11px] font-bold px-2.5 py-0.5 rounded-full border ${
+                currentStatus === "APPROVED"
+                  ? "text-emerald-700 bg-emerald-50 border-emerald-200"
+                  : currentStatus === "REJECTED"
+                  ? "text-rose-700 bg-rose-50 border-rose-200"
+                  : currentStatus === "UNVERIFIED" || !isVerified
+                  ? "text-amber-700 bg-amber-50 border-amber-200"
+                  : "text-blue-700 bg-blue-50 border-blue-200"
+              }`}
+            >
+              {currentStatus}
+            </span>
+            <span className="text-[11px] font-semibold text-rose-600 bg-rose-50/70 px-2 py-0.5 rounded border border-rose-100">
+              {reason}
+            </span>
+          </div>
         );
       }
 

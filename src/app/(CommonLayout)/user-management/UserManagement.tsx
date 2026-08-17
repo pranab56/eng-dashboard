@@ -5,7 +5,7 @@ import CustomPagination from '@/components/cui/CustomPagination';
 import GeneralStateCard from '@/components/cui/GeneralStateCard';
 import TableHeader from '@/components/cui/TableHeader';
 import CustomTable from '@/components/table/CustomTable';
-import { useDeleteUserMutation, useGetIncompleteUsersQuery, useGetUserAnalyticsQuery, useGetUserQuery, useUpdateStatusMutation, useUpdateUserStatusMutation } from '@/features/userManagement/userApi';
+import { useDeleteUserMutation, useGetUserAnalyticsQuery, useGetUserQuery, useUpdateStatusMutation, useUpdateUserStatusMutation } from '@/features/userManagement/userApi';
 import { useHeaders } from '@/hooks/useHeaders';
 import { getUsersColumns } from '@/tableColumns/usersColumns';
 import { TUserManagement } from '@/types/columnTypes';
@@ -21,7 +21,6 @@ import UserEditProfileModal from './UserEditProfileModal';
 const ROLE_TABS = [
   { label: 'All Users', value: 'ALL' },
   { label: 'Pending Requests', value: 'PENDING_REQUESTS' },
-  { label: 'Incomplete Accounts', value: 'INCOMPLETE' },
   { label: 'Players', value: 'PLAYER' },
   { label: 'Trial Players', value: 'OTHER_CLUBS' },
   { label: 'Tournament Players', value: 'TOURNAMENT_PLAYER' },
@@ -55,11 +54,6 @@ const UserManagement = () => {
     pageNumber: page,
     searchValue: searchTerm,
     role: activeRole,
-  }, { skip: activeRole === 'INCOMPLETE' });
-
-  const { data: incompleteData, isLoading: isIncompleteLoading } = useGetIncompleteUsersQuery({
-    pageNumber: page,
-    searchValue: searchTerm,
   });
 
   const [toggleStatus] = useUpdateStatusMutation();
@@ -109,7 +103,7 @@ const UserManagement = () => {
     await handleUpdateUserStatus(id, "REJECTED", rejectionReason);
   };
 
-  const currentList = activeRole === 'INCOMPLETE' ? (incompleteData?.data || []) : (userData?.data || []);
+  const currentList = userData?.data || [];
 
   const handleDeleteUserClick = (id: string) => {
     const target = (currentList || []).find((u: any) => u._id === id);
@@ -180,7 +174,6 @@ const UserManagement = () => {
 
   const analytics = analyticsData?.data || {};
   const pendingCount = analytics.pendingRequests ?? (userData?.data || []).filter((u: any) => (u.status || '').toUpperCase() === 'PENDING').length;
-  const incompleteCount = incompleteData?.pagination?.total ?? incompleteData?.data?.length ?? 0;
 
   const items = [
     {
@@ -234,10 +227,8 @@ const UserManagement = () => {
   ];
 
   const tableHeaderPayload = {
-    title: activeRole === 'INCOMPLETE' ? "Incomplete / Abandoned Accounts" : "Member List",
-    des: activeRole === 'INCOMPLETE' 
-      ? "Accounts with unverified emails or incomplete setups. Delete them so parents can re-register cleanly."
-      : "A list of all players, trial players, tournament players, managers, and pending player requests.",
+    title: "Member List",
+    des: "A list of all players, trial players, tournament players, managers, and pending player requests.",
     url: "#"
   };
 
@@ -248,18 +239,13 @@ const UserManagement = () => {
 
   const columns = getUsersColumns(handleToggleStatus, handleUpdateUserStatus, handleDeleteUserClick, handleViewUser, handleAssignTeams, activeRole, handleEditProfile);
 
-  const displayTableData = activeRole === 'INCOMPLETE'
-    ? (incompleteData?.data || [])
-    : [...filteredUsers].sort((a: any, b: any) => {
-        const statusA = (a.status || '').toUpperCase();
-        const statusB = (b.status || '').toUpperCase();
-        if (statusA === 'PENDING' && statusB !== 'PENDING') return -1;
-        if (statusA !== 'PENDING' && statusB === 'PENDING') return 1;
-        return new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime();
-      });
-
-  const displayLoading = activeRole === 'INCOMPLETE' ? isIncompleteLoading : isLoading;
-  const displayPagination = activeRole === 'INCOMPLETE' ? incompleteData?.pagination : userData?.pagination;
+  const displayTableData = [...filteredUsers].sort((a: any, b: any) => {
+    const statusA = (a.status || '').toUpperCase();
+    const statusB = (b.status || '').toUpperCase();
+    if (statusA === 'PENDING' && statusB !== 'PENDING') return -1;
+    if (statusA !== 'PENDING' && statusB === 'PENDING') return 1;
+    return new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime();
+  });
 
   return (
     <div className='py-10 px-8 space-y-6 pb-16'>
@@ -295,7 +281,6 @@ const UserManagement = () => {
           <div className="flex items-center gap-2 overflow-x-auto">
             {ROLE_TABS.map((tab) => {
               const isPendingTab = tab.value === 'PENDING_REQUESTS';
-              const isIncompleteTab = tab.value === 'INCOMPLETE';
               const isSelected = activeRole === tab.value;
 
               return (
@@ -305,8 +290,6 @@ const UserManagement = () => {
                   className={`px-4 py-2 text-xs font-bold rounded-lg transition-all whitespace-nowrap cursor-pointer flex items-center gap-2 ${
                     isSelected
                       ? 'bg-blue-600 text-white shadow-md shadow-blue-600/20'
-                      : isIncompleteTab
-                      ? 'bg-rose-50 text-rose-700 hover:bg-rose-100 border border-rose-200 font-extrabold'
                       : isPendingTab
                       ? 'bg-amber-50 text-amber-700 hover:bg-amber-100 border border-amber-300 font-extrabold'
                       : 'bg-gray-50 text-gray-600 hover:bg-gray-100 hover:text-gray-900 border border-gray-200/60'
@@ -321,14 +304,6 @@ const UserManagement = () => {
                       {pendingCount}
                     </span>
                   )}
-
-                  {isIncompleteTab && (
-                    <span className={`px-2 py-0.5 rounded-full text-[10px] font-black transition-colors ${
-                      isSelected ? 'bg-rose-500 text-white' : 'bg-rose-500 text-white'
-                    }`}>
-                      {incompleteCount}
-                    </span>
-                  )}
                 </button>
               );
             })}
@@ -340,7 +315,7 @@ const UserManagement = () => {
           <CustomTable
             columns={columns}
             data={displayTableData}
-            isLoading={displayLoading}
+            isLoading={isLoading}
           />
         </div>
 
@@ -350,9 +325,9 @@ const UserManagement = () => {
             Showing <span className="font-semibold text-gray-900">{displayTableData.length}</span> entries
           </p>
 
-          {displayPagination && (
+          {userData?.pagination && (
             <CustomPagination
-              TOTAL_PAGES={displayPagination.totalPage || 1}
+              TOTAL_PAGES={userData.pagination.totalPage || 1}
               qryName="userPage"
             />
           )}
