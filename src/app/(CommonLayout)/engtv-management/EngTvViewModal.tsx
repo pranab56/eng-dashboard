@@ -1,60 +1,70 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client"
+
 import React from 'react';
 import {
   Dialog,
   DialogContent,
   DialogHeader,
-  DialogTitle
+  DialogTitle,
 } from "@/components/ui/dialog";
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
-import Image from 'next/image';
-import { formatImagePath } from '@/utils/formatImagePath';
+import { TEngtv } from '@/types/columnTypes';
+import { getYouTubeEmbedUrl } from '@/utils/getYouTubeEmbedUrl';
+import { baseURL } from '@/utils/BaseURL';
 import {
   X,
+  Tv,
   Calendar,
-  Newspaper,
   Clock,
   Tag,
   Sparkles,
-  BookOpen,
-  Globe,
+  Film,
   CheckCircle2,
 } from 'lucide-react';
 
 dayjs.extend(relativeTime);
 
-interface NewsViewModalProps {
-  news: any;
+interface EngTvViewModalProps {
+  video: TEngtv | null;
   isOpen: boolean;
   onClose: () => void;
 }
 
-const NewsViewModal = ({ news, isOpen, onClose }: NewsViewModalProps) => {
-  if (!news) return null;
+const EngTvViewModal: React.FC<EngTvViewModalProps> = ({ video, isOpen, onClose }) => {
+  if (!video) return null;
 
-  const categoryName = (() => {
-    const catVal = news.category;
-    const rawName =
-      typeof catVal === "object" && catVal
-        ? catVal.name || catVal.title
-        : typeof catVal === "string"
-          ? catVal
-          : "";
-    const isHexId = Boolean(rawName && /^[0-9a-fA-F]{24}$/.test(rawName));
-    return isHexId ? null : rawName;
-  })();
+  const catVal = video.category as any;
+  const catName =
+    typeof catVal === "object" && catVal
+      ? catVal.name
+      : typeof catVal === "string"
+        ? catVal
+        : "";
 
-  const statusStr = (news.status || '').toLowerCase();
-  const isPublished = statusStr === 'publish' || statusStr === 'published';
+  const subVal = (video as any).subCategory;
+  const subName =
+    typeof subVal === "object" && subVal
+      ? subVal.name
+      : typeof subVal === "string"
+        ? subVal
+        : "";
 
-  const readTime = (() => {
-    const text = (news.description || '').replace(/<[^>]*>/g, '');
-    const words = text.trim().split(/\s+/).filter(Boolean).length;
-    const minutes = Math.max(1, Math.ceil(words / 180));
-    return `${minutes} min read`;
-  })();
+  const isPublished = (video.status || '').toLowerCase() === 'publish' || (video.status || '').toLowerCase() === 'published';
+
+  const posterUrl = video.thumbnail
+    ? video.thumbnail.startsWith('http')
+      ? video.thumbnail
+      : baseURL + video.thumbnail
+    : undefined;
+
+  const youtubeEmbed = video.videoUrl ? getYouTubeEmbedUrl(video.videoUrl) : null;
+  const videoSrc = video.videoUrl
+    ? video.videoUrl.startsWith('http')
+      ? video.videoUrl
+      : baseURL + video.videoUrl
+    : '';
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -71,29 +81,26 @@ const NewsViewModal = ({ news, isOpen, onClose }: NewsViewModalProps) => {
           </button>
 
           <div className="flex items-center gap-4">
-            {/* News Icon / Thumbnail Box */}
-            <div className="relative w-14 h-14 rounded-2xl bg-white border border-slate-200 overflow-hidden flex items-center justify-center shrink-0 shadow-xs">
-              {news.image ? (
-                <Image
-                  src={formatImagePath(news.image)}
-                  alt={news.title || "News icon"}
-                  fill
-                  className="object-cover"
-                />
-              ) : (
-                <Newspaper className="w-6 h-6 text-indigo-600" />
-              )}
+            {/* Header TV Icon Box */}
+            <div className="w-14 h-14 rounded-2xl bg-red-50 border border-red-100 overflow-hidden flex items-center justify-center shrink-0 shadow-xs text-red-600">
+              <Tv className="w-6 h-6" />
             </div>
 
             <div className="flex-1 pr-6 min-w-0">
               <div className="flex items-center gap-2 flex-wrap">
                 <span className="px-2.5 py-0.5 rounded-full text-[10px] font-semibold uppercase bg-slate-100 text-slate-700 border border-slate-200">
-                  News Management
+                  ENG TV Network
                 </span>
 
-                {categoryName && (
+                {catName && (
                   <span className="px-2.5 py-0.5 rounded-full text-[10px] font-semibold uppercase bg-indigo-50 text-indigo-700 border border-indigo-200">
-                    {categoryName}
+                    {catName}
+                  </span>
+                )}
+
+                {subName && (
+                  <span className="px-2.5 py-0.5 rounded-full text-[10px] font-semibold uppercase bg-amber-50 text-amber-700 border border-amber-200">
+                    {subName}
                   </span>
                 )}
 
@@ -102,18 +109,22 @@ const NewsViewModal = ({ news, isOpen, onClose }: NewsViewModalProps) => {
                     ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
                     : 'bg-amber-50 text-amber-700 border-amber-200'
                 }`}>
-                  {news.status || 'Draft'}
+                  {video.status || 'Draft'}
                 </span>
               </div>
 
               <DialogTitle className="text-lg sm:text-xl font-bold text-slate-900 mt-1 truncate">
-                {news.title}
+                {video.title}
               </DialogTitle>
 
               <p className="text-xs text-slate-500 font-medium mt-0.5 flex items-center gap-2">
-                <span>Published {news.publishDateTime ? dayjs(news.publishDateTime).format('MMM DD, YYYY') : 'N/A'}</span>
-                <span>•</span>
-                <span>{readTime}</span>
+                <span>Created {video.createdAt ? dayjs(video.createdAt).format('MMM DD, YYYY') : 'N/A'}</span>
+                {video.publishDateTime && (
+                  <>
+                    <span>•</span>
+                    <span>Scheduled {dayjs(video.publishDateTime).fromNow()}</span>
+                  </>
+                )}
               </p>
             </div>
           </div>
@@ -121,77 +132,87 @@ const NewsViewModal = ({ news, isOpen, onClose }: NewsViewModalProps) => {
 
         {/* Modal Body Container */}
         <div className="p-6 space-y-5 overflow-y-auto custom-scrollbar flex-1 text-slate-800">
-          {/* Article Banner Image Section */}
-          {news.image && (
-            <div className="relative w-full h-52 sm:h-60 rounded-2xl overflow-hidden border border-slate-200 bg-slate-950 shadow-xs group">
-              <Image
-                src={formatImagePath(news.image)}
-                alt={news.title || "News Cover Image"}
-                fill
-                quality={100}
-                className="object-cover group-hover:scale-105 transition-transform duration-500 ease-out"
+          {/* Video Stream Container */}
+          <div className="aspect-video bg-slate-950 rounded-2xl overflow-hidden shadow-md border border-slate-800 relative group">
+            {youtubeEmbed ? (
+              <iframe
+                src={youtubeEmbed}
+                title={video.title}
+                className="w-full h-full border-0"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
               />
-            </div>
-          )}
-
-          {/* Article Description Section */}
-          <div className="bg-slate-50/80 rounded-2xl p-5 border border-slate-200/80 space-y-3">
-            <div className="flex items-center gap-2 pb-2 border-b border-slate-200/60">
-              <Sparkles className="w-4 h-4 text-indigo-600" />
-              <h4 className="text-xs font-bold uppercase tracking-wider text-slate-800">
-                Article Description
-              </h4>
-            </div>
-
-            <div
-              className="text-xs sm:text-sm font-medium text-slate-700 leading-relaxed max-h-72 overflow-y-auto custom-scrollbar prose prose-slate max-w-none"
-              dangerouslySetInnerHTML={{ __html: news.description || 'No article content provided.' }}
-            />
+            ) : videoSrc ? (
+              <video
+                src={videoSrc}
+                poster={posterUrl}
+                controls
+                className="w-full h-full object-contain"
+              />
+            ) : (
+              <div className="w-full h-full flex flex-col items-center justify-center text-slate-500 space-y-2">
+                <Film className="w-10 h-10 stroke-1" />
+                <span className="text-xs font-medium">No video stream URL provided</span>
+              </div>
+            )}
           </div>
 
-          {/* Publication Metadata Card */}
+          {/* Description Section */}
+          <div className="bg-slate-50/80 rounded-2xl p-5 border border-slate-200/80 space-y-2">
+            <div className="flex items-center gap-2 pb-2 border-b border-slate-200/60">
+              <Sparkles className="w-4 h-4 text-red-600" />
+              <h4 className="text-xs font-bold uppercase tracking-wider text-slate-800">
+                Video Overview & Synopsis
+              </h4>
+            </div>
+            <p className="text-xs sm:text-sm text-slate-700 leading-relaxed font-medium">
+              {video.description || 'No video description provided.'}
+            </p>
+          </div>
+
+          {/* Broadcast & Channel Specifications */}
           <div className="bg-slate-50/80 rounded-2xl p-5 border border-slate-200/80 space-y-3">
             <div className="flex items-center gap-2 pb-2 border-b border-slate-200/60">
-              <Newspaper className="w-4 h-4 text-indigo-600" />
+              <Film className="w-4 h-4 text-red-600" />
               <h4 className="text-xs font-bold uppercase tracking-wider text-slate-800">
-                Publication Details
+                Broadcast & Channel Details
               </h4>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
               <div className="p-3 bg-white rounded-xl border border-slate-200/60 space-y-1">
                 <span className="text-[11px] font-semibold text-slate-400 flex items-center gap-1">
-                  <Calendar className="w-3.5 h-3.5 text-indigo-500" /> Publication Date
+                  <Calendar className="w-3.5 h-3.5 text-red-500" /> Created Date
                 </span>
                 <p className="font-bold text-slate-800">
-                  {news.publishDateTime ? dayjs(news.publishDateTime).format("DD MMMM YYYY, h:mm A") : "Not Specified"}
+                  {video.createdAt ? dayjs(video.createdAt).format("DD MMMM YYYY, h:mm A") : "N/A"}
                 </p>
               </div>
 
               <div className="p-3 bg-white rounded-xl border border-slate-200/60 space-y-1">
                 <span className="text-[11px] font-semibold text-slate-400 flex items-center gap-1">
-                  <Clock className="w-3.5 h-3.5 text-indigo-500" /> Schedule Status
+                  <Clock className="w-3.5 h-3.5 text-red-500" /> Publish Date
                 </span>
                 <p className="font-bold text-slate-800">
-                  {news.publishDateTime ? dayjs(news.publishDateTime).fromNow() : "Immediate Publication"}
+                  {video.publishDateTime ? dayjs(video.publishDateTime).format("DD MMMM YYYY, h:mm A") : "Immediate Publication"}
                 </p>
               </div>
 
               <div className="p-3 bg-white rounded-xl border border-slate-200/60 space-y-1">
                 <span className="text-[11px] font-semibold text-slate-400 flex items-center gap-1">
-                  <Tag className="w-3.5 h-3.5 text-indigo-500" /> Assigned Category
+                  <Tag className="w-3.5 h-3.5 text-red-500" /> Primary Category
                 </span>
                 <p className="font-bold text-slate-800">
-                  {categoryName || "General Announcement"}
+                  {catName || "General Broadcast"}
                 </p>
               </div>
 
               <div className="p-3 bg-white rounded-xl border border-slate-200/60 space-y-1">
                 <span className="text-[11px] font-semibold text-slate-400 flex items-center gap-1">
-                  <Globe className="w-3.5 h-3.5 text-indigo-500" /> Publisher Channel
+                  <Tv className="w-3.5 h-3.5 text-red-500" /> Network Channel
                 </span>
                 <p className="font-bold text-slate-800 flex items-center gap-1">
-                  <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" /> ENG Official Media
+                  <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" /> ENG Official TV Stream
                 </p>
               </div>
             </div>
@@ -201,7 +222,7 @@ const NewsViewModal = ({ news, isOpen, onClose }: NewsViewModalProps) => {
         {/* Modal Footer (Matches User Management Style) */}
         <div className="p-4 sm:p-5 bg-slate-50 border-t border-slate-100 flex items-center justify-between">
           <p className="text-xs text-slate-500 font-medium flex items-center gap-1">
-            <BookOpen className="w-3.5 h-3.5 text-slate-400" /> Read time: {readTime}
+            <Tv className="w-3.5 h-3.5 text-slate-400" /> Official ENG Broadcast
           </p>
           <button
             type="button"
@@ -216,4 +237,4 @@ const NewsViewModal = ({ news, isOpen, onClose }: NewsViewModalProps) => {
   );
 };
 
-export default NewsViewModal;
+export default EngTvViewModal;

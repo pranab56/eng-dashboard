@@ -5,20 +5,18 @@ import CreateButton from '@/components/buttons/CreateButton';
 import CustomPagination from '@/components/cui/CustomPagination';
 import GeneralStateCard from '@/components/cui/GeneralStateCard';
 import TableHeader from '@/components/cui/TableHeader';
-import { CustomModal } from '@/components/modals/CustomModal';
 import CustomTable from '@/components/table/CustomTable';
 import { useDeleteVideoMutation, useGetAllVideoQuery, useRearrangeVideosMutation } from '@/features/engTVManagement/engApi';
 import { useGetAllVideoCategoryQuery } from '@/features/categoryManagement/categoryApi';
 import { useHeaders } from '@/hooks/useHeaders';
-import { getYouTubeEmbedUrl } from '@/utils/getYouTubeEmbedUrl';
 import { getEngtvColumns } from '@/tableColumns/engtvColumns';
 import { TEngtv } from '@/types/columnTypes';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
-import { baseURL } from '../../../utils/BaseURL';
 import DeleteConfirmModal from '../match-management/DeleteConfirmModal';
+import EngTvViewModal from './EngTvViewModal';
 
 const EngtvManagement = () => {
   const { setHeaders } = useHeaders();
@@ -170,103 +168,11 @@ const EngtvManagement = () => {
         </div>
       </div>
 
-      <CustomModal
+      <EngTvViewModal
         isOpen={isModalOpen}
-        setIsOpen={setIsModalOpen}
-        title="Video Details"
-        className="max-w-2xl"
-      >
-        {selectedVideo ? (
-          <div className="space-y-4 pb-4">
-            <div className="aspect-video bg-black rounded-lg overflow-hidden relative">
-              {selectedVideo.videoUrl && (() => {
-                const youtubeEmbed = getYouTubeEmbedUrl(selectedVideo.videoUrl);
-                if (youtubeEmbed) {
-                  return (
-                    <iframe
-                      src={youtubeEmbed}
-                      title={selectedVideo.title}
-                      className="w-full h-full border-0"
-                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                      allowFullScreen
-                    />
-                  );
-                }
-                return (
-                  <video
-                    src={
-                      selectedVideo.videoUrl.startsWith('http')
-                        ? selectedVideo.videoUrl
-                        : baseURL + selectedVideo.videoUrl
-                    }
-                    poster={
-                      selectedVideo.thumbnail
-                        ? selectedVideo.thumbnail.startsWith('http')
-                          ? selectedVideo.thumbnail
-                          : baseURL + selectedVideo.thumbnail
-                        : undefined
-                    }
-                    controls
-                    className="w-full h-full object-contain"
-                  />
-                );
-              })()}
-            </div>
-            <div className="flex justify-between items-start">
-              <div>
-                <h3 className="text-xl font-medium text-gray-900">{selectedVideo.title}</h3>
-                <div className="flex items-center gap-2 mt-1">
-                  {(() => {
-                    const catVal = selectedVideo.category as any;
-                    const catName =
-                      typeof catVal === "object" && catVal
-                        ? catVal.name
-                        : typeof catVal === "string"
-                          ? catVal
-                          : "";
-                    const subVal = (selectedVideo as any).subCategory;
-                    const subName =
-                      typeof subVal === "object" && subVal
-                        ? subVal.name
-                        : typeof subVal === "string"
-                          ? subVal
-                          : "";
-                    return (
-                      <>
-                        {catName && (
-                          <span className="text-xs font-semibold text-blue-600 bg-blue-50 px-2 py-0.5 rounded . tracking-wider">
-                            {catName}
-                          </span>
-                        )}
-                        {subName && (
-                          <span className="text-xs font-semibold text-amber-700 bg-amber-50 px-2 py-0.5 rounded . tracking-wider">
-                            {subName}
-                          </span>
-                        )}
-                      </>
-                    );
-                  })()}
-                </div>
-              </div>
-              <div className={`px-2 py-1 rounded text-xs font-semibold capitalize ${selectedVideo.status === 'publish' ? 'bg-green-100 text-green-600' : 'bg-yellow-100 text-yellow-600'}`}>
-                {selectedVideo.status}
-              </div>
-            </div>
-            <div className="p-4 bg-gray-50 rounded-lg">
-              <h4 className="text-sm font-semibold text-gray-700 mb-1">Description</h4>
-              <p className="text-sm text-gray-600 leading-relaxed">{selectedVideo.description}</p>
-            </div>
-            <div className="grid grid-cols-2 gap-4 text-xs text-gray-500">
-              <div>Created: {new Date(selectedVideo.createdAt).toLocaleString()}</div>
-              <div>Published: {selectedVideo.publishDateTime ? new Date(selectedVideo.publishDateTime).toLocaleString() : "Not scheduled"}</div>
-            </div>
-          </div>
-        ) : (
-          <div className="h-40 flex items-center justify-center text-gray-400 font-medium italic">
-            Loading details...
-          </div>
-        )}
-      </CustomModal>
+        onClose={() => setIsModalOpen(false)}
+        video={selectedVideo}
+      />
 
 
       <DeleteConfirmModal
