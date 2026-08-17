@@ -13,7 +13,6 @@ import relativeTime from "dayjs/plugin/relativeTime";
 import Image from "next/image";
 import { formatImagePath } from "@/utils/formatImagePath";
 import {
-  Trophy,
   X,
   Sparkles,
   UserCheck,

@@ -10,8 +10,6 @@ import {
 import { TTournament } from "@/types/columnTypes";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
-import Image from "next/image";
-import { formatImagePath } from "@/utils/formatImagePath";
 import {
   Trophy,
   Calendar,
@@ -26,8 +24,6 @@ import {
   Zap,
   ShieldCheck,
   Loader2,
-  UserCheck,
-  Users,
 } from "lucide-react";
 import { toast } from "sonner";
 import { useGetTournamentQrCodeQuery } from "@/features/tournaments/tournamentsApi";

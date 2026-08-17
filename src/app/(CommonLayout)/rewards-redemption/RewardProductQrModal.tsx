@@ -8,8 +8,6 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { X, Sparkles, QrCode, Download, Coffee, AlertCircle, Loader2 } from "lucide-react";
-import Image from "next/image";
-import { formatImagePath } from "@/utils/formatImagePath";
 import { useGetRewardProductQrCodeQuery } from "@/features/rewordProduct/rewordApi";
 import { toast } from "sonner";
 
