@@ -101,20 +101,35 @@ const IncompleteAccounts = () => {
 
   const rawList = incompleteData?.data || [];
 
+  const isUserRejected = (u: any) => {
+    const st = (u.status || '').toUpperCase();
+    const reason = (u.incompleteReason || u.rejectionReason || '').toLowerCase();
+    return st === 'REJECTED' || st === 'REJECT' || reason.includes('reject');
+  };
+
+  const isUserUnverified = (u: any) => {
+    return u.verified === false || u.verified === null || u.verified === undefined || (u.incompleteReason || '').toLowerCase().includes('unverified');
+  };
+
+  const isUserPending = (u: any) => {
+    const st = (u.status || '').toUpperCase();
+    return st === 'PENDING';
+  };
+
   // Count breakdowns
   const totalIncomplete = incompleteData?.pagination?.total ?? rawList.length;
-  const unverifiedCount = rawList.filter((u: any) => u.verified === false).length;
+  const unverifiedCount = rawList.filter(isUserUnverified).length;
   const verifiedCount = rawList.filter((u: any) => u.verified === true).length;
-  const rejectedCount = rawList.filter((u: any) => (u.status || '').toUpperCase() === 'REJECTED').length;
-  const pendingCount = rawList.filter((u: any) => (u.status || '').toUpperCase() === 'PENDING').length;
+  const rejectedCount = rawList.filter(isUserRejected).length;
+  const pendingCount = rawList.filter(isUserPending).length;
 
   // Filter in real-time by status and search input
   const displayTableData = rawList.filter((user: any) => {
     // Status Filter
-    if (statusFilter === 'UNVERIFIED' && user.verified !== false) return false;
+    if (statusFilter === 'UNVERIFIED' && !isUserUnverified(user)) return false;
     if (statusFilter === 'VERIFIED' && user.verified !== true) return false;
-    if (statusFilter === 'REJECTED' && (user.status || '').toUpperCase() !== 'REJECTED') return false;
-    if (statusFilter === 'PENDING' && (user.status || '').toUpperCase() !== 'PENDING') return false;
+    if (statusFilter === 'REJECTED' && !isUserRejected(user)) return false;
+    if (statusFilter === 'PENDING' && !isUserPending(user)) return false;
 
     // Search Filter
     if (!searchTerm.trim()) return true;
@@ -123,7 +138,7 @@ const IncompleteAccounts = () => {
     const emailMatch = (user.email || '').toLowerCase().includes(q);
     const roleMatch = (user.role || '').toLowerCase().includes(q);
     const phoneMatch = (user.phone || user.phoneNumber || '').toLowerCase().includes(q);
-    const reasonMatch = (user.incompleteReason || '').toLowerCase().includes(q);
+    const reasonMatch = (user.incompleteReason || user.rejectionReason || '').toLowerCase().includes(q);
 
     return fullName.includes(q) || emailMatch || roleMatch || phoneMatch || reasonMatch;
   });
