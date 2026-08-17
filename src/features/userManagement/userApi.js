@@ -104,10 +104,12 @@ export const userApi = baseApi.injectEndpoints({
       query: (params) => {
         let pageNumber = 1;
         let searchValue = "";
+        let status = "";
 
         if (typeof params === "object" && params !== null) {
           pageNumber = params.pageNumber || params.page || 1;
           searchValue = params.searchValue || params.searchTerm || "";
+          status = params.status || params.statusFilter || params.filter || "";
         } else if (params) {
           pageNumber = params;
         }
@@ -115,6 +117,9 @@ export const userApi = baseApi.injectEndpoints({
         let url = `/user-management/incomplete?page=${pageNumber}`;
         if (searchValue) {
           url += `&searchTerm=${encodeURIComponent(searchValue)}`;
+        }
+        if (status && status !== "ALL") {
+          url += `&status=${encodeURIComponent(status)}`;
         }
         return {
           url,
