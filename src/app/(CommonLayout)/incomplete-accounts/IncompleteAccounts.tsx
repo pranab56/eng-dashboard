@@ -235,7 +235,7 @@ const IncompleteAccounts = () => {
           {/* Status Quick Filter Tabs */}
           <div className="flex flex-wrap items-center gap-1.5">
             {[
-              { id: 'ALL', label: 'All Accounts', count: rawList.length },
+              { id: 'ALL', label: 'All Accounts', count: totalIncomplete },
               { id: 'UNVERIFIED', label: 'Unverified Email', count: unverifiedCount },
               { id: 'REJECTED', label: 'Rejected', count: rejectedCount },
               { id: 'PENDING', label: 'Pending Approval', count: pendingCount },
@@ -269,7 +269,7 @@ const IncompleteAccounts = () => {
             {/* Custom Styled Status Filter Popover */}
             {(() => {
               const statusOptions = [
-                { value: 'ALL', label: 'All Statuses', count: rawList.length, dotColor: 'bg-slate-400' },
+                { value: 'ALL', label: 'All Statuses', count: totalIncomplete, dotColor: 'bg-slate-400' },
                 { value: 'UNVERIFIED', label: 'Unverified Email', count: unverifiedCount, dotColor: 'bg-amber-500' },
                 { value: 'REJECTED', label: 'Rejected Status', count: rejectedCount, dotColor: 'bg-rose-500' },
                 { value: 'PENDING', label: 'Pending Approval', count: pendingCount, dotColor: 'bg-blue-500' },
