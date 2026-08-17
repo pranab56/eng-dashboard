@@ -19,7 +19,7 @@ import { TUserManagement } from '@/types/columnTypes';
 import { Check, ChevronsUpDown, Filter, RotateCcw, Search, X } from 'lucide-react';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { useSearchParams } from 'next/navigation';
-import { useEffect, useState, useMemo } from 'react';
+import { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import UserVerificationModal from '../user-management/UserVerificationModal';
 import AssignTeamsModal from '../user-management/AssignTeamsModal';
