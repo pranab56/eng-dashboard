@@ -9,6 +9,7 @@ import CustomTable from '@/components/table/CustomTable';
 import {
   useDeleteUserMutation,
   useGetIncompleteUsersQuery,
+  useGetIncompleteUsersAnalyticsQuery,
   useUpdateStatusMutation,
   useUpdateUserStatusMutation,
 } from '@/features/userManagement/userApi';
@@ -18,7 +19,7 @@ import { TUserManagement } from '@/types/columnTypes';
 import { Check, ChevronsUpDown, Filter, RotateCcw, Search, X } from 'lucide-react';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { useSearchParams } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import toast from 'react-hot-toast';
 import UserVerificationModal from '../user-management/UserVerificationModal';
 import AssignTeamsModal from '../user-management/AssignTeamsModal';
@@ -51,6 +52,10 @@ const IncompleteAccounts = () => {
     pageNumber: page,
     searchValue: searchTerm,
   });
+
+  // Dedicated backend analytics query for complete incomplete users breakdown
+  const { data: analyticsRes } = useGetIncompleteUsersAnalyticsQuery({});
+  const analytics = analyticsRes?.data || {};
 
   const [toggleStatus] = useUpdateStatusMutation();
   const [updateUserStatus, { isLoading: isUpdatingUserStatus }] = useUpdateUserStatusMutation();
@@ -116,12 +121,12 @@ const IncompleteAccounts = () => {
     return st === 'PENDING';
   };
 
-  // Count breakdowns
-  const totalIncomplete = incompleteData?.pagination?.total ?? rawList.length;
-  const unverifiedCount = rawList.filter(isUserUnverified).length;
-  const verifiedCount = rawList.filter((u: any) => u.verified === true).length;
-  const rejectedCount = rawList.filter(isUserRejected).length;
-  const pendingCount = rawList.filter(isUserPending).length;
+  // Count breakdowns directly from dedicated backend analytics API
+  const totalIncomplete = analytics.totalIncomplete ?? (incompleteData?.pagination?.total || rawList.length);
+  const unverifiedCount = analytics.unverifiedCount ?? 0;
+  const verifiedCount = analytics.verifiedCount ?? 0;
+  const rejectedCount = analytics.rejectedCount ?? 0;
+  const pendingCount = analytics.pendingCount ?? 0;
 
   // Filter in real-time by status and search input
   const displayTableData = rawList.filter((user: any) => {

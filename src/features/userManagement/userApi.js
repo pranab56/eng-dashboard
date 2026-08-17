@@ -124,6 +124,14 @@ export const userApi = baseApi.injectEndpoints({
       providesTags: ["user"]
     }),
 
+    getIncompleteUsersAnalytics: builder.query({
+      query: () => ({
+        url: `/user-management/incomplete/analytics`,
+        method: "GET",
+      }),
+      providesTags: ["user"]
+    }),
+
     assignTeamToUser: builder.mutation({
       query: ({ id, data }) => ({
         url: `/user-management/assign-team/${id}`,
@@ -150,6 +158,7 @@ export const {
   useGetUserQuery,
   useGetAllParentsQuery,
   useGetIncompleteUsersQuery,
+  useGetIncompleteUsersAnalyticsQuery,
   useAssignTeamToUserMutation,
   useUpdateJerseyNumberMutation,
   useUpdateStatusMutation,
