@@ -60,7 +60,7 @@ const UserManagement = () => {
   const { data: incompleteData, isLoading: isIncompleteLoading } = useGetIncompleteUsersQuery({
     pageNumber: page,
     searchValue: searchTerm,
-  }, { skip: activeRole !== 'INCOMPLETE' });
+  });
 
   const [toggleStatus] = useUpdateStatusMutation();
   const [updateUserStatus, { isLoading: isUpdatingUserStatus }] = useUpdateUserStatusMutation();
@@ -146,20 +146,23 @@ const UserManagement = () => {
     if (isParent) return false;
 
     // Require active subscription / paid access for player profiles (PLAYER, OTHER_CLUBS, TOURNAMENT_PLAYER)
+    // EXCEPT when reviewing PENDING requests or PENDING status!
     const isPlayerRole = ['PLAYER', 'OTHER_CLUBS', 'CLUB', 'CLUBS', 'TOURNAMENT_PLAYER'].includes(userRole) || isChildPlayer;
     const isPaid = Boolean(user.subscription || user.activeSubscription || user.isPaid);
-    if (isPlayerRole && !isPaid) return false;
 
     if (activeRole === 'PENDING_REQUESTS') {
       if (userStatus !== 'PENDING') return false;
-    } else if (activeRole === 'PLAYER') {
-      if (!isChildPlayer && userRole !== 'PLAYER') return false;
-    } else if (activeRole === 'OTHER_CLUBS') {
-      if (userRole !== 'OTHER_CLUBS' && userRole !== 'CLUB' && userRole !== 'CLUBS') return false;
-    } else if (activeRole === 'TOURNAMENT_PLAYER') {
-      if (userRole !== 'TOURNAMENT_PLAYER') return false;
-    } else if (activeRole !== 'ALL') {
-      if (userRole !== activeRole && !userRole.includes(activeRole)) return false;
+    } else {
+      if (isPlayerRole && !isPaid && userStatus !== 'PENDING') return false;
+      if (activeRole === 'PLAYER') {
+        if (!isChildPlayer && userRole !== 'PLAYER') return false;
+      } else if (activeRole === 'OTHER_CLUBS') {
+        if (userRole !== 'OTHER_CLUBS' && userRole !== 'CLUB' && userRole !== 'CLUBS') return false;
+      } else if (activeRole === 'TOURNAMENT_PLAYER') {
+        if (userRole !== 'TOURNAMENT_PLAYER') return false;
+      } else if (activeRole !== 'ALL') {
+        if (userRole !== activeRole && !userRole.includes(activeRole)) return false;
+      }
     }
 
     if (searchTerm.trim()) {
@@ -175,10 +178,9 @@ const UserManagement = () => {
     return true;
   });
 
-  const pendingCount = (userData?.data || []).filter((u: any) => (u.status || '').toUpperCase() === 'PENDING').length;
-  const incompleteCount = incompleteData?.data?.length || 0;
-
   const analytics = analyticsData?.data || {};
+  const pendingCount = analytics.pendingRequests ?? (userData?.data || []).filter((u: any) => (u.status || '').toUpperCase() === 'PENDING').length;
+  const incompleteCount = incompleteData?.pagination?.total ?? incompleteData?.data?.length ?? 0;
 
   const items = [
     {
@@ -189,7 +191,7 @@ const UserManagement = () => {
     },
     {
       title: "Pending Player Registrations",
-      value: analytics.pendingRequests ?? pendingCount,
+      value: pendingCount,
       description: "Registrations awaiting approval",
       id: "users2",
     },
@@ -291,33 +293,45 @@ const UserManagement = () => {
         {/* Role Tabs */}
         <div className="px-6 border-b border-gray-100 pb-3">
           <div className="flex items-center gap-2 overflow-x-auto">
-            {ROLE_TABS.map((tab) => (
-              <button
-                key={tab.value}
-                onClick={() => setActiveRole(tab.value)}
-                className={`px-4 py-2 text-xs font-bold rounded-lg transition-all whitespace-nowrap cursor-pointer flex items-center gap-1.5 ${
-                  activeRole === tab.value
-                    ? 'bg-blue-600 text-white shadow-md shadow-blue-600/20'
-                    : tab.value === 'INCOMPLETE'
-                    ? 'bg-rose-50 text-rose-700 hover:bg-rose-100 border border-rose-200 font-extrabold'
-                    : tab.value === 'PENDING_REQUESTS' && pendingCount > 0
-                    ? 'bg-amber-50 text-amber-700 hover:bg-amber-100 border border-amber-300 font-extrabold'
-                    : 'bg-gray-50 text-gray-600 hover:bg-gray-100 hover:text-gray-900 border border-gray-200/60'
-                }`}
-              >
-                {tab.label}
-                {tab.value === 'PENDING_REQUESTS' && pendingCount > 0 && (
-                  <span className="px-1.5 py-0.5 rounded-full bg-amber-500 text-white text-[10px] font-black">
-                    {pendingCount}
-                  </span>
-                )}
-                {tab.value === 'INCOMPLETE' && incompleteCount > 0 && (
-                  <span className="px-1.5 py-0.5 rounded-full bg-rose-500 text-white text-[10px] font-black">
-                    {incompleteCount}
-                  </span>
-                )}
-              </button>
-            ))}
+            {ROLE_TABS.map((tab) => {
+              const isPendingTab = tab.value === 'PENDING_REQUESTS';
+              const isIncompleteTab = tab.value === 'INCOMPLETE';
+              const isSelected = activeRole === tab.value;
+
+              return (
+                <button
+                  key={tab.value}
+                  onClick={() => setActiveRole(tab.value)}
+                  className={`px-4 py-2 text-xs font-bold rounded-lg transition-all whitespace-nowrap cursor-pointer flex items-center gap-2 ${
+                    isSelected
+                      ? 'bg-blue-600 text-white shadow-md shadow-blue-600/20'
+                      : isIncompleteTab
+                      ? 'bg-rose-50 text-rose-700 hover:bg-rose-100 border border-rose-200 font-extrabold'
+                      : isPendingTab
+                      ? 'bg-amber-50 text-amber-700 hover:bg-amber-100 border border-amber-300 font-extrabold'
+                      : 'bg-gray-50 text-gray-600 hover:bg-gray-100 hover:text-gray-900 border border-gray-200/60'
+                  }`}
+                >
+                  <span>{tab.label}</span>
+
+                  {isPendingTab && (
+                    <span className={`px-2 py-0.5 rounded-full text-[10px] font-black transition-colors ${
+                      isSelected ? 'bg-amber-500 text-white' : 'bg-amber-500 text-white'
+                    }`}>
+                      {pendingCount}
+                    </span>
+                  )}
+
+                  {isIncompleteTab && (
+                    <span className={`px-2 py-0.5 rounded-full text-[10px] font-black transition-colors ${
+                      isSelected ? 'bg-rose-500 text-white' : 'bg-rose-500 text-white'
+                    }`}>
+                      {incompleteCount}
+                    </span>
+                  )}
+                </button>
+              );
+            })}
           </div>
         </div>
 
