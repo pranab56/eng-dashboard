@@ -37,16 +37,29 @@ const UserManagement = () => {
 
   const [activeRole, setActiveRole] = useState<string>('ALL');
   const [searchTerm, setSearchTerm] = useState<string>('');
+  const [currentPage, setCurrentPage] = useState<number>(1);
 
-  // Automatically reset userPage to 1 in URL when user types in search box or switches role tabs
+  // Keep local page state in sync with URL page parameter
   useEffect(() => {
-    const currentPageParam = searchParams.get('userPage');
-    if (currentPageParam && currentPageParam !== '1') {
-      const params = new URLSearchParams(searchParams.toString());
-      params.set('userPage', '1');
-      router.replace(`${pathname}?${params.toString()}`);
-    }
-  }, [searchTerm, activeRole]);
+    const p = searchParams.get('userPage') || '1';
+    setCurrentPage(parseInt(p));
+  }, [searchParams]);
+
+  const handleSearchChange = (val: string) => {
+    setSearchTerm(val);
+    setCurrentPage(1);
+    const params = new URLSearchParams(searchParams.toString());
+    params.set('userPage', '1');
+    router.replace(`${pathname}?${params.toString()}`);
+  };
+
+  const handleRoleChange = (role: string) => {
+    setActiveRole(role);
+    setCurrentPage(1);
+    const params = new URLSearchParams(searchParams.toString());
+    params.set('userPage', '1');
+    router.replace(`${pathname}?${params.toString()}`);
+  };
 
   const [selectedUser, setSelectedUser] = useState<TUserManagement | null>(null);
   const [isVerificationModalOpen, setIsVerificationModalOpen] = useState<boolean>(false);
@@ -63,7 +76,7 @@ const UserManagement = () => {
 
   const { data: analyticsData } = useGetUserAnalyticsQuery({});
   const { data: userData, isLoading } = useGetUserQuery({
-    pageNumber: page,
+    pageNumber: currentPage.toString(),
     searchValue: searchTerm,
     role: activeRole,
   });
@@ -274,12 +287,12 @@ const UserManagement = () => {
               type="text"
               placeholder="Search by name, email or phone..."
               value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
+              onChange={(e) => handleSearchChange(e.target.value)}
               className="w-full pl-9 pr-8 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:border-blue-500 transition-colors"
             />
             {searchTerm && (
               <button
-                onClick={() => setSearchTerm('')}
+                onClick={() => handleSearchChange("")}
                 className="absolute right-2.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
               >
                 <X className="size-4" />
@@ -298,7 +311,7 @@ const UserManagement = () => {
               return (
                 <button
                   key={tab.value}
-                  onClick={() => setActiveRole(tab.value)}
+                  onClick={() => handleRoleChange(tab.value)}
                   className={`px-4 py-2 text-xs font-bold rounded-lg transition-all whitespace-nowrap cursor-pointer flex items-center gap-2 ${
                     isSelected
                       ? 'bg-blue-600 text-white shadow-md shadow-blue-600/20'
@@ -340,7 +353,7 @@ const UserManagement = () => {
           {userData?.pagination && (
             <CustomPagination
               TOTAL_PAGES={
-                (searchTerm.trim() !== '' || activeRole !== 'ALL') && displayTableData.length < 10 && Number(page) === 1
+                (searchTerm.trim() !== '' || activeRole !== 'ALL') && displayTableData.length < 10 && currentPage === 1
                   ? 1
                   : Math.max(1, userData.pagination.totalPage || userData.pagination.totalPages || 1)
               }

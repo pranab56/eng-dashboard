@@ -41,11 +41,22 @@ const SelectField = ({
           name={name}
           control={control}
           render={({ field }) => {
-            const hasValidValue = Boolean(field.value && options?.some((opt) => opt.value === field.value));
-            const selectValue = hasValidValue ? field.value : undefined;
+            const normalizeStr = (str: any) => {
+              if (typeof str !== "string") return str;
+              return str.replace(/\s+/g, "").toLowerCase().trim();
+            };
+            const hasValidValue = Boolean(
+              field.value &&
+              options?.some((opt) => normalizeStr(opt.value) === normalizeStr(field.value))
+            );
+            const selectValue = hasValidValue
+              ? options.find((opt) => normalizeStr(opt.value) === normalizeStr(field.value))?.value
+              : undefined;
+
+            console.log(`[SelectField:${name}] value:`, field.value, "hasValidValue:", hasValidValue, "selectValue:", selectValue, "optionsCount:", options?.length);
 
             return (
-              <Select key={selectValue || 'empty'} onValueChange={field.onChange} value={selectValue} disabled={disabled}>
+              <Select key={`${name}-${options?.length || 0}-${selectValue || 'empty'}`} onValueChange={field.onChange} value={selectValue} disabled={disabled}>
                 <SelectTrigger
                   className={`w-full h-11 px-4 bg-[#f8fafc] border rounded-2xl text-xs font-semibold text-gray-800 hover:bg-white focus:outline-none focus:ring-4 transition-all duration-200 shadow-2xs ${
                     disabled ? "opacity-70 bg-gray-100/90 cursor-not-allowed border-gray-200" : "cursor-pointer"

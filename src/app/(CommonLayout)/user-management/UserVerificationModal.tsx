@@ -724,39 +724,50 @@ const UserVerificationModal: React.FC<UserVerificationModalProps> = ({
                 </div>
               ) : (
                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-                  {documentList.map((docUrl, idx) => (
-                    <div
-                      key={idx}
-                      className="group relative rounded-xl border border-slate-200 overflow-hidden bg-slate-50 aspect-video flex items-center justify-center shadow-xs"
-                    >
-                      <Image
-                        src={docUrl}
-                        alt={`Document ${idx + 1}`}
-                        fill
-                        className="object-cover group-hover:scale-105 transition-transform duration-300"
-                      />
+                  {documentList.map((docUrl, idx) => {
+                    const isPdf = docUrl?.toLowerCase().split('?')[0].endsWith('.pdf');
+                    return (
+                      <div
+                        key={idx}
+                        onClick={() => setPreviewImage(docUrl)}
+                        className="group relative rounded-xl border border-slate-200 overflow-hidden bg-slate-50 aspect-video flex items-center justify-center shadow-xs cursor-pointer"
+                      >
+                        {isPdf ? (
+                          <div className="flex flex-col items-center justify-center w-full h-full p-4 bg-rose-50/50 text-rose-700">
+                            <FileText className="w-10 h-10 text-rose-500 mb-1" />
+                            <span className="text-[10px] font-black uppercase tracking-wider text-rose-600">PDF Document</span>
+                          </div>
+                        ) : (
+                          <Image
+                            src={docUrl}
+                            alt={`Document ${idx + 1}`}
+                            fill
+                            className="object-cover group-hover:scale-105 transition-transform duration-300"
+                          />
+                        )}
 
-                      <div className="absolute inset-0 bg-slate-950/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
-                        <button
-                          type="button"
-                          onClick={() => setPreviewImage(docUrl)}
-                          className="p-1.5 rounded-full bg-white/90 text-slate-800 hover:bg-white transition-colors cursor-pointer"
-                          title="View Full Size"
-                        >
-                          <ZoomIn className="w-4 h-4" />
-                        </button>
-                        <a
-                          href={docUrl}
-                          target="_blank"
-                          rel="noreferrer"
-                          className="p-1.5 rounded-full bg-white/90 text-slate-800 hover:bg-white transition-colors cursor-pointer"
-                          title="Open in New Tab"
-                        >
-                          <ExternalLink className="w-4 h-4" />
-                        </a>
+                        <div className="absolute inset-0 bg-slate-950/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
+                          <button
+                            type="button"
+                            onClick={() => setPreviewImage(docUrl)}
+                            className="p-1.5 rounded-full bg-white/90 text-slate-800 hover:bg-white transition-colors cursor-pointer"
+                            title="View Full Size"
+                          >
+                            <ZoomIn className="w-4 h-4" />
+                          </button>
+                          <a
+                            href={docUrl}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="p-1.5 rounded-full bg-white/90 text-slate-800 hover:bg-white transition-colors cursor-pointer"
+                            title="Open in New Tab"
+                          >
+                            <ExternalLink className="w-4 h-4" />
+                          </a>
+                        </div>
                       </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
               )}
             </div>
@@ -859,7 +870,7 @@ const UserVerificationModal: React.FC<UserVerificationModalProps> = ({
 
       {/* Full-Screen Image Preview Modal */}
       <Dialog open={!!previewImage} onOpenChange={() => setPreviewImage(null)}>
-        <DialogContent className="sm:max-w-2xl bg-white rounded-3xl p-5 border-none shadow-2xl z-[100]">
+        <DialogContent className="sm:max-w-5xl bg-white rounded-3xl p-5 border-none shadow-2xl z-[100]">
           <DialogHeader className="pb-2 border-b border-slate-100">
             <DialogTitle className="text-sm font-bold text-slate-900 flex items-center gap-2">
               <FileText className="w-4 h-4 text-slate-500" /> Document Preview
@@ -867,13 +878,21 @@ const UserVerificationModal: React.FC<UserVerificationModalProps> = ({
           </DialogHeader>
 
           {previewImage && (
-            <div className="relative w-full h-[65vh] bg-slate-50 rounded-xl overflow-hidden border border-slate-100 mt-2 flex items-center justify-center p-2">
-              <Image
-                src={previewImage}
-                alt="Document Preview"
-                fill
-                className="object-contain"
-              />
+            <div className="relative w-full h-[75vh] bg-slate-50 rounded-xl overflow-hidden border border-slate-100 mt-2 flex items-center justify-center p-2">
+              {previewImage.toLowerCase().split('?')[0].endsWith('.pdf') ? (
+                <iframe
+                  src={previewImage}
+                  className="w-full h-full border-none rounded-xl"
+                  title="Document PDF Preview"
+                />
+              ) : (
+                <Image
+                  src={previewImage}
+                  alt="Document Preview"
+                  fill
+                  className="object-contain"
+                />
+              )}
             </div>
           )}
         </DialogContent>

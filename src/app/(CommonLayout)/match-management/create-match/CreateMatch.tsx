@@ -283,38 +283,120 @@ const CreateMatch = () => {
       const match = matchData.data;
       const date = dayjs(match.matchDate).tz("Europe/London");
 
-      const venueVal = typeof match.venueName === "object" ? match.venueName?._id : match.venueName || "";
-      const subVal = typeof match.subVenue === "object" ? match.subVenue?._id : match.subVenue || typeof match.pitch === "object" ? match.pitch?._id : match.pitch || "";
-      const durVal = typeof match.durationMinutes === "object" ? match.durationMinutes?.name : match.durationMinutes || "";
+      console.log("[CreateMatch:Edit] Raw Match details from DB:", match);
 
-      reset({
+      let venueVal =
+        (typeof match.venueCategory === "object" ? match.venueCategory?._id || match.venueCategory?.id : match.venueCategory) ||
+        (typeof match.venueName === "object" ? match.venueName?._id : match.venueName) ||
+        "";
+
+      // If venueVal is a text name instead of ObjectId, find its matching category ID by name
+      if (venueVal && !/^[0-9a-fA-F]{24}$/.test(venueVal) && venueCategories.length > 0) {
+        const found = venueCategories.find((v: any) => v.name?.toLowerCase() === venueVal.toLowerCase());
+        if (found) {
+          venueVal = found._id || found.id;
+        }
+      }
+
+      const selectedVenueObjLocal = venueCategories.find(
+        (v: any) => (v._id || v.id) === venueVal || v.name === venueVal
+      );
+      const subCatsLocal = selectedVenueObjLocal?.subCategories || [];
+
+      let subVal =
+        (typeof match.venueSubCategory === "object" ? match.venueSubCategory?._id || match.venueSubCategory?.id : match.venueSubCategory) ||
+        (typeof match.subVenue === "object" ? match.subVenue?._id : match.subVenue) ||
+        (typeof match.pitch === "object" ? match.pitch?._id : match.pitch) ||
+        "";
+
+      // If subVal is a text name instead of ObjectId, find its matching subcategory ID by name
+      if (subVal && !/^[0-9a-fA-F]{24}$/.test(subVal) && subCatsLocal.length > 0) {
+        const found = subCatsLocal.find((s: any) => s.name?.toLowerCase() === subVal.toLowerCase());
+        if (found) {
+          subVal = found._id || found.id;
+        }
+      }
+
+      let durVal = typeof match.durationMinutes === "object" ? match.durationMinutes?.name : match.durationMinutes || "";
+      // Extract numbers from duration (e.g. "50 minutes" -> "50") and match with option in playTimeList
+      const durMatch = String(durVal).match(/\d+/);
+      if (durMatch && playTimeList.length > 0) {
+        const durNumber = durMatch[0];
+        const foundOpt = playTimeList.find((p: any) => p.name?.startsWith(durNumber));
+        if (foundOpt) {
+          durVal = foundOpt.name;
+        }
+      }
+
+      let formationVal = match.formation || "";
+      if (formationVal) {
+        formationVal = formationVal.replace(/\s+/g, " ").trim();
+      }
+      // Normalize formation format (e.g. "9v9" -> "9 v 9")
+      if (formationVal && !formationVal.includes(" v ")) {
+        const matchDigits = formationVal.match(/\d+/g);
+        if (matchDigits && matchDigits.length === 2) {
+          formationVal = `${matchDigits[0]} v ${matchDigits[1]}`;
+        }
+      }
+
+      const resetPayload = {
         venue: venueVal,
         subVenue: subVal,
         pitch: subVal,
-        league: typeof match.league === "object" ? match.league?._id : match.league || "",
-        referee: typeof match.referee === "object" ? match.referee?._id : match.referee || "",
+        league: typeof match.league === "object" ? match.league?._id || match.league?.id : match.league || "",
+        referee: typeof match.referee === "object" ? match.referee?._id || match.referee?.id : match.referee || "",
         durationMinutes: durVal,
-        formation: match.formation || "",
+        formation: formationVal,
         date: date.format("YYYY-MM-DD"),
         time: date.format("HH:mm"),
-      });
+      };
+
+      console.log("[CreateMatch:Edit] Resetting Form values to:", resetPayload);
+      reset(resetPayload);
 
       if (match.homeTeam) {
         setHomeTeam({
-          value: match.homeTeam._id || match.homeTeam,
+          value: match.homeTeam._id || match.homeTeam.id || match.homeTeam,
           name: match.homeTeam.teamName || "Home Team",
           logo: match.homeTeam.teamLogo || null,
         });
       }
       if (match.awayTeam) {
         setAwayTeam({
-          value: match.awayTeam._id || match.awayTeam,
+          value: match.awayTeam._id || match.awayTeam.id || match.awayTeam,
           name: match.awayTeam.teamName || "Away Team",
           logo: match.awayTeam.teamLogo || null,
         });
       }
     }
-  }, [matchData, reset]);
+  }, [matchData, venueCategoryData, refereeData, playTimeData, reset]);
+
+  // Explicitly set subVenue/pitch value once subCategoriesList is populated in edit mode
+  useEffect(() => {
+    if (isEditMode && matchData?.data && subCategoriesList.length > 0) {
+      const match = matchData.data;
+      let subVal =
+        (typeof match.venueSubCategory === "object" ? match.venueSubCategory?._id || match.venueSubCategory?.id : match.venueSubCategory) ||
+        (typeof match.subVenue === "object" ? match.subVenue?._id : match.subVenue) ||
+        (typeof match.pitch === "object" ? match.pitch?._id : match.pitch) ||
+        "";
+
+      // If subVal is a text name instead of ObjectId, find its matching subcategory ID by name
+      if (subVal && !/^[0-9a-fA-F]{24}$/.test(subVal)) {
+        const found = subCategoriesList.find((s: any) => s.name?.toLowerCase() === subVal.toLowerCase());
+        if (found) {
+          subVal = found._id || found.id;
+        }
+      }
+
+      if (subVal) {
+        console.log("[CreateMatch:Edit] Explicitly setting subVenue to:", subVal);
+        setValue("subVenue", subVal);
+        setValue("pitch", subVal);
+      }
+    }
+  }, [isEditMode, matchData, subCategoriesList, setValue]);
 
   const handleCancelOrReset = () => {
     setHomeTeam(null);
