@@ -27,7 +27,7 @@ dayjs.extend(utc);
 dayjs.extend(timezone);
 import { Calendar, Clock, Loader2, MapPin, Pencil, Trash2 } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { toast } from "sonner";
 import * as z from "zod";
@@ -180,9 +180,9 @@ const CreateMatch = () => {
   const { data: venueCategoryData } = useGetAllVenueCategoryQuery({});
   const { data: playTimeData } = useGetAllPlayTimeQuery({});
 
-  const leagueTeamList: any[] = leagueTeamData?.data || [];
-  const venueCategories: any[] = venueCategoryData?.data || [];
-  const playTimeList: any[] = playTimeData?.data || [];
+  const leagueTeamList: any[] = useMemo(() => leagueTeamData?.data || [], [leagueTeamData]);
+  const venueCategories: any[] = useMemo(() => venueCategoryData?.data || [], [venueCategoryData]);
+  const playTimeList: any[] = useMemo(() => playTimeData?.data || [], [playTimeData]);
 
   // Options for dropdowns
   const leagueOptions = leagueTeamList.map((item: any) => ({
@@ -214,10 +214,15 @@ const CreateMatch = () => {
   const selectedVenueId = watch("venue");
 
   // Derive venue object and subcategories if present
-  const selectedVenueObj = venueCategories.find(
-    (v: any) => (v._id || v.id) === selectedVenueId || v.name === selectedVenueId
-  );
-  const subCategoriesList: any[] = selectedVenueObj?.subCategories || [];
+  const selectedVenueObj = useMemo(() => {
+    return venueCategories.find(
+      (v: any) => (v._id || v.id) === selectedVenueId || v.name === selectedVenueId
+    );
+  }, [venueCategories, selectedVenueId]);
+
+  const subCategoriesList: any[] = useMemo(() => {
+    return selectedVenueObj?.subCategories || [];
+  }, [selectedVenueObj]);
 
   const subVenueOptions = subCategoriesList.map((s: any) => ({
     label: s.name,
@@ -370,7 +375,7 @@ const CreateMatch = () => {
         });
       }
     }
-  }, [matchData, venueCategoryData, refereeData, playTimeData, reset]);
+  }, [matchData, venueCategoryData, refereeData, playTimeData, reset, playTimeList, venueCategories]);
 
   // Explicitly set subVenue/pitch value once subCategoriesList is populated in edit mode
   useEffect(() => {

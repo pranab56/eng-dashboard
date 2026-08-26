@@ -33,8 +33,6 @@ const UserManagement = () => {
   const searchParams = useSearchParams();
   const router = useRouter();
   const pathname = usePathname();
-  const page = searchParams.get('userPage') || '1';
-
   const [activeRole, setActiveRole] = useState<string>('ALL');
   const [searchTerm, setSearchTerm] = useState<string>('');
   const [currentPage, setCurrentPage] = useState<number>(1);
