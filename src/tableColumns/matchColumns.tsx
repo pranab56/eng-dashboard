@@ -86,6 +86,22 @@ export const getMatchColumns = (
     ),
   },
   {
+    accessorKey: "matchType",
+    header: () => <div className="">Type</div>,
+    cell: ({ row }) => {
+      const type = row.original.matchType || "league";
+      switch (type.toLowerCase()) {
+        case "cup":
+          return <span className="bg-amber-50 text-amber-700 border border-amber-200/30 px-2.5 py-1 rounded-md font-bold text-xs">Cup</span>;
+        case "friendly":
+          return <span className="bg-sky-50 text-sky-700 border border-sky-200/30 px-2.5 py-1 rounded-md font-bold text-xs">Friendly</span>;
+        case "league":
+        default:
+          return <span className="bg-indigo-50 text-indigo-700 border border-indigo-200/30 px-2.5 py-1 rounded-md font-bold text-xs">League</span>;
+      }
+    },
+  },
+  {
     accessorKey: "status",
     header: () => <div className="">Status</div>,
     cell: ({ row }) => {

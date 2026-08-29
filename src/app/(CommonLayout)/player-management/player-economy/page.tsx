@@ -37,6 +37,7 @@ const playerEconomySchema = z.object({
   redCard: coinMarketSchema,
   disrespectToReferee: coinMarketSchema,
   grossMisconduct: coinMarketSchema,
+  foul: coinMarketSchema,
 });
 
 type PlayerEconomyFormValues = z.infer<typeof playerEconomySchema>;
@@ -73,6 +74,7 @@ export default function PlayerEconomyPage() {
       redCard: { coin: 0, marketValue: 0 },
       disrespectToReferee: { coin: 0, marketValue: 0 },
       grossMisconduct: { coin: 0, marketValue: 0 },
+      foul: { coin: 0, marketValue: 0 },
     }
   });
 
@@ -102,6 +104,7 @@ export default function PlayerEconomyPage() {
         redCard: { coin: data.redCard?.coin || 0, marketValue: data.redCard?.marketValue || 0 },
         disrespectToReferee: { coin: data.disrespectToReferee?.coin || 0, marketValue: data.disrespectToReferee?.marketValue || 0 },
         grossMisconduct: { coin: data.grossMisconduct?.coin || 0, marketValue: data.grossMisconduct?.marketValue || 0 },
+        foul: { coin: data.foul?.coin || 0, marketValue: data.foul?.marketValue || 0 },
       });
     }
   }, [economyData, reset]);
@@ -125,6 +128,7 @@ export default function PlayerEconomyPage() {
         "redCard",
         "disrespectToReferee",
         "grossMisconduct",
+        "foul",
       ];
       keys.forEach(k => {
         const coin = watch(`${k}.coin` as any);
@@ -170,6 +174,7 @@ export default function PlayerEconomyPage() {
     { key: "redCard", label: "Red Card" },
     { key: "disrespectToReferee", label: "Disrespect to Referee" },
     { key: "grossMisconduct", label: "Gross Misconduct" },
+    { key: "foul", label: "Foul" },
   ];
 
   if (isLoading) {
