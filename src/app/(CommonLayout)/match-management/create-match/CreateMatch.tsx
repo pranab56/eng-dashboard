@@ -652,21 +652,6 @@ const CreateMatch = () => {
     { skip: !selectedAgeGroup }
   );
 
-  const teamIdsInAgeGroup = useMemo(() => {
-    const players = playersOfAgeGroup?.data?.players || playersOfAgeGroup?.data || [];
-    const ids = new Set<string>();
-    if (Array.isArray(players)) {
-      players.forEach((p: any) => {
-        const tId = p?.selectTeam?._id || p?.selectTeam?.id || p?.selectTeam;
-        if (tId) {
-          const idStr = (typeof tId === "string" ? tId : (tId._id || tId.id || tId).toString()).trim();
-          if (idStr) ids.add(idStr);
-        }
-      });
-    }
-    return Array.from(ids);
-  }, [playersOfAgeGroup]);
-
   // Derive venue object and subcategories if present
   const selectedVenueObj = useMemo(() => {
     return venueCategories.find(

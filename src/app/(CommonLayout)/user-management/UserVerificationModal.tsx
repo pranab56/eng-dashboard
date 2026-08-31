@@ -279,7 +279,6 @@ const UserVerificationModal: React.FC<UserVerificationModalProps> = ({
 
   // Date of Birth Editing States
   const [isEditingDob, setIsEditingDob] = useState(false);
-  const [editDobInput, setEditDobInput] = useState<string>("");
   const [isSavingDob, setIsSavingDob] = useState(false);
   const [currentDob, setCurrentDob] = useState<string | null>(null);
 
@@ -289,8 +288,6 @@ const UserVerificationModal: React.FC<UserVerificationModalProps> = ({
       const curTeamId = (user.selectTeam as any)?._id || user.selectTeam || '';
       setSelectedTeamIdInput(typeof curTeamId === 'string' ? curTeamId : (curTeamId as any)?._id || '');
 
-      const dobVal = user.dateOfBirth ? dayjs(user.dateOfBirth).format('YYYY-MM-DD') : '';
-      setEditDobInput(dobVal);
       setCurrentDob(user.dateOfBirth ? user.dateOfBirth.toString() : null);
       setIsEditingDob(false);
     }
