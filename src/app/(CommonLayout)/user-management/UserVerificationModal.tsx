@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client"
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import {
   Dialog,
   DialogContent,
@@ -32,15 +32,209 @@ import {
   Copy,
   CreditCard,
   Edit3,
+  ChevronLeft,
+  ChevronRight,
 } from 'lucide-react';
 import { Loader2 } from 'lucide-react';
 import dayjs from 'dayjs';
 import { toast } from 'sonner';
 import { useUpdateEngCoinBudgetMutation } from '@/features/player/playerApi';
 import { useGetAllTeamQuery } from '@/features/teamManagement/teamApi';
-import { useAssignTeamToUserMutation } from '@/features/userManagement/userApi';
+import { useAssignTeamToUserMutation, useUpdateUserProfileByAdminMutation } from '@/features/userManagement/userApi';
 import { getErrorMessage } from '@/utils/getErrorMessage';
 import { TeamSelectDropdown } from '@/components/dropdowns/TeamSelectDropdown';
+
+// 🗓️ Beautiful Custom Birth Date Picker with Month & Year Selectors
+interface BirthDatePickerProps {
+  value: string;
+  onSave: (dateStr: string) => Promise<void> | void;
+  onCancel: () => void;
+  isLoading?: boolean;
+}
+
+const BirthDatePicker: React.FC<BirthDatePickerProps> = ({
+  value,
+  onSave,
+  onCancel,
+  isLoading = false,
+}) => {
+  const initialDate = value && dayjs(value).isValid() ? dayjs(value) : dayjs("2012-01-01");
+  const [selectedDate, setSelectedDate] = useState<string>(
+    value && dayjs(value).isValid() ? dayjs(value).format("YYYY-MM-DD") : ""
+  );
+
+  const [viewYear, setViewYear] = useState<number>(initialDate.year());
+  const [viewMonth, setViewMonth] = useState<number>(initialDate.month()); // 0-11
+
+  const currentMonthDate = useMemo(() => {
+    return dayjs().year(viewYear).month(viewMonth).date(1);
+  }, [viewYear, viewMonth]);
+
+  const daysInMonth = currentMonthDate.daysInMonth();
+  const startDayOfWeek = currentMonthDate.startOf("month").day();
+
+  const months = [
+    "January", "February", "March", "April", "May", "June",
+    "July", "August", "September", "October", "November", "December"
+  ];
+
+  const years = useMemo(() => {
+    const currentYr = dayjs().year();
+    const yrList: number[] = [];
+    for (let y = currentYr; y >= 1970; y--) {
+      yrList.push(y);
+    }
+    return yrList;
+  }, []);
+
+  const handlePrevMonth = () => {
+    if (viewMonth === 0) {
+      setViewMonth(11);
+      setViewYear(viewYear - 1);
+    } else {
+      setViewMonth(viewMonth - 1);
+    }
+  };
+
+  const handleNextMonth = () => {
+    if (viewMonth === 11) {
+      setViewMonth(0);
+      setViewYear(viewYear + 1);
+    } else {
+      setViewMonth(viewMonth + 1);
+    }
+  };
+
+  const handleSelectDay = (day: number) => {
+    const formatted = dayjs().year(viewYear).month(viewMonth).date(day).format("YYYY-MM-DD");
+    setSelectedDate(formatted);
+  };
+
+  return (
+    <div className="p-3 bg-white border border-blue-200/90 rounded-2xl shadow-xl space-y-3 w-72 sm:w-80 animate-in fade-in zoom-in-95 duration-150">
+      {/* Top Header: Year & Month Selectors */}
+      <div className="flex items-center justify-between gap-1.5 pb-2 border-b border-slate-100">
+        <button
+          type="button"
+          onClick={handlePrevMonth}
+          disabled={isLoading}
+          className="p-1 rounded-lg hover:bg-slate-100 text-slate-600 transition-colors cursor-pointer disabled:opacity-50"
+          title="Previous Month"
+        >
+          <ChevronLeft className="w-4 h-4" />
+        </button>
+
+        <div className="flex items-center gap-1.5">
+          {/* Month Selector */}
+          <select
+            value={viewMonth}
+            onChange={(e) => setViewMonth(Number(e.target.value))}
+            disabled={isLoading}
+            className="px-2 py-1 text-xs font-bold text-slate-800 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500 cursor-pointer"
+          >
+            {months.map((m, idx) => (
+              <option key={m} value={idx}>
+                {m}
+              </option>
+            ))}
+          </select>
+
+          {/* Year Selector */}
+          <select
+            value={viewYear}
+            onChange={(e) => setViewYear(Number(e.target.value))}
+            disabled={isLoading}
+            className="px-2 py-1 text-xs font-bold text-slate-800 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500 cursor-pointer"
+          >
+            {years.map((y) => (
+              <option key={y} value={y}>
+                {y}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        <button
+          type="button"
+          onClick={handleNextMonth}
+          disabled={isLoading}
+          className="p-1 rounded-lg hover:bg-slate-100 text-slate-600 transition-colors cursor-pointer disabled:opacity-50"
+          title="Next Month"
+        >
+          <ChevronRight className="w-4 h-4" />
+        </button>
+      </div>
+
+      {/* Weekdays */}
+      <div className="grid grid-cols-7 gap-1 text-center text-[10px] font-bold text-slate-400">
+        <span>Su</span>
+        <span>Mo</span>
+        <span>Tu</span>
+        <span>We</span>
+        <span>Th</span>
+        <span>Fr</span>
+        <span>Sa</span>
+      </div>
+
+      {/* Days Grid */}
+      <div className="grid grid-cols-7 gap-1">
+        {Array.from({ length: startDayOfWeek }).map((_, idx) => (
+          <div key={`empty-${idx}`} className="h-7" />
+        ))}
+
+        {Array.from({ length: daysInMonth }).map((_, idx) => {
+          const dayNum = idx + 1;
+          const dateStr = dayjs().year(viewYear).month(viewMonth).date(dayNum).format("YYYY-MM-DD");
+          const isSelected = selectedDate === dateStr;
+
+          return (
+            <button
+              key={dayNum}
+              type="button"
+              onClick={() => handleSelectDay(dayNum)}
+              disabled={isLoading}
+              className={`h-7 rounded-lg text-xs font-semibold flex items-center justify-center transition-all cursor-pointer ${
+                isSelected
+                  ? "bg-blue-600 text-white font-bold shadow-md shadow-blue-500/30 scale-105"
+                  : "text-slate-700 hover:bg-blue-50 hover:text-blue-600"
+              }`}
+            >
+              {dayNum}
+            </button>
+          );
+        })}
+      </div>
+
+      {/* Bottom Info & Action Buttons */}
+      <div className="pt-2.5 border-t border-slate-100 flex items-center justify-between">
+        <div className="text-[11px] font-bold text-slate-700">
+          {selectedDate ? dayjs(selectedDate).format("DD MMM YYYY") : "Select date"}
+        </div>
+
+        <div className="flex items-center gap-1.5">
+          <button
+            type="button"
+            onClick={onCancel}
+            disabled={isLoading}
+            className="px-2.5 py-1 text-[11px] font-semibold text-slate-500 hover:text-slate-800 rounded-lg hover:bg-slate-100 cursor-pointer disabled:opacity-50"
+          >
+            Cancel
+          </button>
+
+          <button
+            type="button"
+            onClick={() => selectedDate && onSave(selectedDate)}
+            disabled={!selectedDate || isLoading}
+            className="px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white font-bold text-[11px] rounded-lg shadow-xs flex items-center gap-1 cursor-pointer disabled:opacity-50"
+          >
+            {isLoading ? <Loader2 className="w-3 h-3 animate-spin" /> : <Check className="w-3 h-3" />}
+            Save
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
 
 interface UserVerificationModalProps {
   user: TUserManagement | null;
@@ -77,17 +271,51 @@ const UserVerificationModal: React.FC<UserVerificationModalProps> = ({
 
   const [assignTeamToUser] = useAssignTeamToUserMutation();
   const [updateEngCoinBudget] = useUpdateEngCoinBudgetMutation();
+  const [updateUserProfileByAdmin] = useUpdateUserProfileByAdminMutation();
+
   const [isEditingEconomy, setIsEditingEconomy] = useState(false);
   const [editCoinsInput, setEditCoinsInput] = useState<number | string>("");
   const [isSavingEconomy, setIsSavingEconomy] = useState(false);
+
+  // Date of Birth Editing States
+  const [isEditingDob, setIsEditingDob] = useState(false);
+  const [editDobInput, setEditDobInput] = useState<string>("");
+  const [isSavingDob, setIsSavingDob] = useState(false);
+  const [currentDob, setCurrentDob] = useState<string | null>(null);
 
   React.useEffect(() => {
     if (user) {
       setEditCoinsInput(Number((user as any).engCoine ?? (user as any).coin ?? (user as any).coins) || 0);
       const curTeamId = (user.selectTeam as any)?._id || user.selectTeam || '';
       setSelectedTeamIdInput(typeof curTeamId === 'string' ? curTeamId : (curTeamId as any)?._id || '');
+
+      const dobVal = user.dateOfBirth ? dayjs(user.dateOfBirth).format('YYYY-MM-DD') : '';
+      setEditDobInput(dobVal);
+      setCurrentDob(user.dateOfBirth ? user.dateOfBirth.toString() : null);
+      setIsEditingDob(false);
     }
   }, [user]);
+
+  const handleSaveDob = async (selectedDateStr: string) => {
+    if (!user) return;
+    try {
+      setIsSavingDob(true);
+      const res = await updateUserProfileByAdmin({
+        id: (user as any)._id || (user as any).id,
+        data: { dateOfBirth: selectedDateStr ? new Date(selectedDateStr).toISOString() : null },
+      }).unwrap();
+
+      if (res.success) {
+        toast.success(res.message || "Date of Birth updated successfully");
+        setCurrentDob(selectedDateStr ? new Date(selectedDateStr).toISOString() : null);
+        setIsEditingDob(false);
+      }
+    } catch (err: any) {
+      toast.error(getErrorMessage(err, "Failed to update Date of Birth"));
+    } finally {
+      setIsSavingDob(false);
+    }
+  };
 
   const handleSaveEconomy = async () => {
     if (!user) return;
@@ -478,13 +706,44 @@ const UserVerificationModal: React.FC<UserVerificationModalProps> = ({
                 )}
 
                 {/* Date of Birth: Show for Player, Manager, Referee, or if available */}
-                {(isPlayer || user.role === 'MANAGER' || user.role === 'REFEREE' || user.dateOfBirth) && (
-                  <div>
-                    <p className="text-[11px] font-semibold text-slate-500">Date of Birth</p>
-                    <p className="text-xs font-bold text-slate-800 flex items-center gap-1">
+                {(isPlayer || user.role === 'MANAGER' || user.role === 'REFEREE' || currentDob || user.dateOfBirth) && (
+                  <div className="relative">
+                    <div className="flex items-center justify-between">
+                      <p className="text-[11px] font-semibold text-slate-500">Date of Birth</p>
+                      {!isEditingDob && (
+                        <button
+                          type="button"
+                          onClick={() => setIsEditingDob(true)}
+                          className="text-[10px] text-blue-600 hover:text-blue-700 font-bold underline cursor-pointer"
+                        >
+                          Edit
+                        </button>
+                      )}
+                    </div>
+
+                    <p className="text-xs font-bold text-slate-800 flex items-center gap-1 mt-0.5">
                       <Calendar className="w-3.5 h-3.5 text-slate-500 shrink-0" />
-                      {user.dateOfBirth ? dayjs(user.dateOfBirth).format('DD MMM YYYY') : 'N/A'}
+                      {currentDob ? dayjs(currentDob).format('DD MMM YYYY') : 'N/A'}
                     </p>
+
+                    {isEditingDob && (
+                      <>
+                        {/* Backdrop to close when clicked outside */}
+                        <div
+                          className="fixed inset-0 z-40 bg-transparent"
+                          onClick={() => setIsEditingDob(false)}
+                        />
+                        {/* Floating Popup Calendar */}
+                        <div className="absolute left-0 top-full mt-2 z-50 shadow-2xl">
+                          <BirthDatePicker
+                            value={currentDob || user.dateOfBirth?.toString() || ""}
+                            onSave={handleSaveDob}
+                            onCancel={() => setIsEditingDob(false)}
+                            isLoading={isSavingDob}
+                          />
+                        </div>
+                      </>
+                    )}
                   </div>
                 )}
 
