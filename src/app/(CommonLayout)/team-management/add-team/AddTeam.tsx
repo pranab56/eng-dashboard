@@ -6,13 +6,14 @@ import InputField from '@/components/form/InputField'
 import SelectField from '@/components/form/SelectField'
 import { useHeaders } from '@/hooks/useHeaders'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useEffect } from 'react'
+import { useEffect, useMemo } from 'react'
 import { useForm } from 'react-hook-form'
 import * as z from 'zod'
 
 import { useCreateTeamMutation, useGetSingleTeamQuery, useUpdateTeamMutation } from '@/features/teamManagement/teamApi'
 import { useAssignTeamManagerMutation, useRemoveTeamManagerMutation, useGetAllManagerTeamQuery } from '@/features/managerTeam/managerTeamApi'
 import { useGetAllLeagueQuery } from '@/features/leagueManagement/leagueApi'
+import { useGetAllAgeGroupQuery } from '@/features/categoryManagement/categoryApi'
 import { baseURL } from '@/utils/BaseURL'
 import { getErrorMessage } from '@/utils/getErrorMessage'
 import { useRouter, useSearchParams } from 'next/navigation'
@@ -25,6 +26,7 @@ const addTeamSchema = z.object({
   teamName: z.string().min(1, "Team Name is required"),
   shortName: z.string().min(1, "Short Name is required"),
   teamType: z.string().min(1, "Team Type is required"),
+  ageGroup: z.string().optional(),
   league: z.string().optional(),
   manager: z.string().optional(),
   stadiumName: z.string().min(1, "Stadium Name is required"),
@@ -52,6 +54,38 @@ const AddTeam = () => {
   const { data: teamData, isFetching } = useGetSingleTeamQuery(teamId, { skip: !isEditMode })
   const { data: managersData } = useGetAllManagerTeamQuery(undefined)
   const { data: leagueData } = useGetAllLeagueQuery({ limit: 1000 })
+  const { data: ageGroupData } = useGetAllAgeGroupQuery({})
+
+  const ageGroupOptions = useMemo(() => {
+    const apiCats = ageGroupData?.data?.result || ageGroupData?.data || [];
+    const optionsMap = new Map<string, { label: string; value: string }>();
+
+    apiCats.forEach((cat: any) => {
+      if (Array.isArray(cat.subCategories) && cat.subCategories.length > 0) {
+        cat.subCategories.forEach((sub: any) => {
+          if (sub?.name) {
+            const key = sub.name.trim();
+            if (!optionsMap.has(key)) {
+              optionsMap.set(key, {
+                label: sub.name,
+                value: sub.name,
+              });
+            }
+          }
+        });
+      } else if (cat?.name) {
+        const key = cat.name.trim();
+        if (!optionsMap.has(key)) {
+          optionsMap.set(key, {
+            label: cat.name,
+            value: cat.name,
+          });
+        }
+      }
+    });
+
+    return Array.from(optionsMap.values());
+  }, [ageGroupData]);
 
   const managerOptions = (managersData?.data ?? []).map((m: any) => ({
     label: `${m.firstName} ${m.lastName || ''}`.trim() || m.userName,
@@ -76,6 +110,7 @@ const AddTeam = () => {
       teamName: "",
       shortName: "",
       teamType: "Football",
+      ageGroup: "",
       league: "",
       manager: "",
       stadiumName: "",
@@ -98,6 +133,7 @@ const AddTeam = () => {
         teamName: team.teamName,
         shortName: team.shortName,
         teamType: team.teamType,
+        ageGroup: team.ageGroup || "",
         league: team.league?._id || team.league || "",
         manager: team.managers?.[0]?.manager?._id || "",
         stadiumName: team.stadiumName || team.stadium || "",
@@ -130,7 +166,8 @@ const AddTeam = () => {
         teamType: data.teamType,
         stadiumName: data.stadiumName,
         city: data.city,
-        country: data.country
+        country: data.country,
+        ageGroup: data.ageGroup || undefined
       };
 
       if (data.league && data.league.trim() !== "") {
@@ -194,6 +231,7 @@ const AddTeam = () => {
               </div>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                 <SelectField name="teamType" label="Team Type" control={control} error={errors.teamType} options={teamTypeOptions} />
+                <SelectField name="ageGroup" label="Age Group" placeholder="Select age group (e.g. U7)" control={control} error={errors.ageGroup} options={ageGroupOptions} scrollable />
                 <SelectField name="league" label="Associated League (Optional)" placeholder="Select a league" control={control} error={errors.league} options={leagueOptions} scrollable />
                 <SelectField name="manager" label="Manager (Optional)" placeholder="Select a manager" control={control} error={errors.manager} options={managerOptions} scrollable />
               </div>

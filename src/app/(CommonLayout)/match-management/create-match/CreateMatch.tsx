@@ -16,7 +16,6 @@ import {
   useGetAllPlayTimeQuery,
   useGetAllAgeGroupQuery,
 } from "@/features/categoryManagement/categoryApi";
-import { useGetAllPlayerQuery } from "@/features/player/playerApi";
 import { useHeaders } from "@/hooks/useHeaders";
 import { formatImagePath } from "@/utils/formatImagePath";
 import { getErrorMessage } from "@/utils/getErrorMessage";
@@ -646,12 +645,6 @@ const CreateMatch = () => {
     { skip: watchMatchType !== "cup" && watchMatchType !== "friendly" }
   );
 
-  // Query players of selected ageGroup to identify which teams belong to this ageGroup
-  const { data: playersOfAgeGroup } = useGetAllPlayerQuery(
-    selectedAgeGroup ? { ageGroup: selectedAgeGroup, limit: 1000 } : {},
-    { skip: !selectedAgeGroup }
-  );
-
   // Derive venue object and subcategories if present
   const selectedVenueObj = useMemo(() => {
     return venueCategories.find(
@@ -694,46 +687,14 @@ const CreateMatch = () => {
         logo: t.teamLogo || null,
       }));
     } else if (watchMatchType === "cup" || watchMatchType === "friendly") {
-      const teamMap = new Map<string, Team>();
-
-      // 1. Teams returned directly from team API with ageGroup filter
       const fetchedTeams = allTeamsRes?.data?.result || allTeamsRes?.data || [];
       if (Array.isArray(fetchedTeams)) {
-        fetchedTeams.forEach((t: any) => {
-          const tId = t._id || t.id;
-          if (tId) {
-            const idStr = tId.toString().trim();
-            if (idStr && !teamMap.has(idStr)) {
-              teamMap.set(idStr, {
-                value: idStr,
-                name: t.teamName || t.name || "Unknown Team",
-                logo: t.teamLogo || t.logo || null,
-              });
-            }
-          }
-        });
+        baseList = fetchedTeams.map((t: any) => ({
+          value: (t._id || t.id).toString(),
+          name: t.teamName || t.name || "Unknown Team",
+          logo: t.teamLogo || t.logo || null,
+        }));
       }
-
-      // 2. Teams identified via player profiles of this age group
-      const players = playersOfAgeGroup?.data?.players || playersOfAgeGroup?.data || [];
-      if (Array.isArray(players)) {
-        players.forEach((p: any) => {
-          const t = p?.selectTeam;
-          const tId = t?._id || t?.id || (typeof t === "string" ? t : null);
-          if (tId) {
-            const idStr = tId.toString().trim();
-            if (idStr && !teamMap.has(idStr)) {
-              teamMap.set(idStr, {
-                value: idStr,
-                name: t.teamName || "Unknown Team",
-                logo: t.teamLogo || null,
-              });
-            }
-          }
-        });
-      }
-
-      baseList = Array.from(teamMap.values());
     }
 
     // Always ensure current homeTeam and awayTeam are present in the list (especially in edit mode)
@@ -745,7 +706,7 @@ const CreateMatch = () => {
     }
 
     return baseList;
-  }, [rawTeamsList, watchMatchType, allTeamsRes, playersOfAgeGroup, homeTeam, awayTeam]);
+  }, [rawTeamsList, watchMatchType, allTeamsRes, homeTeam, awayTeam]);
 
   // Reset home/away teams when league or ageGroup changes
   const [prevLeagueId, setPrevLeagueId] = useState(selectedLeagueId);
