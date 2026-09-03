@@ -21,6 +21,7 @@ interface LeagueTeamViewModalProps {
 
 const TeamLogoImage = ({ team }: { team: any }) => {
   const [imageError, setImageError] = useState(false);
+  if (!team) return null;
   const logoUrl = team.teamLogo ? formatImagePath(team.teamLogo) : null;
 
   if (!logoUrl || imageError) {
@@ -51,7 +52,8 @@ const LeagueTeamViewModal = ({
 }: LeagueTeamViewModalProps) => {
   if (!data) return null;
 
-  const { league, teams = [] } = data;
+  const { league, teams: rawTeams = [] } = data;
+  const teams = (rawTeams || []).filter(Boolean);
 
   const startDate = league?.startDate
     ? dayjs(league.startDate).format("DD MMM YYYY")

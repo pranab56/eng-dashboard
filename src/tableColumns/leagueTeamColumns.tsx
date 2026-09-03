@@ -36,7 +36,7 @@ export const getLeagueTeamColumns = (
       accessorKey: "teams",
       header: () => <div>Teams</div>,
       cell: ({ row }) => {
-        const teams: any[] = row.original.teams || [];
+        const teams: any[] = (row.original.teams || []).filter(Boolean);
         const visibleTeams = teams.slice(0, 5);
         const remaining = teams.length - visibleTeams.length;
 
@@ -49,12 +49,12 @@ export const getLeagueTeamColumns = (
                   key={team._id}
                   className="relative w-8 h-8 rounded-full border-2 border-white overflow-hidden bg-gray-100 flex-shrink-0"
                   style={{ marginLeft: idx === 0 ? 0 : -10, zIndex: visibleTeams.length - idx }}
-                  title={team.teamName}
+                  title={team?.teamName || ""}
                 >
                   {team.teamLogo ? (
                     <Image
                       src={formatImagePath(team.teamLogo)}
-                      alt={team.teamName || "team"}
+                      alt={team?.teamName || "team"}
                       width={32}
                       height={32}
                       className="object-cover w-full h-full"

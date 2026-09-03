@@ -185,41 +185,109 @@ const AssignTeamsModal: React.FC<AssignTeamsModalProps> = ({
           ) : (
             filteredTeams.map((team: any) => {
               const isSelected = selectedTeams.includes(team._id);
+              const existingMgr =
+                team.manager ||
+                (Array.isArray(team.managers) && team.managers.length > 0
+                  ? team.managers[0]
+                  : null);
+              const isAssignedToOther =
+                existingMgr &&
+                existingMgr._id &&
+                existingMgr._id.toString() !== user._id.toString();
+              const isAssignedToCurrent =
+                existingMgr &&
+                existingMgr._id &&
+                existingMgr._id.toString() === user._id.toString();
+              const otherMgrName = existingMgr
+                ? `${existingMgr.firstName || ""} ${existingMgr.lastName || ""}`.trim() ||
+                  existingMgr.userName ||
+                  "Another Coach"
+                : "";
+
               return (
                 <div
                   key={team._id}
                   onClick={() => handleToggleTeam(team._id)}
                   className={`flex items-center justify-between p-3.5 rounded-xl cursor-pointer transition-all duration-200 ${
                     isSelected
-                      ? 'bg-amber-50/50 border border-amber-200/50'
-                      : 'hover:bg-gray-50 border border-transparent'
+                      ? isAssignedToOther
+                        ? "bg-amber-50 border border-amber-300 shadow-2xs"
+                        : "bg-blue-50/70 border border-blue-200 shadow-2xs"
+                      : "hover:bg-gray-50 border border-gray-100"
                   }`}
                 >
-                  <div className="flex items-center gap-3">
+                  <div className="flex items-center gap-3 min-w-0">
                     {team.teamLogo ? (
                       /* eslint-disable-next-line @next/next/no-img-element */
                       <img
-                        src={team.teamLogo.startsWith('http') ? team.teamLogo : `http://localhost:5000${team.teamLogo}`}
+                        src={
+                          team.teamLogo.startsWith("http")
+                            ? team.teamLogo
+                            : `http://localhost:5000${team.teamLogo}`
+                        }
                         alt="logo"
-                        className="w-10 h-10 rounded-lg object-cover border border-gray-100"
+                        className="w-10 h-10 rounded-lg object-cover border border-gray-100 shrink-0"
                         onError={(e: any) => {
-                          e.target.src = '';
-                          e.target.style.display = 'none';
+                          e.target.src = "";
+                          e.target.style.display = "none";
                         }}
                       />
                     ) : (
-                      <div className="w-10 h-10 rounded-lg bg-gray-100 flex items-center justify-center text-xs font-semibold text-gray-400">
+                      <div className="w-10 h-10 rounded-lg bg-gray-100 flex items-center justify-center text-xs font-semibold text-gray-400 shrink-0">
                         FC
                       </div>
                     )}
-                    <div>
-                      <h4 className="font-semibold text-gray-900 text-sm">{team.teamName}</h4>
-                      <p className="text-xs text-gray-400 font-medium">{team.shortName}</p>
+                    <div className="min-w-0">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <h4 className="font-bold text-gray-900 text-sm truncate">
+                          {team.teamName}
+                        </h4>
+                        {team.shortName && (
+                          <span className="text-[10px] font-bold text-slate-500 bg-slate-100 px-1.5 py-0.2 rounded border border-slate-200">
+                            {team.shortName}
+                          </span>
+                        )}
+                        {team.ageGroup && (
+                          <span className="text-[10px] font-bold text-blue-600 bg-blue-50 px-1.5 py-0.2 rounded border border-blue-100">
+                            {team.ageGroup}
+                          </span>
+                        )}
+                      </div>
+
+                      {/* Coach Status Badges */}
+                      <div className="mt-1 flex items-center gap-2 text-xs">
+                        {isAssignedToOther ? (
+                          <div className="flex items-center gap-1.5 flex-wrap">
+                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-bold bg-amber-100 text-amber-800 border border-amber-200">
+                              <span className="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
+                              Assigned to: {otherMgrName}
+                            </span>
+                            {isSelected && (
+                              <span className="text-[10px] font-bold text-amber-700 underline">
+                                (Will transfer to {user.firstName || "this coach"})
+                              </span>
+                            )}
+                          </div>
+                        ) : isAssignedToCurrent ? (
+                          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-200">
+                            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                            Current Coach
+                          </span>
+                        ) : (
+                          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-gray-100 text-gray-500">
+                            Available / Unassigned
+                          </span>
+                        )}
+                      </div>
                     </div>
                   </div>
-                  <button type="button" className="text-amber-500 hover:scale-105 transition-transform">
+
+                  <button
+                    type="button"
+                    className="ml-3 text-amber-500 hover:scale-105 transition-transform shrink-0"
+                  >
                     {isSelected ? (
-                      <CheckSquare className="w-5 h-5 fill-amber-500 text-white" />
+                      <CheckSquare className="w-5 h-5 fill-black text-white" />
                     ) : (
                       <Square className="w-5 h-5 text-gray-300" />
                     )}

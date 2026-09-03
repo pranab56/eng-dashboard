@@ -372,6 +372,10 @@ const UserManagement = () => {
         onApprove={handleApproveVerification}
         onReject={handleRejectVerification}
         isUpdating={isUpdatingUserStatus}
+        onAssignTeams={(userToAssign) => {
+          setAssignTargetUser(userToAssign);
+          setIsAssignModalOpen(true);
+        }}
       />
 
       {/* Assign Teams Modal */}

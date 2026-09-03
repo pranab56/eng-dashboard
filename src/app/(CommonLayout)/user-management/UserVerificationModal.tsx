@@ -243,6 +243,7 @@ interface UserVerificationModalProps {
   onApprove: (id: string) => Promise<void>;
   onReject: (id: string, rejectionReason?: string) => Promise<void>;
   isUpdating?: boolean;
+  onAssignTeams?: (user: any) => void;
 }
 
 const UserVerificationModal: React.FC<UserVerificationModalProps> = ({
@@ -252,6 +253,7 @@ const UserVerificationModal: React.FC<UserVerificationModalProps> = ({
   onApprove,
   onReject,
   isUpdating = false,
+  onAssignTeams,
 }) => {
   const [previewImage, setPreviewImage] = useState<string | null>(null);
   const [copiedField, setCopiedField] = useState<string | null>(null);
@@ -825,10 +827,117 @@ const UserVerificationModal: React.FC<UserVerificationModalProps> = ({
             </div>
 
             {/* Club & Academy Credentials Section */}
-            {(isPlayer || selectedTeam || user.role === 'MANAGER') && (
+            {user.role === 'MANAGER' ? (
+              <div className="col-span-1 sm:col-span-2 bg-slate-50/80 border border-slate-200/90 rounded-2xl p-4 space-y-3">
+                <div className="flex items-center justify-between">
+                  <h3 className="text-xs font-bold text-slate-900 uppercase tracking-wider flex items-center gap-1.5">
+                    <Building2 className="w-4 h-4 text-indigo-600" /> Assigned Squads & Teams Managed
+                  </h3>
+                  {onAssignTeams && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        onClose();
+                        onAssignTeams(user);
+                      }}
+                      className="px-3 py-1.5 text-xs font-bold text-white bg-indigo-600 hover:bg-indigo-700 rounded-xl shadow-xs transition-colors flex items-center gap-1.5 cursor-pointer"
+                    >
+                      <Edit3 className="w-3.5 h-3.5" />
+                      Manage Assigned Teams
+                    </button>
+                  )}
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 max-h-56 overflow-y-auto">
+                  {Array.isArray((user as any).managedTeams) && (user as any).managedTeams.length > 0 ? (
+                    (user as any).managedTeams.map((teamItem: any) => (
+                      <div
+                        key={teamItem._id || teamItem.id}
+                        className="flex items-center justify-between p-2.5 bg-white border border-slate-200 rounded-xl shadow-2xs"
+                      >
+                        <div className="flex items-center gap-2.5">
+                          <div className="relative w-9 h-9 rounded-lg bg-slate-50 border border-slate-200 flex items-center justify-center overflow-hidden shrink-0">
+                            {teamItem.teamLogo ? (
+                              <Image
+                                src={formatImagePath(teamItem.teamLogo)}
+                                alt={teamItem.teamName || 'team'}
+                                fill
+                                className="object-contain p-0.5"
+                              />
+                            ) : (
+                              <Shield className="w-4 h-4 text-slate-400" />
+                            )}
+                          </div>
+                          <div>
+                            <p className="text-xs font-bold text-slate-900 leading-tight">
+                              {teamItem.teamName}
+                            </p>
+                            <div className="flex items-center gap-1.5 mt-0.5">
+                              {teamItem.shortName && (
+                                <span className="text-[10px] font-semibold text-blue-600 bg-blue-50 px-1.5 py-0.2 rounded border border-blue-100">
+                                  {teamItem.shortName}
+                                </span>
+                              )}
+                              {teamItem.ageGroup && (
+                                <span className="text-[10px] font-semibold text-emerald-600 bg-emerald-50 px-1.5 py-0.2 rounded border border-emerald-100">
+                                  {teamItem.ageGroup}
+                                </span>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    ))
+                  ) : selectedTeam && (selectedTeam.teamName || selectedTeam.shortName) ? (
+                    <div className="flex items-center justify-between p-2.5 bg-white border border-slate-200 rounded-xl shadow-2xs">
+                      <div className="flex items-center gap-2.5">
+                        <div className="relative w-9 h-9 rounded-lg bg-slate-50 border border-slate-200 flex items-center justify-center overflow-hidden shrink-0">
+                          {selectedTeam.teamLogo ? (
+                            <Image
+                              src={formatImagePath(selectedTeam.teamLogo)}
+                              alt={selectedTeam.teamName || 'team'}
+                              fill
+                              className="object-contain p-0.5"
+                            />
+                          ) : (
+                            <Shield className="w-4 h-4 text-slate-400" />
+                          )}
+                        </div>
+                        <div>
+                          <p className="text-xs font-bold text-slate-900 leading-tight">
+                            {selectedTeam.teamName}
+                          </p>
+                          {selectedTeam.shortName && (
+                            <span className="text-[10px] font-semibold text-blue-600 bg-blue-50 px-1.5 py-0.2 rounded border border-blue-100">
+                              {selectedTeam.shortName}
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="col-span-2 p-4 text-center bg-white border border-dashed border-slate-200 rounded-xl">
+                      <p className="text-xs text-slate-400 italic">No squads assigned to this coach yet.</p>
+                      {onAssignTeams && (
+                        <button
+                          type="button"
+                          onClick={() => {
+                            onClose();
+                            onAssignTeams(user);
+                          }}
+                          className="mt-2 text-xs font-bold text-indigo-600 hover:underline cursor-pointer"
+                        >
+                          + Click here to assign squads
+                        </button>
+                      )}
+                    </div>
+                  )}
+                </div>
+              </div>
+            ) : (isPlayer || selectedTeam) ? (
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
 
-                {/* Team Card with Admin Change Dropdown */}
+                {/* Team Card with Admin Change Dropdown (For Player) */}
                 <div className="bg-slate-50/60 border border-slate-200/80 rounded-2xl p-4 space-y-2.5">
                   <div className="flex items-center justify-between">
                     <h3 className="text-xs font-bold text-slate-900 uppercase tracking-wider flex items-center gap-1.5">
@@ -935,7 +1044,7 @@ const UserVerificationModal: React.FC<UserVerificationModalProps> = ({
                   </div>
                 )}
               </div>
-            )}
+            ) : null}
 
             {/* Emergency Contacts Card */}
             {(user.emergencyEmail || user.emergencyPhone) && (
