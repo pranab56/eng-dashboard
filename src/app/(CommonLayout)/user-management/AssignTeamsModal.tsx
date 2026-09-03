@@ -14,6 +14,7 @@ import {
 } from '@/features/managerTeam/managerTeamApi';
 import { TUserManagement } from '@/types/columnTypes';
 import { Search, Loader2, CheckSquare, Square, Building2, Save } from 'lucide-react';
+import { formatImagePath } from '@/utils/formatImagePath';
 import toast from 'react-hot-toast';
 
 interface AssignTeamsModalProps {
@@ -221,9 +222,7 @@ const AssignTeamsModal: React.FC<AssignTeamsModalProps> = ({
                       /* eslint-disable-next-line @next/next/no-img-element */
                       <img
                         src={
-                          team.teamLogo.startsWith("http")
-                            ? team.teamLogo
-                            : `http://localhost:5000${team.teamLogo}`
+                          formatImagePath(team.teamLogo)
                         }
                         alt="logo"
                         className="w-10 h-10 rounded-lg object-cover border border-gray-100 shrink-0"
