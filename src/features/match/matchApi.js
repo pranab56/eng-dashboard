@@ -72,6 +72,32 @@ export const matchApi = baseApi.injectEndpoints({
       invalidatesTags: ["match"]
     }),
 
+        getMatchScheduleDates: builder.query({
+      query: (params) => {
+        let url = "/match/schedule-dates";
+        if (typeof params === "object" && params !== null) {
+          const queryParts = [];
+          Object.keys(params).forEach((key) => {
+            if (
+              params[key] !== undefined &&
+              params[key] !== null &&
+              params[key] !== "" &&
+              params[key] !== "ALL"
+            ) {
+              queryParts.push(key + "=" + encodeURIComponent(params[key]));
+            }
+          });
+          if (queryParts.length > 0) {
+            url += "?" + queryParts.join("&");
+          }
+        }
+        return {
+          url,
+          method: "GET",
+        };
+      },
+      providesTags: ["match"],
+    }),
     updateMatchStatus: builder.mutation({
       query: ({ id, status }) => ({
         url: `/match/${id}/status`,
@@ -93,4 +119,5 @@ export const {
   useDeleteMatchMutation,
   useModifyScoreMutation,
   useUpdateMatchStatusMutation,
+  useGetMatchScheduleDatesQuery,
 } = matchApi;

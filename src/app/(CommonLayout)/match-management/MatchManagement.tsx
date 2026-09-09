@@ -9,7 +9,7 @@ import CustomTable from "@/components/table/CustomTable";
 import { useGetAllVenueCategoryQuery } from "@/features/categoryManagement/categoryApi";
 import { useGetAllLeagueQuery } from "@/features/leagueManagement/leagueApi";
 import { useGetAllTeamQuery } from "@/features/teamManagement/teamApi";
-import { useDeleteMatchMutation, useGetAllMatchQuery, useUpdateMatchStatusMutation } from "@/features/match/matchApi";
+import { useDeleteMatchMutation, useGetAllMatchQuery, useUpdateMatchStatusMutation, useGetMatchScheduleDatesQuery } from "@/features/match/matchApi";
 import { useHeaders } from "@/hooks/useHeaders";
 import { getMatchColumns } from "@/tableColumns/matchColumns";
 import { formatImagePath } from "@/utils/formatImagePath";
@@ -306,13 +306,33 @@ const MatchManagement = () => {
     })),
   ];
 
-  const dateOptions: OptionItem[] = [
-    { label: "Date : All", value: "ALL" },
-    { label: "Today", value: "today" },
-    { label: "This Week", value: "this_week" },
-    { label: "Upcoming", value: "upcoming" },
-    { label: "Past", value: "past" },
-  ];
+  // Query all unique match dates with match counts (dynamically filtered by current league and team)
+  const { data: scheduleDatesData } = useGetMatchScheduleDatesQuery({
+    ...(leagueFilter !== "ALL" && { league: leagueFilter, leagueId: leagueFilter }),
+    ...(teamFilter !== "ALL" && { team: teamFilter, teamId: teamFilter }),
+    ...(statusFilter !== "ALL" && { status: statusFilter }),
+    ...(unplayedOnly && { unplayedOnly: "true" }),
+  });
+
+  const availableScheduleDates: { date: string; label: string; matchCount: number }[] =
+    scheduleDatesData?.data || [];
+
+  const dateOptions: OptionItem[] = useMemo(() => {
+    const list: OptionItem[] = [
+      { label: "Date : All", value: "ALL" },
+    ];
+
+    if (availableScheduleDates.length > 0) {
+      availableScheduleDates.forEach((item) => {
+        list.push({
+          label: item.label, // e.g. "Fri 05/09/25 [3]"
+          value: item.date,  // e.g. "2025-09-05"
+        });
+      });
+    }
+
+    return list;
+  }, [availableScheduleDates]);
 
   const statusOptions: OptionItem[] = [
     { label: "Status : All", value: "ALL" },
@@ -347,8 +367,10 @@ const MatchManagement = () => {
     })),
   ];
 
-  // Combine query params
-  const effectiveDateStatus = dateFilter !== "ALL" ? dateFilter : matchDateStatusFilter;
+  // Combine query params: distinguish exact match date ("YYYY-MM-DD") from relative dateStatus ("today", "this_week", etc.)
+  const isExactDate = /^\d{4}-\d{2}-\d{2}$/.test(dateFilter);
+  const effectiveDateStatus =
+    !isExactDate && dateFilter !== "ALL" ? dateFilter : matchDateStatusFilter;
 
   // Use URL matchPage parameter if available, but reset to 1 if filter is active
   const page = urlPageParam || "1";
@@ -357,6 +379,7 @@ const MatchManagement = () => {
     page,
     ...(leagueFilter !== "ALL" && { league: leagueFilter, leagueId: leagueFilter }),
     ...(statusFilter !== "ALL" && { status: statusFilter }),
+    ...(isExactDate && { matchDate: dateFilter }),
     ...(effectiveDateStatus !== "ALL" && { dateStatus: effectiveDateStatus }),
     ...(venueFilter !== "ALL" && { venue: venueFilter }),
     ...(teamFilter !== "ALL" && { team: teamFilter, teamId: teamFilter }),
