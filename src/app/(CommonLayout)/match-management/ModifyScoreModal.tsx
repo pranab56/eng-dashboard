@@ -32,6 +32,7 @@ interface GoalScorerEntry {
   team: string; // team ID
   player: string; // player ID
   assistPlayer?: string;
+  assistName?: string;
   goalType: 'normal' | 'penalty' | 'header' | 'own_goal' | 'free_kick';
   minute: number;
 }
@@ -82,6 +83,9 @@ const ModifyScoreModal = ({ match, isOpen, onClose }: ModifyScoreModalProps) => 
           team: g.team?._id || g.team?.id || g.team,
           player: g.player?._id || g.player?.id || g.player || "",
           assistPlayer: g.assist?._id || g.assist?.id || g.assist || "",
+          assistName: g.assist
+            ? `${g.assist.firstName || ""} ${g.assist.lastName || ""}`.trim()
+            : "",
           goalType: g.goalType || "normal",
           minute: g.minute || 1,
         }));
@@ -137,6 +141,7 @@ const ModifyScoreModal = ({ match, isOpen, onClose }: ModifyScoreModalProps) => 
     const validScorers = goalScorers
       .filter((g) => g.player && g.team)
       .map((g) => ({
+        ...(g.id && /^[0-9a-fA-F]{24}$/.test(g.id) ? { _id: g.id } : {}),
         team: g.team,
         player: g.player,
         assistPlayer: g.assistPlayer || undefined,
@@ -332,7 +337,7 @@ const ModifyScoreModal = ({ match, isOpen, onClose }: ModifyScoreModalProps) => 
                             Scorer Player <span className="text-red-500">*</span>
                           </label>
                           <Select
-                            value={entry.player}
+                            value={entry.player ? String(entry.player) : ""}
                             onValueChange={(val) => handleScorerChange(entry.id, "player", val)}
                           >
                             <SelectTrigger className="w-full bg-white border border-slate-200 rounded-xl px-3 h-10 text-xs font-semibold text-slate-800 transition-all shadow-xs cursor-pointer">
@@ -340,7 +345,7 @@ const ModifyScoreModal = ({ match, isOpen, onClose }: ModifyScoreModalProps) => 
                             </SelectTrigger>
                             <SelectContent className="bg-white">
                               {memberList.map((m) => (
-                                <SelectItem key={m._id} value={m._id}>
+                                <SelectItem key={String(m._id)} value={String(m._id)}>
                                   {m.firstName} {m.lastName}
                                 </SelectItem>
                               ))}
@@ -354,18 +359,41 @@ const ModifyScoreModal = ({ match, isOpen, onClose }: ModifyScoreModalProps) => 
                             Assist Player (Optional)
                           </label>
                           <Select
-                            value={entry.assistPlayer || "none"}
-                            onValueChange={(val) => handleScorerChange(entry.id, "assistPlayer", val === "none" ? "" : val)}
+                            value={entry.assistPlayer ? String(entry.assistPlayer) : "none"}
+                            onValueChange={(val) => {
+                              const selectedMember = memberList.find((m) => String(m._id) === val);
+                              const assistName = selectedMember
+                                ? `${selectedMember.firstName || ""} ${selectedMember.lastName || ""}`.trim()
+                                : "";
+                              setGoalScorers((prev) =>
+                                prev.map((item) =>
+                                  item.id === entry.id
+                                    ? {
+                                        ...item,
+                                        assistPlayer: val === "none" ? "" : val,
+                                        assistName: val === "none" ? "" : assistName,
+                                      }
+                                    : item
+                                )
+                              );
+                            }}
                           >
                             <SelectTrigger className="w-full bg-white border border-slate-200 rounded-xl px-3 h-10 text-xs font-semibold text-slate-800 transition-all shadow-xs cursor-pointer">
                               <SelectValue placeholder="None" />
                             </SelectTrigger>
                             <SelectContent className="bg-white">
                               <SelectItem value="none">None</SelectItem>
+                              {entry.assistPlayer &&
+                                entry.assistPlayer !== "none" &&
+                                !memberList.some((m) => String(m._id) === String(entry.assistPlayer)) && (
+                                  <SelectItem value={String(entry.assistPlayer)}>
+                                    {entry.assistName || "Assisting Player"}
+                                  </SelectItem>
+                                )}
                               {memberList
-                                .filter((m) => m._id !== entry.player)
+                                .filter((m) => String(m._id) !== String(entry.player))
                                 .map((m) => (
-                                  <SelectItem key={m._id} value={m._id}>
+                                  <SelectItem key={String(m._id)} value={String(m._id)}>
                                     {m.firstName} {m.lastName}
                                   </SelectItem>
                                 ))}
