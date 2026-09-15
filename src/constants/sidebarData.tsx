@@ -240,6 +240,12 @@ export const sidebarSections: TSidebarSection[] = [
         title: "Settings",
         children: [
           {
+            id: 200,
+            icon: SettingsIcon,
+            title: "General Settings",
+            label: "/settings",
+          },
+          {
             id: 201,
             icon: HiOutlineUser,
             title: "Profile",

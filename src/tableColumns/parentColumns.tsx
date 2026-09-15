@@ -16,14 +16,14 @@ export const getParentColumns = (
 ): ColumnDef<TUserManagement>[] => [
   {
     accessorKey: "userName",
-    header: () => <div>Parent Account Owner</div>,
+    header: () => <div className="min-w-[200px]">Parent Account Owner</div>,
     cell: ({ row }) => {
       const profileUrl = formatImagePath(row.original.profile || row.original.profilePic);
       const name = row.original.firstName ? `${row.original.firstName} ${row.original.lastName || ''}`.trim() : (row.original.userName || row.original.name || 'Parent Account');
       const initials = name.charAt(0).toUpperCase();
 
       return (
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-3 min-w-[200px]">
           <div className="relative w-10 h-10 rounded-full bg-indigo-50 border border-indigo-200 overflow-hidden flex items-center justify-center shrink-0">
             {profileUrl ? (
               <Image
@@ -37,9 +37,9 @@ export const getParentColumns = (
               <span className="text-sm font-bold text-indigo-700">{initials}</span>
             )}
           </div>
-          <div>
-            <p className="font-bold text-slate-900 text-xs">{name}</p>
-            <p className="text-[11px] text-slate-500 font-medium">{row.original.email || 'No email provided'}</p>
+          <div className="min-w-0">
+            <p className="font-bold text-slate-900 text-xs truncate max-w-[180px]">{name}</p>
+            <p className="text-[11px] text-slate-500 font-medium truncate max-w-[180px]">{row.original.email || 'No email provided'}</p>
             {row.original.phone && (
               <p className="text-[10px] text-slate-400 font-medium">{row.original.phone}</p>
             )}
@@ -50,7 +50,7 @@ export const getParentColumns = (
   },
   {
     accessorKey: "myPlayers",
-    header: () => <div>Registered Child Players & Plans</div>,
+    header: () => <div className="min-w-[260px]">Registered Child Players & Plans</div>,
     cell: ({ row }) => {
       const children = row.original.myPlayers || (row.original as any).children || [];
       if (!children || children.length === 0) {
@@ -61,9 +61,12 @@ export const getParentColumns = (
         );
       }
 
+      const displayChildren = children.slice(0, 3);
+      const remainingCount = children.length - 3;
+
       return (
-        <div className="flex flex-col gap-1.5 max-w-sm">
-          {children.map((child: any, idx: number) => {
+        <div className="flex flex-col gap-1.5 min-w-[260px] max-w-[360px] whitespace-normal">
+          {displayChildren.map((child: any, idx: number) => {
             const childName = child.firstName ? `${child.firstName} ${child.lastName || ''}`.trim() : (child.userName || `Player ${idx + 1}`);
             const childSub = child.subscription || child.activeSubscription;
 
@@ -72,7 +75,7 @@ export const getParentColumns = (
                 key={child._id || idx}
                 className="flex items-center justify-between gap-2 p-1.5 rounded-lg text-xs bg-slate-50 border border-slate-200 shadow-2xs"
               >
-                <div className="flex items-center gap-1.5 truncate">
+                <div className="flex items-center gap-1.5 min-w-0 flex-1">
                   <Users className="w-3.5 h-3.5 text-indigo-600 shrink-0" />
                   <span className="font-bold text-slate-900 truncate">{childName}</span>
                   {child.position && (
@@ -93,13 +96,18 @@ export const getParentColumns = (
               </div>
             );
           })}
+          {remainingCount > 0 && (
+            <span className="text-[10px] font-medium text-indigo-600 bg-indigo-50 border border-indigo-200 rounded px-2 py-0.5 w-fit">
+              +{remainingCount} more player{remainingCount > 1 ? 's' : ''}
+            </span>
+          )}
         </div>
       );
     },
   },
   {
     accessorKey: "subscription",
-    header: () => <div>Subscription Status</div>,
+    header: () => <div className="min-w-[180px]">Subscription Status</div>,
     cell: ({ row }) => {
       const children = row.original.myPlayers || (row.original as any).children || [];
       const paidChildren = children.filter((c: any) => Boolean(c.subscription || c.activeSubscription || c.isPaid));
@@ -114,7 +122,7 @@ export const getParentColumns = (
       }
 
       return (
-        <div className="flex flex-col gap-1">
+        <div className="flex flex-col gap-1 min-w-[180px] whitespace-normal">
           <span className="inline-flex items-center gap-1.5 text-xs font-bold text-emerald-800 bg-emerald-50 px-2.5 py-1 rounded-lg border border-emerald-200 w-fit shadow-2xs">
             <Sparkles className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
             {paidChildren.length} {paidChildren.length === 1 ? 'Player Subscribed' : 'Players Subscribed'}
@@ -128,18 +136,18 @@ export const getParentColumns = (
   },
   {
     accessorKey: "createdAt",
-    header: () => <div>Joined Date</div>,
+    header: () => <div className="min-w-[120px]">Joined Date</div>,
     cell: ({ row }) => (
-      <span className="text-xs font-semibold text-slate-600">
+      <span className="text-xs font-semibold text-slate-600 whitespace-nowrap">
         {row.original.createdAt ? dayjs(row.original.createdAt).format("MMM DD, YYYY") : "N/A"}
       </span>
     ),
   },
   {
     id: "action",
-    header: () => <div>Action</div>,
+    header: () => <div className="text-center min-w-[80px]">Action</div>,
     cell: ({ row }) => (
-      <div className="flex items-center gap-2">
+      <div className="flex items-center justify-center gap-2 min-w-[80px]">
         <button
           type="button"
           onClick={() => onViewParent(row.original)}

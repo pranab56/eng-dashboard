@@ -159,7 +159,7 @@ const ParentManagement = () => {
 
         <div className="flex-1">
           <TableHeader payload={tableHeaderPayload} />
-          <div className="pt-2 sm:pt-4">
+          <div className="pt-2 sm:pt-4 px-4 sm:px-6">
             <CustomTable<TUserManagement>
               columns={getParentColumns(handleViewParent, handleDeleteParentClick)}
               data={filteredParents}
@@ -168,7 +168,7 @@ const ParentManagement = () => {
           </div>
         </div>
 
-        <div className="pt-4 sm:pt-8 px-2 sm:px-4">
+        <div className="pt-4 sm:pt-8 px-4 sm:px-6">
           <CustomPagination
             TOTAL_PAGES={pagination.totalPage || 1}
             qryName="userPage"

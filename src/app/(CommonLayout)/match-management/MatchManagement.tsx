@@ -23,6 +23,8 @@ import { toast } from "sonner";
 import DeleteConfirmModal from "./DeleteConfirmModal";
 import MatchViewModal from "./MatchViewModal";
 import ModifyScoreModal from "./ModifyScoreModal";
+import RatingRuleModal from "./RatingRuleModal";
+import { Clock } from "lucide-react";
 
 interface OptionItem {
   label: string;
@@ -394,6 +396,7 @@ const MatchManagement = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [isRatingRuleModalOpen, setIsRatingRuleModalOpen] = useState(false);
   const [deletingId, setDeletingId] = useState<string | null>(null);
 
   const [isScoreModalOpen, setIsScoreModalOpen] = useState(false);
@@ -470,9 +473,19 @@ const MatchManagement = () => {
           <h2 className="text-xl font-bold text-gray-900">Match Management</h2>
           <p className="text-xs text-gray-500">Filter, search, and manage match schedules and scores.</p>
         </div>
-        <Link href="/match-management/create-match">
-          <CreateButton text="Add Match" />
-        </Link>
+        <div className="flex items-center gap-3">
+          <button
+            type="button"
+            onClick={() => setIsRatingRuleModalOpen(true)}
+            className="flex items-center gap-2 px-4 py-2.5 bg-amber-500 hover:bg-amber-600 text-white text-xs font-bold rounded-xl transition-all shadow-md shadow-amber-500/20 cursor-pointer"
+          >
+            <Clock className="w-4 h-4" />
+            <span>Rating Window Rule</span>
+          </button>
+          <Link href="/match-management/create-match">
+            <CreateButton text="Add Match" />
+          </Link>
+        </div>
       </div>
 
       {/* Filter Control Section matching Client Reference UI */}
@@ -628,6 +641,7 @@ const MatchManagement = () => {
         match={selectedMatch}
       />
 
+      <RatingRuleModal isOpen={isRatingRuleModalOpen} onClose={() => setIsRatingRuleModalOpen(false)} />
       <ModifyScoreModal
         isOpen={isScoreModalOpen}
         onClose={() => {

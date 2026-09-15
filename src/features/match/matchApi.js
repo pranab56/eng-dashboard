@@ -98,6 +98,21 @@ export const matchApi = baseApi.injectEndpoints({
       },
       providesTags: ["match"],
     }),
+    getMatchFeedbackSetting: builder.query({
+      query: () => ({
+        url: "/match/feedback-setting",
+        method: "GET",
+      }),
+      providesTags: ["matchSetting"],
+    }),
+    updateMatchFeedbackSetting: builder.mutation({
+      query: (data) => ({
+        url: "/match/feedback-setting",
+        method: "PATCH",
+        body: data,
+      }),
+      invalidatesTags: ["matchSetting"],
+    }),
     updateMatchStatus: builder.mutation({
       query: ({ id, status }) => ({
         url: `/match/${id}/status`,
@@ -120,4 +135,6 @@ export const {
   useModifyScoreMutation,
   useUpdateMatchStatusMutation,
   useGetMatchScheduleDatesQuery,
+  useGetMatchFeedbackSettingQuery,
+  useUpdateMatchFeedbackSettingMutation,
 } = matchApi;
