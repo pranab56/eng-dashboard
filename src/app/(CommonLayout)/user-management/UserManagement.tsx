@@ -79,6 +79,18 @@ const UserManagement = () => {
     role: activeRole,
   });
 
+  // Keep selected user details in sync when list refetches
+  useEffect(() => {
+    if (selectedUser && userData?.data?.result) {
+      const updated = userData.data.result.find(
+        (u: any) => (u._id || u.id) === ((selectedUser as any)._id || (selectedUser as any).id)
+      );
+      if (updated) {
+        setSelectedUser(updated);
+      }
+    }
+  }, [userData, selectedUser]);
+
   const [toggleStatus] = useUpdateStatusMutation();
   const [updateUserStatus, { isLoading: isUpdatingUserStatus }] = useUpdateUserStatusMutation();
   const [deleteUser] = useDeleteUserMutation();

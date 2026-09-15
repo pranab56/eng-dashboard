@@ -64,12 +64,23 @@ const PlayerViewModal: React.FC<PlayerViewModalProps> = ({
   const [isEditingEconomy, setIsEditingEconomy] = useState(false);
   const [editCoinsInput, setEditCoinsInput] = useState<number | string>("");
   const [isSavingEconomy, setIsSavingEconomy] = useState(false);
+  const [currentCoins, setCurrentCoins] = useState<number>(0);
+  const [currentMarketValue, setCurrentMarketValue] = useState<number>(0);
 
   React.useEffect(() => {
     if (player) {
-      setEditCoinsInput(Number((player as any).engCoine ?? (player as any).coin ?? 0));
+      const pCoins = Number((player as any).engCoine ?? (player as any).coin ?? 0);
+      const pMv = (player as any).marketValue !== undefined && (player as any).marketValue !== null
+        ? Number((player as any).marketValue)
+        : (pCoins * 100);
+
+      setCurrentCoins(pCoins);
+      setCurrentMarketValue(pMv);
+      setEditCoinsInput(pCoins);
+
       const curTeamId = (player as any).selectTeam?._id || (player as any).selectTeam || '';
       setSelectedTeamIdInput(typeof curTeamId === 'string' ? curTeamId : (curTeamId as any)?._id || '');
+      setIsEditingEconomy(false);
     }
   }, [player]);
 
@@ -84,7 +95,17 @@ const PlayerViewModal: React.FC<PlayerViewModalProps> = ({
         data: { engCoine: newCoins, marketValue: newMarketValue },
       }).unwrap();
 
-      if (res.success) {
+      if (res?.success) {
+        const savedCoins = res?.data?.engCoine !== undefined ? Number(res.data.engCoine) : newCoins;
+        const savedMV = res?.data?.marketValue !== undefined ? Number(res.data.marketValue) : (savedCoins * 100);
+
+        setCurrentCoins(savedCoins);
+        setCurrentMarketValue(savedMV);
+        setEditCoinsInput(savedCoins);
+
+        (player as any).engCoine = savedCoins;
+        (player as any).marketValue = savedMV;
+
         toast.success(res.message || "ENG Coins & Market Value updated successfully");
         setIsEditingEconomy(false);
       }
@@ -134,8 +155,8 @@ const PlayerViewModal: React.FC<PlayerViewModalProps> = ({
   const parentEmail = parentObj?.email || null;
   const parentPhone = parentObj?.phone || null;
 
-  const coins = Number((player as any).engCoine ?? (player as any).coin ?? 0);
-  const marketValue = Number((player as any).marketValue) || (coins * 100);
+  const coins = currentCoins;
+  const marketValue = currentMarketValue;
   const rawSub = (player as any).subscription || (player as any).activeSubscription;
   const sub = rawSub ? {
     _id: rawSub._id,
@@ -494,7 +515,7 @@ const PlayerViewModal: React.FC<PlayerViewModalProps> = ({
                 <div>
                   <p className="text-[11px] font-semibold text-slate-500">Market Value</p>
                   <p className="text-xs font-bold text-emerald-600">
-                    £{isEditingEconomy ? ((Number(editCoinsInput) || 0) * 100).toLocaleString() : marketValue.toLocaleString()}
+                    £{isEditingEconomy ? ((Number(editCoinsInput) || 0) * 100).toLocaleString() : currentMarketValue.toLocaleString()}
                   </p>
                 </div>
 

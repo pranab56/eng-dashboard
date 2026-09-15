@@ -278,6 +278,8 @@ const UserVerificationModal: React.FC<UserVerificationModalProps> = ({
   const [isEditingEconomy, setIsEditingEconomy] = useState(false);
   const [editCoinsInput, setEditCoinsInput] = useState<number | string>("");
   const [isSavingEconomy, setIsSavingEconomy] = useState(false);
+  const [currentCoins, setCurrentCoins] = useState<number>(0);
+  const [currentMarketValue, setCurrentMarketValue] = useState<number>(0);
 
   // Date of Birth Editing States
   const [isEditingDob, setIsEditingDob] = useState(false);
@@ -286,12 +288,21 @@ const UserVerificationModal: React.FC<UserVerificationModalProps> = ({
 
   React.useEffect(() => {
     if (user) {
-      setEditCoinsInput(Number((user as any).engCoine ?? (user as any).coin ?? (user as any).coins) || 0);
+      const userCoins = Number((user as any).engCoine ?? (user as any).coin ?? (user as any).coins) || 0;
+      const userMv = (user as any).marketValue !== undefined && (user as any).marketValue !== null
+        ? Number((user as any).marketValue)
+        : (userCoins * 100);
+
+      setCurrentCoins(userCoins);
+      setCurrentMarketValue(userMv);
+      setEditCoinsInput(userCoins);
+
       const curTeamId = (user.selectTeam as any)?._id || user.selectTeam || '';
       setSelectedTeamIdInput(typeof curTeamId === 'string' ? curTeamId : (curTeamId as any)?._id || '');
 
       setCurrentDob(user.dateOfBirth ? user.dateOfBirth.toString() : null);
       setIsEditingDob(false);
+      setIsEditingEconomy(false);
     }
   }, [user]);
 
@@ -327,7 +338,17 @@ const UserVerificationModal: React.FC<UserVerificationModalProps> = ({
         data: { engCoine: newCoins, marketValue: newMarketValue },
       }).unwrap();
 
-      if (res.success) {
+      if (res?.success) {
+        const savedCoins = res?.data?.engCoine !== undefined ? Number(res.data.engCoine) : newCoins;
+        const savedMV = res?.data?.marketValue !== undefined ? Number(res.data.marketValue) : (savedCoins * 100);
+
+        setCurrentCoins(savedCoins);
+        setCurrentMarketValue(savedMV);
+        setEditCoinsInput(savedCoins);
+
+        (user as any).engCoine = savedCoins;
+        (user as any).marketValue = savedMV;
+
         toast.success(res.message || "ENG Coins & Market Value updated successfully");
         setIsEditingEconomy(false);
       }
@@ -377,8 +398,8 @@ const UserVerificationModal: React.FC<UserVerificationModalProps> = ({
   const parentEmail = parentObj?.email || null;
   const parentPhone = parentObj?.phone || null;
 
-  const coins = Number((user as any).engCoine ?? (user as any).coin ?? (user as any).coins) || 0;
-  const marketValue = Number((user as any).marketValue) || (coins * 100);
+  const coins = currentCoins;
+  const marketValue = currentMarketValue;
   const rawSub = user.subscription || (user as any).activeSubscription;
   const sub = rawSub ? {
     _id: rawSub._id,
@@ -811,7 +832,7 @@ const UserVerificationModal: React.FC<UserVerificationModalProps> = ({
                     <div>
                       <p className="text-[11px] font-semibold text-slate-500">Market Value</p>
                       <p className="text-xs font-bold text-emerald-600">
-                        £{isEditingEconomy ? ((Number(editCoinsInput) || 0) * 100).toLocaleString() : marketValue.toLocaleString()}
+                        £{isEditingEconomy ? ((Number(editCoinsInput) || 0) * 100).toLocaleString() : currentMarketValue.toLocaleString()}
                       </p>
                     </div>
                   </>
