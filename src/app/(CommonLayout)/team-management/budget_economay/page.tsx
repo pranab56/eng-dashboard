@@ -7,7 +7,7 @@ import SubmitButton from '@/components/buttons/SubmitButton';
 import { useGetBudgetAndEconomayQuery, useUpdateBudgetAndEconomayMutation } from '@/features/teamManagement/teamApi';
 import { useHeaders } from '@/hooks/useHeaders';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, Calculator } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
@@ -15,14 +15,15 @@ import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import * as z from 'zod';
 
-// Zod Scheme verification
+// Zod Schema verification
 const coinBudgetSchema = z.object({
   coin: z.number(),
   budgetValue: z.number()
 });
 
 const budgetEconomySchema = z.object({
-  startingBudget: z.number().min(1, "Starting budget is required"),
+  startingCoins: z.number().min(0, "Starting coins must be a positive number"),
+  startingBudget: z.number().min(0, "Starting budget is required"),
   conversionRate: z.number().min(1, "Conversion rate is required"),
   attendMatch: coinBudgetSchema,
   drawMatch: coinBudgetSchema,
@@ -54,6 +55,7 @@ export default function BudgetEconomyPage() {
   } = useForm<BudgetEconomyFormValues>({
     resolver: zodResolver(budgetEconomySchema),
     defaultValues: {
+      startingCoins: 10000,
       startingBudget: 100000,
       conversionRate: 10,
       attendMatch: { coin: 0, budgetValue: 0 },
@@ -78,27 +80,69 @@ export default function BudgetEconomyPage() {
   useEffect(() => {
     if (budgetData?.data) {
       const data = budgetData.data;
+      const rate = Number(data.conversionRate) || 10;
+      const initialBudget = Number(data.startingBudget) || 100000;
+      const initialCoins = data.startingCoins !== undefined
+        ? Number(data.startingCoins)
+        : (rate > 0 ? Math.round(initialBudget / rate) : 10000);
+
       reset({
-        startingBudget: data.startingBudget || 100000,
-        conversionRate: data.conversionRate || 10,
-        attendMatch: { coin: data.attendMatch?.coin || 0, budgetValue: data.attendMatch?.budgetValue || 0 },
-        drawMatch: { coin: data.drawMatch?.coin || 0, budgetValue: data.drawMatch?.budgetValue || 0 },
-        winMatch: { coin: data.winMatch?.coin || 0, budgetValue: data.winMatch?.budgetValue || 0 },
-        exceptionalConduct: { coin: data.exceptionalConduct?.coin || 0, budgetValue: data.exceptionalConduct?.budgetValue || 0 },
-        goodConduct: { coin: data.goodConduct?.coin || 0, budgetValue: data.goodConduct?.budgetValue || 0 },
-        satisfactoryConduct: { coin: data.satisfactoryConduct?.coin || 0, budgetValue: data.satisfactoryConduct?.budgetValue || 0 },
-        averageConduct: { coin: data.averageConduct?.coin || 0, budgetValue: data.averageConduct?.budgetValue || 0 },
-        poorConduct: { coin: data.poorConduct?.coin || 0, budgetValue: data.poorConduct?.budgetValue || 0 },
-        unprofessionalConduct: { coin: data.unprofessionalConduct?.coin || 0, budgetValue: data.unprofessionalConduct?.budgetValue || 0 },
+        startingCoins: initialCoins,
+        startingBudget: initialCoins * rate,
+        conversionRate: rate,
+        attendMatch: { coin: data.attendMatch?.coin || 0, budgetValue: (data.attendMatch?.coin || 0) * rate },
+        drawMatch: { coin: data.drawMatch?.coin || 0, budgetValue: (data.drawMatch?.coin || 0) * rate },
+        winMatch: { coin: data.winMatch?.coin || 0, budgetValue: (data.winMatch?.coin || 0) * rate },
+        exceptionalConduct: { coin: data.exceptionalConduct?.coin || 0, budgetValue: (data.exceptionalConduct?.coin || 0) * rate },
+        goodConduct: { coin: data.goodConduct?.coin || 0, budgetValue: (data.goodConduct?.coin || 0) * rate },
+        satisfactoryConduct: { coin: data.satisfactoryConduct?.coin || 0, budgetValue: (data.satisfactoryConduct?.coin || 0) * rate },
+        averageConduct: { coin: data.averageConduct?.coin || 0, budgetValue: (data.averageConduct?.coin || 0) * rate },
+        poorConduct: { coin: data.poorConduct?.coin || 0, budgetValue: (data.poorConduct?.coin || 0) * rate },
+        unprofessionalConduct: { coin: data.unprofessionalConduct?.coin || 0, budgetValue: (data.unprofessionalConduct?.coin || 0) * rate },
       });
     }
   }, [budgetData, reset]);
 
   const conversionRate = watch("conversionRate");
+  const startingCoins = watch("startingCoins");
 
-  // Automatically recalculate budget values if conversion rate changes
+  // Automatically recalculate budget values when conversion rate or starting coins changes
   useEffect(() => {
-    if (typeof conversionRate === "number") {
+    const rate = Number(conversionRate) || 0;
+    const coins = Number(startingCoins) || 0;
+    setValue("startingBudget", coins * rate);
+
+    const keys = [
+      "attendMatch",
+      "drawMatch",
+      "winMatch",
+      "exceptionalConduct",
+      "goodConduct",
+      "satisfactoryConduct",
+      "averageConduct",
+      "poorConduct",
+      "unprofessionalConduct",
+    ];
+    keys.forEach((k) => {
+      const coin = watch(`${k}.coin` as any);
+      if (typeof coin === "number") {
+        setValue(`${k}.budgetValue` as any, coin * rate);
+      }
+    });
+  }, [conversionRate, startingCoins]);
+
+  // Recalculate on individual coin change
+  const handleCoinChange = (key: string, val: number) => {
+    const rate = Number(watch("conversionRate")) || 0;
+    setValue(`${key}.budgetValue` as any, val * rate);
+  };
+
+  const onSubmit = async (data: BudgetEconomyFormValues) => {
+    try {
+      const rate = Number(data.conversionRate) || 0;
+      const coins = Number(data.startingCoins) || 0;
+      data.startingBudget = coins * rate;
+
       const keys = [
         "attendMatch",
         "drawMatch",
@@ -109,24 +153,14 @@ export default function BudgetEconomyPage() {
         "averageConduct",
         "poorConduct",
         "unprofessionalConduct",
-      ];
-      keys.forEach(k => {
-        const coin = watch(`${k}.coin` as any);
-        if (typeof coin === "number") {
-          setValue(`${k}.budgetValue` as any, coin * conversionRate);
+      ] as const;
+
+      keys.forEach((k) => {
+        if (data[k]) {
+          data[k].budgetValue = Number(data[k].coin || 0) * rate;
         }
       });
-    }
-  }, [conversionRate]);
 
-  // Recalculate on individual coin change
-  const handleCoinChange = (key: string, val: number) => {
-    const rate = watch("conversionRate") || 0;
-    setValue(`${key}.budgetValue` as any, val * rate);
-  };
-
-  const onSubmit = async (data: BudgetEconomyFormValues) => {
-    try {
       const res = await updateBudgetEconomy({ data }).unwrap();
       if (res.success) {
         toast.success(res.message || "Club Economy parameters updated successfully!");
@@ -175,34 +209,85 @@ export default function BudgetEconomyPage() {
         </div>
       </div>
 
-      {/* General Settings - Conversion rate & starting budget */}
+      {/* General Configurations */}
       <section className="bg-white rounded-2xl p-8 border border-gray-100 shadow-xl shadow-gray-200/50 text-gray-800">
-        <h2 className="text-xl font-medium text-gray-800 mb-6 flex items-center gap-2">
-          General Configurations
-        </h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="flex items-center justify-between mb-6">
+          <div>
+            <h2 className="text-xl font-semibold text-gray-900 flex items-center gap-2">
+              General Valuation Configurations
+            </h2>
+            <p className="text-xs text-gray-400 mt-0.5">Define coin starting balance and base conversion multiplier for squad budgets</p>
+          </div>
+          <div className="hidden sm:flex items-center gap-1.5 px-3 py-1 bg-amber-50 text-amber-700 border border-amber-200 rounded-xl text-xs font-semibold">
+            <Calculator className="w-3.5 h-3.5" />
+            1 Coin = £{watch("conversionRate") || 0}
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {/* Starting Coins Input */}
           <div className="space-y-2">
-            <label className="text-sm font-medium text-gray-700">Starting Budget (£)</label>
+            <label className="text-sm font-medium text-gray-700">Starting Coins (ENG Coins)</label>
             <div className="relative">
               <input
                 type="number"
-                {...register("startingBudget", { valueAsNumber: true })}
-                className="w-full py-3.5 px-4 bg-gray-50 border border-gray-100 rounded-xl text-gray-950 font-medium text-sm h-12 focus:ring-2 focus:ring-yellow-600/20 focus:bg-white focus:border-yellow-600 transition-all outline-none"
+                {...register("startingCoins", { valueAsNumber: true })}
+                onChange={(e) => {
+                  const coins = Number(e.target.value) || 0;
+                  const rate = Number(watch("conversionRate")) || 0;
+                  setValue("startingCoins", coins);
+                  setValue("startingBudget", coins * rate);
+                }}
+                className="w-full py-3.5 px-4 bg-gray-50 border border-gray-200 rounded-xl text-gray-900 font-medium text-sm h-12 focus:ring-2 focus:ring-yellow-600/20 focus:bg-white focus:border-yellow-600 transition-all outline-none"
+                placeholder="e.g. 10000"
               />
             </div>
-            {errors.startingBudget && <p className="text-xs text-red-500">{errors.startingBudget.message}</p>}
+            {errors.startingCoins && <p className="text-xs text-red-500">{errors.startingCoins.message}</p>}
+            <p className="text-[11px] text-gray-400">Initial coins allocated to new team budgets</p>
           </div>
 
+          {/* Conversion Rate Input */}
           <div className="space-y-2">
             <label className="text-sm font-medium text-gray-700">Conversion Rate (£ per Coin)</label>
             <div className="relative">
               <input
                 type="number"
                 {...register("conversionRate", { valueAsNumber: true })}
-                className="w-full py-3.5 px-4 bg-gray-50 border border-gray-100 rounded-xl text-gray-950 font-medium text-sm h-12 focus:ring-2 focus:ring-yellow-600/20 focus:bg-white focus:border-yellow-600 transition-all outline-none"
+                onChange={(e) => {
+                  const rate = Number(e.target.value) || 0;
+                  const coins = Number(watch("startingCoins")) || 0;
+                  setValue("conversionRate", rate);
+                  setValue("startingBudget", coins * rate);
+                }}
+                className="w-full py-3.5 px-4 bg-gray-50 border border-gray-200 rounded-xl text-gray-900 font-medium text-sm h-12 focus:ring-2 focus:ring-yellow-600/20 focus:bg-white focus:border-yellow-600 transition-all outline-none"
+                placeholder="e.g. 10"
               />
             </div>
             {errors.conversionRate && <p className="text-xs text-red-500">{errors.conversionRate.message}</p>}
+            <p className="text-[11px] text-gray-400">Multiplier used to evaluate budget valuations</p>
+          </div>
+
+          {/* Starting Budget (Disabled / Auto Calculated) */}
+          <div className="space-y-2">
+            <div className="flex items-center justify-between">
+              <label className="text-sm font-medium text-gray-700">Default Starting Budget (£)</label>
+              <span className="text-[10px] font-semibold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
+                Auto Calculated
+              </span>
+            </div>
+            <div className="relative">
+              <input
+                type="number"
+                {...register("startingBudget", { valueAsNumber: true })}
+                readOnly
+                tabIndex={-1}
+                className="w-full py-3.5 px-4 bg-gray-100 border border-gray-200 rounded-xl text-gray-600 font-bold text-sm h-12 select-none cursor-not-allowed outline-none"
+              />
+            </div>
+            {errors.startingBudget && <p className="text-xs text-red-500">{errors.startingBudget.message}</p>}
+            <p className="text-[11px] text-emerald-600 font-medium">
+              = {(Number(watch("startingCoins")) || 0).toLocaleString()} Coins × £{Number(watch("conversionRate")) || 0}
+            </p>
           </div>
         </div>
       </section>
@@ -210,7 +295,9 @@ export default function BudgetEconomyPage() {
       {/* Economy Settings Card */}
       <section className="bg-white rounded-2xl p-8 border border-gray-100 shadow-xl shadow-gray-200/50 text-gray-800">
         <h2 className="text-2xl font-medium text-gray-900 leading-tight">Economy Settings</h2>
-        <p className="text-sm text-gray-400 font-semibold mb-8">Configure base coin rewards for this player</p>
+        <p className="text-sm text-gray-400 font-semibold mb-8">
+          Configure base coin rewards for squad matches (Budget values are auto-calculated and disabled)
+        </p>
 
         <div className="space-y-6">
           {economyFields.map((field) => (
@@ -219,21 +306,27 @@ export default function BudgetEconomyPage() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {/* Coin Reward */}
                 <div className="relative">
-                  <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-xs font-medium tracking-wider select-none">Coin Reward:</span>
+                  <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 text-xs font-medium tracking-wider select-none">
+                    Coin Reward:
+                  </span>
                   <input
                     type="number"
                     {...register(`${field.key}.coin` as any, { valueAsNumber: true })}
                     onChange={(e) => handleCoinChange(field.key, Number(e.target.value))}
-                    className="w-full pl-32 pr-4 bg-gray-100 border-none rounded-xl text-gray-900 font-medium text-sm h-12 focus:ring-2 focus:ring-yellow-600/20 focus:bg-white transition-all outline-none"
+                    className="w-full pl-32 pr-4 bg-gray-50 border border-gray-200 rounded-xl text-gray-900 font-medium text-sm h-12 focus:ring-2 focus:ring-yellow-600/20 focus:bg-white focus:border-yellow-600 transition-all outline-none"
                   />
                 </div>
-                {/* Budget Impact */}
+                {/* Budget Value (Auto Calculated & Disabled) */}
                 <div className="relative">
-                  <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-xs font-medium tracking-wider select-none font-sans">Budget Impact (£):</span>
+                  <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-xs font-medium tracking-wider select-none font-sans">
+                    Budget Impact (£):
+                  </span>
                   <input
                     type="number"
                     {...register(`${field.key}.budgetValue` as any, { valueAsNumber: true })}
-                    className="w-full pl-40 pr-4 bg-gray-100 border-none rounded-xl text-gray-900 font-medium text-sm h-12 focus:ring-2 focus:ring-yellow-600/20 focus:bg-white transition-all outline-none"
+                    readOnly
+                    tabIndex={-1}
+                    className="w-full pl-36 pr-4 bg-gray-100 border border-gray-200 rounded-xl text-gray-500 font-semibold text-sm h-12 select-none cursor-not-allowed outline-none"
                   />
                 </div>
               </div>
@@ -245,30 +338,38 @@ export default function BudgetEconomyPage() {
       {/* Penalty Settings Card */}
       <section className="bg-white rounded-2xl p-8 border border-gray-100 shadow-xl shadow-gray-200/50 text-gray-800">
         <h2 className="text-2xl font-medium text-gray-900 leading-tight">Penalty Settings</h2>
-        <p className="text-sm text-gray-400 font-semibold mb-8">Configure coin deductions for infractions</p>
+        <p className="text-sm text-gray-400 font-semibold mb-8">
+          Configure coin deductions for infractions (Budget values are auto-calculated and disabled)
+        </p>
 
         <div className="space-y-6">
           {penaltyFields.map((field) => (
             <div key={field.key} className="space-y-2">
               <label className="text-sm font-medium text-gray-800">{field.label}</label>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {/* Coin Reward */}
+                {/* Coin Reward / Deduction */}
                 <div className="relative">
-                  <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-medium tracking-wider select-none">Coin Reward:</span>
+                  <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 text-xs font-medium tracking-wider select-none">
+                    Coin Value:
+                  </span>
                   <input
                     type="number"
                     {...register(`${field.key}.coin` as any, { valueAsNumber: true })}
                     onChange={(e) => handleCoinChange(field.key, Number(e.target.value))}
-                    className="w-full pl-32 pr-4 bg-gray-100 border-none rounded-xl text-gray-900 font-medium text-sm h-12 focus:ring-2 focus:ring-yellow-600/20 focus:bg-white transition-all outline-none"
+                    className="w-full pl-32 pr-4 bg-gray-50 border border-gray-200 rounded-xl text-gray-900 font-medium text-sm h-12 focus:ring-2 focus:ring-yellow-600/20 focus:bg-white focus:border-yellow-600 transition-all outline-none"
                   />
                 </div>
-                {/* Budget Impact */}
+                {/* Budget Value (Auto Calculated & Disabled) */}
                 <div className="relative">
-                  <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-xs font-medium tracking-wider select-none font-sans">Budget Impact (£):</span>
+                  <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-xs font-medium tracking-wider select-none font-sans">
+                    Budget Impact (£):
+                  </span>
                   <input
                     type="number"
                     {...register(`${field.key}.budgetValue` as any, { valueAsNumber: true })}
-                    className="w-full pl-40 pr-4 bg-gray-100 border-none rounded-xl text-gray-900 font-medium text-sm h-12 focus:ring-2 focus:ring-yellow-600/20 focus:bg-white transition-all outline-none"
+                    readOnly
+                    tabIndex={-1}
+                    className="w-full pl-36 pr-4 bg-gray-100 border border-gray-200 rounded-xl text-gray-500 font-semibold text-sm h-12 select-none cursor-not-allowed outline-none"
                   />
                 </div>
               </div>

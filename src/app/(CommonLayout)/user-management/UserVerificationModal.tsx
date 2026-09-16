@@ -372,10 +372,9 @@ const UserVerificationModal: React.FC<UserVerificationModalProps> = ({
     try {
       setIsSavingEconomy(true);
       const newCoins = Math.max(0, Number(editCoinsInput) || 0);
-      const newMarketValue = newCoins * 100;
       const res = await updateEngCoinBudget({
         id: (user as any)._id || (user as any).id,
-        data: { engCoine: newCoins, marketValue: newMarketValue },
+        data: { engCoine: newCoins },
       }).unwrap();
 
       if (res.success) {
@@ -389,7 +388,7 @@ const UserVerificationModal: React.FC<UserVerificationModalProps> = ({
         const updatedMarketValue =
           res?.data?.marketValue !== undefined
             ? Number(res.data.marketValue)
-            : newMarketValue;
+            : currentMarketValue;
 
         setCurrentCoins(updatedCoins);
         setCurrentMarketValue(updatedMarketValue);
