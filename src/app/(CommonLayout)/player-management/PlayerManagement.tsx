@@ -130,6 +130,19 @@ const PlayerManagement = () => {
     });
   }, [setHeaders]);
 
+  // Keep selected player details in sync when list refetches
+  useEffect(() => {
+    if (selectedPlayer) {
+      const list = allPlayersList;
+      const updated = list.find(
+        (p: any) => (p._id || p.id) === ((selectedPlayer as any)._id || (selectedPlayer as any).id)
+      );
+      if (updated) {
+        setSelectedPlayer(updated);
+      }
+    }
+  }, [allPlayersList, selectedPlayer]);
+
   const handleView = (player: TPlayer) => {
     setSelectedPlayer(player);
     setIsViewModalOpen(true);

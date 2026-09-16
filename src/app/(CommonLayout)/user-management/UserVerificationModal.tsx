@@ -306,6 +306,8 @@ const UserVerificationModal: React.FC<UserVerificationModalProps> = ({
   const [isEditingEconomy, setIsEditingEconomy] = useState(false);
   const [editCoinsInput, setEditCoinsInput] = useState<number | string>("");
   const [isSavingEconomy, setIsSavingEconomy] = useState(false);
+  const [currentCoins, setCurrentCoins] = useState<number>(0);
+  const [currentMarketValue, setCurrentMarketValue] = useState<number>(0);
 
   // Date of Birth Editing States
   const [isEditingDob, setIsEditingDob] = useState(false);
@@ -314,11 +316,17 @@ const UserVerificationModal: React.FC<UserVerificationModalProps> = ({
 
   React.useEffect(() => {
     if (user) {
-      setEditCoinsInput(
+      const initialCoins =
         Number(
           (user as any).engCoine ?? (user as any).coin ?? (user as any).coins,
-        ) || 0,
-      );
+        ) || 0;
+      const initialMarketValue =
+        Number((user as any).marketValue) || initialCoins * 100;
+
+      setCurrentCoins(initialCoins);
+      setCurrentMarketValue(initialMarketValue);
+      setEditCoinsInput(initialCoins);
+
       const curTeamId = (user.selectTeam as any)?._id || user.selectTeam || "";
       setSelectedTeamIdInput(
         typeof curTeamId === "string"
@@ -328,6 +336,7 @@ const UserVerificationModal: React.FC<UserVerificationModalProps> = ({
 
       setCurrentDob(user.dateOfBirth ? user.dateOfBirth.toString() : null);
       setIsEditingDob(false);
+      setIsEditingEconomy(false);
     }
   }, [user]);
 
@@ -362,7 +371,7 @@ const UserVerificationModal: React.FC<UserVerificationModalProps> = ({
     if (!user) return;
     try {
       setIsSavingEconomy(true);
-      const newCoins = Number(editCoinsInput) || 0;
+      const newCoins = Math.max(0, Number(editCoinsInput) || 0);
       const newMarketValue = newCoins * 100;
       const res = await updateEngCoinBudget({
         id: (user as any)._id || (user as any).id,
@@ -373,6 +382,18 @@ const UserVerificationModal: React.FC<UserVerificationModalProps> = ({
         toast.success(
           res.message || "ENG Coins & Market Value updated successfully",
         );
+        const updatedCoins =
+          res?.data?.engCoine !== undefined
+            ? Number(res.data.engCoine)
+            : newCoins;
+        const updatedMarketValue =
+          res?.data?.marketValue !== undefined
+            ? Number(res.data.marketValue)
+            : newMarketValue;
+
+        setCurrentCoins(updatedCoins);
+        setCurrentMarketValue(updatedMarketValue);
+        setEditCoinsInput(updatedCoins);
         setIsEditingEconomy(false);
       }
     } catch (err: any) {
@@ -430,11 +451,8 @@ const UserVerificationModal: React.FC<UserVerificationModalProps> = ({
   const parentEmail = parentObj?.email || null;
   const parentPhone = parentObj?.phone || null;
 
-  const coins =
-    Number(
-      (user as any).engCoine ?? (user as any).coin ?? (user as any).coins,
-    ) || 0;
-  const marketValue = Number((user as any).marketValue) || coins * 100;
+  const coins = currentCoins;
+  const marketValue = currentMarketValue;
   const rawSub = user.subscription || (user as any).activeSubscription;
   const sub = rawSub
     ? {
@@ -962,11 +980,22 @@ const UserVerificationModal: React.FC<UserVerificationModalProps> = ({
                             )}
                             Save
                           </button>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setEditCoinsInput(currentCoins);
+                              setIsEditingEconomy(false);
+                            }}
+                            disabled={isSavingEconomy}
+                            className="px-2 py-1 bg-slate-200 text-slate-700 font-bold text-[10px] rounded-lg hover:bg-slate-300 disabled:opacity-50 cursor-pointer shadow-xs"
+                          >
+                            Cancel
+                          </button>
                         </div>
                       ) : (
                         <p className="text-xs font-bold text-amber-600 flex items-center gap-1">
                           <Coins className="w-3.5 h-3.5 text-amber-500" />
-                          {coins} Coins
+                          {currentCoins} Coins
                         </p>
                       )}
                     </div>
@@ -979,9 +1008,9 @@ const UserVerificationModal: React.FC<UserVerificationModalProps> = ({
                         £
                         {isEditingEconomy
                           ? (
-                              (Number(editCoinsInput) || 0) * 100
+                              Math.max(0, Number(editCoinsInput) || 0) * 100
                             ).toLocaleString()
-                          : marketValue.toLocaleString()}
+                          : currentMarketValue.toLocaleString()}
                       </p>
                     </div>
                   </>

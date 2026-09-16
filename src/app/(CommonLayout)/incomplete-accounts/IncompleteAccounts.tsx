@@ -69,6 +69,21 @@ const IncompleteAccounts = () => {
     });
   }, [setHeaders]);
 
+  // Keep selected user details in sync when list refetches
+  useEffect(() => {
+    if (selectedUser) {
+      const list = Array.isArray(incompleteData?.data)
+        ? incompleteData.data
+        : incompleteData?.data?.result || [];
+      const updated = list.find(
+        (u: any) => (u._id || u.id) === ((selectedUser as any)._id || (selectedUser as any).id)
+      );
+      if (updated) {
+        setSelectedUser(updated);
+      }
+    }
+  }, [incompleteData, selectedUser]);
+
   const handleToggleStatus = async (id: string) => {
     try {
       await toggleStatus({ id }).unwrap();

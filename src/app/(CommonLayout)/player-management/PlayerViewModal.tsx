@@ -67,12 +67,20 @@ const PlayerViewModal: React.FC<PlayerViewModalProps> = ({
   const [isEditingEconomy, setIsEditingEconomy] = useState(false);
   const [editCoinsInput, setEditCoinsInput] = useState<number | string>("");
   const [isSavingEconomy, setIsSavingEconomy] = useState(false);
+  const [currentCoins, setCurrentCoins] = useState<number>(0);
+  const [currentMarketValue, setCurrentMarketValue] = useState<number>(0);
 
   React.useEffect(() => {
     if (player) {
-      setEditCoinsInput(
-        Number((player as any).engCoine ?? (player as any).coin ?? 0),
-      );
+      const initialCoins =
+        Number((player as any).engCoine ?? (player as any).coin ?? 0) || 0;
+      const initialMarketValue =
+        Number((player as any).marketValue) || initialCoins * 100;
+
+      setCurrentCoins(initialCoins);
+      setCurrentMarketValue(initialMarketValue);
+      setEditCoinsInput(initialCoins);
+
       const curTeamId =
         (player as any).selectTeam?._id || (player as any).selectTeam || "";
       setSelectedTeamIdInput(
@@ -80,6 +88,7 @@ const PlayerViewModal: React.FC<PlayerViewModalProps> = ({
           ? curTeamId
           : (curTeamId as any)?._id || "",
       );
+      setIsEditingEconomy(false);
     }
   }, [player]);
 
@@ -87,7 +96,7 @@ const PlayerViewModal: React.FC<PlayerViewModalProps> = ({
     if (!player) return;
     try {
       setIsSavingEconomy(true);
-      const newCoins = Number(editCoinsInput) || 0;
+      const newCoins = Math.max(0, Number(editCoinsInput) || 0);
       const newMarketValue = newCoins * 100;
       const res = await updateEngCoinBudget({
         id: (player as any)._id || (player as any).id,
@@ -98,6 +107,18 @@ const PlayerViewModal: React.FC<PlayerViewModalProps> = ({
         toast.success(
           res.message || "ENG Coins & Market Value updated successfully",
         );
+        const updatedCoins =
+          res?.data?.engCoine !== undefined
+            ? Number(res.data.engCoine)
+            : newCoins;
+        const updatedMarketValue =
+          res?.data?.marketValue !== undefined
+            ? Number(res.data.marketValue)
+            : newMarketValue;
+
+        setCurrentCoins(updatedCoins);
+        setCurrentMarketValue(updatedMarketValue);
+        setEditCoinsInput(updatedCoins);
         setIsEditingEconomy(false);
       }
     } catch (err: any) {
@@ -153,8 +174,8 @@ const PlayerViewModal: React.FC<PlayerViewModalProps> = ({
   const parentEmail = parentObj?.email || null;
   const parentPhone = parentObj?.phone || null;
 
-  const coins = Number((player as any).engCoine ?? (player as any).coin ?? 0);
-  const marketValue = Number((player as any).marketValue) || coins * 100;
+  const coins = currentCoins;
+  const marketValue = currentMarketValue;
   const rawSub =
     (player as any).subscription || (player as any).activeSubscription;
   const sub = rawSub
@@ -598,11 +619,22 @@ const PlayerViewModal: React.FC<PlayerViewModalProps> = ({
                         )}
                         Save
                       </button>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setEditCoinsInput(currentCoins);
+                          setIsEditingEconomy(false);
+                        }}
+                        disabled={isSavingEconomy}
+                        className="px-2 py-1 bg-slate-200 text-slate-700 font-bold text-[10px] rounded-lg hover:bg-slate-300 disabled:opacity-50 cursor-pointer shadow-xs"
+                      >
+                        Cancel
+                      </button>
                     </div>
                   ) : (
                     <p className="text-xs font-bold text-amber-600 flex items-center gap-1">
                       <Coins className="w-3.5 h-3.5 text-amber-500" />
-                      {coins} Coins
+                      {currentCoins} Coins
                     </p>
                   )}
                 </div>
@@ -614,8 +646,10 @@ const PlayerViewModal: React.FC<PlayerViewModalProps> = ({
                   <p className="text-xs font-bold text-emerald-600">
                     £
                     {isEditingEconomy
-                      ? ((Number(editCoinsInput) || 0) * 100).toLocaleString()
-                      : marketValue.toLocaleString()}
+                      ? (
+                          Math.max(0, Number(editCoinsInput) || 0) * 100
+                        ).toLocaleString()
+                      : currentMarketValue.toLocaleString()}
                   </p>
                 </div>
 

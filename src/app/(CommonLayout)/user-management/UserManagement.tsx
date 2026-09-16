@@ -81,8 +81,11 @@ const UserManagement = () => {
 
   // Keep selected user details in sync when list refetches
   useEffect(() => {
-    if (selectedUser && userData?.data?.result) {
-      const updated = userData.data.result.find(
+    if (selectedUser) {
+      const list = Array.isArray(userData?.data)
+        ? userData.data
+        : userData?.data?.result || [];
+      const updated = list.find(
         (u: any) => (u._id || u.id) === ((selectedUser as any)._id || (selectedUser as any).id)
       );
       if (updated) {

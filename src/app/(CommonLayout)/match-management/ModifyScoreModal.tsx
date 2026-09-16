@@ -19,7 +19,7 @@ import { useGetSingleTeamQuery } from "@/features/teamManagement/teamApi";
 import { toast } from "sonner";
 import Image from "next/image";
 import { formatImagePath } from "../../../utils/formatImagePath";
-import { X, Plus, Trash2, UserCheck, Shield } from "lucide-react";
+import { X, Plus, Trash2, UserCheck, Shield, Award, Loader2 } from "lucide-react";
 
 interface ModifyScoreModalProps {
   match: any;
@@ -34,18 +34,21 @@ interface GoalScorerEntry {
   assistPlayer?: string;
   assistName?: string;
   goalType: 'normal' | 'penalty' | 'header' | 'own_goal' | 'free_kick';
-  minute: number;
+  minute: number | string;
 }
 
 const ModifyScoreModal = ({ match, isOpen, onClose }: ModifyScoreModalProps) => {
   const [homeScore, setHomeScore] = useState<number>(0);
   const [awayScore, setAwayScore] = useState<number>(0);
   const [goalScorers, setGoalScorers] = useState<GoalScorerEntry[]>([]);
+  const [selectedPOTD, setSelectedPOTD] = useState<string>("");
 
   const [modifyScore, { isLoading }] = useModifyScoreMutation();
 
   const homeTeamId = match?.homeTeam?._id || match?.homeTeam?.id || match?.homeTeam;
   const awayTeamId = match?.awayTeam?._id || match?.awayTeam?.id || match?.awayTeam;
+  const currentMatchId = match?._id || match?.id;
+  const loadedMatchIdRef = React.useRef<string | null>(null);
 
   // Fetch players for home & away teams
   const { data: homeTeamData } = useGetSingleTeamQuery(homeTeamId, {
@@ -58,27 +61,62 @@ const ModifyScoreModal = ({ match, isOpen, onClose }: ModifyScoreModalProps) => 
   const homeMembers: any[] = homeTeamData?.data?.members || homeTeamData?.members || [];
   const awayMembers: any[] = awayTeamData?.data?.members || awayTeamData?.members || [];
 
+  // All players combined for Player of the Day selector
+  const allPlayers = React.useMemo(() => {
+    const list: Array<{ id: string; name: string; teamName: string }> = [];
+    homeMembers.forEach((m) => {
+      list.push({
+        id: String(m._id),
+        name: `${m.firstName || ""} ${m.lastName || ""}`.trim(),
+        teamName: match?.homeTeam?.teamName || "Home",
+      });
+    });
+    awayMembers.forEach((m) => {
+      list.push({
+        id: String(m._id),
+        name: `${m.firstName || ""} ${m.lastName || ""}`.trim(),
+        teamName: match?.awayTeam?.teamName || "Away",
+      });
+    });
+    return list;
+  }, [homeMembers, awayMembers, match]);
+
   // Fetch detailed match info (which includes goals, cards, evaluations, etc.)
-  const { data: singleMatchData } = useGetSingleMatchQuery(match?._id || match?.id, {
-    skip: (!match?._id && !match?.id) || !isOpen,
+  const { data: singleMatchData, isLoading: isMatchLoading } = useGetSingleMatchQuery(currentMatchId, {
+    skip: !currentMatchId || !isOpen,
   });
 
+  // Only reset form when opening modal for a new/different match
   useEffect(() => {
-    if (match) {
+    if (isOpen && currentMatchId && currentMatchId !== loadedMatchIdRef.current) {
+      loadedMatchIdRef.current = currentMatchId;
       setHomeScore(match.homeScore ?? 0);
       setAwayScore(match.awayScore ?? 0);
       setGoalScorers([]);
+      setSelectedPOTD("");
     }
-  }, [match, isOpen]);
+    if (!isOpen) {
+      loadedMatchIdRef.current = null;
+    }
+  }, [isOpen, currentMatchId, match]);
 
+  // Populate goals and evaluations when detailed match data arrives
   useEffect(() => {
-    if (singleMatchData?.data) {
+    if (isOpen && singleMatchData?.data) {
       const detailedMatch = singleMatchData.data;
       setHomeScore(detailedMatch.homeScore ?? 0);
       setAwayScore(detailedMatch.awayScore ?? 0);
 
+      const motmId =
+        detailedMatch.refereeReport?.manOfTheMatch?._id ||
+        detailedMatch.refereeReport?.manOfTheMatch?.id ||
+        detailedMatch.refereeReport?.manOfTheMatch;
+      if (motmId) {
+        setSelectedPOTD(String(motmId));
+      }
+
       if (Array.isArray(detailedMatch.goals)) {
-        const scorers = detailedMatch.goals.map((g: any) => ({
+        const scorers: GoalScorerEntry[] = detailedMatch.goals.map((g: any) => ({
           id: g._id || Math.random().toString(36).substring(2, 9),
           team: g.team?._id || g.team?.id || g.team,
           player: g.player?._id || g.player?.id || g.player || "",
@@ -87,12 +125,12 @@ const ModifyScoreModal = ({ match, isOpen, onClose }: ModifyScoreModalProps) => 
             ? `${g.assist.firstName || ""} ${g.assist.lastName || ""}`.trim()
             : "",
           goalType: g.goalType || "normal",
-          minute: g.minute || 1,
+          minute: g.minute !== undefined && g.minute !== null ? g.minute : 1,
         }));
         setGoalScorers(scorers);
       }
     }
-  }, [singleMatchData]);
+  }, [isOpen, singleMatchData]);
 
   if (!match) return null;
 
@@ -155,6 +193,7 @@ const ModifyScoreModal = ({ match, isOpen, onClose }: ModifyScoreModalProps) => 
         data: {
           homeScore,
           awayScore,
+          manOfTheMatch: selectedPOTD || null,
           goalScorers: validScorers,
         },
       }).unwrap();
@@ -257,6 +296,37 @@ const ModifyScoreModal = ({ match, isOpen, onClose }: ModifyScoreModalProps) => 
             </div>
           </div>
 
+          {/* Player of the Day / Match Section */}
+          <div className="p-4 bg-amber-50/60 border border-amber-200/80 rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-xs">
+            <div>
+              <h4 className="text-xs font-bold text-amber-900 flex items-center gap-1.5 uppercase tracking-wider">
+                <Award className="w-4 h-4 text-amber-600" />
+                Player of the Day / Match
+              </h4>
+              <p className="text-xs text-amber-700/80 font-medium mt-0.5">
+                Reward coins and market value for outstanding player performance
+              </p>
+            </div>
+            <div className="w-full sm:w-72">
+              <Select
+                value={selectedPOTD || "none"}
+                onValueChange={(val) => setSelectedPOTD(val === "none" ? "" : val)}
+              >
+                <SelectTrigger className="w-full bg-white border border-amber-200 rounded-xl px-3 h-10 text-xs font-semibold text-slate-800 transition-all shadow-xs cursor-pointer">
+                  <SelectValue placeholder="Select Player of the Day" />
+                </SelectTrigger>
+                <SelectContent className="bg-white">
+                  <SelectItem value="none">None / No Player Selected</SelectItem>
+                  {allPlayers.map((p) => (
+                    <SelectItem key={p.id} value={p.id}>
+                      {p.name} ({p.teamName})
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+
           {/* Goal Scorer Assignment Section */}
           <div className="space-y-4 pt-2">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
@@ -291,7 +361,12 @@ const ModifyScoreModal = ({ match, isOpen, onClose }: ModifyScoreModalProps) => 
             </div>
 
             {/* Goal Scorers List */}
-            {goalScorers.length === 0 ? (
+            {isMatchLoading ? (
+              <div className="p-8 rounded-3xl bg-slate-50 text-center border border-dashed border-slate-200 flex flex-col items-center justify-center gap-2">
+                <Loader2 className="w-5 h-5 text-emerald-600 animate-spin" />
+                <p className="text-xs text-slate-400 font-bold">Loading match details & goals...</p>
+              </div>
+            ) : goalScorers.length === 0 ? (
               <div className="p-8 rounded-3xl bg-slate-50 text-center border border-dashed border-slate-200">
                 <p className="text-xs text-slate-400 font-bold">
                   No goal scorers added yet. Click "+ Home Goal" or "+ Away Goal" to credit players.
@@ -431,11 +506,19 @@ const ModifyScoreModal = ({ match, isOpen, onClose }: ModifyScoreModalProps) => 
                           <input
                             type="number"
                             min="1"
-                            max="120"
-                            value={entry.minute}
+                            max="130"
+                            value={entry.minute !== undefined && entry.minute !== null ? entry.minute : ""}
                             onChange={(e) =>
-                              handleScorerChange(entry.id, "minute", parseInt(e.target.value) || 1)
+                              handleScorerChange(entry.id, "minute", e.target.value)
                             }
+                            onBlur={(e) => {
+                              const val = parseInt(e.target.value, 10);
+                              handleScorerChange(
+                                entry.id,
+                                "minute",
+                                isNaN(val) ? 1 : Math.max(1, Math.min(130, val))
+                              );
+                            }}
                             className="w-full bg-white border border-slate-200 focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 rounded-xl p-2.5 text-xs font-bold text-slate-800 focus:outline-none text-center shadow-xs"
                           />
                         </div>
@@ -453,14 +536,14 @@ const ModifyScoreModal = ({ match, isOpen, onClose }: ModifyScoreModalProps) => 
               type="button"
               variant="outline"
               onClick={onClose}
-              disabled={isLoading}
+              disabled={isLoading || isMatchLoading}
               className="flex-1 h-12 rounded-xl cursor-pointer text-slate-700 hover:text-slate-900 font-bold hover:bg-slate-100/50 border-slate-200 transition-all duration-200"
             >
               Cancel
             </Button>
             <Button
               type="submit"
-              disabled={isLoading}
+              disabled={isLoading || isMatchLoading}
               className="flex-1 h-12 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold cursor-pointer transition-all duration-200 flex items-center justify-center gap-2 shadow-md shadow-emerald-50"
             >
               {isLoading ? (
