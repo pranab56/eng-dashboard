@@ -5,7 +5,7 @@ import CreateButton from '@/components/buttons/CreateButton';
 import CustomPagination from '@/components/cui/CustomPagination';
 import TableHeader from '@/components/cui/TableHeader';
 import CustomTable from '@/components/table/CustomTable';
-import { useDeleteeventMutation, useGetEventQuery } from '@/features/eventManagement/eventApi';
+import { useDeleteeventMutation, useGetEventQuery, useRearrangeEventsMutation } from '@/features/eventManagement/eventApi';
 import { useHeaders } from '@/hooks/useHeaders';
 import { getEventColumns } from '@/tableColumns/eventColumns';
 import Link from 'next/link';
@@ -15,17 +15,16 @@ import { toast } from 'sonner';
 import DeleteConfirmModal from '../match-management/DeleteConfirmModal';
 import EventViewModal from './EventViewModal';
 
-
 const EventManagement = () => {
-
   const { setHeaders } = useHeaders();
   const searchParams = useSearchParams();
   const page = searchParams.get("eventPage") || "1";
 
   const { data: eventData, isLoading } = useGetEventQuery(page);
-  console.log("event Data", eventData)
   const [deleteEvent, { isLoading: isDeleting }] = useDeleteeventMutation();
+  const [rearrangeEvents] = useRearrangeEventsMutation();
 
+  const [localEvents, setLocalEvents] = useState<any[]>([]);
   const [selectedEvent, setSelectedEvent] = useState<any>(null);
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
 
@@ -33,11 +32,44 @@ const EventManagement = () => {
   const [deletingId, setDeletingId] = useState<string | null>(null);
 
   useEffect(() => {
+    if (eventData?.data) {
+      setLocalEvents(eventData.data);
+    }
+  }, [eventData]);
+
+  useEffect(() => {
     setHeaders({
       title: "Event Management",
       des: "Organize, schedule, and verify club events and matchdays across the digital network."
-    })
-  }, [])
+    });
+  }, []);
+
+  const handleDragEnd = async (startIndex: number, endIndex: number) => {
+    const updatedEvents = [...localEvents];
+    const [removed] = updatedEvents.splice(startIndex, 1);
+    updatedEvents.splice(endIndex, 0, removed);
+
+    setLocalEvents(updatedEvents);
+
+    const limit = eventData?.pagination?.limit || 10;
+    const pageNum = Number(page) || 1;
+    const offset = (pageNum - 1) * limit;
+
+    const reorderedPayload = updatedEvents.map((ev: any, index: number) => ({
+      id: ev._id,
+      order: offset + index + 1,
+    }));
+
+    try {
+      await rearrangeEvents({ events: reorderedPayload }).unwrap();
+      toast.success("Events reordered successfully");
+    } catch (error: any) {
+      toast.error(error?.data?.message || "Failed to reorder events");
+      if (eventData?.data) {
+        setLocalEvents(eventData.data);
+      }
+    }
+  };
 
   const handleView = (event: any) => {
     setSelectedEvent(event);
@@ -66,7 +98,7 @@ const EventManagement = () => {
   const tableHeaderPayload = {
     title: "Event Registry",
     url: ""
-  }
+  };
 
   return (
     <div className='pt-10 px-8 space-y-4'>
@@ -81,7 +113,13 @@ const EventManagement = () => {
             <TableHeader payload={tableHeaderPayload} />
           </>
           <div className="pt-4 px-4 overflow-hidden">
-            <CustomTable<any> columns={getEventColumns(handleView, handleDelete)} data={eventData?.data || []} isLoading={isLoading} />
+            <CustomTable<any>
+              columns={getEventColumns(handleView, handleDelete)}
+              data={localEvents}
+              isLoading={isLoading}
+              isSortable={true}
+              onDragEnd={handleDragEnd}
+            />
           </div>
         </div>
         <div className='pt-8 px-4'>
@@ -104,7 +142,7 @@ const EventManagement = () => {
         description="Are you sure you want to delete this specific event? This action cannot be undone."
       />
     </div>
-  )
-}
+  );
+};
 
 export default EventManagement;

@@ -43,6 +43,15 @@ export const eventApi = baseApi.injectEndpoints({
       }),
       invalidatesTags: ["event"]
     }),
+
+    rearrangeEvents: builder.mutation({
+      query: (data) => ({
+        url: "/event/reorder",
+        method: "PATCH",
+        body: data,
+      }),
+      invalidatesTags: ["event"],
+    }),
   }),
 });
 
@@ -53,4 +62,5 @@ export const {
   useCreateEventMutation,
   useEditeventMutation,
   useDeleteeventMutation,
+  useRearrangeEventsMutation,
 } = eventApi;
