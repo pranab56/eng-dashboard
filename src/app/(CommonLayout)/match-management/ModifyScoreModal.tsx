@@ -58,8 +58,14 @@ const ModifyScoreModal = ({ match, isOpen, onClose }: ModifyScoreModalProps) => 
     skip: !awayTeamId || !isOpen,
   });
 
-  const homeMembers: any[] = homeTeamData?.data?.members || homeTeamData?.members || [];
-  const awayMembers: any[] = awayTeamData?.data?.members || awayTeamData?.members || [];
+  const homeMembers: any[] = React.useMemo(
+    () => homeTeamData?.data?.members || homeTeamData?.members || [],
+    [homeTeamData],
+  );
+  const awayMembers: any[] = React.useMemo(
+    () => awayTeamData?.data?.members || awayTeamData?.members || [],
+    [awayTeamData],
+  );
 
   // All players combined for Player of the Day selector
   const allPlayers = React.useMemo(() => {

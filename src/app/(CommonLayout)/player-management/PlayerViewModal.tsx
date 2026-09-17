@@ -174,8 +174,6 @@ const PlayerViewModal: React.FC<PlayerViewModalProps> = ({
   const parentEmail = parentObj?.email || null;
   const parentPhone = parentObj?.phone || null;
 
-  const coins = currentCoins;
-  const marketValue = currentMarketValue;
   const rawSub =
     (player as any).subscription || (player as any).activeSubscription;
   const sub = rawSub

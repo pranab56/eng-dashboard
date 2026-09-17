@@ -450,8 +450,6 @@ const UserVerificationModal: React.FC<UserVerificationModalProps> = ({
   const parentEmail = parentObj?.email || null;
   const parentPhone = parentObj?.phone || null;
 
-  const coins = currentCoins;
-  const marketValue = currentMarketValue;
   const rawSub = user.subscription || (user as any).activeSubscription;
   const sub = rawSub
     ? {
