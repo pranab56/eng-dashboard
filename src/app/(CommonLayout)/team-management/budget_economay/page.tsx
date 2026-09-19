@@ -25,6 +25,7 @@ const budgetEconomySchema = z.object({
   startingCoins: z.number().min(0, "Starting coins must be a positive number"),
   startingBudget: z.number().min(0, "Starting budget is required"),
   conversionRate: z.number().min(1, "Conversion rate is required"),
+  minReserveCoins: z.number().min(0, "Minimum reserve coins must be a positive number").default(100000),
   attendMatch: coinBudgetSchema,
   drawMatch: coinBudgetSchema,
   winMatch: coinBudgetSchema,
@@ -58,6 +59,7 @@ export default function BudgetEconomyPage() {
       startingCoins: 10000,
       startingBudget: 100000,
       conversionRate: 10,
+      minReserveCoins: 100000,
       attendMatch: { coin: 0, budgetValue: 0 },
       drawMatch: { coin: 0, budgetValue: 0 },
       winMatch: { coin: 0, budgetValue: 0 },
@@ -90,6 +92,7 @@ export default function BudgetEconomyPage() {
         startingCoins: initialCoins,
         startingBudget: initialCoins * rate,
         conversionRate: rate,
+        minReserveCoins: data.minReserveCoins !== undefined ? Number(data.minReserveCoins) : 100000,
         attendMatch: { coin: data.attendMatch?.coin || 0, budgetValue: (data.attendMatch?.coin || 0) * rate },
         drawMatch: { coin: data.drawMatch?.coin || 0, budgetValue: (data.drawMatch?.coin || 0) * rate },
         winMatch: { coin: data.winMatch?.coin || 0, budgetValue: (data.winMatch?.coin || 0) * rate },
@@ -288,6 +291,41 @@ export default function BudgetEconomyPage() {
             <p className="text-[11px] text-emerald-600 font-medium">
               = {(Number(watch("startingCoins")) || 0).toLocaleString()} Coins × £{Number(watch("conversionRate")) || 0}
             </p>
+          </div>
+        </div>
+      </section>
+
+      {/* Minimum Reserve Coins Section (Separated Container) */}
+      <section className="bg-white rounded-2xl p-8 border border-gray-100 shadow-xl shadow-gray-200/50 text-gray-800">
+        <div className="flex items-center justify-between mb-6">
+          <div>
+            <div className="flex items-center gap-2.5">
+              <h2 className="text-xl font-semibold text-gray-900">
+                Player Transfer & Minimum Coin Reserve
+              </h2>
+              <span className="text-[11px] font-bold text-amber-700 bg-amber-50 px-2.5 py-0.5 rounded-full border border-amber-200">
+                Transfer Rule
+              </span>
+            </div>
+            <p className="text-xs text-gray-400 mt-1">
+              Minimum ENG coins balance that clubs must retain in their wallet after bidding for and purchasing players
+            </p>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="space-y-2">
+            <label className="text-sm font-medium text-gray-700">Minimum Reserve (Coins)</label>
+            <div className="relative">
+              <input
+                type="number"
+                {...register("minReserveCoins", { valueAsNumber: true })}
+                className="w-full py-3.5 px-4 bg-gray-50 border border-gray-200 rounded-xl text-gray-900 font-semibold text-sm h-12 focus:ring-2 focus:ring-yellow-600/20 focus:bg-white focus:border-yellow-600 transition-all outline-none"
+                placeholder="e.g. 100000"
+              />
+            </div>
+            {errors.minReserveCoins && <p className="text-xs text-red-500">{errors.minReserveCoins.message}</p>}
+            <p className="text-[11px] text-gray-400">Clubs cannot complete player transfers if remaining balance falls below this amount</p>
           </div>
         </div>
       </section>
