@@ -25,7 +25,7 @@ const budgetEconomySchema = z.object({
   startingCoins: z.number().min(0, "Starting coins must be a positive number"),
   startingBudget: z.number().min(0, "Starting budget is required"),
   conversionRate: z.number().min(1, "Conversion rate is required"),
-  minReserveCoins: z.number().min(0, "Minimum reserve coins must be a positive number").default(100000),
+  minReserveCoins: z.number().min(0, "Minimum reserve coins must be a positive number"),
   attendMatch: coinBudgetSchema,
   drawMatch: coinBudgetSchema,
   winMatch: coinBudgetSchema,
