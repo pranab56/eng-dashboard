@@ -1,55 +1,62 @@
 import React from "react";
 import Image from "next/image";
 import { ColumnDef } from "@tanstack/react-table";
-import { FiEdit2, FiEye } from "react-icons/fi";
-import { HiOutlineTrash } from "react-icons/hi";
 import { TPlayer } from "@/types/columnTypes";
 import { formatImagePath } from "@/utils/formatImagePath";
-
-// ============================================================================
-// Helpers & Utilities
-// ============================================================================
+import {
+  Eye,
+  Edit3,
+  Trash2,
+  MoreVertical,
+  Activity,
+  Coins,
+  Shield,
+  User,
+} from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 const getPlayerCoinBalance = (player: TPlayer): number => {
-  return player.engCoine ?? player.engCoin ?? player.coin ?? 0;
+  return (player as any).engCoine ?? (player as any).engCoin ?? (player as any).coin ?? 0;
 };
 
 const getPlayerFullName = (player: TPlayer): string => {
   const fullName = `${player.firstName ?? ""} ${player.lastName ?? ""}`.trim();
-  return fullName || "Unnamed Player";
+  return fullName || (player as any).userName || "Unnamed Player";
 };
-
-// ============================================================================
-// Modular UI Sub-Components (Player Domain)
-// ============================================================================
 
 export const PlayerNameCell: React.FC<{ player: TPlayer }> = ({ player }) => {
   const fullName = getPlayerFullName(player);
   const initials = `${player.firstName?.[0] ?? "P"}${player.lastName?.[0] ?? ""}`;
 
   return (
-    <div className="flex items-center gap-2 sm:gap-3.5 py-0.5 max-w-[160px] sm:max-w-none">
-      <div className="relative h-8 w-8 sm:h-10 sm:w-10 shrink-0 overflow-hidden rounded-full border border-slate-200/80 bg-slate-100 flex items-center justify-center shadow-xs">
+    <div className="flex items-center gap-3 py-1">
+      <div className="relative h-9 w-9 shrink-0 overflow-hidden rounded-full border border-slate-200 bg-slate-100 flex items-center justify-center shadow-xs">
         {player.profile ? (
           <Image
             src={formatImagePath(player.profile)}
-            alt={`${fullName}'s profile picture`}
-            width={40}
-            height={40}
+            alt={fullName}
+            width={36}
+            height={36}
             className="h-full w-full object-cover"
           />
         ) : (
-          <span className="text-[10px] sm:text-xs font-semibold text-slate-500 uppercase tracking-wider select-none">
+          <span className="text-xs font-bold text-slate-500 uppercase select-none">
             {initials}
           </span>
         )}
       </div>
       <div className="flex flex-col min-w-0">
-        <span className="font-semibold text-slate-900 text-xs sm:text-sm tracking-tight truncate group-hover:text-blue-600 transition-colors">
+        <span className="font-bold text-slate-900 text-xs sm:text-sm tracking-tight truncate">
           {fullName}
         </span>
         <span className="text-[11px] text-slate-400 truncate">
-          {player.email || (player.role ? player.role.replace(/_/g, ' ') : "Player")}
+          {player.email || ((player as any).role ? (player as any).role.replace(/_/g, ' ') : "Player")}
         </span>
       </div>
     </div>
@@ -60,17 +67,17 @@ export const PlayerTeamCell: React.FC<{ player: TPlayer }> = ({ player }) => {
   const teamName = player.teamName || "Unassigned";
 
   return (
-    <div className="flex items-center gap-1.5 sm:gap-2.5 py-0.5 max-w-[120px] sm:max-w-none">
+    <div className="flex items-center gap-2 py-1">
       {player.teamLogo ? (
         <Image
           src={formatImagePath(player.teamLogo)}
-          alt={`${teamName} logo`}
+          alt={teamName}
           width={28}
           height={28}
-          className="h-6 w-6 sm:h-7 sm:w-7 rounded-full border border-slate-200/80 object-cover shrink-0"
+          className="h-7 w-7 rounded-full border border-slate-200 object-cover shrink-0"
         />
       ) : (
-        <div className="h-6 w-6 sm:h-7 sm:w-7 rounded-full bg-slate-100 border border-slate-200/60 shrink-0 flex items-center justify-center text-[10px] font-bold text-slate-400">
+        <div className="h-7 w-7 rounded-full bg-slate-100 border border-slate-200 shrink-0 flex items-center justify-center text-[10px] font-bold text-slate-400">
           ⚽
         </div>
       )}
@@ -96,24 +103,11 @@ export const PlayerCoinButton: React.FC<{
       type="button"
       disabled={!isEditable}
       onClick={() => onEditCoin?.(player)}
-      aria-label={`Update coin balance for ${getPlayerFullName(player)}. Current balance: ${coins.toLocaleString()}`}
-      className={`group inline-flex items-center gap-1 sm:gap-2 px-2 py-1 sm:px-3 sm:py-1.5 rounded-lg border transition-all duration-150 text-[11px] sm:text-xs font-semibold ${
-        isEditable
-          ? "bg-amber-50/80 hover:bg-amber-100/90 border-amber-200/80 hover:border-amber-300 text-amber-950 shadow-2xs cursor-pointer active:scale-95"
-          : "bg-slate-50 border-slate-200/60 text-slate-600 cursor-default"
-      }`}
-      title={isEditable ? "Click to update coin balance" : undefined}
+      className="group inline-flex items-center gap-1.5 px-3 py-1 rounded-full border border-amber-200 bg-amber-50/70 hover:bg-amber-100 text-amber-900 text-xs font-bold transition-all shadow-2xs cursor-pointer active:scale-95"
+      title="Click to adjust coins"
     >
-      <span className="text-xs sm:text-sm transition-transform duration-200 group-hover:scale-110" aria-hidden="true">
-        🪙
-      </span>
-      <span className="tabular-nums font-semibold tracking-tight">{coins.toLocaleString()}</span>
-      {isEditable && (
-        <FiEdit2
-          className="h-2.5 w-2.5 sm:h-3 sm:w-3 text-amber-600/70 group-hover:text-amber-700 group-hover:translate-x-0.5 transition-all"
-          aria-hidden="true"
-        />
-      )}
+      <span className="text-sm">🪙</span>
+      <span className="tabular-nums">{coins.toLocaleString()}</span>
     </button>
   );
 };
@@ -123,57 +117,95 @@ export const PlayerActionCell: React.FC<{
   onView: (player: TPlayer) => void;
   onEdit?: (player: TPlayer) => void;
   onDelete?: (player: TPlayer) => void;
-}> = ({ player, onView, onEdit, onDelete }) => {
-  const fullName = getPlayerFullName(player);
-
+  onEditStats?: (player: TPlayer) => void;
+  onAdjustCoins?: (player: TPlayer) => void;
+}> = ({ player, onView, onEdit, onDelete, onEditStats, onAdjustCoins }) => {
   return (
-    <div className="flex items-center gap-1 sm:gap-1.5">
+    <div className="flex items-center justify-end gap-1.5 pr-2">
+      {/* Quick View Button */}
       <button
         type="button"
         onClick={() => onView(player)}
-        aria-label={`View details for ${fullName}`}
-        title="View Player"
-        className="flex h-7.5 w-7.5 sm:h-8.5 sm:w-8.5 items-center justify-center rounded-lg bg-slate-100/80 hover:bg-slate-200/80 text-slate-600 hover:text-slate-900 transition-all cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-400 active:scale-95"
+        className="flex items-center justify-center h-8.5 w-8.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 hover:text-slate-900 transition-all cursor-pointer shadow-2xs"
+        title="View Full Profile"
       >
-        <FiEye className="h-3.5 w-3.5 sm:h-4.5 sm:w-4.5" aria-hidden="true" />
+        <Eye className="w-4 h-4" />
       </button>
 
-      {onEdit && (
-        <button
-          type="button"
-          onClick={() => onEdit(player)}
-          aria-label={`Edit ${fullName}`}
-          title="Edit Player"
-          className="flex h-7.5 w-7.5 sm:h-8.5 sm:w-8.5 items-center justify-center rounded-lg bg-blue-50 hover:bg-blue-100 text-blue-600 hover:text-blue-700 transition-all cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400 active:scale-95"
-        >
-          <FiEdit2 className="h-3.5 w-3.5 sm:h-4 sm:w-4" aria-hidden="true" />
-        </button>
-      )}
+      {/* Unified Professional Dropdown Menu */}
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <button
+            type="button"
+            className="flex items-center justify-center h-8.5 w-8.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 hover:text-slate-900 transition-all cursor-pointer shadow-2xs focus:outline-none"
+            title="Player Actions"
+          >
+            <MoreVertical className="w-4 h-4" />
+          </button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end" className="w-52 p-1.5 bg-white rounded-2xl shadow-xl border border-slate-100 text-xs">
+          <DropdownMenuItem
+            onClick={() => onView(player)}
+            className="flex items-center gap-2.5 p-2 rounded-xl text-slate-700 hover:text-indigo-700 hover:bg-indigo-50 font-semibold cursor-pointer"
+          >
+            <User className="w-4 h-4 text-indigo-600" />
+            <span>View 360° Profile</span>
+          </DropdownMenuItem>
 
-      {onDelete && (
-        <button
-          type="button"
-          onClick={() => onDelete(player)}
-          aria-label={`Delete ${fullName}`}
-          title="Delete Player"
-          className="flex h-7.5 w-7.5 sm:h-8.5 sm:w-8.5 items-center justify-center rounded-lg bg-red-50 hover:bg-red-100 text-red-600 hover:text-red-700 transition-all cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-400 active:scale-95"
-        >
-          <HiOutlineTrash className="h-4 w-4 sm:h-5 sm:w-5" aria-hidden="true" />
-        </button>
-      )}
+          {onEdit && (
+            <DropdownMenuItem
+              onClick={() => onEdit(player)}
+              className="flex items-center gap-2.5 p-2 rounded-xl text-slate-700 hover:text-blue-700 hover:bg-blue-50 font-semibold cursor-pointer"
+            >
+              <Edit3 className="w-4 h-4 text-blue-600" />
+              <span>Edit Player Details</span>
+            </DropdownMenuItem>
+          )}
+
+          {onEditStats && (
+            <DropdownMenuItem
+              onClick={() => onEditStats(player)}
+              className="flex items-center gap-2.5 p-2 rounded-xl text-slate-700 hover:text-emerald-700 hover:bg-emerald-50 font-semibold cursor-pointer"
+            >
+              <Activity className="w-4 h-4 text-emerald-600" />
+              <span>Modify Career Stats</span>
+            </DropdownMenuItem>
+          )}
+
+          {onAdjustCoins && (
+            <DropdownMenuItem
+              onClick={() => onAdjustCoins(player)}
+              className="flex items-center gap-2.5 p-2 rounded-xl text-slate-700 hover:text-amber-700 hover:bg-amber-50 font-semibold cursor-pointer"
+            >
+              <Coins className="w-4 h-4 text-amber-600" />
+              <span>Adjust ENG Coins (+/-)</span>
+            </DropdownMenuItem>
+          )}
+
+          {onDelete && (
+            <>
+              <DropdownMenuSeparator className="my-1 bg-slate-100" />
+              <DropdownMenuItem
+                onClick={() => onDelete(player)}
+                className="flex items-center gap-2.5 p-2 rounded-xl text-rose-600 hover:bg-rose-50 font-semibold cursor-pointer"
+              >
+                <Trash2 className="w-4 h-4 text-rose-600" />
+                <span>Delete Player</span>
+              </DropdownMenuItem>
+            </>
+          )}
+        </DropdownMenuContent>
+      </DropdownMenu>
     </div>
   );
 };
-
-// ============================================================================
-// Column Definitions
-// ============================================================================
 
 export const getPlayerColumns = (
   onView: (player: TPlayer) => void,
   onEditCoin?: (player: TPlayer) => void,
   onEdit?: (player: TPlayer) => void,
-  onDelete?: (player: TPlayer) => void
+  onDelete?: (player: TPlayer) => void,
+  onEditStats?: (player: TPlayer) => void
 ): ColumnDef<TPlayer>[] => [
   {
     id: "name",
@@ -187,7 +219,7 @@ export const getPlayerColumns = (
     accessorKey: "role",
     cell: ({ row }) => (
       <span className="text-xs font-semibold text-slate-700 bg-slate-100 px-2.5 py-1 rounded-full border border-slate-200">
-        {row.original.role ? row.original.role.replace(/_/g, " ") : "PLAYER"}
+        {(row.original as any).role ? (row.original as any).role.replace(/_/g, " ") : "PLAYER"}
       </span>
     ),
   },
@@ -201,7 +233,7 @@ export const getPlayerColumns = (
     accessorKey: "position",
     header: "Position",
     cell: ({ row }) => (
-      <span className="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-semibold bg-slate-100/90 text-slate-700 border border-slate-200/50">
+      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-slate-100 text-slate-700 border border-slate-200">
         {row.original.position || "Undesignated"}
       </span>
     ),
@@ -221,7 +253,7 @@ export const getPlayerColumns = (
       const pkgName = rawSub.packageName || rawSub.package?.title || rawSub.package?.packageName || rawSub.package?.name || 'Active Plan';
       const pkgPrice = rawSub.price ?? rawSub.package?.price ?? 0;
       return (
-        <span className="inline-flex items-center gap-1 text-[11px] font-bold text-emerald-800 bg-emerald-50 px-2.5 py-1 rounded-full border border-emerald-200 shadow-2xs">
+        <span className="inline-flex items-center gap-1.5 text-[11px] font-bold text-emerald-800 bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-200 shadow-2xs">
           <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
           {pkgName} • £{pkgPrice}
         </span>
@@ -233,27 +265,20 @@ export const getPlayerColumns = (
     header: "Status",
     accessorKey: "status",
     cell: ({ row }) => {
-      const status = (row.original.status || "APPROVED").toUpperCase();
+      const status = ((row.original as any).status || "APPROVED").toUpperCase();
       const isApproved = status === "APPROVED";
       return (
-        <div className="flex flex-col gap-0.5">
-          <span
-            className={`text-xs font-semibold px-2.5 py-1 rounded-full border w-fit ${
-              isApproved
-                ? "text-emerald-700 bg-emerald-50 border-emerald-200"
-                : status === "REJECTED"
-                ? "text-rose-700 bg-rose-50 border-rose-200"
-                : "text-amber-700 bg-amber-50 border-amber-200"
-            }`}
-          >
-            {status}
-          </span>
-          {status === "REJECTED" && (row.original as any).rejectionReason && (
-            <span className="text-[10px] text-rose-600 font-medium truncate max-w-[120px]" title={(row.original as any).rejectionReason}>
-              Reason: {(row.original as any).rejectionReason}
-            </span>
-          )}
-        </div>
+        <span
+          className={`text-xs font-bold px-2.5 py-0.5 rounded-full border w-fit ${
+            isApproved
+              ? "text-emerald-700 bg-emerald-50 border-emerald-200"
+              : status === "REJECTED"
+              ? "text-rose-700 bg-rose-50 border-rose-200"
+              : "text-amber-700 bg-amber-50 border-amber-200"
+          }`}
+        >
+          {status}
+        </span>
       );
     },
   },
@@ -265,7 +290,7 @@ export const getPlayerColumns = (
   },
   {
     id: "actions",
-    header: "Actions",
+    header: () => <div className="text-right pr-4 font-bold text-xs text-slate-700">Actions</div>,
     enableSorting: false,
     cell: ({ row }) => (
       <PlayerActionCell
@@ -273,6 +298,8 @@ export const getPlayerColumns = (
         onView={onView}
         onEdit={onEdit}
         onDelete={onDelete}
+        onEditStats={onEditStats}
+        onAdjustCoins={onEditCoin}
       />
     ),
   },

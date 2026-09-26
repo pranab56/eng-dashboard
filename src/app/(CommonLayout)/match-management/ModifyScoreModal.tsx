@@ -19,7 +19,7 @@ import { useGetSingleTeamQuery } from "@/features/teamManagement/teamApi";
 import { toast } from "sonner";
 import Image from "next/image";
 import { formatImagePath } from "../../../utils/formatImagePath";
-import { X, Plus, Trash2, UserCheck, Shield, Award, Loader2 } from "lucide-react";
+import { X, Plus, Trash2, UserCheck, Shield, ShieldCheck, ShieldAlert, Award, Loader2, Sparkles } from "lucide-react";
 
 interface ModifyScoreModalProps {
   match: any;
@@ -38,16 +38,15 @@ interface GoalScorerEntry {
 }
 
 const ModifyScoreModal = ({ match, isOpen, onClose }: ModifyScoreModalProps) => {
+  const currentMatchId = match?._id || match?.id;
+  const homeTeamId = match?.homeTeam?._id || match?.homeTeam?.id || match?.homeTeam;
+  const awayTeamId = match?.awayTeam?._id || match?.awayTeam?.id || match?.awayTeam;
   const [homeScore, setHomeScore] = useState<number>(0);
   const [awayScore, setAwayScore] = useState<number>(0);
   const [goalScorers, setGoalScorers] = useState<GoalScorerEntry[]>([]);
   const [selectedPOTD, setSelectedPOTD] = useState<string>("");
 
   const [modifyScore, { isLoading }] = useModifyScoreMutation();
-
-  const homeTeamId = match?.homeTeam?._id || match?.homeTeam?.id || match?.homeTeam;
-  const awayTeamId = match?.awayTeam?._id || match?.awayTeam?.id || match?.awayTeam;
-  const currentMatchId = match?._id || match?.id;
   const loadedMatchIdRef = React.useRef<string | null>(null);
 
   // Fetch players for home & away teams
@@ -219,28 +218,37 @@ const ModifyScoreModal = ({ match, isOpen, onClose }: ModifyScoreModalProps) => 
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent
         showCloseButton={false}
-        className="sm:max-w-4xl w-full bg-white rounded-3xl p-0 overflow-hidden border-none shadow-2xl animate-in zoom-in-95 duration-200 max-h-[92vh] flex flex-col"
+        className="sm:max-w-3xl w-full bg-white rounded-2xl p-0 overflow-hidden border border-slate-200 shadow-xl max-h-[90vh] flex flex-col text-slate-800"
       >
         {/* Header */}
-        <DialogHeader className="bg-slate-50 p-6 border-b border-slate-100 relative shrink-0">
+        <div className="px-6 py-5 border-b border-slate-200/80 bg-white flex items-center justify-between shrink-0">
+          <div>
+            <div className="flex items-center gap-2">
+              <DialogTitle className="text-base font-semibold text-slate-900">
+                Modify Match Score
+              </DialogTitle>
+              <span className="px-2 py-0.5 rounded-md text-[11px] font-medium bg-slate-100 text-slate-700 border border-slate-200">
+                Official Result
+              </span>
+            </div>
+            <p className="text-xs text-slate-500 mt-1">
+              Update scoreline, assign goalscorers & assists, and select Player of the Day
+            </p>
+          </div>
+
           <button
             type="button"
             onClick={onClose}
-            className="absolute top-4 right-4 p-2 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 hover:text-slate-900 transition-all cursor-pointer z-30"
+            className="p-1.5 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-colors cursor-pointer"
+            title="Close"
           >
             <X className="w-4 h-4" />
           </button>
-          <DialogTitle className="text-xl font-bold text-slate-900">
-            Modify Match Score & Assign Goals
-          </DialogTitle>
-          <p className="text-xs text-slate-500 mt-1 font-medium">
-            Update total goals & assign individual player scores with specific goal types
-          </p>
-        </DialogHeader>
+        </div>
 
         <form onSubmit={handleSubmit} className="p-6 space-y-6 overflow-y-auto flex-1 bg-white">
           {/* Score Counter Box */}
-          <div className="grid grid-cols-3 items-center bg-slate-50/50 p-6 rounded-3xl border border-slate-100">
+          <div className="grid grid-cols-3 items-center bg-slate-50 p-5 rounded-xl border border-slate-200 shadow-2xs">
             {/* Home Team */}
             <div className="flex flex-col items-center text-center space-y-3">
               <div className="relative w-16 h-16 bg-white rounded-2xl border border-slate-100 shadow-xs flex items-center justify-center p-2.5 transition-all">
@@ -333,7 +341,8 @@ const ModifyScoreModal = ({ match, isOpen, onClose }: ModifyScoreModalProps) => 
             </div>
           </div>
 
-          {/* Goal Scorer Assignment Section */}
+          
+                    {/* Goal Scorer Assignment Section */}
           <div className="space-y-4 pt-2">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
               <div>
@@ -368,12 +377,12 @@ const ModifyScoreModal = ({ match, isOpen, onClose }: ModifyScoreModalProps) => 
 
             {/* Goal Scorers List */}
             {isMatchLoading ? (
-              <div className="p-8 rounded-3xl bg-slate-50 text-center border border-dashed border-slate-200 flex flex-col items-center justify-center gap-2">
+              <div className="p-8 rounded-xl bg-slate-50 text-center border border-dashed border-slate-200 flex flex-col items-center justify-center gap-2">
                 <Loader2 className="w-5 h-5 text-emerald-600 animate-spin" />
                 <p className="text-xs text-slate-400 font-bold">Loading match details & goals...</p>
               </div>
             ) : goalScorers.length === 0 ? (
-              <div className="p-8 rounded-3xl bg-slate-50 text-center border border-dashed border-slate-200">
+              <div className="p-8 rounded-xl bg-slate-50 text-center border border-dashed border-slate-200">
                 <p className="text-xs text-slate-400 font-bold">
                   No goal scorers added yet. Click "+ Home Goal" or "+ Away Goal" to credit players.
                 </p>

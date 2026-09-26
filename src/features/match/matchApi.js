@@ -113,6 +113,33 @@ export const matchApi = baseApi.injectEndpoints({
       }),
       invalidatesTags: ["matchSetting"],
     }),
+  
+    getMatchCleanSheets: builder.query({
+      query: (id) => ({
+        url: `/match/${id}/clean-sheets`,
+        method: "GET",
+      }),
+      providesTags: ["match"],
+    }),
+
+    awardCleanSheet: builder.mutation({
+      query: ({ matchId, data }) => ({
+        url: `/match/${matchId}/clean-sheets`,
+        method: "POST",
+        body: data,
+      }),
+      invalidatesTags: ["match", "player"],
+    }),
+
+    revokeCleanSheet: builder.mutation({
+      query: ({ matchId, playerId, data }) => ({
+        url: `/match/${matchId}/clean-sheets/${playerId}`,
+        method: "DELETE",
+        body: data,
+      }),
+      invalidatesTags: ["match", "player"],
+    }),
+
     updateMatchStatus: builder.mutation({
       query: ({ id, status }) => ({
         url: `/match/${id}/status`,
@@ -137,4 +164,8 @@ export const {
   useGetMatchScheduleDatesQuery,
   useGetMatchFeedbackSettingQuery,
   useUpdateMatchFeedbackSettingMutation,
+  useGetMatchCleanSheetsQuery,
+  useAwardCleanSheetMutation,
+  useRevokeCleanSheetMutation,
+
 } = matchApi;

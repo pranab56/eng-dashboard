@@ -60,6 +60,49 @@ export const playerApi = baseApi.injectEndpoints({
       invalidatesTags: ["player"]
     }),
 
+  
+    getPlayerStats: builder.query({
+      query: (playerId) => ({
+        url: `/playerStats/${playerId}`,
+        method: "GET",
+      }),
+      providesTags: ["player", "statsAudit"],
+    }),
+
+    getPlayerCoinHistory: builder.query({
+      query: ({ playerId, page = 1, limit = 20 }) => ({
+        url: `/coins/history/${playerId}?page=${page}&limit=${limit}`,
+        method: "GET",
+      }),
+      providesTags: ["player", "coin"],
+    }),
+
+    adjustPlayerCoins: builder.mutation({
+      query: ({ playerId, data }) => ({
+        url: `/coins/adjust/${playerId}`,
+        method: "PATCH",
+        body: data,
+      }),
+      invalidatesTags: ["player", "coin", "user"],
+    }),
+
+    editPlayerStats: builder.mutation({
+      query: ({ playerId, data }) => ({
+        url: `/stats-audit/edit/${playerId}`,
+        method: "PATCH",
+        body: data,
+      }),
+      invalidatesTags: ["player", "statsAudit"],
+    }),
+
+    getPlayerStatsAuditLogs: builder.query({
+      query: (playerId) => ({
+        url: `/stats-audit/audit-logs/${playerId}`,
+        method: "GET",
+      }),
+      providesTags: ["statsAudit"],
+    }),
+
     deletePlayer: builder.mutation({
       query: ({ id }) => ({
         url: `/player/${id}`,
@@ -78,4 +121,10 @@ export const {
   useUpdateEngCoinBudgetMutation,
   useUpdatePlayerMutation,
   useDeletePlayerMutation,
+  useGetPlayerStatsQuery,
+  useGetPlayerCoinHistoryQuery,
+  useAdjustPlayerCoinsMutation,
+  useEditPlayerStatsMutation,
+  useGetPlayerStatsAuditLogsQuery,
+
 } = playerApi;

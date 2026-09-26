@@ -180,5 +180,7 @@ export const baseApi = createApi({
     "newsCategory",
     "tournaments",
     "tournamentClaim",
+    "coin",
+    "statsAudit",
   ],
 });

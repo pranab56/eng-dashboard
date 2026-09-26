@@ -20,6 +20,8 @@ import CreateButton from '../../../components/buttons/CreateButton';
 import PlayerViewModal from './PlayerViewModal';
 import PlayerEditModal from './PlayerEditModal';
 import { UpdateCoinModal } from '@/components/modals/UpdateCoinModal';
+import { EditPlayerStatsModal } from '@/components/modals/EditPlayerStatsModal';
+import { AdjustCoinModal } from '@/components/modals/AdjustCoinModal';
 import DeleteConfirmationModal from '../user-management/DeleteConfirmationModal';
 import { AgeGroupSelectDropdown } from '@/components/dropdowns/AgeGroupSelectDropdown';
 import { PositionSelectDropdown } from '@/components/dropdowns/PositionSelectDropdown';
@@ -111,6 +113,13 @@ const PlayerManagement = () => {
   const [updateEngCoinBudget, { isLoading: isUpdatingCoin }] = useUpdateEngCoinBudgetMutation();
   const [deletePlayer, { isLoading: isDeletingPlayer }] = useDeletePlayerMutation();
 
+  const [statsTargetPlayer, setStatsTargetPlayer] = useState<TPlayer | null>(null);
+  const [isStatsModalOpen, setIsStatsModalOpen] = useState(false);
+
+  const handleEditStats = (player: TPlayer) => {
+    setStatsTargetPlayer(player);
+    setIsStatsModalOpen(true);
+  };
   const [selectedPlayer, setSelectedPlayer] = useState<TPlayer | null>(null);
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
 
@@ -313,7 +322,7 @@ const PlayerManagement = () => {
           <TableHeader payload={tableHeaderPayload} />
           <div className="pt-2 sm:pt-4">
             <CustomTable<TPlayer>
-              columns={getPlayerColumns(handleView, handleEditCoin, handleEdit, handleDeleteClick)}
+              columns={getPlayerColumns(handleView, handleEditCoin, handleEdit, handleDeleteClick, handleEditStats)}
               data={rawPlayers}
               isLoading={isLoading}
             />
@@ -346,18 +355,26 @@ const PlayerManagement = () => {
         player={editTargetPlayer}
       />
 
-      <UpdateCoinModal
+            <EditPlayerStatsModal
+        isOpen={isStatsModalOpen}
+        onClose={() => {
+          setIsStatsModalOpen(false);
+          setStatsTargetPlayer(null);
+        }}
+        player={statsTargetPlayer}
+        currentStats={null}
+      />
+
+      <AdjustCoinModal
         isOpen={isCoinModalOpen}
         onClose={() => {
           setIsCoinModalOpen(false);
           setCoinTargetPlayer(null);
         }}
-        onConfirm={handleConfirmUpdateCoin}
-        title="Update Player ENG Coin"
-        entityName={coinTargetPlayer ? `${coinTargetPlayer.firstName} ${coinTargetPlayer.lastName}` : undefined}
-        initialValue={coinTargetPlayer?.engCoine ?? coinTargetPlayer?.engCoin ?? coinTargetPlayer?.coin ?? 0}
-        isLoading={isUpdatingCoin}
+        player={coinTargetPlayer}
+        currentCoins={coinTargetPlayer ? (Number((coinTargetPlayer as any).engCoine ?? (coinTargetPlayer as any).engCoin ?? (coinTargetPlayer as any).coin ?? 0) || 0) : 0}
       />
+      
 
       <DeleteConfirmationModal
         isOpen={isDeleteModalOpen}

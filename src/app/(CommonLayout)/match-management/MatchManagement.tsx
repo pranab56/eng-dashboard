@@ -23,6 +23,7 @@ import { toast } from "sonner";
 import DeleteConfirmModal from "./DeleteConfirmModal";
 import MatchViewModal from "./MatchViewModal";
 import ModifyScoreModal from "./ModifyScoreModal";
+import CleanSheetModal from "./CleanSheetModal";
 import RatingRuleModal from "./RatingRuleModal";
 import { Clock } from "lucide-react";
 
@@ -400,6 +401,13 @@ const MatchManagement = () => {
   const [deletingId, setDeletingId] = useState<string | null>(null);
 
   const [isScoreModalOpen, setIsScoreModalOpen] = useState(false);
+  const [cleanSheetMatch, setCleanSheetMatch] = useState<any>(null);
+  const [isCleanSheetModalOpen, setIsCleanSheetModalOpen] = useState(false);
+
+  const handleManageCleanSheet = (match: any) => {
+    setCleanSheetMatch(match);
+    setIsCleanSheetModalOpen(true);
+  };
   const [scoreModifyingMatch, setScoreModifyingMatch] = useState<any>(null);
 
   const [isStatusModalOpen, setIsStatusModalOpen] = useState(false);
@@ -639,9 +647,18 @@ const MatchManagement = () => {
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         match={selectedMatch}
+        onManageCleanSheet={handleManageCleanSheet}
       />
 
       <RatingRuleModal isOpen={isRatingRuleModalOpen} onClose={() => setIsRatingRuleModalOpen(false)} />
+      <CleanSheetModal
+        isOpen={isCleanSheetModalOpen}
+        onClose={() => {
+          setIsCleanSheetModalOpen(false);
+          setCleanSheetMatch(null);
+        }}
+        match={cleanSheetMatch}
+      />
       <ModifyScoreModal
         isOpen={isScoreModalOpen}
         onClose={() => {
