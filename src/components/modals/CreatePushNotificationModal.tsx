@@ -21,6 +21,7 @@ import {
   Loader2,
   Globe,
   FileText,
+  Briefcase,
 } from "lucide-react";
 import toast from "react-hot-toast";
 import dayjs from "dayjs";
@@ -42,8 +43,8 @@ export default function CreatePushNotificationModal({
   // Delivery Mode: "IMMEDIATE" vs "SCHEDULED"
   const [deliveryMode, setDeliveryMode] = useState<"IMMEDIATE" | "SCHEDULED">("IMMEDIATE");
 
-  // Target audience: "ALL" | "PLAYER" | "PARENT" | "REFEREE" | "SINGLE"
-  const [audienceType, setAudienceType] = useState<"ALL" | "PLAYER" | "PARENT" | "REFEREE" | "SINGLE">("ALL");
+  // Target audience: "ALL" | "PLAYER" | "MANAGER" | "REFEREE" | "SINGLE"
+  const [audienceType, setAudienceType] = useState<"ALL" | "PLAYER" | "MANAGER" | "REFEREE" | "SINGLE">("ALL");
 
   const [title, setTitle] = useState("");
   const [message, setMessage] = useState("");
@@ -254,8 +255,8 @@ export default function CreatePushNotificationModal({
             <div className="grid grid-cols-2 sm:grid-cols-5 gap-1 p-1 bg-slate-100 rounded-md border border-slate-200 text-xs">
               {[
                 { id: "ALL", label: "All Users", icon: Users },
-                { id: "PLAYER", label: "Players", icon: User },
-                { id: "PARENT", label: "Parents", icon: Users },
+                { id: "PLAYER", label: "Players / Parents", icon: User },
+                { id: "MANAGER", label: "Managers", icon: Briefcase },
                 { id: "REFEREE", label: "Referees", icon: FileText },
                 { id: "SINGLE", label: "Specific User", icon: User },
               ].map(({ id, label, icon: Icon }) => (
