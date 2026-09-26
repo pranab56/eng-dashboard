@@ -23,6 +23,8 @@ import {
   FileText,
   Briefcase,
 } from "lucide-react";
+import CustomDatePicker from "@/components/ui/CustomDatePicker";
+import CustomTimePicker from "@/components/ui/CustomTimePicker";
 import toast from "react-hot-toast";
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
@@ -48,8 +50,18 @@ export default function CreatePushNotificationModal({
 
   const [title, setTitle] = useState("");
   const [message, setMessage] = useState("");
-  const [scheduledAtTime, setScheduledAtTime] = useState("");
+  const [scheduledDate, setScheduledDate] = useState("");
+  const [scheduledTime, setScheduledTime] = useState("");
   const [selectedUser, setSelectedUser] = useState<{ id: string; name: string; email?: string } | null>(null);
+
+  // Initialize default scheduled date/time (today/next hour UK time) when switching to SCHEDULED
+  useEffect(() => {
+    if (deliveryMode === "SCHEDULED" && !scheduledDate) {
+      const nowUk = dayjs().tz("Europe/London");
+      setScheduledDate(nowUk.format("YYYY-MM-DD"));
+      setScheduledTime(nowUk.add(1, "hour").minute(0).format("HH:mm"));
+    }
+  }, [deliveryMode, scheduledDate]);
 
   // User dropdown states
   const [isUserDropdownOpen, setIsUserDropdownOpen] = useState(false);
@@ -75,9 +87,8 @@ export default function CreatePushNotificationModal({
     { skip: audienceType !== "SINGLE" }
   );
 
-  const rawUsers = usersData?.data?.result || usersData?.data || [];
-
   const filteredUsers = useMemo(() => {
+    const rawUsers = usersData?.data?.result || usersData?.data || [];
     if (!userSearchTerm.trim()) return rawUsers;
     const term = userSearchTerm.toLowerCase();
     return rawUsers.filter((u: any) => {
@@ -85,7 +96,7 @@ export default function CreatePushNotificationModal({
       const email = (u.email || "").toLowerCase();
       return name.includes(term) || email.includes(term);
     });
-  }, [rawUsers, userSearchTerm]);
+  }, [usersData, userSearchTerm]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -112,13 +123,18 @@ export default function CreatePushNotificationModal({
     };
 
     if (deliveryMode === "SCHEDULED") {
-      if (!scheduledAtTime) {
-        toast.error("Please select a date and time for scheduled delivery");
+      if (!scheduledDate || !scheduledTime) {
+        toast.error("Please select both scheduled date and time");
         return;
       }
 
-      const scheduledUk = dayjs.tz(scheduledAtTime, "Europe/London");
+      const scheduledUk = dayjs.tz(`${scheduledDate}T${scheduledTime}`, "Europe/London");
       const nowUk = dayjs().tz("Europe/London");
+
+      if (!scheduledUk.isValid()) {
+        toast.error("Invalid scheduled date or time");
+        return;
+      }
 
       if (scheduledUk.diff(nowUk, "seconds") < 10) {
         toast.error("Scheduled time must be at least 10 seconds in the future (UK Time)");
@@ -138,7 +154,8 @@ export default function CreatePushNotificationModal({
       // Reset
       setTitle("");
       setMessage("");
-      setScheduledAtTime("");
+      setScheduledDate("");
+      setScheduledTime("");
       setSelectedUser(null);
       setDeliveryMode("IMMEDIATE");
       setAudienceType("ALL");
@@ -215,8 +232,8 @@ export default function CreatePushNotificationModal({
 
           {/* Scheduling Controls */}
           {deliveryMode === "SCHEDULED" && (
-            <div className="space-y-2 p-3.5 bg-slate-50 rounded-md border border-slate-200 text-xs">
-              <div className="flex items-center justify-between text-[11px] text-slate-500">
+            <div className="space-y-3 p-3.5 bg-slate-50/80 rounded-xl border border-slate-200 text-xs">
+              <div className="flex items-center justify-between text-[11px] text-slate-500 pb-1 border-b border-slate-200/60">
                 <span className="flex items-center gap-1.5 font-medium text-slate-700">
                   <Globe className="w-3.5 h-3.5 text-slate-500" />
                   Timezone: Europe/London (GMT/BST)
@@ -226,23 +243,32 @@ export default function CreatePushNotificationModal({
                 </span>
               </div>
 
-              <div className="space-y-1">
-                <label className="text-xs font-medium text-slate-700">
-                  Scheduled Date & Time <span className="text-rose-500">*</span>
-                </label>
-                <input
-                  type="datetime-local"
-                  required={deliveryMode === "SCHEDULED"}
-                  value={scheduledAtTime}
-                  onChange={(e) => setScheduledAtTime(e.target.value)}
-                  className="w-full h-9 bg-white border border-slate-300 rounded-md px-3 text-xs text-slate-900 focus:outline-hidden focus:border-slate-900 focus:ring-1 focus:ring-slate-900"
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <CustomDatePicker
+                  label="Scheduled Date"
+                  value={scheduledDate}
+                  onChange={setScheduledDate}
+                  placeholder="Select Date"
+                  align="left"
+                />
+                <CustomTimePicker
+                  label="Scheduled Time (UK)"
+                  value={scheduledTime}
+                  onChange={setScheduledTime}
+                  placeholder="Select Time"
+                  align="right"
                 />
               </div>
 
-              {scheduledAtTime && (
-                <p className="text-[11px] text-slate-600 font-medium pt-0.5">
-                  Scheduled for: <span className="text-slate-900 font-semibold">{dayjs.tz(scheduledAtTime, "Europe/London").format("DD MMM YYYY, HH:mm")}</span> (UK local time)
-                </p>
+              {scheduledDate && scheduledTime && (
+                <div className="p-2.5 rounded-xl bg-amber-50/80 border border-amber-200/70 flex items-center justify-between text-[11px] text-amber-900">
+                  <span className="font-medium text-amber-800">Scheduled for:</span>
+                  <span className="font-bold text-amber-950">
+                    {dayjs.tz(`${scheduledDate}T${scheduledTime}`, "Europe/London").isValid()
+                      ? dayjs.tz(`${scheduledDate}T${scheduledTime}`, "Europe/London").format("ddd, DD MMM YYYY [at] hh:mm A") + " (UK)"
+                      : `${scheduledDate} ${scheduledTime}`}
+                  </span>
+                </div>
               )}
             </div>
           )}

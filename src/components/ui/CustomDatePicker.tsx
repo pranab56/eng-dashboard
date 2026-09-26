@@ -9,6 +9,8 @@ interface CustomDatePickerProps {
   onChange: (dateStr: string) => void;
   label?: string;
   error?: string;
+  align?: "left" | "right";
+  placeholder?: string;
 }
 
 const CustomDatePicker: React.FC<CustomDatePickerProps> = ({
@@ -16,6 +18,8 @@ const CustomDatePicker: React.FC<CustomDatePickerProps> = ({
   onChange,
   label = "Match Date",
   error,
+  align = "left",
+  placeholder,
 }) => {
   const [isOpen, setIsOpen] = useState(false);
 
@@ -62,7 +66,7 @@ const CustomDatePicker: React.FC<CustomDatePickerProps> = ({
 
   const displayDate = value && dayjs(value).isValid()
     ? dayjs(value).format("ddd, DD MMM YYYY")
-    : "Select Match Date";
+    : (placeholder || (label ? `Select ${label}` : "Select Date"));
 
   return (
     <div className="space-y-2 relative" ref={containerRef}>
@@ -106,7 +110,7 @@ const CustomDatePicker: React.FC<CustomDatePickerProps> = ({
 
       {/* POPUP CALENDAR DROPDOWN */}
       {isOpen && (
-        <div className="absolute left-0 top-full mt-2 w-80 bg-white rounded-2xl shadow-2xl border border-gray-100 p-4 z-50 animate-in fade-in zoom-in-95 duration-150">
+        <div className={`absolute ${align === "right" ? "right-0" : "left-0"} top-full mt-2 w-80 bg-white rounded-2xl shadow-2xl border border-gray-100 p-4 z-50 animate-in fade-in zoom-in-95 duration-150`}>
           {/* Header */}
           <div className="flex items-center justify-between pb-3 border-b border-gray-100 mb-3">
             <button

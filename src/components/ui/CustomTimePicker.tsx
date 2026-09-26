@@ -9,6 +9,8 @@ interface CustomTimePickerProps {
   onChange: (timeStr: string) => void;
   label?: string;
   error?: string;
+  align?: "left" | "right";
+  placeholder?: string;
 }
 
 const CustomTimePicker: React.FC<CustomTimePickerProps> = ({
@@ -16,6 +18,8 @@ const CustomTimePicker: React.FC<CustomTimePickerProps> = ({
   onChange,
   label = "Kick-off Time",
   error,
+  align = "left",
+  placeholder,
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -104,7 +108,7 @@ const CustomTimePicker: React.FC<CustomTimePickerProps> = ({
 
   const displayTime = value
     ? dayjs(`2000-01-01 ${value}`).format("hh:mm A")
-    : "Select Kick-off Time";
+    : (placeholder || (label ? `Select ${label}` : "Select Time"));
 
   return (
     <div className="space-y-2 relative" ref={containerRef}>
@@ -148,7 +152,7 @@ const CustomTimePicker: React.FC<CustomTimePickerProps> = ({
 
       {/* POPUP CLOCK TIME PICKER DROPDOWN */}
       {isOpen && (
-        <div className="absolute left-0 top-full mt-2 w-80 bg-white rounded-2xl shadow-2xl border border-gray-100 p-4 z-50 animate-in fade-in zoom-in-95 duration-150">
+        <div className={`absolute ${align === "right" ? "right-0" : "left-0"} top-full mt-2 w-80 bg-white rounded-2xl shadow-2xl border border-gray-100 p-4 z-50 animate-in fade-in zoom-in-95 duration-150`}>
           {/* Digital Time Header */}
           <div className="flex items-center justify-between pb-3 border-b border-gray-100 mb-3 bg-gradient-to-r from-amber-50 to-orange-50 p-3 rounded-xl border border-amber-100/50">
             <div className="flex items-center gap-1">
