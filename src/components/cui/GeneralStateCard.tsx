@@ -44,7 +44,7 @@ const GeneralStateCard = ({
           <div
             key={itemId}
             onClick={() => handleTab(itemId)}
-            className={`group relative overflow-hidden p-5 rounded-2xl border transition-all duration-200 cursor-pointer select-none ${
+            className={`group relative overflow-hidden p-5 rounded-lg border transition-all duration-200 cursor-pointer select-none ${
               active
                 ? "bg-white border-slate-900 ring-2 ring-slate-900/10 shadow-md"
                 : "bg-white border-slate-200/90 hover:border-slate-400 hover:shadow-xs"

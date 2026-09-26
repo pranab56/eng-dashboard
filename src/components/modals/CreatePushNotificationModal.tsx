@@ -7,11 +7,9 @@ import { useGetUserQuery } from "@/features/userManagement/userApi";
 import {
   Dialog,
   DialogContent,
-  DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
 import {
-  Bell,
   Clock,
   Send,
   Users,
@@ -21,9 +19,8 @@ import {
   Search,
   X,
   Loader2,
-  Calendar,
   Globe,
-  ShieldAlert,
+  FileText,
 } from "lucide-react";
 import toast from "react-hot-toast";
 import dayjs from "dayjs";
@@ -42,7 +39,7 @@ export default function CreatePushNotificationModal({
   isOpen,
   setIsOpen,
 }: CreatePushNotificationModalProps) {
-  // Mode: "IMMEDIATE" vs "SCHEDULED"
+  // Delivery Mode: "IMMEDIATE" vs "SCHEDULED"
   const [deliveryMode, setDeliveryMode] = useState<"IMMEDIATE" | "SCHEDULED">("IMMEDIATE");
 
   // Target audience: "ALL" | "PLAYER" | "PARENT" | "REFEREE" | "SINGLE"
@@ -53,11 +50,11 @@ export default function CreatePushNotificationModal({
   const [scheduledAtTime, setScheduledAtTime] = useState("");
   const [selectedUser, setSelectedUser] = useState<{ id: string; name: string; email?: string } | null>(null);
 
-  // User combobox states
+  // User dropdown states
   const [isUserDropdownOpen, setIsUserDropdownOpen] = useState(false);
   const [userSearchTerm, setUserSearchTerm] = useState("");
 
-  // Live UK Time clock for admin convenience
+  // UK Time clock metadata
   const [currentUkTime, setCurrentUkTime] = useState("");
 
   useEffect(() => {
@@ -71,7 +68,7 @@ export default function CreatePushNotificationModal({
 
   const [createPushNotification, { isLoading: isSubmitting }] = useCreatePushNotificationMutation();
 
-  // Fetch users for single user combobox
+  // Fetch users for specific user selection
   const { data: usersData, isLoading: isUsersLoading } = useGetUserQuery(
     { page: 1, limit: 300 },
     { skip: audienceType !== "SINGLE" }
@@ -102,7 +99,7 @@ export default function CreatePushNotificationModal({
     }
 
     if (audienceType === "SINGLE" && !selectedUser) {
-      toast.error("Please select a specific recipient user");
+      toast.error("Please select a recipient user");
       return;
     }
 
@@ -119,7 +116,6 @@ export default function CreatePushNotificationModal({
         return;
       }
 
-      // Parse user selection in UK Timezone (Europe/London)
       const scheduledUk = dayjs.tz(scheduledAtTime, "Europe/London");
       const nowUk = dayjs().tz("Europe/London");
 
@@ -136,9 +132,9 @@ export default function CreatePushNotificationModal({
 
     try {
       const res = await createPushNotification(payload).unwrap();
-      toast.success(res?.message || (deliveryMode === "SCHEDULED" ? "Notification scheduled!" : "Notification sent!"));
+      toast.success(res?.message || (deliveryMode === "SCHEDULED" ? "Notification scheduled successfully" : "Notification sent successfully"));
 
-      // Reset Form
+      // Reset
       setTitle("");
       setMessage("");
       setScheduledAtTime("");
@@ -155,212 +151,167 @@ export default function CreatePushNotificationModal({
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogContent
         showCloseButton={false}
-        className="sm:max-w-xl w-full bg-white rounded-2xl p-0 overflow-hidden border border-slate-200 shadow-xl max-h-[90vh] flex flex-col text-slate-800"
+        className="sm:max-w-lg w-full bg-white rounded-lg p-0 overflow-hidden border border-slate-200 shadow-lg text-slate-800"
       >
-        {/* Modal Header */}
-        <div className="px-6 py-5 border-b border-slate-200/80 bg-white flex items-center justify-between shrink-0">
+        {/* Header */}
+        <div className="px-6 py-4 border-b border-slate-200 flex items-start justify-between">
           <div>
             <div className="flex items-center gap-2">
               <DialogTitle className="text-base font-semibold text-slate-900">
                 Create Push Notification
               </DialogTitle>
-              <span className="px-2 py-0.5 rounded-md text-[11px] font-medium bg-slate-100 text-slate-700 border border-slate-200">
+              <span className="px-2 py-0.5 rounded text-[11px] font-medium bg-slate-100 text-slate-600 border border-slate-200">
                 BullMQ Queue
               </span>
             </div>
             <p className="text-xs text-slate-500 mt-1">
-              Broadcast announcements immediately or schedule for future delivery
+              Broadcast announcements immediately or schedule targeted delivery.
             </p>
           </div>
 
           <button
             type="button"
             onClick={() => setIsOpen(false)}
-            className="p-1.5 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-colors cursor-pointer"
+            className="p-1 rounded text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-colors cursor-pointer"
             title="Close"
           >
             <X className="w-4 h-4" />
           </button>
         </div>
 
-        {/* Modal Body Form */}
-        <form onSubmit={handleSubmit} className="p-6 space-y-5 overflow-y-auto max-h-[70vh] bg-white">
-          {/* Delivery Mode Toggle */}
+        {/* Form Body */}
+        <form onSubmit={handleSubmit} className="p-6 space-y-4 overflow-y-auto max-h-[72vh] bg-white">
+          {/* Delivery Schedule Segmented Control */}
           <div className="space-y-1.5">
-            <label className="text-xs font-semibold text-slate-700">
+            <label className="text-xs font-medium text-slate-700">
               Delivery Schedule
             </label>
-            <div className="grid grid-cols-2 gap-2 bg-slate-100 p-1 rounded-xl border border-slate-200/60">
+            <div className="grid grid-cols-2 gap-1 p-1 bg-slate-100 rounded-md border border-slate-200">
               <button
                 type="button"
                 onClick={() => setDeliveryMode("IMMEDIATE")}
-                className={`flex items-center justify-center gap-1.5 py-2 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
+                className={`flex items-center justify-center gap-2 py-1.5 px-3 rounded text-xs font-medium transition-all cursor-pointer ${
                   deliveryMode === "IMMEDIATE"
-                    ? "bg-white text-slate-900 shadow-2xs border border-slate-200/50"
+                    ? "bg-white text-slate-900 shadow-2xs border border-slate-200/80 font-semibold"
                     : "text-slate-600 hover:text-slate-900"
                 }`}
               >
-                <Send className="w-3.5 h-3.5 text-blue-600" />
-                Send Immediately
+                <Send className="w-3.5 h-3.5 text-slate-500" />
+                <span>Send Immediately</span>
               </button>
 
               <button
                 type="button"
                 onClick={() => setDeliveryMode("SCHEDULED")}
-                className={`flex items-center justify-center gap-1.5 py-2 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
+                className={`flex items-center justify-center gap-2 py-1.5 px-3 rounded text-xs font-medium transition-all cursor-pointer ${
                   deliveryMode === "SCHEDULED"
-                    ? "bg-white text-slate-900 shadow-2xs border border-slate-200/50"
+                    ? "bg-white text-slate-900 shadow-2xs border border-slate-200/80 font-semibold"
                     : "text-slate-600 hover:text-slate-900"
                 }`}
               >
-                <Clock className="w-3.5 h-3.5 text-amber-600" />
-                Schedule for Later
+                <Clock className="w-3.5 h-3.5 text-slate-500" />
+                <span>Schedule for Later</span>
               </button>
             </div>
           </div>
 
-          {/* Scheduled Date & Time Controls (UK Timezone) */}
+          {/* Scheduling Controls */}
           {deliveryMode === "SCHEDULED" && (
-            <div className="bg-slate-50 border border-slate-200 rounded-xl p-4 space-y-3 animate-in fade-in-50 duration-150">
-              {/* UK Timezone Information Banner */}
-              <div className="flex items-center justify-between text-xs">
-                <span className="flex items-center gap-1.5 font-semibold text-slate-700">
-                  <Globe className="w-3.5 h-3.5 text-blue-600" />
-                  UK Timezone (Europe/London)
+            <div className="space-y-2 p-3.5 bg-slate-50 rounded-md border border-slate-200 text-xs">
+              <div className="flex items-center justify-between text-[11px] text-slate-500">
+                <span className="flex items-center gap-1.5 font-medium text-slate-700">
+                  <Globe className="w-3.5 h-3.5 text-slate-500" />
+                  Timezone: Europe/London (GMT/BST)
                 </span>
-                <span className="text-[11px] font-mono text-slate-500 bg-white px-2 py-0.5 rounded border border-slate-200">
+                <span className="font-mono text-slate-500">
                   Current: {currentUkTime || "Loading..."}
                 </span>
               </div>
 
-              {/* DateTime Local Input */}
               <div className="space-y-1">
-                <label className="text-[11px] font-medium text-slate-500 uppercase tracking-wider block">
-                  Select UK Date & Time <span className="text-rose-500">*</span>
+                <label className="text-xs font-medium text-slate-700">
+                  Scheduled Date & Time <span className="text-rose-500">*</span>
                 </label>
                 <input
                   type="datetime-local"
                   required={deliveryMode === "SCHEDULED"}
                   value={scheduledAtTime}
                   onChange={(e) => setScheduledAtTime(e.target.value)}
-                  className="w-full bg-white border border-slate-300 rounded-lg px-3 py-2 text-xs font-semibold text-slate-900 focus:outline-hidden focus:border-slate-900 transition-colors"
+                  className="w-full h-9 bg-white border border-slate-300 rounded-md px-3 text-xs text-slate-900 focus:outline-hidden focus:border-slate-900 focus:ring-1 focus:ring-slate-900"
                 />
               </div>
 
               {scheduledAtTime && (
-                <div className="text-[11px] text-amber-800 bg-amber-50/80 border border-amber-200/70 p-2.5 rounded-lg flex items-center gap-2">
-                  <Clock className="w-3.5 h-3.5 text-amber-600 shrink-0" />
-                  <span>
-                    Will be queued in BullMQ to dispatch at:{" "}
-                    <strong>{dayjs.tz(scheduledAtTime, "Europe/London").format("DD MMM YYYY, HH:mm")}</strong> UK Local Time
-                  </span>
-                </div>
+                <p className="text-[11px] text-slate-600 font-medium pt-0.5">
+                  Scheduled for: <span className="text-slate-900 font-semibold">{dayjs.tz(scheduledAtTime, "Europe/London").format("DD MMM YYYY, HH:mm")}</span> (UK local time)
+                </p>
               )}
             </div>
           )}
 
-          {/* Target Audience Selector */}
-          <div className="space-y-2">
-            <label className="text-xs font-semibold text-slate-700">
+          {/* Target Audience Segmented Control */}
+          <div className="space-y-1.5">
+            <label className="text-xs font-medium text-slate-700">
               Target Audience
             </label>
-            <div className="grid grid-cols-2 sm:grid-cols-5 gap-1.5 bg-slate-100 p-1 rounded-xl border border-slate-200/60 text-xs">
-              <button
-                type="button"
-                onClick={() => setAudienceType("ALL")}
-                className={`py-1.5 px-2 rounded-lg font-medium transition-all cursor-pointer text-center ${
-                  audienceType === "ALL"
-                    ? "bg-white text-slate-900 font-semibold shadow-2xs border border-slate-200/50"
-                    : "text-slate-600 hover:text-slate-900"
-                }`}
-              >
-                📢 All Users
-              </button>
-
-              <button
-                type="button"
-                onClick={() => setAudienceType("PLAYER")}
-                className={`py-1.5 px-2 rounded-lg font-medium transition-all cursor-pointer text-center ${
-                  audienceType === "PLAYER"
-                    ? "bg-white text-slate-900 font-semibold shadow-2xs border border-slate-200/50"
-                    : "text-slate-600 hover:text-slate-900"
-                }`}
-              >
-                ⚽ Players
-              </button>
-
-              <button
-                type="button"
-                onClick={() => setAudienceType("PARENT")}
-                className={`py-1.5 px-2 rounded-lg font-medium transition-all cursor-pointer text-center ${
-                  audienceType === "PARENT"
-                    ? "bg-white text-slate-900 font-semibold shadow-2xs border border-slate-200/50"
-                    : "text-slate-600 hover:text-slate-900"
-                }`}
-              >
-                👨‍👩‍👧 Parents
-              </button>
-
-              <button
-                type="button"
-                onClick={() => setAudienceType("REFEREE")}
-                className={`py-1.5 px-2 rounded-lg font-medium transition-all cursor-pointer text-center ${
-                  audienceType === "REFEREE"
-                    ? "bg-white text-slate-900 font-semibold shadow-2xs border border-slate-200/50"
-                    : "text-slate-600 hover:text-slate-900"
-                }`}
-              >
-                🏁 Referees
-              </button>
-
-              <button
-                type="button"
-                onClick={() => setAudienceType("SINGLE")}
-                className={`py-1.5 px-2 rounded-lg font-medium transition-all cursor-pointer text-center ${
-                  audienceType === "SINGLE"
-                    ? "bg-white text-slate-900 font-semibold shadow-2xs border border-slate-200/50"
-                    : "text-slate-600 hover:text-slate-900"
-                }`}
-              >
-                👤 Single User
-              </button>
+            <div className="grid grid-cols-2 sm:grid-cols-5 gap-1 p-1 bg-slate-100 rounded-md border border-slate-200 text-xs">
+              {[
+                { id: "ALL", label: "All Users", icon: Users },
+                { id: "PLAYER", label: "Players", icon: User },
+                { id: "PARENT", label: "Parents", icon: Users },
+                { id: "REFEREE", label: "Referees", icon: FileText },
+                { id: "SINGLE", label: "Specific User", icon: User },
+              ].map(({ id, label, icon: Icon }) => (
+                <button
+                  key={id}
+                  type="button"
+                  onClick={() => setAudienceType(id as any)}
+                  className={`flex items-center justify-center gap-1.5 py-1.5 px-2 rounded text-xs transition-all cursor-pointer ${
+                    audienceType === id
+                      ? "bg-white text-slate-900 font-semibold shadow-2xs border border-slate-200/80"
+                      : "text-slate-600 hover:text-slate-900"
+                  }`}
+                >
+                  <Icon className="w-3.5 h-3.5 text-slate-500" />
+                  <span>{label}</span>
+                </button>
+              ))}
             </div>
           </div>
 
-          {/* Specific User Combobox (Only shown if audienceType === 'SINGLE') */}
+          {/* Specific User Dropdown */}
           {audienceType === "SINGLE" && (
-            <div className="space-y-1.5 animate-in fade-in-50 duration-150">
-              <label className="text-xs font-semibold text-slate-700">
-                Select User Recipient <span className="text-rose-500">*</span>
+            <div className="space-y-1.5">
+              <label className="text-xs font-medium text-slate-700">
+                Recipient User <span className="text-rose-500">*</span>
               </label>
               <div className="relative">
                 <button
                   type="button"
                   onClick={() => setIsUserDropdownOpen(!isUserDropdownOpen)}
-                  className="w-full flex items-center justify-between px-3.5 py-2 bg-white border border-slate-300 rounded-xl text-xs text-left cursor-pointer hover:border-slate-400 focus:outline-hidden"
+                  className="w-full h-9 flex items-center justify-between px-3 bg-white border border-slate-300 rounded-md text-xs text-left cursor-pointer hover:border-slate-400 focus:outline-hidden focus:border-slate-900 focus:ring-1 focus:ring-slate-900"
                 >
                   <span className="truncate">
                     {selectedUser ? (
-                      <span className="flex items-center gap-2 text-slate-900 font-semibold">
-                        <User className="w-3.5 h-3.5 text-blue-600" />
+                      <span className="text-slate-900 font-medium">
                         {selectedUser.name} {selectedUser.email ? `(${selectedUser.email})` : ""}
                       </span>
                     ) : (
-                      <span className="text-slate-400">Click to search and select user...</span>
+                      <span className="text-slate-400">Select user...</span>
                     )}
                   </span>
-                  <ChevronsUpDown className="w-4 h-4 text-slate-400 shrink-0 ml-2" />
+                  <ChevronsUpDown className="w-3.5 h-3.5 text-slate-400 shrink-0 ml-2" />
                 </button>
 
                 {isUserDropdownOpen && (
-                  <div className="absolute left-0 right-0 top-full mt-1 z-50 bg-white border border-slate-200 rounded-xl shadow-xl overflow-hidden max-h-56 flex flex-col">
+                  <div className="absolute left-0 right-0 top-full mt-1 z-50 bg-white border border-slate-200 rounded-md shadow-lg overflow-hidden max-h-52 flex flex-col">
                     <div className="p-2 border-b border-slate-100 bg-slate-50 flex items-center gap-2">
                       <Search className="w-3.5 h-3.5 text-slate-400 shrink-0 ml-1" />
                       <input
                         type="text"
                         value={userSearchTerm}
                         onChange={(e) => setUserSearchTerm(e.target.value)}
-                        placeholder="Search by name or email..."
+                        placeholder="Search name or email..."
                         className="w-full bg-transparent text-xs py-1 text-slate-900 placeholder:text-slate-400 focus:outline-hidden"
                         autoFocus
                       />
@@ -382,17 +333,17 @@ export default function CreatePushNotificationModal({
                                 setSelectedUser({ id: u._id, name, email: u.email });
                                 setIsUserDropdownOpen(false);
                               }}
-                              className={`w-full flex items-center justify-between px-3 py-1.5 text-xs rounded-lg transition-colors cursor-pointer text-left ${
-                                isSelected ? "bg-slate-900 text-white font-semibold" : "text-slate-700 hover:bg-slate-100"
+                              className={`w-full flex items-center justify-between px-3 py-1.5 text-xs rounded transition-colors cursor-pointer text-left ${
+                                isSelected ? "bg-slate-900 text-white font-medium" : "text-slate-700 hover:bg-slate-100"
                               }`}
                             >
                               <div className="flex flex-col min-w-0 pr-2">
-                                <span className="font-semibold truncate">{name}</span>
+                                <span className="font-medium truncate">{name}</span>
                                 <span className={isSelected ? "text-slate-300 text-[10px]" : "text-slate-500 text-[10px]"}>
-                                  {u.parentId ? "⚽ Child Player (Routed to Parent Device)" : `👨‍👩‍👧 Parent Account ${u.email ? `• ${u.email}` : ""}`}
+                                  {u.parentId ? "Child Player (routes to parent device)" : (u.email || "Parent Account")}
                                 </span>
                               </div>
-                              {isSelected && <Check className="w-3.5 h-3.5 text-emerald-400 shrink-0" />}
+                              {isSelected && <Check className="w-3.5 h-3.5 text-white shrink-0" />}
                             </button>
                           );
                         })
@@ -402,7 +353,7 @@ export default function CreatePushNotificationModal({
                 )}
               </div>
               <p className="text-[11px] text-slate-500">
-                💡 <strong>Note:</strong> Child players do not have independent logins. Selecting a child player will automatically deliver the push notification to their registered parent&apos;s device token.
+                Child players do not maintain independent sessions. Push notifications to a child player will be delivered to their parent&apos;s registered device.
               </p>
             </div>
           )}
@@ -410,10 +361,10 @@ export default function CreatePushNotificationModal({
           {/* Title Input */}
           <div className="space-y-1.5">
             <div className="flex items-center justify-between">
-              <label className="text-xs font-semibold text-slate-700">
+              <label className="text-xs font-medium text-slate-700">
                 Notification Title <span className="text-rose-500">*</span>
               </label>
-              <span className="text-[11px] text-slate-400">{title.length}/60</span>
+              <span className="text-[11px] font-mono text-slate-400">{title.length}/60</span>
             </div>
             <input
               type="text"
@@ -421,18 +372,18 @@ export default function CreatePushNotificationModal({
               maxLength={60}
               value={title}
               onChange={(e) => setTitle(e.target.value)}
-              placeholder="e.g., Weekend Fixtures Announced!"
-              className="w-full bg-white border border-slate-300 rounded-xl px-3.5 py-2 text-xs font-medium text-slate-900 placeholder:text-slate-400 focus:outline-hidden focus:border-slate-900 transition-colors"
+              placeholder="e.g. Schedule update for upcoming match"
+              className="w-full h-9 bg-white border border-slate-300 rounded-md px-3 text-xs text-slate-900 placeholder:text-slate-400 focus:outline-hidden focus:border-slate-900 focus:ring-1 focus:ring-slate-900 transition-colors"
             />
           </div>
 
           {/* Message Body */}
           <div className="space-y-1.5">
             <div className="flex items-center justify-between">
-              <label className="text-xs font-semibold text-slate-700">
+              <label className="text-xs font-medium text-slate-700">
                 Message Body <span className="text-rose-500">*</span>
               </label>
-              <span className="text-[11px] text-slate-400">{message.length}/300</span>
+              <span className="text-[11px] font-mono text-slate-400">{message.length}/300</span>
             </div>
             <textarea
               required
@@ -441,24 +392,24 @@ export default function CreatePushNotificationModal({
               value={message}
               onChange={(e) => setMessage(e.target.value)}
               placeholder="Enter push notification message content..."
-              className="w-full bg-white border border-slate-300 rounded-xl p-3 text-xs text-slate-800 placeholder:text-slate-400 focus:outline-hidden focus:border-slate-900 resize-none transition-colors"
+              className="w-full bg-white border border-slate-300 rounded-md p-3 text-xs text-slate-900 placeholder:text-slate-400 focus:outline-hidden focus:border-slate-900 focus:ring-1 focus:ring-slate-900 resize-none transition-colors"
             />
           </div>
 
           {/* Footer Submit Actions */}
-          <div className="flex items-center justify-end gap-3 pt-3 border-t border-slate-100">
+          <div className="flex items-center justify-end gap-3 pt-3 border-t border-slate-200">
             <button
               type="button"
               onClick={() => setIsOpen(false)}
               disabled={isSubmitting}
-              className="px-4 py-2 rounded-lg border border-slate-300 text-xs font-medium text-slate-700 hover:bg-slate-50 transition-colors cursor-pointer"
+              className="px-4 py-2 rounded-md border border-slate-300 bg-white text-xs font-medium text-slate-700 hover:bg-slate-50 transition-colors cursor-pointer"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={isSubmitting || !title.trim() || !message.trim()}
-              className="px-4 py-2 rounded-lg bg-slate-900 hover:bg-slate-800 text-white text-xs font-semibold transition-colors disabled:opacity-50 flex items-center gap-2 cursor-pointer shadow-xs"
+              className="px-4 py-2 rounded-md bg-slate-900 hover:bg-slate-800 text-white text-xs font-medium transition-colors disabled:opacity-50 flex items-center gap-2 cursor-pointer shadow-2xs"
             >
               {isSubmitting ? (
                 <Loader2 className="w-3.5 h-3.5 animate-spin" />
@@ -467,7 +418,7 @@ export default function CreatePushNotificationModal({
               ) : (
                 <Send className="w-3.5 h-3.5" />
               )}
-              {deliveryMode === "SCHEDULED" ? "Schedule Notification" : "Send Immediately"}
+              <span>{deliveryMode === "SCHEDULED" ? "Schedule Notification" : "Send Notification"}</span>
             </button>
           </div>
         </form>
