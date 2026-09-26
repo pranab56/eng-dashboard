@@ -160,9 +160,6 @@ export default function CreatePushNotificationModal({
               <DialogTitle className="text-base font-semibold text-slate-900">
                 Create Push Notification
               </DialogTitle>
-              <span className="px-2 py-0.5 rounded text-[11px] font-medium bg-slate-100 text-slate-600 border border-slate-200">
-                BullMQ Queue
-              </span>
             </div>
             <p className="text-xs text-slate-500 mt-1">
               Broadcast announcements immediately or schedule targeted delivery.
