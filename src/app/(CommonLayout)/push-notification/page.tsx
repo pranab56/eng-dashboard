@@ -65,12 +65,24 @@ export default function PushNotificationPage() {
     });
   }, [setHeaders]);
 
-  const rawNotifications = useMemo(() => {
-    return notificationRes?.data || [];
+  const rawNotifications: any[] = useMemo(() => {
+    if (Array.isArray(notificationRes?.data?.result)) {
+      return notificationRes.data.result;
+    }
+    if (Array.isArray(notificationRes?.data)) {
+      return notificationRes.data;
+    }
+    if (Array.isArray(notificationRes?.result)) {
+      return notificationRes.result;
+    }
+    return [];
   }, [notificationRes]);
 
   const paginationInfo = useMemo(() => {
-    return notificationRes?.pagination || { totalPage: 1, total: 0 };
+    return (
+      notificationRes?.data?.pagination ||
+      notificationRes?.pagination || { totalPage: 1, total: 0 }
+    );
   }, [notificationRes]);
 
   // Compute live stats cards
@@ -79,15 +91,17 @@ export default function PushNotificationPage() {
     let scheduledCount = 0;
     let cancelledCount = 0;
 
-    rawNotifications.forEach((n: any) => {
-      const st = (n.status || "SENT").toUpperCase();
-      if (st === "SCHEDULED") scheduledCount++;
-      else if (st === "CANCELLED") cancelledCount++;
-      else sentCount++;
-    });
+    if (Array.isArray(rawNotifications)) {
+      rawNotifications.forEach((n: any) => {
+        const st = (n?.status || "SENT").toUpperCase();
+        if (st === "SCHEDULED") scheduledCount++;
+        else if (st === "CANCELLED") cancelledCount++;
+        else sentCount++;
+      });
+    }
 
     return {
-      total: paginationInfo.total || rawNotifications.length,
+      total: paginationInfo?.total || (Array.isArray(rawNotifications) ? rawNotifications.length : 0),
       sentCount,
       scheduledCount,
       cancelledCount,
@@ -117,14 +131,15 @@ export default function PushNotificationPage() {
 
   // Client-side search and status filter
   const filteredNotifications = useMemo(() => {
+    if (!Array.isArray(rawNotifications)) return [];
     return rawNotifications.filter((n: any) => {
       const matchSearch =
-        n.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        n.message?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        n.user?.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        n.user?.userName?.toLowerCase().includes(searchTerm.toLowerCase());
+        n?.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        n?.message?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        n?.user?.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        n?.user?.userName?.toLowerCase().includes(searchTerm.toLowerCase());
 
-      const itemStatus = (n.status || "SENT").toUpperCase();
+      const itemStatus = (n?.status || "SENT").toUpperCase();
       const matchStatus = statusFilter === "ALL" || itemStatus === statusFilter;
 
       return matchSearch && matchStatus;

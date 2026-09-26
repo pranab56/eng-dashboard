@@ -386,7 +386,12 @@ export default function CreatePushNotificationModal({
                                 isSelected ? "bg-slate-900 text-white font-semibold" : "text-slate-700 hover:bg-slate-100"
                               }`}
                             >
-                              <span className="truncate">{name} {u.email ? `(${u.email})` : ""}</span>
+                              <div className="flex flex-col min-w-0 pr-2">
+                                <span className="font-semibold truncate">{name}</span>
+                                <span className={isSelected ? "text-slate-300 text-[10px]" : "text-slate-500 text-[10px]"}>
+                                  {u.parentId ? "⚽ Child Player (Routed to Parent Device)" : `👨‍👩‍👧 Parent Account ${u.email ? `• ${u.email}` : ""}`}
+                                </span>
+                              </div>
                               {isSelected && <Check className="w-3.5 h-3.5 text-emerald-400 shrink-0" />}
                             </button>
                           );
@@ -396,6 +401,9 @@ export default function CreatePushNotificationModal({
                   </div>
                 )}
               </div>
+              <p className="text-[11px] text-slate-500">
+                💡 <strong>Note:</strong> Child players do not have independent logins. Selecting a child player will automatically deliver the push notification to their registered parent&apos;s device token.
+              </p>
             </div>
           )}
 
