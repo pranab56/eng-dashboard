@@ -265,7 +265,7 @@ export default function CreatePushNotificationModal({
                   <span className="font-medium text-amber-800">Scheduled for:</span>
                   <span className="font-bold text-amber-950">
                     {dayjs.tz(`${scheduledDate}T${scheduledTime}`, "Europe/London").isValid()
-                      ? dayjs.tz(`${scheduledDate}T${scheduledTime}`, "Europe/London").format("ddd, DD MMM YYYY [at] hh:mm A") + " (UK)"
+                      ? dayjs.tz(`${scheduledDate}T${scheduledTime}`, "Europe/London").format("ddd, DD MMM YYYY [at] HH:mm") + " (UK Time, 24h)"
                       : `${scheduledDate} ${scheduledTime}`}
                   </span>
                 </div>
