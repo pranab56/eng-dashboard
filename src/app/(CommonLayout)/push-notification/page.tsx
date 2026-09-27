@@ -14,6 +14,7 @@ import GeneralStateCard, { GeneralStateCardProps } from "@/components/cui/Genera
 import CreateButton from "@/components/buttons/CreateButton";
 import CustomPagination from "@/components/cui/CustomPagination";
 import CreatePushNotificationModal from "@/components/modals/CreatePushNotificationModal";
+import DeleteConfirmModal from "@/components/modals/DeleteConfirmModal";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 import utc from "dayjs/plugin/utc";
@@ -47,6 +48,8 @@ export default function PushNotificationPage() {
   const page = searchParams.get("page") || "1";
 
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isClearAllModalOpen, setIsClearAllModalOpen] = useState(false);
+  const [deleteTargetId, setDeleteTargetId] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState<"ALL" | "SENT" | "SCHEDULED" | "CANCELLED">("ALL");
   const [deletingId, setDeletingId] = useState<string | null>(null);
@@ -146,12 +149,17 @@ export default function PushNotificationPage() {
     });
   }, [rawNotifications, searchTerm, statusFilter]);
 
-  const handleSingleDelete = async (id: string) => {
-    if (!confirm("Are you sure you want to delete this notification record?")) return;
+  const handleSingleDelete = (id: string) => {
+    setDeleteTargetId(id);
+  };
+
+  const confirmSingleDelete = async () => {
+    if (!deleteTargetId) return;
     try {
-      setDeletingId(id);
-      await deleteSingleNotification(id).unwrap();
+      setDeletingId(deleteTargetId);
+      await deleteSingleNotification(deleteTargetId).unwrap();
       toast.success("Notification deleted successfully");
+      setDeleteTargetId(null);
     } catch (error: any) {
       toast.error(error?.data?.message || "Failed to delete notification");
     } finally {
@@ -160,7 +168,6 @@ export default function PushNotificationPage() {
   };
 
   const handleCancelScheduled = async (id: string) => {
-    if (!confirm("Cancel this scheduled notification? It will not be sent.")) return;
     try {
       setActionInProgressId(id);
       await cancelScheduledNotification(id).unwrap();
@@ -173,7 +180,6 @@ export default function PushNotificationPage() {
   };
 
   const handleSendNow = async (id: string) => {
-    if (!confirm("Dispatch this scheduled notification immediately to users?")) return;
     try {
       setActionInProgressId(id);
       await sendScheduledNowNotification(id).unwrap();
@@ -185,94 +191,133 @@ export default function PushNotificationPage() {
     }
   };
 
-  const handleClearAll = async () => {
-    if (!confirm("Are you sure you want to clear all notification history?")) return;
+  const handleClearAll = () => {
+    setIsClearAllModalOpen(true);
+  };
+
+  const confirmClearAll = async () => {
     try {
       await deleteAllNotification(undefined).unwrap();
       toast.success("All notifications cleared");
+      setIsClearAllModalOpen(false);
     } catch (error: any) {
       toast.error(error?.data?.message || "Failed to clear notifications");
     }
   };
 
   return (
-    <div className="space-y-6">
+    <div className="w-full p-4 sm:p-5 space-y-5">
       {/* Top Metric Cards */}
       <GeneralStateCard className="grid-cols-1 md:grid-cols-3" items={stateCardsData} />
 
       {/* Main Content Box */}
       <div className="bg-white rounded-lg border border-slate-200 p-6 shadow-xs space-y-6">
-        {/* Header Controls: Title, Search, Buttons */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-100">
+        {/* Header Controls: Title on Left, Action Buttons on Right */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-5 border-b border-slate-100">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-lg bg-slate-900 text-white flex items-center justify-center shadow-xs shrink-0">
-              <Bell className="w-4 h-4 text-slate-300" />
+            <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-slate-900 to-slate-800 text-white flex items-center justify-center shadow-xs shrink-0 border border-slate-700/50">
+              <Bell className="w-5 h-5 text-amber-400" />
             </div>
             <div>
-              <h2 className="text-base font-semibold text-slate-900 tracking-tight">
-                Push Notifications & Schedule Log
-              </h2>
-              <p className="text-xs text-slate-500">
-                Monitor live broadcasts and future scheduled deliveries (UK Time / BullMQ)
+              <div className="flex items-center gap-2">
+                <h2 className="text-base font-bold text-slate-900 tracking-tight">
+                  Push Notifications & Schedule Log
+                </h2>
+                <span className="hidden sm:inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-amber-50 text-amber-700 border border-amber-200/70">
+                  <Globe className="w-3 h-3 text-amber-600" />
+                  UK Time (BST/GMT)
+                </span>
+              </div>
+              <p className="text-xs text-slate-500 mt-0.5">
+                Monitor live broadcasts and future scheduled deliveries managed by BullMQ
               </p>
             </div>
           </div>
 
-          <div className="flex flex-wrap items-center gap-2.5">
-            {/* Search Input */}
-            <div className="relative min-w-[200px]">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 w-3.5 h-3.5" />
-              <input
-                type="text"
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                placeholder="Search notifications..."
-                className="w-full pl-8 pr-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-xs text-slate-900 placeholder:text-slate-400 focus:outline-hidden focus:border-slate-900 transition-colors"
-              />
-            </div>
-
+          <div className="flex items-center gap-2.5 shrink-0 self-start sm:self-auto">
             {/* Clear All Button */}
             {rawNotifications.length > 0 && (
               <button
                 type="button"
                 onClick={handleClearAll}
                 disabled={isClearingAll}
-                className="inline-flex items-center gap-1.5 px-3 py-2 bg-rose-50 hover:bg-rose-100 text-rose-600 border border-rose-200/60 rounded-lg text-xs font-semibold transition-colors disabled:opacity-50 cursor-pointer"
+                className="inline-flex items-center gap-1.5 px-3 py-2 bg-rose-50 hover:bg-rose-100 text-rose-600 hover:text-rose-700 border border-rose-200/70 rounded-xl text-xs font-semibold transition-all duration-150 disabled:opacity-50 cursor-pointer active:scale-95"
               >
                 <Trash2 className="w-3.5 h-3.5" />
                 <span>Clear All</span>
               </button>
             )}
 
-            {/* Create Button */}
-            <CreateButton
-              text="Send / Schedule Push"
+            {/* Primary Action Button: Send / Schedule Push */}
+            <button
+              type="button"
               onClick={() => setIsModalOpen(true)}
-              className="py-2 px-3.5 text-xs font-semibold rounded-lg shadow-xs"
-            />
+              className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white rounded-xl text-xs font-bold shadow-sm shadow-amber-500/25 transition-all duration-150 active:scale-95 cursor-pointer shrink-0"
+            >
+              <Send className="w-3.5 h-3.5" />
+              <span>Send / Schedule Push</span>
+            </button>
           </div>
         </div>
 
-        {/* Status Filter Tabs */}
-        <div className="flex items-center gap-1.5 border-b border-slate-100 pb-3 text-xs">
-          <span className="text-slate-400 font-medium text-[11px] mr-1">Filter Status:</span>
-          {(["ALL", "SENT", "SCHEDULED", "CANCELLED"] as const).map((tab) => (
-            <button
-              key={tab}
-              type="button"
-              onClick={() => setStatusFilter(tab)}
-              className={`px-3 py-1.5 rounded-lg font-medium transition-all cursor-pointer ${
-                statusFilter === tab
-                  ? "bg-slate-900 text-white font-semibold shadow-2xs"
-                  : "bg-slate-100 text-slate-600 hover:text-slate-900 hover:bg-slate-200/60"
-              }`}
-            >
-              {tab === "ALL" && "All"}
-              {tab === "SENT" && "Dispatched"}
-              {tab === "SCHEDULED" && `Scheduled (${stats.scheduledCount})`}
-              {tab === "CANCELLED" && "Cancelled"}
-            </button>
-          ))}
+        {/* Toolbar: Filter Status Tabs on Left, Search Input on Right */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-100">
+          {/* Status Filter Tabs */}
+          <div className="flex items-center gap-1.5 overflow-x-auto py-0.5 slim-scroll">
+            <span className="text-slate-400 font-medium text-xs mr-1 shrink-0">Filter:</span>
+            {[
+              { id: "ALL", label: "All", count: stats.total },
+              { id: "SENT", label: "Dispatched", count: stats.sentCount },
+              { id: "SCHEDULED", label: "Scheduled", count: stats.scheduledCount },
+              { id: "CANCELLED", label: "Cancelled", count: stats.cancelledCount },
+            ].map((tab) => {
+              const isActive = statusFilter === tab.id;
+              return (
+                <button
+                  key={tab.id}
+                  type="button"
+                  onClick={() => setStatusFilter(tab.id as any)}
+                  className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold transition-all duration-150 cursor-pointer shrink-0 ${
+                    isActive
+                      ? "bg-slate-900 text-white shadow-xs"
+                      : "bg-slate-100/80 text-slate-600 hover:text-slate-900 hover:bg-slate-200/70"
+                  }`}
+                >
+                  <span>{tab.label}</span>
+                  <span
+                    className={`text-[10px] px-1.5 py-0.5 rounded-md font-mono ${
+                      isActive
+                        ? "bg-white/20 text-white"
+                        : "bg-slate-200/80 text-slate-600"
+                    }`}
+                  >
+                    {tab.count}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+
+          {/* Search Input */}
+          <div className="relative w-full sm:w-72 shrink-0">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 w-3.5 h-3.5" />
+            <input
+              type="text"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              placeholder="Search notifications..."
+              className="w-full pl-9 pr-3 py-1.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-900 placeholder:text-slate-400 focus:outline-hidden focus:border-amber-500 focus:ring-1 focus:ring-amber-500 transition-colors"
+            />
+            {searchTerm && (
+              <button
+                type="button"
+                onClick={() => setSearchTerm("")}
+                className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 text-xs cursor-pointer p-0.5"
+              >
+                ✕
+              </button>
+            )}
+          </div>
         </div>
 
         {/* Notifications List */}
@@ -465,6 +510,26 @@ export default function PushNotificationPage() {
 
       {/* Create Modal */}
       <CreatePushNotificationModal isOpen={isModalOpen} setIsOpen={setIsModalOpen} />
+
+      {/* Clear All Confirmation Modal */}
+      <DeleteConfirmModal
+        isOpen={isClearAllModalOpen}
+        onClose={() => setIsClearAllModalOpen(false)}
+        onConfirm={confirmClearAll}
+        isLoading={isClearingAll}
+        title="Clear All Notifications"
+        description="Are you sure you want to permanently delete all notification logs from the database? This action cannot be undone."
+      />
+
+      {/* Delete Single Notification Modal */}
+      <DeleteConfirmModal
+        isOpen={deleteTargetId !== null}
+        onClose={() => setDeleteTargetId(null)}
+        onConfirm={confirmSingleDelete}
+        isLoading={deletingId !== null}
+        title="Delete Notification Log"
+        description="Are you sure you want to delete this notification record? This action cannot be undone."
+      />
     </div>
   );
 }

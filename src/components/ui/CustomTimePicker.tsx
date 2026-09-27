@@ -113,7 +113,7 @@ const CustomTimePicker: React.FC<CustomTimePickerProps> = ({
       <button
         type="button"
         onClick={() => setIsOpen(!isOpen)}
-        className={`w-full flex items-center justify-between px-3.5 py-2.5 bg-[#f8fafc] border rounded-xl text-xs font-semibold text-slate-800 hover:bg-white focus:outline-none focus:ring-2 transition-all duration-200 cursor-pointer shadow-2xs ${
+        className={`w-full h-14 flex items-center justify-between px-3.5 py-2 bg-[#f8fafc] border rounded-xl text-xs font-semibold text-slate-800 hover:bg-white focus:outline-none focus:ring-2 transition-all duration-200 cursor-pointer shadow-2xs ${
           error
             ? "border-red-400 focus:ring-red-100 bg-red-50/30"
             : isOpen

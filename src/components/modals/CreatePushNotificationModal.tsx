@@ -29,9 +29,11 @@ import toast from "react-hot-toast";
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
 import timezone from "dayjs/plugin/timezone";
+import relativeTime from "dayjs/plugin/relativeTime";
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
+dayjs.extend(relativeTime);
 
 interface CreatePushNotificationModalProps {
   isOpen: boolean;
@@ -54,12 +56,12 @@ export default function CreatePushNotificationModal({
   const [scheduledTime, setScheduledTime] = useState("");
   const [selectedUser, setSelectedUser] = useState<{ id: string; name: string; email?: string } | null>(null);
 
-  // Initialize default scheduled date/time (today/next hour UK time) when switching to SCHEDULED
+  // Initialize default scheduled date/time (today / next 15 mins UK time) when switching to SCHEDULED
   useEffect(() => {
     if (deliveryMode === "SCHEDULED" && !scheduledDate) {
       const nowUk = dayjs().tz("Europe/London");
       setScheduledDate(nowUk.format("YYYY-MM-DD"));
-      setScheduledTime(nowUk.add(1, "hour").minute(0).format("HH:mm"));
+      setScheduledTime(nowUk.add(15, "minute").format("HH:mm"));
     }
   }, [deliveryMode, scheduledDate]);
 
@@ -97,6 +99,15 @@ export default function CreatePushNotificationModal({
       return name.includes(term) || email.includes(term);
     });
   }, [usersData, userSearchTerm]);
+
+  // Check if scheduled time is valid future
+  const isScheduledValid = useMemo(() => {
+    if (deliveryMode !== "SCHEDULED") return true;
+    if (!scheduledDate || !scheduledTime) return false;
+    const scheduledUk = dayjs.tz(`${scheduledDate}T${scheduledTime}`, "Europe/London");
+    const nowUk = dayjs().tz("Europe/London");
+    return scheduledUk.isValid() && scheduledUk.diff(nowUk, "seconds") >= 10;
+  }, [deliveryMode, scheduledDate, scheduledTime]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -137,19 +148,27 @@ export default function CreatePushNotificationModal({
       }
 
       if (scheduledUk.diff(nowUk, "seconds") < 10) {
-        toast.error("Scheduled time must be at least 10 seconds in the future (UK Time)");
+        toast.error(
+          `Scheduled time must be at least 10 seconds in the future (UK Time). Current UK Time: ${nowUk.format("HH:mm:ss")}.`
+        );
         return;
       }
 
       payload.isScheduled = true;
       payload.scheduledAt = scheduledUk.toISOString();
+      payload.scheduledAtUK = scheduledUk.format("YYYY-MM-DD HH:mm:ss");
     } else {
       payload.isScheduled = false;
     }
 
     try {
       const res = await createPushNotification(payload).unwrap();
-      toast.success(res?.message || (deliveryMode === "SCHEDULED" ? "Notification scheduled successfully" : "Notification sent successfully"));
+      toast.success(
+        res?.message ||
+          (deliveryMode === "SCHEDULED"
+            ? "Notification scheduled successfully"
+            : "Notification sent successfully")
+      );
 
       // Reset
       setTitle("");
@@ -195,37 +214,42 @@ export default function CreatePushNotificationModal({
         </div>
 
         {/* Form Body */}
-        <form onSubmit={handleSubmit} className="p-6 space-y-4 overflow-y-auto max-h-[72vh] bg-white">
+        <form onSubmit={handleSubmit} className="p-6 space-y-4 overflow-y-auto max-h-[72vh] bg-white slim-scroll">
           {/* Delivery Schedule Segmented Control */}
-          <div className="space-y-1.5">
-            <label className="text-xs font-medium text-slate-700">
-              Delivery Schedule
-            </label>
-            <div className="grid grid-cols-2 gap-1 p-1 bg-slate-100 rounded-md border border-slate-200">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2.5 p-3 bg-slate-50/80 rounded-xl border border-slate-200">
+            <div>
+              <span className="block text-xs font-semibold text-slate-800">
+                Delivery Schedule
+              </span>
+              <span className="block text-[11px] text-slate-500">
+                Choose delivery timing for this notification
+              </span>
+            </div>
+            <div className="inline-flex p-1 bg-slate-200/60 rounded-xl border border-slate-200/80 shrink-0 self-start sm:self-auto">
               <button
                 type="button"
                 onClick={() => setDeliveryMode("IMMEDIATE")}
-                className={`flex items-center justify-center gap-2 py-1.5 px-3 rounded text-xs font-medium transition-all cursor-pointer ${
+                className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all duration-150 cursor-pointer ${
                   deliveryMode === "IMMEDIATE"
-                    ? "bg-white text-slate-900 shadow-2xs border border-slate-200/80 font-semibold"
+                    ? "bg-white text-slate-900 shadow-xs font-bold"
                     : "text-slate-600 hover:text-slate-900"
                 }`}
               >
-                <Send className="w-3.5 h-3.5 text-slate-500" />
-                <span>Send Immediately</span>
+                <Send className={`w-3.5 h-3.5 ${deliveryMode === "IMMEDIATE" ? "text-amber-600" : "text-slate-400"}`} />
+                <span>Send Now</span>
               </button>
 
               <button
                 type="button"
                 onClick={() => setDeliveryMode("SCHEDULED")}
-                className={`flex items-center justify-center gap-2 py-1.5 px-3 rounded text-xs font-medium transition-all cursor-pointer ${
+                className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all duration-150 cursor-pointer ${
                   deliveryMode === "SCHEDULED"
-                    ? "bg-white text-slate-900 shadow-2xs border border-slate-200/80 font-semibold"
+                    ? "bg-white text-slate-900 shadow-xs font-bold"
                     : "text-slate-600 hover:text-slate-900"
                 }`}
               >
-                <Clock className="w-3.5 h-3.5 text-slate-500" />
-                <span>Schedule for Later</span>
+                <Clock className={`w-3.5 h-3.5 ${deliveryMode === "SCHEDULED" ? "text-amber-600" : "text-slate-400"}`} />
+                <span>Schedule</span>
               </button>
             </div>
           </div>
@@ -238,8 +262,8 @@ export default function CreatePushNotificationModal({
                   <Globe className="w-3.5 h-3.5 text-slate-500" />
                   Timezone: Europe/London (GMT/BST)
                 </span>
-                <span className="font-mono text-slate-500">
-                  Current: {currentUkTime || "Loading..."}
+                <span className="font-mono text-slate-600 font-semibold">
+                  UK Clock: {currentUkTime || "Loading..."}
                 </span>
               </div>
 
@@ -250,6 +274,7 @@ export default function CreatePushNotificationModal({
                   onChange={setScheduledDate}
                   placeholder="Select Date"
                   align="left"
+                  theme="amber"
                 />
                 <CustomTimePicker
                   label="Scheduled Time (UK)"
@@ -260,16 +285,44 @@ export default function CreatePushNotificationModal({
                 />
               </div>
 
-              {scheduledDate && scheduledTime && (
-                <div className="p-2.5 rounded-xl bg-amber-50/80 border border-amber-200/70 flex items-center justify-between text-[11px] text-amber-900">
-                  <span className="font-medium text-amber-800">Scheduled for:</span>
-                  <span className="font-bold text-amber-950">
-                    {dayjs.tz(`${scheduledDate}T${scheduledTime}`, "Europe/London").isValid()
-                      ? dayjs.tz(`${scheduledDate}T${scheduledTime}`, "Europe/London").format("ddd, DD MMM YYYY [at] HH:mm") + " (UK Time, 24h)"
-                      : `${scheduledDate} ${scheduledTime}`}
-                  </span>
-                </div>
-              )}
+              {scheduledDate && scheduledTime && (() => {
+                const scheduledUk = dayjs.tz(`${scheduledDate}T${scheduledTime}`, "Europe/London");
+                const nowUk = dayjs().tz("Europe/London");
+                const isFuture = scheduledUk.isValid() && scheduledUk.diff(nowUk, "seconds") >= 10;
+                return (
+                  <div
+                    className={`p-2.5 rounded-xl border flex items-center justify-between text-[11px] transition-all ${
+                      isFuture
+                        ? "bg-emerald-50/90 border-emerald-200 text-emerald-900"
+                        : "bg-rose-50/90 border-rose-200 text-rose-900"
+                    }`}
+                  >
+                    <div className="flex items-center gap-1.5">
+                      <span className="font-semibold">
+                        {isFuture ? "Scheduled for:" : "Invalid (Past Time):"}
+                      </span>
+                      <span className="font-bold">
+                        {scheduledUk.isValid()
+                          ? `${scheduledUk.format("ddd, DD MMM YYYY [at] HH:mm")} UK`
+                          : `${scheduledDate} ${scheduledTime}`}
+                      </span>
+                    </div>
+                    <span
+                      className={`text-[10px] font-bold px-2 py-0.5 rounded-md ${
+                        isFuture
+                          ? "bg-emerald-100 text-emerald-800"
+                          : "bg-rose-100 text-rose-800"
+                      }`}
+                    >
+                      {scheduledUk.isValid()
+                        ? isFuture
+                          ? scheduledUk.from(nowUk)
+                          : "Past Time"
+                        : "Invalid"}
+                    </span>
+                  </div>
+                );
+              })()}
             </div>
           )}
 
@@ -278,28 +331,41 @@ export default function CreatePushNotificationModal({
             <label className="text-xs font-medium text-slate-700">
               Target Audience
             </label>
-            <div className="grid grid-cols-2 sm:grid-cols-5 gap-1 p-1 bg-slate-100 rounded-md border border-slate-200 text-xs">
+            <div className="grid grid-cols-2 sm:grid-cols-5 gap-2">
               {[
-                { id: "ALL", label: "All Users", icon: Users },
-                { id: "PLAYER", label: "Players / Parents", icon: User },
-                { id: "MANAGER", label: "Managers", icon: Briefcase },
-                { id: "REFEREE", label: "Referees", icon: FileText },
-                { id: "SINGLE", label: "Specific User", icon: User },
-              ].map(({ id, label, icon: Icon }) => (
-                <button
-                  key={id}
-                  type="button"
-                  onClick={() => setAudienceType(id as any)}
-                  className={`flex items-center justify-center gap-1.5 py-1.5 px-2 rounded text-xs transition-all cursor-pointer ${
-                    audienceType === id
-                      ? "bg-white text-slate-900 font-semibold shadow-2xs border border-slate-200/80"
-                      : "text-slate-600 hover:text-slate-900"
-                  }`}
-                >
-                  <Icon className="w-3.5 h-3.5 text-slate-500" />
-                  <span>{label}</span>
-                </button>
-              ))}
+                { type: "ALL", label: "All Users", icon: Users },
+                { type: "PLAYER", label: "Players", icon: User },
+                { type: "MANAGER", label: "Managers", icon: Briefcase },
+                { type: "REFEREE", label: "Referees", icon: FileText },
+                { type: "SINGLE", label: "Specific User", icon: User },
+              ].map(({ type, label, icon: Icon }) => {
+                const isSelected = audienceType === type;
+                return (
+                  <button
+                    key={type}
+                    type="button"
+                    onClick={() => setAudienceType(type as any)}
+                    className={`group relative flex flex-col items-center justify-center h-[72px] w-full p-2 rounded-xl border text-center transition-all duration-150 ease-out cursor-pointer select-none active:scale-95 ${
+                      isSelected
+                        ? "bg-gradient-to-br from-amber-500 to-amber-600 text-white border-amber-500 shadow-sm shadow-amber-500/25"
+                        : "bg-white hover:bg-amber-50/40 text-slate-700 hover:text-amber-950 border-slate-200 hover:border-amber-300 shadow-2xs"
+                    }`}
+                  >
+                    <div
+                      className={`w-7 h-7 shrink-0 rounded-lg flex items-center justify-center mb-1 transition-colors duration-150 ${
+                        isSelected
+                          ? "bg-white/20 text-white"
+                          : "bg-amber-50 text-amber-600 group-hover:bg-amber-100 group-hover:text-amber-700"
+                      }`}
+                    >
+                      <Icon className={`w-3.5 h-3.5 transition-colors ${isSelected ? "text-white" : "text-amber-600"}`} />
+                    </div>
+                    <span className={`text-[11px] leading-tight truncate w-full px-0.5 ${isSelected ? "font-semibold text-white" : "font-medium text-slate-700"}`}>
+                      {label}
+                    </span>
+                  </button>
+                );
+              })}
             </div>
           </div>
 
@@ -313,7 +379,7 @@ export default function CreatePushNotificationModal({
                 <button
                   type="button"
                   onClick={() => setIsUserDropdownOpen(!isUserDropdownOpen)}
-                  className="w-full h-9 flex items-center justify-between px-3 bg-white border border-slate-300 rounded-md text-xs text-left cursor-pointer hover:border-slate-400 focus:outline-hidden focus:border-slate-900 focus:ring-1 focus:ring-slate-900"
+                  className="w-full h-9 flex items-center justify-between px-3 bg-white border border-slate-300 rounded-md text-xs text-left cursor-pointer hover:border-slate-400 focus:outline-hidden focus:border-amber-500 focus:ring-1 focus:ring-amber-500"
                 >
                   <span className="truncate">
                     {selectedUser ? (
@@ -340,7 +406,7 @@ export default function CreatePushNotificationModal({
                         autoFocus
                       />
                     </div>
-                    <div className="overflow-y-auto flex-1 p-1 space-y-0.5">
+                    <div className="overflow-y-auto flex-1 p-1 space-y-0.5 slim-scroll">
                       {isUsersLoading ? (
                         <div className="py-3 text-center text-xs text-slate-400">Loading users...</div>
                       ) : filteredUsers.length === 0 ? (
@@ -358,7 +424,7 @@ export default function CreatePushNotificationModal({
                                 setIsUserDropdownOpen(false);
                               }}
                               className={`w-full flex items-center justify-between px-3 py-1.5 text-xs rounded transition-colors cursor-pointer text-left ${
-                                isSelected ? "bg-slate-900 text-white font-medium" : "text-slate-700 hover:bg-slate-100"
+                                isSelected ? "bg-amber-500 text-white font-semibold" : "text-slate-700 hover:bg-slate-100"
                               }`}
                             >
                               <div className="flex flex-col min-w-0 pr-2">
@@ -388,16 +454,16 @@ export default function CreatePushNotificationModal({
               <label className="text-xs font-medium text-slate-700">
                 Notification Title <span className="text-rose-500">*</span>
               </label>
-              <span className="text-[11px] font-mono text-slate-400">{title.length}/60</span>
+              <span className="text-[11px] font-mono text-slate-400">{title.length}/100</span>
             </div>
             <input
               type="text"
               required
-              maxLength={60}
+              maxLength={100}
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               placeholder="e.g. Schedule update for upcoming match"
-              className="w-full h-9 bg-white border border-slate-300 rounded-md px-3 text-xs text-slate-900 placeholder:text-slate-400 focus:outline-hidden focus:border-slate-900 focus:ring-1 focus:ring-slate-900 transition-colors"
+              className="w-full h-9 bg-white border border-slate-300 rounded-md px-3 text-xs text-slate-900 placeholder:text-slate-400 focus:outline-hidden focus:border-amber-500 focus:ring-1 focus:ring-amber-500 transition-colors"
             />
           </div>
 
@@ -407,33 +473,33 @@ export default function CreatePushNotificationModal({
               <label className="text-xs font-medium text-slate-700">
                 Message Body <span className="text-rose-500">*</span>
               </label>
-              <span className="text-[11px] font-mono text-slate-400">{message.length}/300</span>
+              <span className="text-[11px] font-mono text-slate-400">{message.length}/500</span>
             </div>
             <textarea
               required
-              rows={4}
-              maxLength={300}
+              rows={5}
+              maxLength={500}
               value={message}
               onChange={(e) => setMessage(e.target.value)}
               placeholder="Enter push notification message content..."
-              className="w-full bg-white border border-slate-300 rounded-md p-3 text-xs text-slate-900 placeholder:text-slate-400 focus:outline-hidden focus:border-slate-900 focus:ring-1 focus:ring-slate-900 resize-none transition-colors"
+              className="w-full bg-white border border-slate-300 rounded-md p-3 text-xs text-slate-900 placeholder:text-slate-400 focus:outline-hidden focus:border-amber-500 focus:ring-1 focus:ring-amber-500 resize-none transition-colors slim-scroll"
             />
           </div>
 
           {/* Footer Submit Actions */}
-          <div className="flex items-center justify-end gap-3 pt-3 border-t border-slate-200">
+          <div className="flex items-center justify-end gap-2.5 pt-3.5 border-t border-slate-200">
             <button
               type="button"
               onClick={() => setIsOpen(false)}
               disabled={isSubmitting}
-              className="px-4 py-2 rounded-md border border-slate-300 bg-white text-xs font-medium text-slate-700 hover:bg-slate-50 transition-colors cursor-pointer"
+              className="px-3.5 py-2 rounded-xl border border-slate-300 bg-white text-xs font-semibold text-slate-700 hover:bg-slate-50 transition-colors cursor-pointer"
             >
               Cancel
             </button>
             <button
               type="submit"
-              disabled={isSubmitting || !title.trim() || !message.trim()}
-              className="px-4 py-2 rounded-md bg-slate-900 hover:bg-slate-800 text-white text-xs font-medium transition-colors disabled:opacity-50 flex items-center gap-2 cursor-pointer shadow-2xs"
+              disabled={isSubmitting || !title.trim() || !message.trim() || !isScheduledValid}
+              className="px-4 py-2 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white text-xs font-bold transition-all active:scale-95 disabled:opacity-50 flex items-center gap-2 cursor-pointer shadow-sm shadow-amber-500/25"
             >
               {isSubmitting ? (
                 <Loader2 className="w-3.5 h-3.5 animate-spin" />
@@ -442,7 +508,7 @@ export default function CreatePushNotificationModal({
               ) : (
                 <Send className="w-3.5 h-3.5" />
               )}
-              <span>{deliveryMode === "SCHEDULED" ? "Schedule Notification" : "Send Notification"}</span>
+              <span>{deliveryMode === "SCHEDULED" ? "Schedule Push" : "Send Push"}</span>
             </button>
           </div>
         </form>

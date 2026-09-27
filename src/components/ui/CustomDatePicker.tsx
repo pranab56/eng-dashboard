@@ -11,6 +11,7 @@ interface CustomDatePickerProps {
   error?: string;
   align?: "left" | "right";
   placeholder?: string;
+  theme?: "blue" | "amber";
 }
 
 const CustomDatePicker: React.FC<CustomDatePickerProps> = ({
@@ -20,6 +21,7 @@ const CustomDatePicker: React.FC<CustomDatePickerProps> = ({
   error,
   align = "left",
   placeholder,
+  theme = "blue",
 }) => {
   const [isOpen, setIsOpen] = useState(false);
 
@@ -69,9 +71,9 @@ const CustomDatePicker: React.FC<CustomDatePickerProps> = ({
     : (placeholder || (label ? `Select ${label}` : "Select Date"));
 
   return (
-    <div className="space-y-2 relative" ref={containerRef}>
+    <div className="space-y-1.5 relative" ref={containerRef}>
       {label && (
-        <label className="block text-xs font-bold text-gray-700">
+        <label className="block text-xs font-semibold text-slate-700">
           {label}
         </label>
       )}
@@ -80,28 +82,44 @@ const CustomDatePicker: React.FC<CustomDatePickerProps> = ({
       <button
         type="button"
         onClick={() => setIsOpen(!isOpen)}
-        className={`w-full flex items-center justify-between px-4 py-3 bg-[#f8fafc] border rounded-2xl text-xs font-semibold text-gray-800 hover:bg-white focus:outline-none focus:ring-4 transition-all duration-200 cursor-pointer shadow-sm ${
+        className={`w-full h-14 flex items-center justify-between px-3.5 py-2 bg-[#f8fafc] border rounded-xl text-xs font-semibold text-slate-800 hover:bg-white focus:outline-none focus:ring-2 transition-all duration-200 cursor-pointer shadow-2xs ${
           error
             ? "border-red-400 focus:ring-red-100 bg-red-50/30"
             : isOpen
-            ? "border-blue-500 ring-4 ring-blue-500/10 bg-white shadow-md shadow-blue-500/5"
-            : "border-gray-200 hover:border-blue-300 hover:shadow"
+            ? theme === "amber"
+              ? "border-amber-500 ring-2 ring-amber-500/10 bg-white shadow-sm"
+              : "border-blue-500 ring-2 ring-blue-500/10 bg-white shadow-sm"
+            : theme === "amber"
+            ? "border-slate-200 hover:border-amber-300 hover:shadow-xs"
+            : "border-slate-200 hover:border-blue-300 hover:shadow-xs"
         }`}
       >
-        <div className="flex items-center gap-3 truncate">
-          <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 text-white flex items-center justify-center shrink-0 shadow-md shadow-blue-500/20">
+        <div className="flex items-center gap-2.5 truncate">
+          <div
+            className={`w-8 h-8 rounded-lg text-white flex items-center justify-center shrink-0 shadow-xs ${
+              theme === "amber"
+                ? "bg-gradient-to-br from-amber-500 to-amber-600"
+                : "bg-gradient-to-br from-blue-500 to-indigo-600"
+            }`}
+          >
             <CalendarIcon className="w-4 h-4" />
           </div>
           <div className="text-left truncate">
-            <span className="block text-[10px] font-bold text-gray-400 uppercase tracking-wider">
+            <span className="block text-[9px] font-bold text-slate-400 uppercase tracking-wider">
               Date
             </span>
-            <span className={`block text-xs font-bold truncate ${value ? "text-gray-900" : "text-gray-400 font-medium"}`}>
+            <span className={`block text-xs font-bold truncate ${value ? "text-slate-900" : "text-slate-400 font-medium"}`}>
               {displayDate}
             </span>
           </div>
         </div>
-        <span className="text-[10px] font-bold bg-blue-50 text-blue-700 px-2.5 py-1 rounded-lg border border-blue-100/80">
+        <span
+          className={`text-[10px] font-bold px-2 py-0.5 rounded-md border ${
+            theme === "amber"
+              ? "bg-amber-50 text-amber-800 border-amber-200/80"
+              : "bg-blue-50 text-blue-700 border-blue-100/80"
+          }`}
+        >
           Calendar
         </span>
       </button>
@@ -166,15 +184,15 @@ const CustomDatePicker: React.FC<CustomDatePickerProps> = ({
                   onClick={() => handleSelectDay(dayNum)}
                   className={`h-8 rounded-lg text-xs font-semibold flex items-center justify-center transition-all cursor-pointer relative ${
                     isSelected
-                      ? "bg-blue-600 text-white font-bold shadow-md shadow-blue-500/30 scale-105"
+                      ? (theme === "amber" ? "bg-gradient-to-r from-amber-500 to-amber-600 text-white font-bold shadow-md shadow-amber-500/25 scale-105" : "bg-blue-600 text-white font-bold shadow-md shadow-blue-500/30 scale-105")
                       : isToday
-                      ? "bg-blue-50 text-blue-600 font-bold border border-blue-200"
+                      ? (theme === "amber" ? "bg-amber-50 text-amber-700 font-bold border border-amber-200" : "bg-blue-50 text-blue-600 font-bold border border-blue-200")
                       : "text-gray-700 hover:bg-gray-100"
                   }`}
                 >
                   {dayNum}
                   {isToday && !isSelected && (
-                    <span className="absolute bottom-1 w-1 h-1 rounded-full bg-blue-600" />
+                    <span className={`absolute bottom-1 w-1 h-1 rounded-full ${theme === "amber" ? "bg-amber-600" : "bg-blue-600"}`} />
                   )}
                 </button>
               );

@@ -1,239 +1,436 @@
-"use client"
+/* eslint-disable @typescript-eslint/no-explicit-any */
+"use client";
 
-import { useGetOverviewQuery } from '@/features/overview/overviewApi';
-import { useHeaders } from '@/hooks/useHeaders';
-import { useEffect } from 'react';
-import { GiSoccerBall } from "react-icons/gi";
-import { MdPendingActions } from "react-icons/md";
-import { PiUserCheck, PiUserGear, PiUserPlus, PiUsersThree } from "react-icons/pi";
-import { RiTeamLine } from "react-icons/ri";
-
-
+import { useGetOverviewQuery } from "@/features/overview/overviewApi";
+import { useHeaders } from "@/hooks/useHeaders";
+import { useEffect, useMemo } from "react";
+import {
+  Users,
+  Clock,
+  Briefcase,
+  ShieldCheck,
+  Users2,
+  UserPlus,
+  CreditCard,
+  Shield,
+  Gamepad2,
+  CalendarClock,
+  Activity,
+} from "lucide-react";
 import {
   Bar,
   BarChart,
   CartesianGrid,
   Cell,
-  Legend,
   Pie,
   PieChart,
   ResponsiveContainer,
   Tooltip,
   XAxis,
-  YAxis
+  YAxis,
 } from "recharts";
 
-const Home = () => {
+// Custom chart tooltip for user role distribution
+const CustomDonutTooltip = ({ active, payload, total }: any) => {
+  if (active && payload && payload.length) {
+    const data = payload[0];
+    const percentage = total > 0 ? ((data.value / total) * 100).toFixed(1) : "0.0";
+    return (
+      <div className="bg-slate-900 border border-slate-700/80 rounded-lg p-3 text-xs shadow-xl text-white select-none">
+        <div className="flex items-center gap-2 mb-1">
+          <span
+            className="w-2.5 h-2.5 rounded-full"
+            style={{ backgroundColor: data.payload.color }}
+          />
+          <span className="font-semibold text-slate-200">{data.name}</span>
+        </div>
+        <div className="flex items-baseline gap-2">
+          <span className="text-base font-bold text-white tabular-nums">
+            {Number(data.value).toLocaleString()}
+          </span>
+          <span className="text-[11px] text-slate-400">({percentage}%)</span>
+        </div>
+      </div>
+    );
+  }
+  return null;
+};
+
+// Custom chart tooltip for league summary
+const CustomBarTooltip = ({ active, payload }: any) => {
+  if (active && payload && payload.length) {
+    const data = payload[0];
+    return (
+      <div className="bg-slate-900 border border-slate-700/80 rounded-lg p-3 text-xs shadow-xl text-white select-none">
+        <div className="flex items-center gap-2 mb-1">
+          <span
+            className="w-2.5 h-2.5 rounded-full"
+            style={{ backgroundColor: data.payload.color }}
+          />
+          <span className="font-semibold text-slate-200">{data.payload.name}</span>
+        </div>
+        <p className="text-base font-bold text-white tabular-nums">
+          {Number(data.value).toLocaleString()}
+        </p>
+      </div>
+    );
+  }
+  return null;
+};
+
+export default function Home() {
   const { setHeaders } = useHeaders();
-  const { data: overviewData } = useGetOverviewQuery({});
+  const { data: overviewData, isLoading, isFetching } = useGetOverviewQuery({});
 
   useEffect(() => {
     setHeaders({
       title: "Dashboard Overview",
-      des: "Welcome back! Here's the latest summary of your league activities."
-    })
+      des: "Real-time summary of league operations, registered personnel, and match activities.",
+    });
   }, [setHeaders]);
-
-  // if (isLoading) {
-  //   return (
-  //     <div className="flex justify-center items-center h-[calc(100vh-160px)]">
-  //       <Loader2 className="w-10 h-10 animate-spin text-black" />
-  //     </div>
-  //   );
-  // }
 
   const stats = overviewData?.data || {};
 
-  const cards = [
-    {
-      title: "Total Players",
-      value: stats.users?.totalPlayers || 0,
-      icon: <PiUsersThree className="text-3xl text-blue-600" />,
-      gradient: "from-blue-50 to-blue-100",
-      border: "border-blue-200",
-      textColor: "text-blue-900"
-    },
-    {
-      title: "Pending Players",
-      value: stats.users?.totalPendingPlayers || 0,
-      icon: <MdPendingActions className="text-3xl text-yellow-600" />,
-      gradient: "from-yellow-50 to-yellow-100",
-      border: "border-yellow-200",
-      textColor: "text-yellow-900"
-    },
-    {
-      title: "Total Managers",
-      value: stats.users?.totalManagers || 0,
-      icon: <PiUserGear className="text-3xl text-emerald-600" />,
-      gradient: "from-emerald-50 to-emerald-100",
-      border: "border-emerald-200",
-      textColor: "text-emerald-900"
-    },
-    {
-      title: "Total Referees",
-      value: stats.users?.totalReferees || 0,
-      icon: <PiUserCheck className="text-3xl text-amber-600" />,
-      gradient: "from-amber-50 to-amber-100",
-      border: "border-amber-200",
-      textColor: "text-amber-900"
-    },
-    {
-      title: "Parent Accounts",
-      value: stats.users?.totalParents || 0,
-      icon: <PiUsersThree className="text-3xl text-pink-600" />,
-      gradient: "from-pink-50 to-pink-100",
-      border: "border-pink-200",
-      textColor: "text-pink-900"
-    },
-    {
-      title: "Outclub Players",
-      value: stats.users?.totalOutclubPlayers || 0,
-      icon: <PiUserPlus className="text-3xl text-purple-600" />,
-      gradient: "from-purple-50 to-purple-100",
-      border: "border-purple-200",
-      textColor: "text-purple-900"
-    },
-    {
-      title: "Active Subscriptions",
-      value: stats.users?.activeSubscriptions || 0,
-      icon: <PiUserCheck className="text-3xl text-teal-600" />,
-      gradient: "from-teal-50 to-teal-100",
-      border: "border-teal-200",
-      textColor: "text-teal-900"
-    },
-    {
-      title: "Total Teams",
-      value: stats.teams?.totalTeams || 0,
-      icon: <RiTeamLine className="text-3xl text-rose-600" />,
-      gradient: "from-rose-50 to-rose-100",
-      border: "border-rose-200",
-      textColor: "text-rose-900"
-    },
-    {
-      title: "Total Matches",
-      value: stats.matches?.totalMatches || 0,
-      icon: <GiSoccerBall className="text-3xl text-indigo-600" />,
-      gradient: "from-indigo-50 to-indigo-100",
-      border: "border-indigo-200",
-      textColor: "text-indigo-900"
-    },
-    {
-      title: "Pending Matches",
-      value: stats.matches?.pendingMatches || 0,
-      icon: <MdPendingActions className="text-3xl text-orange-600" />,
-      gradient: "from-orange-50 to-orange-100",
-      border: "border-orange-200",
-      textColor: "text-orange-900"
-    }
-  ];
+  // Exact 10 metrics preserving 100% backend fields & bindings
+  const cards = useMemo(
+    () => [
+      {
+        id: "total-players",
+        title: "Total Players",
+        value: stats.users?.totalPlayers || 0,
+        icon: Users,
+        badge: "Roster",
+        badgeStyle: "bg-slate-100 text-slate-600 border-slate-200",
+      },
+      {
+        id: "pending-players",
+        title: "Pending Players",
+        value: stats.users?.totalPendingPlayers || 0,
+        icon: Clock,
+        badge: "Needs Review",
+        badgeStyle: "bg-amber-50 text-amber-700 border-amber-200/80",
+      },
+      {
+        id: "total-managers",
+        title: "Total Managers",
+        value: stats.users?.totalManagers || 0,
+        icon: Briefcase,
+        badge: "Staff",
+        badgeStyle: "bg-slate-100 text-slate-600 border-slate-200",
+      },
+      {
+        id: "total-referees",
+        title: "Total Referees",
+        value: stats.users?.totalReferees || 0,
+        icon: ShieldCheck,
+        badge: "Officials",
+        badgeStyle: "bg-slate-100 text-slate-600 border-slate-200",
+      },
+      {
+        id: "parent-accounts",
+        title: "Parent Accounts",
+        value: stats.users?.totalParents || 0,
+        icon: Users2,
+        badge: "Guardians",
+        badgeStyle: "bg-slate-100 text-slate-600 border-slate-200",
+      },
+      {
+        id: "outclub-players",
+        title: "Outclub Players",
+        value: stats.users?.totalOutclubPlayers || 0,
+        icon: UserPlus,
+        badge: "External",
+        badgeStyle: "bg-slate-100 text-slate-600 border-slate-200",
+      },
+      {
+        id: "active-subscriptions",
+        title: "Active Subscriptions",
+        value: stats.users?.activeSubscriptions || 0,
+        icon: CreditCard,
+        badge: "Active Paid",
+        badgeStyle: "bg-emerald-50 text-emerald-700 border-emerald-200/80",
+      },
+      {
+        id: "total-teams",
+        title: "Total Teams",
+        value: stats.teams?.totalTeams || 0,
+        icon: Shield,
+        badge: "Registered",
+        badgeStyle: "bg-slate-100 text-slate-600 border-slate-200",
+      },
+      {
+        id: "total-matches",
+        title: "Total Matches",
+        value: stats.matches?.totalMatches || 0,
+        icon: Gamepad2,
+        badge: "Fixtures",
+        badgeStyle: "bg-slate-100 text-slate-600 border-slate-200",
+      },
+      {
+        id: "pending-matches",
+        title: "Pending Matches",
+        value: stats.matches?.pendingMatches || 0,
+        icon: CalendarClock,
+        badge: "Scheduled",
+        badgeStyle: "bg-amber-50 text-amber-700 border-amber-200/80",
+      },
+    ],
+    [stats]
+  );
 
-  const userDistribution = [
-    { name: 'Players', value: stats.users?.totalPlayers || 0, color: '#3B82F6' },
-    { name: 'Managers', value: stats.users?.totalManagers || 0, color: '#10B981' },
-    { name: 'Referees', value: stats.users?.totalReferees || 0, color: '#F59E0B' },
-    { name: 'Parents', value: stats.users?.totalParents || 0, color: '#EC4899' },
-    { name: 'Outclub', value: stats.users?.totalOutclubPlayers || 0, color: '#8B5CF6' },
-  ];
+  // Exact 5 User Role Distribution categories and backend data
+  const userDistribution = useMemo(
+    () => [
+      { name: "Players", value: stats.users?.totalPlayers || 0, color: "#2563eb" },
+      { name: "Managers", value: stats.users?.totalManagers || 0, color: "#059669" },
+      { name: "Referees", value: stats.users?.totalReferees || 0, color: "#d97706" },
+      { name: "Parents", value: stats.users?.totalParents || 0, color: "#4f46e5" },
+      { name: "Outclub", value: stats.users?.totalOutclubPlayers || 0, color: "#0891b2" },
+    ],
+    [stats]
+  );
 
-  const leagueSummary = [
-    { name: 'Teams', count: stats.teams?.totalTeams || 0, color: '#F43F5E' },
-    { name: 'Matches', count: stats.matches?.totalMatches || 0, color: '#6366F1' },
-    { name: 'Pending', count: stats.matches?.pendingMatches || 0, color: '#F97316' },
-    { name: 'Active Subs', count: stats.users?.activeSubscriptions || 0, color: '#0D9488' },
-  ];
+  const totalPersonnel = useMemo(() => {
+    return userDistribution.reduce((acc, curr) => acc + (Number(curr.value) || 0), 0);
+  }, [userDistribution]);
+
+  // Exact 4 League Summary categories and backend data
+  const leagueSummary = useMemo(
+    () => [
+      { name: "Teams", count: stats.teams?.totalTeams || 0, color: "#0284c7" },
+      { name: "Matches", count: stats.matches?.totalMatches || 0, color: "#4f46e5" },
+      { name: "Pending", count: stats.matches?.pendingMatches || 0, color: "#d97706" },
+      { name: "Active Subs", count: stats.users?.activeSubscriptions || 0, color: "#059669" },
+    ],
+    [stats]
+  );
 
   return (
-    <div className='pt-10 px-8 pb-10 space-y-10'>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-        {cards.map((card, index) => (
-          <div
-            key={index}
-            className={`relative overflow-hidden group bg-gradient-to-br ${card.gradient} border ${card.border} p-6 rounded-2xl transition-all duration-300 hover:shadow-xl hover:-translate-y-1`}
-          >
-            <div className="flex justify-between items-start">
-              <div className="space-y-4">
-                <p className={`text-sm font-medium opacity-80 ${card.textColor}`}>{card.title}</p>
-                <h3 className={`text-4xl font-medium ${card.textColor}`}>{card.value}</h3>
-              </div>
-              <div className="p-3 bg-white/50 backdrop-blur-sm rounded-xl border border-white/50 shadow-sm group-hover:scale-110 transition-transform duration-300">
-                {card.icon}
-              </div>
-            </div>
-            <div className="absolute -right-4 -bottom-4 w-24 h-24 bg-white/10 rounded-full blur-2xl group-hover:bg-white/20 transition-all duration-500" />
+    <div className="p-4 sm:p-6 lg:p-8 space-y-6 w-full">
+      {/* Executive Header Banner */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-2 border-b border-slate-200/80">
+        <div>
+          <h2 className="text-base font-semibold text-slate-900 tracking-tight flex items-center gap-2">
+            <span>League Operations Summary</span>
+            {isFetching && !isLoading && (
+              <span className="text-[11px] text-slate-400 font-normal animate-pulse">
+                (Updating...)
+              </span>
+            )}
+          </h2>
+          <p className="text-xs text-slate-500">
+            Real-time metric telemetry across active clubs, divisions, and registered personnel.
+          </p>
+        </div>
+
+        <div className="flex items-center gap-2 self-start sm:self-auto">
+          <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-white border border-slate-200 shadow-2xs text-[11px] text-slate-600 font-medium">
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse shrink-0" />
+            <span>Live Data Sync</span>
           </div>
-        ))}
+        </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        {/* User Distribution Chart */}
-        <div className="bg-white p-8 rounded-3xl shadow-sm border border-gray-100 flex flex-col items-center">
-          <div className="w-full flex justify-between items-center mb-8">
-            <h3 className="text-xl font-medium text-gray-800">User Role Distribution</h3>
-            <div className="px-3 py-1 bg-gray-50 rounded-full text-xs font-semibold text-gray-500 border border-gray-200">Live Data</div>
+      {/* 10 Structured Metric Cards: 5 columns on XL, 4 on LG, 3 on MD, 2 on SM */}
+      <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3.5 sm:gap-4">
+        {cards.map((card) => {
+          const Icon = card.icon;
+          return (
+            <div
+              key={card.id}
+              className="bg-white border border-slate-200/90 rounded-lg p-4 shadow-2xs hover:border-slate-300 hover:shadow-xs transition-all flex flex-col justify-between"
+            >
+              {/* Header: Title & Icon */}
+              <div className="flex items-start justify-between gap-2 mb-3">
+                <span className="text-xs font-medium text-slate-500 line-clamp-1">
+                  {card.title}
+                </span>
+                <div className="w-7 h-7 rounded-md bg-slate-100/90 text-slate-600 flex items-center justify-center shrink-0 border border-slate-200/60">
+                  <Icon className="w-3.5 h-3.5" />
+                </div>
+              </div>
+
+              {/* Value & Badge */}
+              <div className="space-y-2">
+                <div className="text-2xl sm:text-3xl font-semibold tracking-tight text-slate-900 tabular-nums">
+                  {isLoading ? (
+                    <div className="h-7 w-16 bg-slate-200 rounded animate-pulse" />
+                  ) : (
+                    Number(card.value).toLocaleString()
+                  )}
+                </div>
+
+                <div className="pt-1 flex items-center justify-between border-t border-slate-100">
+                  <span
+                    className={`inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium border ${card.badgeStyle}`}
+                  >
+                    {card.badge}
+                  </span>
+                </div>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+
+      {/* Analytics Charts Grid: Side-by-Side */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* 1. User Role Distribution (Donut Chart) */}
+        <div className="bg-white rounded-lg border border-slate-200 p-5 sm:p-6 shadow-2xs flex flex-col justify-between">
+          <div>
+            <div className="flex items-start justify-between gap-3 mb-4">
+              <div>
+                <h3 className="text-sm font-semibold text-slate-900 tracking-tight">
+                  User Role Distribution
+                </h3>
+                <p className="text-xs text-slate-500">
+                  Active proportion across registered personnel roles.
+                </p>
+              </div>
+              <span className="px-2 py-0.5 rounded text-[11px] font-medium bg-slate-100 text-slate-600 border border-slate-200 shrink-0">
+                {totalPersonnel.toLocaleString()} Total Users
+              </span>
+            </div>
+
+            {/* Donut Chart */}
+            <div className="w-full h-[260px] relative">
+              <ResponsiveContainer width="100%" height="100%">
+                <PieChart>
+                  <Pie
+                    data={userDistribution}
+                    cx="50%"
+                    cy="50%"
+                    innerRadius={70}
+                    outerRadius={100}
+                    paddingAngle={4}
+                    dataKey="value"
+                    stroke="#ffffff"
+                    strokeWidth={2}
+                  >
+                    {userDistribution.map((entry, index) => (
+                      <Cell key={`donut-${index}`} fill={entry.color} />
+                    ))}
+                  </Pie>
+                  <Tooltip content={<CustomDonutTooltip total={totalPersonnel} />} />
+                </PieChart>
+              </ResponsiveContainer>
+
+              {/* Center Stat */}
+              <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
+                <span className="text-xs font-medium text-slate-400">Total</span>
+                <span className="text-xl font-bold text-slate-900 tabular-nums">
+                  {totalPersonnel.toLocaleString()}
+                </span>
+              </div>
+            </div>
           </div>
-          <div className="w-full h-[350px]">
-            <ResponsiveContainer width="100%" height="100%">
-              <PieChart>
-                <Pie
-                  data={userDistribution}
-                  cx="50%"
-                  cy="50%"
-                  innerRadius={80}
-                  outerRadius={120}
-                  paddingAngle={8}
-                  dataKey="value"
+
+          {/* Breakdown Legend List */}
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5 pt-4 mt-2 border-t border-slate-100 text-xs">
+            {userDistribution.map((role) => {
+              const pct =
+                totalPersonnel > 0
+                  ? ((Number(role.value) / totalPersonnel) * 100).toFixed(1)
+                  : "0.0";
+              return (
+                <div
+                  key={role.name}
+                  className="flex items-center justify-between p-2 rounded-md bg-slate-50 border border-slate-200/70"
                 >
-                  {userDistribution.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={entry.color} stroke="none" />
-                  ))}
-                </Pie>
-                <Tooltip
-                  contentStyle={{ borderRadius: '16px', border: 'none', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)' }}
-                />
-                <Legend verticalAlign="bottom" height={36} />
-              </PieChart>
-            </ResponsiveContainer>
+                  <div className="flex items-center gap-2 min-w-0 pr-1">
+                    <span
+                      className="w-2.5 h-2.5 rounded-full shrink-0"
+                      style={{ backgroundColor: role.color }}
+                    />
+                    <span className="font-medium text-slate-700 truncate">{role.name}</span>
+                  </div>
+                  <div className="text-right shrink-0">
+                    <span className="font-semibold text-slate-900 tabular-nums">
+                      {Number(role.value).toLocaleString()}
+                    </span>
+                    <span className="text-[10px] text-slate-400 block">{pct}%</span>
+                  </div>
+                </div>
+              );
+            })}
           </div>
         </div>
 
-        {/* League Summary Chart */}
-        <div className="bg-white p-8 rounded-3xl shadow-sm border border-gray-100 flex flex-col items-center">
-          <div className="w-full flex justify-between items-center mb-8">
-            <h3 className="text-xl font-medium text-gray-800">League Summary</h3>
-            <div className="px-3 py-1 bg-gray-50 rounded-full text-xs font-semibold text-gray-500 border border-gray-200">Across Entities</div>
+        {/* 2. League Summary (Bar Chart) */}
+        <div className="bg-white rounded-lg border border-slate-200 p-5 sm:p-6 shadow-2xs flex flex-col justify-between">
+          <div>
+            <div className="flex items-start justify-between gap-3 mb-4">
+              <div>
+                <h3 className="text-sm font-semibold text-slate-900 tracking-tight">
+                  League Summary
+                </h3>
+                <p className="text-xs text-slate-500">
+                  Competition fixture density and subscription engagement.
+                </p>
+              </div>
+              <span className="px-2 py-0.5 rounded text-[11px] font-medium bg-slate-100 text-slate-600 border border-slate-200 shrink-0">
+                Key Entities
+              </span>
+            </div>
+
+            {/* Bar Chart */}
+            <div className="w-full h-[260px]">
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart
+                  data={leagueSummary}
+                  margin={{ top: 20, right: 10, left: -20, bottom: 0 }}
+                >
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
+                  <XAxis
+                    dataKey="name"
+                    axisLine={false}
+                    tickLine={false}
+                    tick={{ fill: "#64748b", fontSize: 12, fontWeight: 500 }}
+                    dy={8}
+                  />
+                  <YAxis
+                    axisLine={false}
+                    tickLine={false}
+                    tick={{ fill: "#94a3b8", fontSize: 11 }}
+                  />
+                  <Tooltip
+                    cursor={{ fill: "rgba(241, 245, 249, 0.6)" }}
+                    content={<CustomBarTooltip />}
+                  />
+                  <Bar dataKey="count" radius={[4, 4, 0, 0]} barSize={42}>
+                    {leagueSummary.map((entry, index) => (
+                      <Cell key={`bar-${index}`} fill={entry.color} />
+                    ))}
+                  </Bar>
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
           </div>
-          <div className="w-full h-[350px]">
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={leagueSummary} margin={{ top: 20, right: 30, left: 0, bottom: 0 }}>
-                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f0f0f0" />
-                <XAxis
-                  dataKey="name"
-                  axisLine={false}
-                  tickLine={false}
-                  tick={{ fill: '#6B7280', fontSize: 13, fontWeight: 500 }}
-                  dy={10}
-                />
-                <YAxis
-                  axisLine={false}
-                  tickLine={false}
-                  tick={{ fill: '#6B7280', fontSize: 13 }}
-                />
-                <Tooltip
-                  cursor={{ fill: '#f8fafc' }}
-                  contentStyle={{ borderRadius: '16px', border: 'none', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)' }}
-                />
-                <Bar dataKey="count" radius={[10, 10, 10, 10]} barSize={50}>
-                  {leagueSummary.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={entry.color} />
-                  ))}
-                </Bar>
-              </BarChart>
-            </ResponsiveContainer>
+
+          {/* Metric Summary Strips */}
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-4 mt-2 border-t border-slate-100 text-xs">
+            {leagueSummary.map((item) => (
+              <div
+                key={item.name}
+                className="p-2 rounded-md bg-slate-50 border border-slate-200/70 flex flex-col justify-between"
+              >
+                <div className="flex items-center gap-1.5 mb-1">
+                  <span
+                    className="w-2 h-2 rounded-full shrink-0"
+                    style={{ backgroundColor: item.color }}
+                  />
+                  <span className="text-[11px] text-slate-500 font-medium truncate">
+                    {item.name}
+                  </span>
+                </div>
+                <span className="text-base font-semibold text-slate-900 tabular-nums">
+                  {Number(item.count).toLocaleString()}
+                </span>
+              </div>
+            ))}
           </div>
         </div>
       </div>
     </div>
-  )
+  );
 }
-
-export default Home;
