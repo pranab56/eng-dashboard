@@ -12,7 +12,7 @@ import {
 import { useGetAllTableQuery } from "@/features/tableManagement/tableApi";
 import { useHeaders } from "@/hooks/useHeaders";
 import { getTableColumns } from "@/tableColumns/tableColumns";
-import { ChevronDown, Trophy, Shield, Users } from "lucide-react";
+import { ChevronDown, Trophy, Users } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { EditTableStandingModal } from "./EditTableStandingModal";
 
@@ -52,7 +52,7 @@ const TableManagement = () => {
   const tableHeaderPayload = {
     title: "Point Table Standings",
     des: selectedLeague?.league
-      ? `${selectedLeague.league.leagueName} • ${selectedLeague.league.season || ""}`
+      ? `${selectedLeague.league.leagueName} - ${selectedLeague.league.season || ""}`
       : "Select a league",
   };
 
@@ -83,12 +83,12 @@ const TableManagement = () => {
     <div className="py-8 px-6 lg:px-8 space-y-6 pb-16 max-w-[1600px] mx-auto">
       {/* Stats Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
-        <div className="bg-white rounded-2xl p-5 shadow-xs border border-gray-100 flex items-center gap-4">
-          <div className="w-12 h-12 rounded-xl bg-blue-50 flex items-center justify-center shrink-0">
-            <Trophy className="w-6 h-6 text-blue-600" />
+        <div className="bg-white rounded-xl p-5 shadow-xs border border-gray-200 flex items-center gap-4">
+          <div className="w-11 h-11 rounded-lg bg-blue-50 flex items-center justify-center shrink-0">
+            <Trophy className="w-5 h-5 text-blue-600" />
           </div>
           <div>
-            <p className="text-xs text-gray-400 font-medium tracking-wide">
+            <p className="text-xs text-gray-500 font-medium tracking-wide">
               Active Leagues
             </p>
             <p className="text-2xl font-bold text-gray-900">
@@ -96,12 +96,12 @@ const TableManagement = () => {
             </p>
           </div>
         </div>
-        <div className="bg-white rounded-2xl p-5 shadow-xs border border-gray-100 flex items-center gap-4">
-          <div className="w-12 h-12 rounded-xl bg-emerald-50 flex items-center justify-center shrink-0">
-            <Shield className="w-6 h-6 text-emerald-600" />
+        <div className="bg-white rounded-xl p-5 shadow-xs border border-gray-200 flex items-center gap-4">
+          <div className="w-11 h-11 rounded-lg bg-gray-100 flex items-center justify-center shrink-0">
+            <Users className="w-5 h-5 text-gray-700" />
           </div>
           <div>
-            <p className="text-xs text-gray-400 font-medium tracking-wide">
+            <p className="text-xs text-gray-500 font-medium tracking-wide">
               Teams in League
             </p>
             <p className="text-2xl font-bold text-gray-900">
@@ -112,7 +112,7 @@ const TableManagement = () => {
       </div>
 
       {/* Standings Table Container */}
-      <div className="bg-white rounded-2xl shadow-xs border border-gray-100 py-4 flex flex-col">
+      <div className="bg-white rounded-xl shadow-xs border border-gray-200 py-4 flex flex-col">
         <div className="flex-1">
           <div className="flex flex-wrap items-center justify-between px-6 py-2 gap-4 border-b border-gray-100 pb-4">
             <TableTitle
@@ -126,32 +126,32 @@ const TableManagement = () => {
             {allEntries.length > 0 && (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <button className="bg-white border border-gray-200 rounded-full px-5 py-2.5 flex items-center gap-3 shadow-2xs hover:border-gray-300 focus:outline-none transition-all cursor-pointer">
-                    <div className="flex items-center gap-2">
-                      <Trophy className="w-4 h-4 text-blue-600" />
-                      <span className="font-semibold text-sm text-gray-800">
-                        {getSelectedLeagueName()}
+                  <button className="bg-white border border-gray-300 rounded-lg px-4 py-2 flex items-center gap-2.5 shadow-2xs hover:border-gray-400 focus:outline-none transition-all cursor-pointer">
+                    <Trophy className="w-4 h-4 text-gray-600" />
+                    <span className="font-medium text-sm text-gray-800">
+                      {getSelectedLeagueName()}
+                    </span>
+                    {getSelectedLeagueSeason() && (
+                      <span className="text-xs text-gray-500 font-normal">
+                        ({getSelectedLeagueSeason()})
                       </span>
-                      <span className="text-xs text-gray-400 font-normal">
-                        {getSelectedLeagueSeason()}
-                      </span>
-                    </div>
-                    <ChevronDown className="w-4 h-4 text-gray-400" />
+                    )}
+                    <ChevronDown className="w-4 h-4 text-gray-400 ml-1" />
                   </button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent
                   align="end"
-                  className="w-72 max-h-80 overflow-y-auto rounded-xl p-1 shadow-lg border-gray-200"
+                  className="w-72 max-h-80 overflow-y-auto rounded-lg p-1 shadow-md border-gray-200"
                 >
                   {allEntries.map((entry) => (
                     <DropdownMenuItem
                       key={entry.league._id}
                       onClick={() => setSelectedLeagueId(entry.league._id)}
-                      className={`cursor-pointer py-2.5 px-4 text-sm flex items-center justify-between rounded-lg transition-colors
+                      className={`cursor-pointer py-2 px-3 text-sm flex items-center justify-between rounded-md transition-colors
                         ${
                           selectedLeagueId === entry.league._id
-                            ? "bg-blue-50 font-semibold text-blue-600"
-                            : "hover:bg-slate-50"
+                            ? "bg-blue-50 font-medium text-blue-600"
+                            : "hover:bg-gray-50"
                         }
                       `}
                     >
@@ -159,12 +159,12 @@ const TableManagement = () => {
                         <p className="font-medium text-sm text-gray-800">
                           {entry.league.leagueName}
                         </p>
-                        <p className="text-xs text-gray-400">
+                        <p className="text-xs text-gray-500">
                           {entry.league.season}
                         </p>
                       </div>
                       {selectedLeagueId === entry.league._id && (
-                        <div className="w-2 h-2 rounded-full bg-blue-600"></div>
+                        <div className="w-1.5 h-1.5 rounded-full bg-blue-600"></div>
                       )}
                     </DropdownMenuItem>
                   ))}
@@ -175,14 +175,14 @@ const TableManagement = () => {
 
           <div className="pt-4 px-4 overflow-x-auto">
             {standings.length === 0 && !isLoading ? (
-              <div className="flex flex-col items-center justify-center py-20 gap-3 text-center">
-                <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center">
-                  <Trophy className="w-7 h-7 text-gray-400" />
+              <div className="flex flex-col items-center justify-center py-16 gap-3 text-center">
+                <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center">
+                  <Trophy className="w-6 h-6 text-gray-400" />
                 </div>
-                <p className="text-gray-600 font-semibold">
+                <p className="text-gray-600 font-medium text-sm">
                   No standings available for this league
                 </p>
-                <p className="text-gray-400 text-sm">
+                <p className="text-gray-400 text-xs">
                   Teams will appear once added to this league.
                 </p>
               </div>

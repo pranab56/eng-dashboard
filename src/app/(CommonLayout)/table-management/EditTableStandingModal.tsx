@@ -15,14 +15,12 @@ import {
 import { formatImagePath } from "@/utils/formatImagePath";
 import { toast } from "sonner";
 import {
-  Trophy,
   X,
   Loader2,
   RotateCcw,
   Check,
-  Shield,
-  Sparkles,
-  Calculator,
+  RefreshCw,
+  Trophy,
 } from "lucide-react";
 
 interface EditTableStandingModalProps {
@@ -87,7 +85,7 @@ export const EditTableStandingModal: React.FC<EditTableStandingModalProps> = ({
     }
   }, [isOpen, standing]);
 
-  // Quick auto-recalculate helper
+  // Recalculate helper (standard football math)
   const handleAutoCalculate = () => {
     const computedPlayed = win + draw + loss;
     const computedGD = goalsFor - goalsAgainst;
@@ -95,17 +93,17 @@ export const EditTableStandingModal: React.FC<EditTableStandingModalProps> = ({
     setPlayed(computedPlayed);
     setGoalDifference(computedGD);
     setPoints(computedPts);
-    toast.info("Auto-calculated: Played = " + computedPlayed + ", GD = " + (computedGD >= 0 ? "+" + computedGD : computedGD) + ", PTS = " + computedPts);
+    toast.info("Recalculated: Played=" + computedPlayed + ", GD=" + computedGD + ", PTS=" + computedPts);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!league?._id) {
-      toast.error("League information missing");
+      toast.error("League information is missing");
       return;
     }
     if (!teamId) {
-      toast.error("Team information missing");
+      toast.error("Team information is missing");
       return;
     }
 
@@ -124,7 +122,7 @@ export const EditTableStandingModal: React.FC<EditTableStandingModalProps> = ({
       };
 
       const res = await updateTableStanding(payload).unwrap();
-      toast.success(res?.message || "Table standing updated successfully!");
+      toast.success(res?.message || "Table standing updated successfully");
       if (onSuccess) onSuccess();
       onClose();
     } catch (err: any) {
@@ -140,7 +138,7 @@ export const EditTableStandingModal: React.FC<EditTableStandingModalProps> = ({
         league: league._id,
         team: teamId,
       }).unwrap();
-      toast.success(res?.message || "Reset standing back to match-calculated totals!");
+      toast.success(res?.message || "Standing reset to match-calculated totals");
       if (onSuccess) onSuccess();
       onClose();
     } catch (err: any) {
@@ -152,44 +150,37 @@ export const EditTableStandingModal: React.FC<EditTableStandingModalProps> = ({
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent
         showCloseButton={false}
-        className="sm:max-w-lg w-full bg-white rounded-2xl p-0 overflow-hidden border border-slate-200 shadow-2xl text-slate-800"
+        className="sm:max-w-lg w-full bg-white rounded-xl p-0 overflow-hidden border border-gray-200 shadow-xl text-gray-900"
       >
         {/* Header */}
-        <div className="px-6 py-5 border-b border-slate-100 bg-slate-50/70 flex items-center justify-between">
+        <div className="px-6 py-4 border-b border-gray-200 bg-gray-50 flex items-center justify-between">
           <div className="flex items-center gap-3">
             {team?.teamLogo ? (
               <Image
                 src={formatImagePath(team.teamLogo)}
                 alt="logo"
-                width={48}
-                height={48}
-                className="w-12 h-12 rounded-xl border border-slate-200 object-cover shadow-xs bg-white"
+                width={40}
+                height={40}
+                className="w-10 h-10 rounded-full border border-gray-200 object-cover bg-white"
               />
             ) : (
-              <div className="w-12 h-12 rounded-xl bg-blue-50 border border-blue-100 flex items-center justify-center text-blue-600 font-bold text-base shadow-xs">
-                <Shield className="w-6 h-6" />
+              <div className="w-10 h-10 rounded-full bg-gray-200 border border-gray-300 flex items-center justify-center text-xs font-semibold text-gray-600">
+                {team?.shortName || "FC"}
               </div>
             )}
             <div>
               <div className="flex items-center gap-2">
-                <DialogTitle className="text-base font-bold text-slate-900 leading-tight">
+                <DialogTitle className="text-base font-semibold text-gray-900">
                   {team?.teamName || "Edit Standing"}
                 </DialogTitle>
                 {standing?.isManual && (
-                  <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-amber-100 text-amber-800 border border-amber-200">
-                    Manual Override
+                  <span className="px-2 py-0.5 rounded text-[11px] font-medium bg-gray-200 text-gray-700">
+                    Manual
                   </span>
                 )}
               </div>
-              <p className="text-xs text-slate-500 mt-0.5 flex items-center gap-1.5 font-medium">
-                <Trophy className="w-3.5 h-3.5 text-amber-500" />
-                <span>{league?.leagueName || "League"}</span>
-                {league?.season && (
-                  <>
-                    <span className="text-slate-300">•</span>
-                    <span>{league.season}</span>
-                  </>
-                )}
+              <p className="text-xs text-gray-500 mt-0.5">
+                {league?.leagueName} {league?.season ? `(${league.season})` : ""}
               </p>
             </div>
           </div>
@@ -197,189 +188,161 @@ export const EditTableStandingModal: React.FC<EditTableStandingModalProps> = ({
           <button
             type="button"
             onClick={onClose}
-            className="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-200/60 transition-colors cursor-pointer"
+            className="p-1.5 rounded-md text-gray-400 hover:text-gray-700 hover:bg-gray-200 transition-colors cursor-pointer"
           >
             <X className="w-4 h-4" />
           </button>
         </div>
 
         {/* Form Body */}
-        <form onSubmit={handleSubmit} className="p-6 space-y-5">
-          {/* Top Quick Actions Bar */}
-          <div className="flex items-center justify-between bg-blue-50/60 border border-blue-100/80 rounded-xl px-4 py-2.5">
-            <span className="text-xs font-semibold text-blue-900 flex items-center gap-1.5">
-              <Sparkles className="w-3.5 h-3.5 text-blue-600" />
-              Team Standing Metrics
-            </span>
-            <button
-              type="button"
-              onClick={handleAutoCalculate}
-              className="text-xs font-medium text-blue-600 hover:text-blue-800 flex items-center gap-1 cursor-pointer hover:underline"
-              title="Recalculate Played, Goal Difference, and Points from W/D/L and GF/GA"
-            >
-              <Calculator className="w-3.5 h-3.5" />
-              <span>Auto-Calculate PTS & GD</span>
-            </button>
-          </div>
-
-          {/* Matches & Results Grid */}
+        <form onSubmit={handleSubmit} className="p-6 space-y-6">
+          {/* Section 1: Matches */}
           <div>
-            <label className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block mb-2">
-              Match Record (P / W / D / L)
-            </label>
-            <div className="grid grid-cols-4 gap-2.5">
-              {/* Played */}
-              <div className="bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-center focus-within:border-blue-500 focus-within:ring-1 focus-within:ring-blue-500 transition-all">
-                <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block">
+            <div className="flex items-center justify-between mb-2.5">
+              <span className="text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                Match Record
+              </span>
+            </div>
+            <div className="grid grid-cols-4 gap-3">
+              <div>
+                <label className="text-[11px] font-medium text-gray-500 block mb-1">
                   Played (P)
-                </span>
+                </label>
                 <input
                   type="number"
                   min="0"
                   value={played}
                   onChange={(e) => setPlayed(Math.max(0, parseInt(e.target.value) || 0))}
-                  className="w-full bg-transparent text-center text-lg font-bold text-slate-900 focus:outline-none"
+                  className="w-full bg-white border border-gray-300 rounded-lg px-3 py-2 text-center text-sm font-semibold text-gray-900 focus:outline-none focus:border-blue-600 focus:ring-1 focus:ring-blue-600"
                 />
               </div>
 
-              {/* Wins */}
-              <div className="bg-emerald-50/50 border border-emerald-200/80 rounded-xl p-2.5 text-center focus-within:border-emerald-500 focus-within:ring-1 focus-within:ring-emerald-500 transition-all">
-                <span className="text-[10px] font-bold text-emerald-700 uppercase tracking-wider block">
+              <div>
+                <label className="text-[11px] font-medium text-gray-500 block mb-1">
                   Won (W)
-                </span>
+                </label>
                 <input
                   type="number"
                   min="0"
                   value={win}
-                  onChange={(e) => {
-                    const newW = Math.max(0, parseInt(e.target.value) || 0);
-                    setWin(newW);
-                  }}
-                  className="w-full bg-transparent text-center text-lg font-bold text-emerald-800 focus:outline-none"
+                  onChange={(e) => setWin(Math.max(0, parseInt(e.target.value) || 0))}
+                  className="w-full bg-white border border-gray-300 rounded-lg px-3 py-2 text-center text-sm font-semibold text-gray-900 focus:outline-none focus:border-blue-600 focus:ring-1 focus:ring-blue-600"
                 />
               </div>
 
-              {/* Draws */}
-              <div className="bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-center focus-within:border-slate-500 focus-within:ring-1 focus-within:ring-slate-500 transition-all">
-                <span className="text-[10px] font-bold text-slate-600 uppercase tracking-wider block">
+              <div>
+                <label className="text-[11px] font-medium text-gray-500 block mb-1">
                   Drawn (D)
-                </span>
+                </label>
                 <input
                   type="number"
                   min="0"
                   value={draw}
-                  onChange={(e) => {
-                    const newD = Math.max(0, parseInt(e.target.value) || 0);
-                    setDraw(newD);
-                  }}
-                  className="w-full bg-transparent text-center text-lg font-bold text-slate-800 focus:outline-none"
+                  onChange={(e) => setDraw(Math.max(0, parseInt(e.target.value) || 0))}
+                  className="w-full bg-white border border-gray-300 rounded-lg px-3 py-2 text-center text-sm font-semibold text-gray-900 focus:outline-none focus:border-blue-600 focus:ring-1 focus:ring-blue-600"
                 />
               </div>
 
-              {/* Losses */}
-              <div className="bg-rose-50/50 border border-rose-200/80 rounded-xl p-2.5 text-center focus-within:border-rose-500 focus-within:ring-1 focus-within:ring-rose-500 transition-all">
-                <span className="text-[10px] font-bold text-rose-700 uppercase tracking-wider block">
+              <div>
+                <label className="text-[11px] font-medium text-gray-500 block mb-1">
                   Lost (L)
-                </span>
+                </label>
                 <input
                   type="number"
                   min="0"
                   value={loss}
-                  onChange={(e) => {
-                    const newL = Math.max(0, parseInt(e.target.value) || 0);
-                    setLoss(newL);
-                  }}
-                  className="w-full bg-transparent text-center text-lg font-bold text-rose-800 focus:outline-none"
+                  onChange={(e) => setLoss(Math.max(0, parseInt(e.target.value) || 0))}
+                  className="w-full bg-white border border-gray-300 rounded-lg px-3 py-2 text-center text-sm font-semibold text-gray-900 focus:outline-none focus:border-blue-600 focus:ring-1 focus:ring-blue-600"
                 />
               </div>
             </div>
           </div>
 
-          {/* Goals & Standing Stats Grid */}
+          {/* Section 2: Goals & Points */}
           <div>
-            <label className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block mb-2">
-              Goals & Points (GF / GA / GD / PTS)
-            </label>
-            <div className="grid grid-cols-4 gap-2.5">
-              {/* Goals For */}
-              <div className="bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-center focus-within:border-blue-500 focus-within:ring-1 focus-within:ring-blue-500 transition-all">
-                <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block">
+            <div className="flex items-center justify-between mb-2.5">
+              <span className="text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                Goals & Points
+              </span>
+              <button
+                type="button"
+                onClick={handleAutoCalculate}
+                className="text-xs font-medium text-blue-600 hover:text-blue-800 inline-flex items-center gap-1 cursor-pointer"
+                title="Recalculate Played, GD and Points from W, D, L, GF, GA"
+              >
+                <RefreshCw className="w-3 h-3" />
+                <span>Recalculate PTS & GD</span>
+              </button>
+            </div>
+            <div className="grid grid-cols-4 gap-3">
+              <div>
+                <label className="text-[11px] font-medium text-gray-500 block mb-1">
                   Goals For (GF)
-                </span>
+                </label>
                 <input
                   type="number"
                   min="0"
                   value={goalsFor}
-                  onChange={(e) => {
-                    const newGf = Math.max(0, parseInt(e.target.value) || 0);
-                    setGoalsFor(newGf);
-                  }}
-                  className="w-full bg-transparent text-center text-lg font-bold text-slate-900 focus:outline-none"
+                  onChange={(e) => setGoalsFor(Math.max(0, parseInt(e.target.value) || 0))}
+                  className="w-full bg-white border border-gray-300 rounded-lg px-3 py-2 text-center text-sm font-semibold text-gray-900 focus:outline-none focus:border-blue-600 focus:ring-1 focus:ring-blue-600"
                 />
               </div>
 
-              {/* Goals Against */}
-              <div className="bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-center focus-within:border-blue-500 focus-within:ring-1 focus-within:ring-blue-500 transition-all">
-                <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block">
-                  Goals Ag (GA)
-                </span>
+              <div>
+                <label className="text-[11px] font-medium text-gray-500 block mb-1">
+                  Goals Against (GA)
+                </label>
                 <input
                   type="number"
                   min="0"
                   value={goalsAgainst}
-                  onChange={(e) => {
-                    const newGa = Math.max(0, parseInt(e.target.value) || 0);
-                    setGoalsAgainst(newGa);
-                  }}
-                  className="w-full bg-transparent text-center text-lg font-bold text-slate-900 focus:outline-none"
+                  onChange={(e) => setGoalsAgainst(Math.max(0, parseInt(e.target.value) || 0))}
+                  className="w-full bg-white border border-gray-300 rounded-lg px-3 py-2 text-center text-sm font-semibold text-gray-900 focus:outline-none focus:border-blue-600 focus:ring-1 focus:ring-blue-600"
                 />
               </div>
 
-              {/* Goal Difference */}
-              <div className="bg-blue-50/40 border border-blue-200/80 rounded-xl p-2.5 text-center focus-within:border-blue-500 focus-within:ring-1 focus-within:ring-blue-500 transition-all">
-                <span className="text-[10px] font-bold text-blue-700 uppercase tracking-wider block">
+              <div>
+                <label className="text-[11px] font-medium text-gray-500 block mb-1">
                   Goal Diff (GD)
-                </span>
+                </label>
                 <input
                   type="number"
                   value={goalDifference}
                   onChange={(e) => setGoalDifference(parseInt(e.target.value) || 0)}
-                  className="w-full bg-transparent text-center text-lg font-bold text-blue-900 focus:outline-none"
+                  className="w-full bg-white border border-gray-300 rounded-lg px-3 py-2 text-center text-sm font-semibold text-gray-900 focus:outline-none focus:border-blue-600 focus:ring-1 focus:ring-blue-600"
                 />
               </div>
 
-              {/* Points */}
-              <div className="bg-amber-50/50 border border-amber-300 rounded-xl p-2.5 text-center focus-within:border-amber-500 focus-within:ring-2 focus-within:ring-amber-500/20 transition-all">
-                <span className="text-[10px] font-extrabold text-amber-800 uppercase tracking-wider block">
+              <div>
+                <label className="text-[11px] font-bold text-gray-700 block mb-1">
                   Points (PTS)
-                </span>
+                </label>
                 <input
                   type="number"
                   min="0"
                   value={points}
                   onChange={(e) => setPoints(Math.max(0, parseInt(e.target.value) || 0))}
-                  className="w-full bg-transparent text-center text-xl font-black text-amber-900 focus:outline-none"
+                  className="w-full bg-gray-50 border border-gray-300 rounded-lg px-3 py-2 text-center text-sm font-bold text-gray-900 focus:outline-none focus:border-blue-600 focus:ring-1 focus:ring-blue-600"
                 />
               </div>
             </div>
           </div>
 
-          {/* Action Buttons Footer */}
-          <div className="pt-2 flex items-center justify-between gap-3 border-t border-slate-100">
+          {/* Footer Actions */}
+          <div className="pt-3 border-t border-gray-200 flex items-center justify-between">
             {standing?.isManual ? (
               <button
                 type="button"
                 onClick={handleResetToAuto}
                 disabled={isResetting || isUpdating}
-                className="inline-flex items-center gap-1.5 px-3 py-2 text-xs font-semibold text-rose-600 hover:text-rose-700 bg-rose-50 hover:bg-rose-100 rounded-xl transition-all cursor-pointer disabled:opacity-50"
-                title="Restore standings calculated strictly from actual match scores"
+                className="inline-flex items-center gap-1.5 px-3 py-2 text-xs font-medium text-red-600 hover:text-red-700 hover:bg-red-50 rounded-lg transition-colors cursor-pointer disabled:opacity-50"
               >
                 {isResetting ? (
                   <Loader2 className="w-3.5 h-3.5 animate-spin" />
                 ) : (
                   <RotateCcw className="w-3.5 h-3.5" />
                 )}
-                <span>Reset to Auto-Calc</span>
+                <span>Reset to Match Results</span>
               </button>
             ) : (
               <div />
@@ -390,14 +353,14 @@ export const EditTableStandingModal: React.FC<EditTableStandingModalProps> = ({
                 type="button"
                 onClick={onClose}
                 disabled={isUpdating || isResetting}
-                className="px-4 py-2 text-sm font-medium text-slate-600 hover:text-slate-800 hover:bg-slate-100 rounded-xl transition-colors cursor-pointer"
+                className="px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 rounded-lg transition-colors cursor-pointer"
               >
                 Cancel
               </button>
               <button
                 type="submit"
                 disabled={isUpdating || isResetting}
-                className="inline-flex items-center gap-2 px-5 py-2 text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700 rounded-xl shadow-xs transition-all cursor-pointer disabled:opacity-50 active:scale-98"
+                className="inline-flex items-center gap-1.5 px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg shadow-xs transition-colors cursor-pointer disabled:opacity-50"
               >
                 {isUpdating ? (
                   <>
