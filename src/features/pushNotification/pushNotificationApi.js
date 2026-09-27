@@ -12,10 +12,25 @@ export const pushNotificationApi = baseApi.injectEndpoints({
         }),
 
         getAllPushNotification: builder.query({
-            query: (page) => ({
-                url: page ? `/push-notification?page=${page}` : "/push-notification?page=1",
-                method: "GET",
-            }),
+            query: (params) => {
+                let queryString = "";
+                if (typeof params === "object" && params !== null) {
+                    const searchParams = new URLSearchParams();
+                    if (params.page) searchParams.append("page", params.page);
+                    if (params.limit) searchParams.append("limit", params.limit);
+                    if (params.status && params.status !== "ALL") searchParams.append("status", params.status);
+                    if (params.searchTerm) searchParams.append("searchTerm", params.searchTerm);
+                    queryString = `?${searchParams.toString()}`;
+                } else if (params) {
+                    queryString = `?page=${params}`;
+                } else {
+                    queryString = "?page=1";
+                }
+                return {
+                    url: `/push-notification${queryString}`,
+                    method: "GET",
+                };
+            },
             providesTags: ["pushNotification"]
         }),
 
