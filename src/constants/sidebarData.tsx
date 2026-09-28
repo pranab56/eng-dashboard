@@ -92,11 +92,15 @@ export function hasRoleOrPermission(
     if (!isAllowed) return false;
   }
 
-  // Check granular permission if configured
-  if (requiredPermission) {
-    if (!userPermissions || !userPermissions.includes(requiredPermission)) {
-      return false;
+  // Granular permission check for ADMIN
+  if (normalized === "ADMIN") {
+    // Fail-safe: If this admin has NO custom permissions assigned yet, grant access
+    if (!userPermissions || userPermissions.length === 0) return true;
+
+    if (requiredPermission) {
+      return userPermissions.includes(requiredPermission);
     }
+    return true;
   }
 
   return true;
@@ -170,6 +174,7 @@ export const sidebarSections: TSidebarSection[] = [
         icon: LayoutDashboard,
         title: "Overview",
         label: "/",
+        requiredPermission: "OVERVIEW",
         allowedRoles: ["SUPER_ADMIN", "ADMIN", "MANAGER", "REFEREE"],
       },
     ],
@@ -183,6 +188,7 @@ export const sidebarSections: TSidebarSection[] = [
         icon: Gamepad2,
         title: "Match Management",
         label: "/match-management",
+        requiredPermission: "MATCH_MANAGEMENT",
         allowedRoles: ["SUPER_ADMIN", "ADMIN", "REFEREE", "MANAGER"],
       },
       {
@@ -190,6 +196,7 @@ export const sidebarSections: TSidebarSection[] = [
         icon: Trophy,
         title: "League Management",
         label: "/league-management",
+        requiredPermission: "LEAGUE_MANAGEMENT",
         allowedRoles: ["SUPER_ADMIN", "ADMIN", "MANAGER"],
       },
       {
@@ -197,6 +204,7 @@ export const sidebarSections: TSidebarSection[] = [
         icon: Award,
         title: "Tournaments",
         label: "/tournaments",
+        requiredPermission: "TOURNAMENTS",
         allowedRoles: ["SUPER_ADMIN", "ADMIN", "MANAGER"],
       },
       {
@@ -204,6 +212,7 @@ export const sidebarSections: TSidebarSection[] = [
         icon: Gift,
         title: "Tournament Claim",
         label: "/tournament-claim",
+        requiredPermission: "TOURNAMENT_CLAIM",
         allowedRoles: ["SUPER_ADMIN", "ADMIN"],
       },
       {
@@ -211,6 +220,7 @@ export const sidebarSections: TSidebarSection[] = [
         icon: Table2,
         title: "Table Management",
         label: "/table-management",
+        requiredPermission: "TABLE_MANAGEMENT",
         allowedRoles: ["SUPER_ADMIN", "ADMIN", "MANAGER", "REFEREE"],
       },
     ],
@@ -224,6 +234,7 @@ export const sidebarSections: TSidebarSection[] = [
         icon: Shield,
         title: "Team Management",
         label: "/team-management",
+        requiredPermission: "TEAM_MANAGEMENT",
         allowedRoles: ["SUPER_ADMIN", "ADMIN", "MANAGER"],
       },
       {
@@ -231,6 +242,7 @@ export const sidebarSections: TSidebarSection[] = [
         icon: Users,
         title: "League Team",
         label: "/league-team",
+        requiredPermission: "LEAGUE_TEAM",
         allowedRoles: ["SUPER_ADMIN", "ADMIN", "MANAGER"],
       },
       {
@@ -238,6 +250,7 @@ export const sidebarSections: TSidebarSection[] = [
         icon: UserCheck,
         title: "Player Management",
         label: "/player-management",
+        requiredPermission: "PLAYER_MANAGEMENT",
         allowedRoles: ["SUPER_ADMIN", "ADMIN", "MANAGER"],
       },
       {
@@ -245,6 +258,7 @@ export const sidebarSections: TSidebarSection[] = [
         icon: Users2,
         title: "Parent Management",
         label: "/parent-management",
+        requiredPermission: "PARENT_MANAGEMENT",
         allowedRoles: ["SUPER_ADMIN", "ADMIN"],
       },
       {
@@ -252,6 +266,7 @@ export const sidebarSections: TSidebarSection[] = [
         icon: ArrowLeftRight,
         title: "Transfer Management",
         label: "/transfer-management",
+        requiredPermission: "TRANSFER_MANAGEMENT",
         allowedRoles: ["SUPER_ADMIN", "ADMIN", "MANAGER"],
       },
     ],
@@ -261,10 +276,18 @@ export const sidebarSections: TSidebarSection[] = [
     title: "Users & Plans",
     items: [
       {
+        id: 112,
+        icon: ShieldCheck,
+        title: "Admin Management",
+        label: "/admin-management",
+        allowedRoles: ["SUPER_ADMIN"],
+      },
+      {
         id: 11,
         icon: UserCog,
         title: "User Management",
         label: "/user-management",
+        requiredPermission: "USER_MANAGEMENT",
         allowedRoles: ["SUPER_ADMIN", "ADMIN"],
       },
       {
@@ -272,6 +295,7 @@ export const sidebarSections: TSidebarSection[] = [
         icon: ShieldAlert,
         title: "Incomplete Accounts",
         label: "/incomplete-accounts",
+        requiredPermission: "INCOMPLETE_ACCOUNTS",
         allowedRoles: ["SUPER_ADMIN", "ADMIN"],
       },
       {
@@ -279,6 +303,7 @@ export const sidebarSections: TSidebarSection[] = [
         icon: CreditCard,
         title: "Subscribe Plan",
         label: "/subscribe-plan",
+        requiredPermission: "SUBSCRIBE_PLAN",
         allowedRoles: ["SUPER_ADMIN", "ADMIN"],
       },
     ],
@@ -292,6 +317,7 @@ export const sidebarSections: TSidebarSection[] = [
         icon: Bell,
         title: "Push Notification",
         label: "/push-notification",
+        requiredPermission: "PUSH_NOTIFICATION",
         allowedRoles: ["SUPER_ADMIN", "ADMIN"],
       },
       {
@@ -299,6 +325,7 @@ export const sidebarSections: TSidebarSection[] = [
         icon: Tv,
         title: "ENG TV Management",
         label: "/engtv-management",
+        requiredPermission: "ENGTV_MANAGEMENT",
         allowedRoles: ["SUPER_ADMIN", "ADMIN"],
       },
       {
@@ -306,6 +333,7 @@ export const sidebarSections: TSidebarSection[] = [
         icon: Newspaper,
         title: "News Management",
         label: "/news-management",
+        requiredPermission: "NEWS_MANAGEMENT",
         allowedRoles: ["SUPER_ADMIN", "ADMIN"],
       },
       {
@@ -313,6 +341,7 @@ export const sidebarSections: TSidebarSection[] = [
         icon: Calendar,
         title: "Event Management",
         label: "/event-management",
+        requiredPermission: "EVENT_MANAGEMENT",
         allowedRoles: ["SUPER_ADMIN", "ADMIN", "MANAGER"],
       },
       {
@@ -320,6 +349,7 @@ export const sidebarSections: TSidebarSection[] = [
         icon: ImageIcon,
         title: "Gallery",
         label: "/gallery",
+        requiredPermission: "GALLERY",
         allowedRoles: ["SUPER_ADMIN", "ADMIN"],
       },
       {
@@ -327,6 +357,7 @@ export const sidebarSections: TSidebarSection[] = [
         icon: Share2,
         title: "Social Media",
         label: "/social-media",
+        requiredPermission: "SOCIAL_MEDIA",
         allowedRoles: ["SUPER_ADMIN", "ADMIN"],
       },
     ],
@@ -340,6 +371,7 @@ export const sidebarSections: TSidebarSection[] = [
         icon: Sparkles,
         title: "Rewards / Redemption",
         label: "/rewards-redemption",
+        requiredPermission: "REWARDS_REDEMPTION",
         allowedRoles: ["SUPER_ADMIN", "ADMIN"],
       },
       {
@@ -347,6 +379,7 @@ export const sidebarSections: TSidebarSection[] = [
         icon: ShoppingBag,
         title: "Order Management",
         label: "/order-management",
+        requiredPermission: "ORDER_MANAGEMENT",
         allowedRoles: ["SUPER_ADMIN", "ADMIN"],
       },
     ],
@@ -360,12 +393,14 @@ export const sidebarSections: TSidebarSection[] = [
         icon: FolderTree,
         title: "Category Management",
         label: "/category-management",
+        requiredPermission: "CATEGORY_MANAGEMENT",
         allowedRoles: ["SUPER_ADMIN", "ADMIN"],
       },
       {
         id: 20,
         icon: Settings,
         title: "Settings",
+        requiredPermission: "SETTINGS",
         children: [
           {
             id: 200,

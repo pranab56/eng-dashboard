@@ -148,6 +148,7 @@ export const baseApi = createApi({
   baseQuery: baseQueryWithReauth,
   endpoints: () => ({}),
   tagTypes: [
+    "admin",
     "table",
     "match",
     "team",

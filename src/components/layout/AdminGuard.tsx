@@ -5,6 +5,12 @@ import { useDispatch } from "react-redux";
 import { logout } from "@/features/auth/authSlice";
 import { removeAuthCookie } from "@/app/actions/auth";
 import { toast } from "sonner";
+import { usePathname, useRouter } from "next/navigation";
+import { useGetProfileQuery } from "@/features/profile/profileApi";
+import {
+  getFirstPermittedRoute,
+  isRouteAllowedForAdmin,
+} from "@/constants/permissions";
 
 export const decodeRoleFromToken = (token: string): string | null => {
   try {
@@ -34,7 +40,12 @@ const getCookieValue = (name: string): string | null => {
 
 export default function AdminGuard({ children }: { children: React.ReactNode }) {
   const dispatch = useDispatch();
+  const router = useRouter();
+  const pathname = usePathname();
   const [isAuthorized, setIsAuthorized] = useState<boolean | null>(null);
+
+  const { data: profileData } = useGetProfileQuery({});
+  const profileUser = profileData?.data;
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -49,8 +60,13 @@ export default function AdminGuard({ children }: { children: React.ReactNode }) 
       return;
     }
 
-    const role = decodeRoleFromToken(token);
+    const role = (
+      profileUser?.role ||
+      decodeRoleFromToken(token) ||
+      ""
+    ).toUpperCase();
 
+    // 1. Strictly block non-admin accounts from the dashboard
     if (role && role !== "ADMIN" && role !== "SUPER_ADMIN") {
       toast.error("Access Denied: Dashboard access is restricted to Administrators only.");
       dispatch(logout());
@@ -60,10 +76,45 @@ export default function AdminGuard({ children }: { children: React.ReactNode }) 
       localStorage.removeItem("token");
       setIsAuthorized(false);
       window.location.replace("/auth/login");
-    } else {
-      setIsAuthorized(true);
+      return;
     }
-  }, [dispatch]);
+
+    // 2. Super Admin always has full unrestricted access
+    if (role === "SUPER_ADMIN") {
+      setIsAuthorized(true);
+      return;
+    }
+
+    // 3. Granular permission checking for ADMIN
+    if (role === "ADMIN" && profileUser) {
+      const permissions: string[] = Array.isArray(profileUser.permissions)
+        ? profileUser.permissions
+        : [];
+
+      // If this admin has custom assigned permissions:
+      if (permissions.length > 0) {
+        // If landing on root overview '/' without OVERVIEW permission, redirect to their first permitted route
+        if (pathname === "/" && !permissions.includes("OVERVIEW")) {
+          const target = getFirstPermittedRoute(permissions, role);
+          if (target && target !== "/") {
+            setIsAuthorized(true);
+            router.replace(target);
+            return;
+          }
+        }
+
+        // If trying to access a page that is not permitted, block and redirect back
+        if (!isRouteAllowedForAdmin(pathname, permissions, role)) {
+          toast.error("Access Denied: You do not have permission to view this page.");
+          const target = getFirstPermittedRoute(permissions, role);
+          router.replace(target || "/");
+          return;
+        }
+      }
+    }
+
+    setIsAuthorized(true);
+  }, [dispatch, router, pathname, profileUser]);
 
   if (isAuthorized === false) {
     return null;

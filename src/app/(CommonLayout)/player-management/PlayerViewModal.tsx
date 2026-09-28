@@ -63,13 +63,35 @@ interface PlayerViewModalProps {
 const formatTransactionCategory = (cat: string) => {
   switch (cat) {
     case "MATCH_GOAL":
+    case "GOAL":
       return { label: "Goal Scored", icon: "⚽", bg: "bg-emerald-50 text-emerald-700 border-emerald-200" };
     case "MATCH_ASSIST":
+    case "ASSIST":
       return { label: "Goal Assist", icon: "👟", bg: "bg-blue-50 text-blue-700 border-blue-200" };
     case "MATCH_CLEAN_SHEET":
+    case "CLEAN_SHEET":
       return { label: "Clean Sheet", icon: "🛡️", bg: "bg-teal-50 text-teal-700 border-teal-200" };
     case "MATCH_POTD":
+    case "PLAYER_OF_THE_DAY":
       return { label: "Player of Day", icon: "⭐", bg: "bg-amber-50 text-amber-700 border-amber-200" };
+    case "PLAYING_MATCH":
+    case "ATTEND_MATCH":
+      return { label: "Match Appearance", icon: "🏟️", bg: "bg-sky-50 text-sky-700 border-sky-200" };
+    case "MATCH_RATING":
+      return { label: "Match Rating", icon: "🌟", bg: "bg-amber-50 text-amber-700 border-amber-200" };
+    case "YELLOW_CARD_PENALTY":
+      return { label: "Yellow Card", icon: "🟨", bg: "bg-amber-50 text-amber-700 border-amber-200" };
+    case "RED_CARD_PENALTY":
+    case "PENALTY_CARD":
+      return { label: "Red Card", icon: "🟥", bg: "bg-rose-50 text-rose-700 border-rose-200" };
+    case "FOUL_PENALTY":
+      return { label: "Foul Penalty", icon: "⚠️", bg: "bg-orange-50 text-orange-700 border-orange-200" };
+    case "SIN_BIN_PENALTY":
+      return { label: "Sin Bin", icon: "⏱️", bg: "bg-purple-50 text-purple-700 border-purple-200" };
+    case "DISRESPECT_TO_REFEREE":
+      return { label: "Referee Dispute", icon: "🚫", bg: "bg-rose-50 text-rose-700 border-rose-200" };
+    case "GROSS_MISCONDUCT":
+      return { label: "Gross Misconduct", icon: "🛑", bg: "bg-rose-50 text-rose-700 border-rose-200" };
     case "SUBSCRIPTION_BONUS":
       return { label: "Plan Bonus", icon: "🎁", bg: "bg-purple-50 text-purple-700 border-purple-200" };
     case "PRODUCT_PURCHASE":
@@ -78,10 +100,10 @@ const formatTransactionCategory = (cat: string) => {
       return { label: "Admin Adjustment", icon: "⚖️", bg: "bg-indigo-50 text-indigo-700 border-indigo-200" };
     case "REFEREE_REVIEW":
       return { label: "Manager Review", icon: "📋", bg: "bg-slate-50 text-slate-700 border-slate-200" };
-    case "PENALTY_CARD":
-      return { label: "Card Penalty", icon: "🟥", bg: "bg-rose-50 text-rose-700 border-rose-200" };
+    case "ROLLBACK":
+      return { label: "Rollback Reversal", icon: "🔄", bg: "bg-slate-50 text-slate-700 border-slate-200" };
     default:
-      return { label: cat || "Transaction", icon: "🪙", bg: "bg-slate-50 text-slate-700 border-slate-200" };
+      return { label: cat ? cat.replace(/_/g, " ") : "Transaction", icon: "🪙", bg: "bg-slate-50 text-slate-700 border-slate-200" };
   }
 };
 

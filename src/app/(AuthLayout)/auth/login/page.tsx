@@ -28,6 +28,7 @@ import { toast } from 'sonner';
 import { useDispatch } from 'react-redux';
 import { setAuthCookie } from '../../../actions/auth';
 import { decodeRoleFromToken } from "@/components/layout/AdminGuard";
+import { getFirstPermittedRoute } from "@/constants/permissions";
 
 // Schema
 const contactUsFormSchema = z
@@ -98,7 +99,14 @@ const Login = () => {
         if (refreshToken) localStorage.setItem('refreshToken', refreshToken);
       }
       await setAuthCookie(accessToken, refreshToken);
-      window.location.replace('/');
+      // Smart landing redirect based on permissions
+      const permissions = res?.data?.permissions || [];
+      if (userRole === 'ADMIN' && Array.isArray(permissions) && permissions.length > 0 && !permissions.includes('OVERVIEW')) {
+        const targetRoute = getFirstPermittedRoute(permissions, userRole);
+        window.location.replace(targetRoute);
+      } else {
+        window.location.replace('/');
+      }
     } catch (error: any) {
       console.error("Login error:", error);
       const errorMessage =
