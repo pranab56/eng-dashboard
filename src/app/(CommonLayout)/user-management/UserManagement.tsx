@@ -327,7 +327,7 @@ const UserManagement = () => {
                   onClick={() => handleRoleChange(tab.value)}
                   className={`px-4 py-2 text-xs font-bold rounded-lg transition-all whitespace-nowrap cursor-pointer flex items-center gap-2 ${
                     isSelected
-                      ? 'bg-blue-600 text-white shadow-md shadow-blue-600/20'
+                      ? 'bg-black text-white shadow-md shadow-blue-600/20'
                       : isPendingTab
                       ? 'bg-amber-50 text-amber-700 hover:bg-amber-100 border border-amber-300 font-extrabold'
                       : 'bg-gray-50 text-gray-600 hover:bg-gray-100 hover:text-gray-900 border border-gray-200/60'
