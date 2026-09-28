@@ -45,7 +45,7 @@ const CustomSearchableSelect = ({
   label?: string;
   badgeText?: string;
   value: string;
-  onChange: (val: string) => void;
+  onChange: (val: string, option?: OptionItem) => void;
   options: OptionItem[];
   placeholder?: string;
   className?: string;
@@ -177,7 +177,7 @@ const CustomSearchableSelect = ({
                       key={opt.value}
                       type="button"
                       onClick={() => {
-                        onChange(opt.value);
+                        onChange(opt.value, opt);
                         setIsOpen(false);
                         setQuery("");
                       }}
@@ -241,6 +241,70 @@ const MatchManagement = () => {
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [debouncedSearchTerm, setDebouncedSearchTerm] = useState<string>("");
 
+  // Store selected option labels so dropdowns retain labels even during loading
+  const [filterLabels, setFilterLabels] = useState<Record<string, string>>({});
+  const [isFiltersRestored, setIsFiltersRestored] = useState<boolean>(false);
+
+  // 1. Restore saved filters from sessionStorage on mount (survives edit page navigation & refresh)
+  useEffect(() => {
+    try {
+      const saved = sessionStorage.getItem("match_management_filters");
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (parsed.leagueFilter !== undefined) setLeagueFilter(parsed.leagueFilter);
+        if (parsed.dateFilter !== undefined) setDateFilter(parsed.dateFilter);
+        if (parsed.statusFilter !== undefined) setStatusFilter(parsed.statusFilter);
+        if (parsed.matchDateStatusFilter !== undefined) setMatchDateStatusFilter(parsed.matchDateStatusFilter);
+        if (parsed.venueFilter !== undefined) setVenueFilter(parsed.venueFilter);
+        if (parsed.teamFilter !== undefined) setTeamFilter(parsed.teamFilter);
+        if (parsed.unplayedOnly !== undefined) setUnplayedOnly(parsed.unplayedOnly);
+        if (parsed.searchTerm !== undefined) {
+          setSearchTerm(parsed.searchTerm);
+          setDebouncedSearchTerm(parsed.searchTerm);
+        }
+        if (parsed.labels) {
+          setFilterLabels(parsed.labels);
+        }
+      }
+    } catch (e) {
+      console.error("Failed to restore match filters from storage:", e);
+    } finally {
+      setIsFiltersRestored(true);
+    }
+  }, []);
+
+  // 2. Persist filters to sessionStorage on any change (only after initial restoration)
+  useEffect(() => {
+    if (!isFiltersRestored) return;
+    try {
+      const stateToSave = {
+        leagueFilter,
+        dateFilter,
+        statusFilter,
+        matchDateStatusFilter,
+        venueFilter,
+        teamFilter,
+        unplayedOnly,
+        searchTerm,
+        labels: filterLabels,
+      };
+      sessionStorage.setItem("match_management_filters", JSON.stringify(stateToSave));
+    } catch (e) {
+      console.error("Failed to persist match filters:", e);
+    }
+  }, [
+    isFiltersRestored,
+    leagueFilter,
+    dateFilter,
+    statusFilter,
+    matchDateStatusFilter,
+    venueFilter,
+    teamFilter,
+    unplayedOnly,
+    searchTerm,
+    filterLabels,
+  ]);
+
   const resetPageInUrl = () => {
     if (urlPageParam && urlPageParam !== "1") {
       const params = new URLSearchParams(searchParams.toString());
@@ -249,34 +313,40 @@ const MatchManagement = () => {
     }
   };
 
-  const handleSetLeagueFilter = (val: string) => {
+  const handleSetLeagueFilter = (val: string, opt?: OptionItem) => {
     resetPageInUrl();
     setLeagueFilter(val);
+    if (opt) setFilterLabels((prev) => ({ ...prev, league: opt.label }));
   };
 
-  const handleSetDateFilter = (val: string) => {
+  const handleSetDateFilter = (val: string, opt?: OptionItem) => {
     resetPageInUrl();
     setDateFilter(val);
+    if (opt) setFilterLabels((prev) => ({ ...prev, date: opt.label }));
   };
 
-  const handleSetStatusFilter = (val: string) => {
+  const handleSetStatusFilter = (val: string, opt?: OptionItem) => {
     resetPageInUrl();
     setStatusFilter(val);
+    if (opt) setFilterLabels((prev) => ({ ...prev, status: opt.label }));
   };
 
-  const handleSetMatchDateStatusFilter = (val: string) => {
+  const handleSetMatchDateStatusFilter = (val: string, opt?: OptionItem) => {
     resetPageInUrl();
     setMatchDateStatusFilter(val);
+    if (opt) setFilterLabels((prev) => ({ ...prev, matchDateStatus: opt.label }));
   };
 
-  const handleSetVenueFilter = (val: string) => {
+  const handleSetVenueFilter = (val: string, opt?: OptionItem) => {
     resetPageInUrl();
     setVenueFilter(val);
+    if (opt) setFilterLabels((prev) => ({ ...prev, venue: opt.label }));
   };
 
-  const handleSetTeamFilter = (val: string) => {
+  const handleSetTeamFilter = (val: string, opt?: OptionItem) => {
     resetPageInUrl();
     setTeamFilter(val);
+    if (opt) setFilterLabels((prev) => ({ ...prev, team: opt.label, teamLogo: opt.logo || "" }));
   };
 
   // Debounce search term to prevent API hit on every keystroke
@@ -300,14 +370,20 @@ const MatchManagement = () => {
   const allTeams: any[] = teamData?.data?.result || teamData?.data || [];
   const venueList: any[] = venueCategoryData?.data || [];
 
-  // Options arrays
-  const competitionOptions: OptionItem[] = [
-    { label: "Competition : All", value: "ALL" },
-    ...allLeagues.map((item: any) => ({
-      label: item.season ? `${item.leagueName} (${item.season})` : item.leagueName,
-      value: item._id,
-    })),
-  ];
+  // Options arrays with preserved fallback for restored filters during async query load
+  const competitionOptions: OptionItem[] = useMemo(() => {
+    const list: OptionItem[] = [
+      { label: "Competition : All", value: "ALL" },
+      ...allLeagues.map((item: any) => ({
+        label: item.season ? `${item.leagueName} (${item.season})` : item.leagueName,
+        value: item._id,
+      })),
+    ];
+    if (leagueFilter !== "ALL" && !list.some((o) => o.value === leagueFilter)) {
+      list.push({ label: filterLabels.league || "Selected Competition", value: leagueFilter });
+    }
+    return list;
+  }, [allLeagues, leagueFilter, filterLabels.league]);
 
   // Query all unique match dates with match counts (dynamically filtered by current league and team)
   const { data: scheduleDatesData } = useGetMatchScheduleDatesQuery({
@@ -334,8 +410,12 @@ const MatchManagement = () => {
       });
     }
 
+    if (dateFilter !== "ALL" && !list.some((o) => o.value === dateFilter)) {
+      list.push({ label: filterLabels.date || dateFilter, value: dateFilter });
+    }
+
     return list;
-  }, [availableScheduleDates]);
+  }, [availableScheduleDates, dateFilter, filterLabels.date]);
 
   const statusOptions: OptionItem[] = [
     { label: "Status : All", value: "ALL" },
@@ -353,22 +433,38 @@ const MatchManagement = () => {
     { label: "Past Matches", value: "past" },
   ];
 
-  const venueOptions: OptionItem[] = [
-    { label: "Venue : All", value: "ALL" },
-    ...venueList.map((v: any) => ({
-      label: v.name,
-      value: v._id || v.id,
-    })),
-  ];
+  const venueOptions: OptionItem[] = useMemo(() => {
+    const list: OptionItem[] = [
+      { label: "Venue : All", value: "ALL" },
+      ...venueList.map((v: any) => ({
+        label: v.name,
+        value: v._id || v.id,
+      })),
+    ];
+    if (venueFilter !== "ALL" && !list.some((o) => o.value === venueFilter)) {
+      list.push({ label: filterLabels.venue || "Selected Venue", value: venueFilter });
+    }
+    return list;
+  }, [venueList, venueFilter, filterLabels.venue]);
 
-  const teamOptions: OptionItem[] = [
-    { label: "Team : All", value: "ALL" },
-    ...allTeams.map((t: any) => ({
-      label: t.teamName,
-      value: t._id,
-      logo: t.teamLogo || null,
-    })),
-  ];
+  const teamOptions: OptionItem[] = useMemo(() => {
+    const list: OptionItem[] = [
+      { label: "Team : All", value: "ALL" },
+      ...allTeams.map((t: any) => ({
+        label: t.teamName,
+        value: t._id,
+        logo: t.teamLogo || null,
+      })),
+    ];
+    if (teamFilter !== "ALL" && !list.some((o) => o.value === teamFilter)) {
+      list.push({
+        label: filterLabels.team || "Selected Team",
+        value: teamFilter,
+        logo: filterLabels.teamLogo || null,
+      });
+    }
+    return list;
+  }, [allTeams, teamFilter, filterLabels.team, filterLabels.teamLogo]);
 
   // Combine query params: distinguish exact match date ("YYYY-MM-DD") from relative dateStatus ("today", "this_week", etc.)
   const isExactDate = /^\d{4}-\d{2}-\d{2}$/.test(dateFilter);
@@ -430,6 +526,10 @@ const MatchManagement = () => {
     setUnplayedOnly(false);
     setSearchTerm("");
     setDebouncedSearchTerm("");
+    setFilterLabels({});
+    try {
+      sessionStorage.removeItem("match_management_filters");
+    } catch (e) {}
     toast.info("Filters reset to default");
   };
 
