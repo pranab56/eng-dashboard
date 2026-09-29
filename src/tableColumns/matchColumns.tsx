@@ -10,6 +10,7 @@ import { formatImagePath } from "../utils/formatImagePath";
 import {
   Shield,
   Eye,
+  Activity,
   MoreVertical,
   Edit3,
   Trash2,
@@ -50,7 +51,7 @@ const statusStyle = (status: string): string => {
 };
 
 export const getMatchColumns = (
-  onView: (match: any) => void,
+  onView: (match: any, initialTab?: "overview" | "events" | "actions") => void,
   onDelete: (id: string) => void,
   onModifyScore: (match: any) => void,
   onUpdateStatus?: (match: any) => void,
@@ -199,11 +200,21 @@ export const getMatchColumns = (
           {/* Quick View Button */}
           <button
             type="button"
-            onClick={() => onView(match)}
-            className="flex items-center justify-center h-8.5 w-8.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 hover:text-slate-900 transition-all cursor-pointer shadow-2xs"
-            title="View Match Details"
+            onClick={() => onView(match, "overview")}
+            className="flex items-center justify-center h-8 w-8 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-slate-600 hover:text-slate-900 transition-colors cursor-pointer"
+            title="Match Overview"
           >
-            <Eye className="w-4 h-4" />
+            <Eye className="w-3.5 h-3.5" />
+          </button>
+
+          {/* Match Events & Cards Button */}
+          <button
+            type="button"
+            onClick={() => onView(match, "events")}
+            className="flex items-center justify-center h-8 w-8 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-slate-600 hover:text-slate-900 transition-colors cursor-pointer"
+            title="Match Events & Cards"
+          >
+            <Activity className="w-3.5 h-3.5" />
           </button>
 
           {/* Unified Dropdown Menu for all modification actions */}
@@ -211,10 +222,10 @@ export const getMatchColumns = (
             <DropdownMenuTrigger asChild>
               <button
                 type="button"
-                className="flex items-center justify-center h-8.5 w-8.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 hover:text-slate-900 transition-all cursor-pointer shadow-2xs focus:outline-none"
+                className="flex items-center justify-center h-8 w-8 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-slate-600 hover:text-slate-900 transition-colors cursor-pointer focus:outline-none"
                 title="Match Actions"
               >
-                <MoreVertical className="w-4 h-4" />
+                <MoreVertical className="w-3.5 h-3.5" />
               </button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-56 p-1.5 bg-white rounded-2xl shadow-xl border border-slate-100 text-xs">

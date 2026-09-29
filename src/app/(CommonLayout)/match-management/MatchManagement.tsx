@@ -491,6 +491,7 @@ const MatchManagement = () => {
 
   const [selectedMatch, setSelectedMatch] = useState<any>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [modalTab, setModalTab] = useState<"overview" | "events" | "actions">("overview");
 
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [isRatingRuleModalOpen, setIsRatingRuleModalOpen] = useState(false);
@@ -533,8 +534,9 @@ const MatchManagement = () => {
     toast.info("Filters reset to default");
   };
 
-  const handleView = (match: any) => {
+  const handleView = (match: any, tab: "overview" | "events" | "actions" = "overview") => {
     setSelectedMatch(match);
+    setModalTab(tab);
     setIsModalOpen(true);
   };
 
@@ -748,6 +750,9 @@ const MatchManagement = () => {
         onClose={() => setIsModalOpen(false)}
         match={selectedMatch}
         onManageCleanSheet={handleManageCleanSheet}
+        onModifyScore={handleModifyScore}
+        onUpdateStatus={handleUpdateStatus}
+        initialTab={modalTab}
       />
 
       <RatingRuleModal isOpen={isRatingRuleModalOpen} onClose={() => setIsRatingRuleModalOpen(false)} />

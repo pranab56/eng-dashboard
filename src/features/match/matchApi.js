@@ -148,6 +148,40 @@ export const matchApi = baseApi.injectEndpoints({
       }),
       invalidatesTags: ["match"]
     }),
+    getMatchEvents: builder.query({
+      query: (matchId) => ({
+        url: `/match-result/match/${matchId}`,
+        method: "GET",
+      }),
+      providesTags: ["matchResult", "match"],
+    }),
+
+    createMatchEvent: builder.mutation({
+      query: (data) => ({
+        url: "/match-result",
+        method: "POST",
+        body: data,
+      }),
+      invalidatesTags: ["matchResult", "match", "player"],
+    }),
+
+    updateMatchEvent: builder.mutation({
+      query: ({ id, data }) => ({
+        url: `/match-result/${id}`,
+        method: "PATCH",
+        body: data,
+      }),
+      invalidatesTags: ["matchResult", "match", "player"],
+    }),
+
+    deleteMatchEvent: builder.mutation({
+      query: (id) => ({
+        url: `/match-result/${id}`,
+        method: "DELETE",
+      }),
+      invalidatesTags: ["matchResult", "match", "player"],
+    }),
+
 
   }),
 });
@@ -167,5 +201,9 @@ export const {
   useGetMatchCleanSheetsQuery,
   useAwardCleanSheetMutation,
   useRevokeCleanSheetMutation,
+  useGetMatchEventsQuery,
+  useCreateMatchEventMutation,
+  useUpdateMatchEventMutation,
+  useDeleteMatchEventMutation,
 
 } = matchApi;

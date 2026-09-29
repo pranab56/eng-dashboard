@@ -1316,9 +1316,23 @@ const PlayerViewModal: React.FC<PlayerViewModalProps> = ({
                                     {tx.title || tx.description}
                                   </p>
                                   {tx.description && tx.title !== tx.description && (
-                                    <p className="text-[11px] text-slate-400 truncate">
+                                    <p className="text-[11px] text-slate-500">
                                       {tx.description}
                                     </p>
+                                  )}
+                                  {(tx.opponentTeam?.teamName || tx.fixture) && (
+                                    <div className="mt-1 flex items-center gap-1.5 flex-wrap">
+                                      {tx.opponentTeam?.teamName && (
+                                        <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-semibold bg-rose-50 text-rose-700 border border-rose-200/70">
+                                          vs {tx.opponentTeam.teamName}
+                                        </span>
+                                      )}
+                                      {tx.fixture && (
+                                        <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-medium bg-slate-100 text-slate-600 border border-slate-200/70">
+                                          🏟️ {tx.fixture}
+                                        </span>
+                                      )}
+                                    </div>
                                   )}
                                 </td>
                               </tr>
