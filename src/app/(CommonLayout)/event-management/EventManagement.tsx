@@ -22,6 +22,7 @@ import {
   useDeleteeventMutation,
   useGetEventQuery,
   useRearrangeEventsMutation,
+  useGetEventAnalyticsQuery,
 } from "@/features/eventManagement/eventApi";
 import { useHeaders } from "@/hooks/useHeaders";
 import { getEventColumns } from "@/tableColumns/eventColumns";
@@ -39,6 +40,7 @@ const EventManagement = () => {
   const [activeTab, setActiveTab] = useState<FilterTab>("all");
 
   const { data: eventData, isLoading } = useGetEventQuery(page);
+  const { data: analyticsData } = useGetEventAnalyticsQuery(undefined);
   const [deleteEvent, { isLoading: isDeleting }] = useDeleteeventMutation();
   const [rearrangeEvents] = useRearrangeEventsMutation();
 
@@ -61,27 +63,12 @@ const EventManagement = () => {
     }
   }, [eventData]);
 
-  // Compute statistics
-  const totalCount = eventData?.pagination?.total || localEvents.length;
-  const publishedCount = useMemo(() => {
-    return localEvents.filter(
-      (ev: any) => ev.status?.toLowerCase() === "publish"
-    ).length;
-  }, [localEvents]);
-
-  const upcomingCount = useMemo(() => {
-    const now = new Date();
-    return localEvents.filter((ev: any) => {
-      if (!ev.eventDate) return false;
-      return new Date(ev.eventDate) >= now;
-    }).length;
-  }, [localEvents]);
-
-  const draftCount = useMemo(() => {
-    return localEvents.filter(
-      (ev: any) => ev.status?.toLowerCase() === "draft"
-    ).length;
-  }, [localEvents]);
+  // Compute statistics directly from backend DB aggregation
+  const eventAnalytics = analyticsData?.data;
+  const totalCount = eventAnalytics?.total ?? (eventData?.pagination?.total || localEvents.length);
+  const publishedCount = eventAnalytics?.published ?? 0;
+  const upcomingCount = eventAnalytics?.upcoming ?? 0;
+  const draftCount = eventAnalytics?.drafts ?? 0;
 
   // Filtered list based on search and tab
   const displayedEvents = useMemo(() => {

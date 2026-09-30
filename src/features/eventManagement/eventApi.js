@@ -10,6 +10,14 @@ export const eventApi = baseApi.injectEndpoints({
       providesTags: ["event"]
     }),
 
+    getEventAnalytics: builder.query({
+      query: () => ({
+        url: "/event/analytics",
+        method: "GET",
+      }),
+      providesTags: ["event"]
+    }),
+
     singleEvent: builder.query({
       query: (id) => ({
         url: `/event/${id}`,
@@ -58,6 +66,7 @@ export const eventApi = baseApi.injectEndpoints({
 // Export hooks
 export const {
   useGetEventQuery,
+  useGetEventAnalyticsQuery,
   useSingleEventQuery,
   useCreateEventMutation,
   useEditeventMutation,

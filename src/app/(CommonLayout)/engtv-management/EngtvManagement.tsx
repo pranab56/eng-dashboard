@@ -23,6 +23,7 @@ import {
   useDeleteVideoMutation,
   useGetAllVideoQuery,
   useRearrangeVideosMutation,
+  useGetVideoAnalyticsQuery,
 } from "@/features/engTVManagement/engApi";
 import { useGetAllVideoCategoryQuery } from "@/features/categoryManagement/categoryApi";
 import { useHeaders } from "@/hooks/useHeaders";
@@ -46,6 +47,7 @@ const EngtvManagement = () => {
     page,
     category: selectedCategory,
   });
+  const { data: analyticsData } = useGetVideoAnalyticsQuery(undefined);
   const { data: categoriesData } = useGetAllVideoCategoryQuery({});
 
   const [deleteVideo, { isLoading: isDeleting }] = useDeleteVideoMutation();
@@ -70,23 +72,12 @@ const EngtvManagement = () => {
     }
   }, [videoData]);
 
-  // Compute statistics
-  const totalCount = videoData?.pagination?.total || localVideos.length;
-  const publishedCount = useMemo(() => {
-    return localVideos.filter(
-      (v) => v.status?.toLowerCase() === "publish"
-    ).length;
-  }, [localVideos]);
-
-  const highlightsCount = useMemo(() => {
-    return localVideos.filter((v) => !!v.isHighlight).length;
-  }, [localVideos]);
-
-  const draftsCount = useMemo(() => {
-    return localVideos.filter(
-      (v) => v.status?.toLowerCase() === "draft"
-    ).length;
-  }, [localVideos]);
+  // Compute statistics directly from backend DB aggregation
+  const videoAnalytics = analyticsData?.data;
+  const totalCount = videoAnalytics?.total ?? (videoData?.pagination?.total || localVideos.length);
+  const publishedCount = videoAnalytics?.published ?? 0;
+  const highlightsCount = videoAnalytics?.highlights ?? 0;
+  const draftsCount = videoAnalytics?.drafts ?? 0;
 
   // Filtered list based on search and tab
   const displayedVideos = useMemo(() => {

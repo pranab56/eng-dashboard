@@ -1,6 +1,5 @@
 import { baseApi } from "../../utils/apiBaseQuery";
 
-
 export const teamApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
     createTeam: builder.mutation({
@@ -45,6 +44,14 @@ export const teamApi = baseApi.injectEndpoints({
       providesTags: ["team"]
     }),
 
+    getTeamAnalytics: builder.query({
+      query: () => ({
+        url: "/team/analytics",
+        method: "GET",
+      }),
+      providesTags: ["team"]
+    }),
+
     getSingleTeam: builder.query({
       query: (id) => ({
         url: `/team/${id}`,
@@ -52,7 +59,6 @@ export const teamApi = baseApi.injectEndpoints({
       }),
       providesTags: ["team"]
     }),
-
 
     deleteTeam: builder.mutation({
       query: (id) => ({
@@ -79,7 +85,6 @@ export const teamApi = baseApi.injectEndpoints({
       providesTags: ["team"]
     }),
 
-
     updateTeamCoinBudget: builder.mutation({
       query: ({ id, data }) => ({
         url: `/team/${id}/economy`,
@@ -88,8 +93,6 @@ export const teamApi = baseApi.injectEndpoints({
       }),
       invalidatesTags: ["team"]
     }),
-
-
   }),
 });
 
@@ -98,6 +101,7 @@ export const {
   useCreateTeamMutation,
   useUpdateTeamMutation,
   useGetAllTeamQuery,
+  useGetTeamAnalyticsQuery,
   useGetSingleTeamQuery,
   useDeleteTeamMutation,
   useUpdateBudgetAndEconomayMutation,

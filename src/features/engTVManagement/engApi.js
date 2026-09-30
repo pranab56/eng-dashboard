@@ -1,9 +1,7 @@
 import { baseApi } from "../../utils/apiBaseQuery";
 
-
 export const engApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
-
     createVideo: builder.mutation({
       query: (data) => ({
         url: "/video",
@@ -47,6 +45,14 @@ export const engApi = baseApi.injectEndpoints({
       providesTags: ["video"]
     }),
 
+    getVideoAnalytics: builder.query({
+      query: () => ({
+        url: "/video/analytics",
+        method: "GET",
+      }),
+      providesTags: ["video"]
+    }),
+
     getSingleVideo: builder.query({
       query: (id) => ({
         url: `/video/${id}`,
@@ -54,7 +60,6 @@ export const engApi = baseApi.injectEndpoints({
       }),
       providesTags: ["video"]
     }),
-
 
     deleteVideo: builder.mutation({
       query: (id) => ({
@@ -94,7 +99,6 @@ export const engApi = baseApi.injectEndpoints({
       }),
       invalidatesTags: ["video"]
     }),
-
   }),
 });
 
@@ -103,6 +107,7 @@ export const {
   useCreateVideoMutation,
   useUpdateVideoMutation,
   useGetAllVideoQuery,
+  useGetVideoAnalyticsQuery,
   useGetSingleVideoQuery,
   useDeleteVideoMutation,
   useFrontEndVideoQuery,

@@ -24,6 +24,7 @@ import {
   useGetAllTeamQuery,
   useGetSingleTeamQuery,
   useUpdateTeamCoinBudgetMutation,
+  useGetTeamAnalyticsQuery,
 } from "@/features/teamManagement/teamApi";
 import { useGetAllLeagueQuery } from "@/features/leagueManagement/leagueApi";
 import { useGetAllManagerTeamQuery } from "@/features/managerTeam/managerTeamApi";
@@ -59,6 +60,7 @@ const TeamManagement = () => {
   );
 
   const { data: teamData, isLoading } = useGetAllTeamQuery(queryParams);
+  const { data: analyticsData } = useGetTeamAnalyticsQuery(undefined);
   const { data: leaguesData } = useGetAllLeagueQuery({ limit: 100 });
   const { data: managersData } = useGetAllManagerTeamQuery({ limit: 100 });
 
@@ -167,16 +169,13 @@ const TeamManagement = () => {
   const displayedTeams = teamData?.data?.result || teamData?.data || [];
   const totalPages =
     teamData?.pagination?.totalPage || teamData?.meta?.totalPage || 1;
-  const totalCount =
-    teamData?.pagination?.total || teamData?.meta?.total || displayedTeams.length || 0;
 
-  // Total coin across displayed squads
-  const totalEconomy = useMemo(() => {
-    return displayedTeams.reduce(
-      (acc: number, t: any) => acc + (t.coin || 0),
-      0
-    );
-  }, [displayedTeams]);
+  const teamAnalytics = analyticsData?.data;
+  const totalCount =
+    teamAnalytics?.totalTeams ?? (teamData?.pagination?.total || teamData?.meta?.total || displayedTeams.length || 0);
+  const totalLeaguesCount = teamAnalytics?.totalLeagues ?? allLeagues.length;
+  const totalManagersCount = teamAnalytics?.totalManagers ?? allManagers.length;
+  const totalEconomy = teamAnalytics?.totalCoins ?? 0;
 
   return (
     <div className="pt-6 px-6 sm:px-8 space-y-6 max-w-[1600px] mx-auto pb-16">
@@ -211,7 +210,7 @@ const TeamManagement = () => {
             </div>
           </div>
           <p className="text-2xl font-semibold text-amber-600 dark:text-amber-400 mt-2">
-            {allLeagues.length}
+            {totalLeaguesCount}
           </p>
           <span className="text-[11px] text-slate-400 mt-1 block">
             Competition divisions
@@ -229,7 +228,7 @@ const TeamManagement = () => {
             </div>
           </div>
           <p className="text-2xl font-semibold text-blue-600 dark:text-blue-400 mt-2">
-            {allManagers.length}
+            {totalManagersCount}
           </p>
           <span className="text-[11px] text-slate-400 mt-1 block">
             Registered team leaders
@@ -240,7 +239,7 @@ const TeamManagement = () => {
         <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg p-4">
           <div className="flex items-center justify-between">
             <span className="text-xs font-medium text-slate-500 dark:text-slate-400">
-              Squad Coins (Page)
+              Total Coin Economy
             </span>
             <div className="w-8 h-8 rounded-md bg-emerald-50 dark:bg-emerald-950/40 flex items-center justify-center text-emerald-600 dark:text-emerald-400">
               <Coins className="w-4 h-4" />
