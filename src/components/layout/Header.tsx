@@ -14,6 +14,7 @@ import { logout } from "@/features/auth/authSlice";
 import { useDispatch } from "react-redux";
 import { toast } from "sonner";
 import LogoutConfirmModal from "../modals/LogoutConfirmModal";
+import NotificationDropdown from "./NotificationDropdown";
 
 import {
   Bell,
@@ -152,20 +153,8 @@ const Header = () => {
             <span className="hidden lg:inline text-[11px]">System Status</span>
           </Link>
 
-          {/* Notifications Button */}
-          <Link
-            href="/notifications"
-            className="relative w-8 h-8 rounded-md border border-slate-200 text-slate-600 hover:text-slate-900 hover:bg-slate-50 flex items-center justify-center transition-colors cursor-pointer"
-            aria-label="Notifications"
-            title="System Notifications"
-          >
-            <Bell className="w-4 h-4" />
-            {unreadCount > 0 && (
-              <span className="absolute -top-1 -right-1 min-w-[17px] h-[17px] flex items-center justify-center bg-rose-600 text-white font-bold text-[9px] rounded-full px-1 border-2 border-white tabular-nums">
-                {unreadCount > 99 ? "99+" : unreadCount}
-              </span>
-            )}
-          </Link>
+          {/* Notifications Dropdown */}
+          <NotificationDropdown />
 
           {/* Vertical Divider */}
           <div className="h-5 w-px bg-slate-200 shrink-0" />

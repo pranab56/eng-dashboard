@@ -20,7 +20,7 @@ export const notificationApi = baseApi.injectEndpoints({
 
     readAllNotification: builder.mutation({
       query: () => ({
-        url: "notification/read-all",
+        url: "/notification/read-all",
         method: "PATCH",
       }),
       invalidatesTags: ["notification"]
