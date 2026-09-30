@@ -1,16 +1,14 @@
 import { baseApi } from "../../utils/apiBaseQuery";
 
-
 export const leagueApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
-
     createLeague: builder.mutation({
       query: (data) => ({
         url: "/league",
         method: "POST",
         body: data,
       }),
-      invalidatesTags: ["league"]
+      invalidatesTags: ["league"],
     }),
 
     updateLeague: builder.mutation({
@@ -19,7 +17,7 @@ export const leagueApi = baseApi.injectEndpoints({
         method: "PATCH",
         body: data,
       }),
-      invalidatesTags: ["league"]
+      invalidatesTags: ["league"],
     }),
 
     getAllLeague: builder.query({
@@ -27,10 +25,12 @@ export const leagueApi = baseApi.injectEndpoints({
         let page = 1;
         let limit = 10;
         let searchValue = "";
+        let status = "";
         if (typeof params === "object" && params !== null) {
           page = params.page || params.pageNumber || 1;
           limit = params.limit || 10;
           searchValue = params.searchValue || params.searchTerm || "";
+          status = params.status || "";
         } else if (params) {
           page = params;
         }
@@ -39,12 +39,23 @@ export const leagueApi = baseApi.injectEndpoints({
         if (searchValue) {
           url += `&searchTerm=${encodeURIComponent(searchValue)}`;
         }
+        if (status && status !== "all") {
+          url += `&status=${encodeURIComponent(status)}`;
+        }
         return {
           url,
           method: "GET",
         };
       },
-      providesTags: ["league"]
+      providesTags: ["league"],
+    }),
+
+    getLeagueAnalytics: builder.query({
+      query: () => ({
+        url: "/league/analytics",
+        method: "GET",
+      }),
+      providesTags: ["league"],
     }),
 
     getSingleLeague: builder.query({
@@ -52,19 +63,16 @@ export const leagueApi = baseApi.injectEndpoints({
         url: `/league/${id}`,
         method: "GET",
       }),
-      providesTags: ["league"]
+      providesTags: ["league"],
     }),
-
 
     deleteLeague: builder.mutation({
       query: (id) => ({
         url: `/league/${id}`,
         method: "DELETE",
       }),
-      invalidatesTags: ["league"]
+      invalidatesTags: ["league"],
     }),
-
-
   }),
 });
 
@@ -73,6 +81,7 @@ export const {
   useCreateLeagueMutation,
   useUpdateLeagueMutation,
   useGetAllLeagueQuery,
+  useGetLeagueAnalyticsQuery,
   useGetSingleLeagueQuery,
   useDeleteLeagueMutation,
 } = leagueApi;

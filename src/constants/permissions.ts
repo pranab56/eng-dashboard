@@ -169,6 +169,13 @@ export const AVAILABLE_PERMISSIONS: IPermissionOption[] = [
     description: "Configure venues, playtimes, age groups, and categories",
   },
   {
+    key: "SERVER_HEALTH",
+    label: "Server Health",
+    route: "/server-health",
+    category: "System & Settings",
+    description: "Monitor real-time system resources, server metrics, and Winston logs",
+  },
+  {
     key: "SETTINGS",
     label: "Settings",
     route: "/settings",
@@ -217,14 +224,36 @@ export const isRouteAllowedForAdmin = (
     return permissions.includes("OVERVIEW");
   }
 
+  // User profile is accessible by all authenticated admins
+  if (pathname === "/profile" || pathname.startsWith("/profile/")) {
+    return true;
+  }
+
+  // Server health route
+  if (pathname === "/server-health" || pathname.startsWith("/server-health/")) {
+    return permissions.includes("SERVER_HEALTH");
+  }
+
+  // Settings subroutes: /settings, /terms-and-condition, /privacy-policy
+  if (
+    pathname === "/settings" ||
+    pathname.startsWith("/settings/") ||
+    pathname === "/terms-and-condition" ||
+    pathname.startsWith("/terms-and-condition/") ||
+    pathname === "/privacy-policy" ||
+    pathname.startsWith("/privacy-policy/")
+  ) {
+    return permissions.includes("SETTINGS");
+  }
+
   // Check matching permission
   const match = AVAILABLE_PERMISSIONS.find((p) => {
     if (p.route === "/") return false;
     return pathname === p.route || pathname.startsWith(`${p.route}/`);
   });
 
-  // If page is not in the permission list (e.g. general subpages), allow or check
-  if (!match) return true;
+  // If page is not in the permission list, deny access
+  if (!match) return false;
 
   return permissions.includes(match.key);
 };

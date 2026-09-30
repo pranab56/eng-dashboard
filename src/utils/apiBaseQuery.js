@@ -183,5 +183,7 @@ export const baseApi = createApi({
     "tournamentClaim",
     "coin",
     "statsAudit",
+    "serverHealth",
+    "serverLogs",
   ],
 });

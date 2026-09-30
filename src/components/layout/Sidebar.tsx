@@ -13,6 +13,7 @@ import {
   TSubMenuItem,
 } from "@/constants/sidebarData";
 import { logo } from "@/assets/assets";
+import { getFirstPermittedRoute } from "@/constants/permissions";
 import {
   ChevronDown,
   Search,
@@ -67,6 +68,16 @@ export default function Sidebar({ isMobile = false }: SidebarProps) {
   // Compute authorized navigation sections based on user role and permissions
   const authorizedSections = useMemo(() => {
     return getAuthorizedNavigation(sidebarSections, user?.role, user?.permissions);
+  }, [user?.role, user?.permissions]);
+
+  // Compute dynamic logo destination matching admin's permissions
+  const logoHref = useMemo(() => {
+    if (user?.role === "SUPER_ADMIN") return "/";
+    const perms = Array.isArray(user?.permissions) ? user.permissions : [];
+    if (perms.length === 0 || perms.includes("OVERVIEW")) {
+      return "/";
+    }
+    return getFirstPermittedRoute(perms, user?.role) || "/";
   }, [user?.role, user?.permissions]);
 
   // Route matching
@@ -161,7 +172,7 @@ export default function Sidebar({ isMobile = false }: SidebarProps) {
           {!collapsed ? (
             <>
               <Link
-                href="/"
+                href={logoHref}
                 onClick={handleLinkClick}
                 className="flex items-center gap-2.5 min-w-0 group cursor-pointer"
               >

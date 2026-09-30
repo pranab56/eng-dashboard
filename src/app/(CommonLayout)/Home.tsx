@@ -2,7 +2,9 @@
 "use client";
 
 import { useGetOverviewQuery } from "@/features/overview/overviewApi";
+import { useGetProfileQuery } from "@/features/profile/profileApi";
 import { useHeaders } from "@/hooks/useHeaders";
+import Link from "next/link";
 import { useEffect, useMemo } from "react";
 import {
   Users,
@@ -81,6 +83,12 @@ const CustomBarTooltip = ({ active, payload }: any) => {
 export default function Home() {
   const { setHeaders } = useHeaders();
   const { data: overviewData, isLoading, isFetching } = useGetOverviewQuery({});
+  const { data: profileData } = useGetProfileQuery({});
+  const profileUser = profileData?.data;
+  const isSuperAdmin = profileUser?.role === "SUPER_ADMIN";
+  const hasHealthPerm = isSuperAdmin || (profileUser?.role === "ADMIN" && (
+    !profileUser?.permissions || profileUser?.permissions?.length === 0 || profileUser?.permissions?.includes("SERVER_HEALTH")
+  ));
 
   useEffect(() => {
     setHeaders({
@@ -223,7 +231,22 @@ export default function Home() {
           </p>
         </div>
 
-        <div className="flex items-center gap-2 self-start sm:self-auto">
+        <div className="flex items-center gap-2.5 self-start sm:self-auto flex-wrap">
+          {stats.serverHealth && hasHealthPerm && (
+            <Link
+              href="/server-health"
+              className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-white border border-slate-200 shadow-2xs text-[11px] text-slate-700 font-medium hover:border-slate-400 hover:text-slate-900 transition-colors"
+              title="Click to view detailed Server Health & Logs"
+            >
+              <Activity className="w-3.5 h-3.5 text-emerald-500" />
+              <span>
+                Server: <strong className={stats.serverHealth.status === "critical" ? "text-amber-600" : "text-emerald-600"}>
+                  {stats.serverHealth.status === "critical" ? "High RAM" : "Healthy"}
+                </strong> ({stats.serverHealth.memory?.usedMemoryPercentage}%)
+              </span>
+            </Link>
+          )}
+
           <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-white border border-slate-200 shadow-2xs text-[11px] text-slate-600 font-medium">
             <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse shrink-0" />
             <span>Live Data Sync</span>

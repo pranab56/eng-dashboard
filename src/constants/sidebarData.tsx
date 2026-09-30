@@ -2,6 +2,7 @@
 import React from "react";
 import {
   LayoutDashboard,
+  Activity,
   Gamepad2,
   Trophy,
   Award,
@@ -129,6 +130,11 @@ export function getAuthorizedNavigation(
         .map((item) => {
           // If item contains children (nested submenu)
           if (item.children && item.children.length > 0) {
+            // Check parent permission first
+            if (item.requiredPermission && !hasRoleOrPermission(activeRole, userPermissions, item.allowedRoles, item.requiredPermission)) {
+              return null;
+            }
+
             const accessibleChildren = item.children.filter((child) =>
               hasRoleOrPermission(activeRole, userPermissions, child.allowedRoles, child.requiredPermission)
             );
@@ -397,16 +403,26 @@ export const sidebarSections: TSidebarSection[] = [
         allowedRoles: ["SUPER_ADMIN", "ADMIN"],
       },
       {
+        id: 21,
+        icon: Activity,
+        title: "Server Health",
+        label: "/server-health",
+        requiredPermission: "SERVER_HEALTH",
+        allowedRoles: ["SUPER_ADMIN", "ADMIN"],
+      },
+      {
         id: 20,
         icon: Settings,
         title: "Settings",
         requiredPermission: "SETTINGS",
+        allowedRoles: ["SUPER_ADMIN", "ADMIN"],
         children: [
           {
             id: 200,
             icon: Sliders,
             title: "General Settings",
             label: "/settings",
+            requiredPermission: "SETTINGS",
             allowedRoles: ["SUPER_ADMIN", "ADMIN"],
           },
           {
@@ -421,6 +437,7 @@ export const sidebarSections: TSidebarSection[] = [
             icon: FileText,
             title: "Terms & Condition",
             label: "/terms-and-condition",
+            requiredPermission: "SETTINGS",
             allowedRoles: ["SUPER_ADMIN", "ADMIN"],
           },
           {
@@ -428,6 +445,7 @@ export const sidebarSections: TSidebarSection[] = [
             icon: ShieldCheck,
             title: "Privacy Policy",
             label: "/privacy-policy",
+            requiredPermission: "SETTINGS",
             allowedRoles: ["SUPER_ADMIN", "ADMIN"],
           },
         ],
