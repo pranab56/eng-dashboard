@@ -99,62 +99,81 @@ const OrderManagement = () => {
   );
 
   return (
-    <div className="py-10 px-8 space-y-6 pb-16">
-      {/* Stats Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="bg-white rounded-xl p-5 shadow-sm border border-gray-100 flex items-center gap-4">
-          <div className="w-12 h-12 rounded-xl bg-blue-50 flex items-center justify-center flex-shrink-0">
-            <ShoppingBag className="w-6 h-6 text-blue-600" />
-          </div>
-          <div>
-            <p className="text-xs text-gray-400 font-medium . tracking-wide">
+    <div className="w-full p-4 sm:p-6 lg:p-8 space-y-6 pb-16">
+      {/* 1. Executive Summary KPI Strip */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+        {/* Total Orders */}
+        <div className="bg-white border border-slate-200/80 rounded-lg p-3.5 sm:p-4 transition-all">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-medium text-slate-500 uppercase tracking-wider">
               Total Orders
-            </p>
-            <p className="text-2xl font-medium text-gray-900">
+            </span>
+            <div className="w-8 h-8 rounded-md bg-slate-100 text-slate-600 flex items-center justify-center">
+              <ShoppingBag className="w-4 h-4" />
+            </div>
+          </div>
+          <div className="mt-2 flex items-baseline gap-2">
+            <span className="text-2xl font-bold tracking-tight text-slate-900 tabular-nums">
               {isLoading ? "—" : totalOrders}
-            </p>
+            </span>
+            <span className="text-xs text-slate-400">orders</span>
           </div>
         </div>
 
-        <div className="bg-white rounded-xl p-5 shadow-sm border border-gray-100 flex items-center gap-4">
-          <div className="w-12 h-12 rounded-xl bg-amber-50 flex items-center justify-center flex-shrink-0">
-            <Clock className="w-6 h-6 text-amber-600" />
-          </div>
-          <div>
-            <p className="text-xs text-gray-400 font-medium . tracking-wide">
+        {/* Pending Orders */}
+        <div className="bg-white border border-slate-200/80 rounded-lg p-3.5 sm:p-4 transition-all">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-medium text-slate-500 uppercase tracking-wider">
               Pending Orders
-            </p>
-            <p className="text-2xl font-medium text-amber-600">
+            </span>
+            <div className="w-8 h-8 rounded-md bg-amber-50 text-amber-600 flex items-center justify-center">
+              <Clock className="w-4 h-4" />
+            </div>
+          </div>
+          <div className="mt-2 flex items-baseline gap-2">
+            <span className="text-2xl font-bold tracking-tight text-amber-700 tabular-nums">
               {isLoading ? "—" : pendingCount}
-            </p>
+            </span>
+            <span className="text-xs text-slate-400">awaiting</span>
           </div>
         </div>
 
-        <div className="bg-white rounded-xl p-5 shadow-sm border border-gray-100 flex items-center gap-4">
-          <div className="w-12 h-12 rounded-xl bg-green-50 flex items-center justify-center flex-shrink-0">
-            <CheckCircle2 className="w-6 h-6 text-green-600" />
-          </div>
-          <div>
-            <p className="text-xs text-gray-400 font-medium . tracking-wide">
+        {/* Approved */}
+        <div className="bg-white border border-slate-200/80 rounded-lg p-3.5 sm:p-4 transition-all">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-medium text-slate-500 uppercase tracking-wider">
               Approved
-            </p>
-            <p className="text-2xl font-medium text-green-600">
+            </span>
+            <div className="w-8 h-8 rounded-md bg-emerald-50 text-emerald-600 flex items-center justify-center">
+              <CheckCircle2 className="w-4 h-4" />
+            </div>
+          </div>
+          <div className="mt-2 flex items-baseline gap-2">
+            <span className="text-2xl font-bold tracking-tight text-emerald-700 tabular-nums">
               {isLoading ? "—" : approvedCount}
-            </p>
+            </span>
+            <span className="inline-flex items-center gap-1 text-[11px] font-medium text-emerald-600">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+              Live
+            </span>
           </div>
         </div>
 
-        <div className="bg-white rounded-xl p-5 shadow-sm border border-gray-100 flex items-center gap-4">
-          <div className="w-12 h-12 rounded-xl bg-red-50 flex items-center justify-center flex-shrink-0">
-            <XCircle className="w-6 h-6 text-red-600" />
-          </div>
-          <div>
-            <p className="text-xs text-gray-400 font-medium . tracking-wide">
+        {/* Rejected */}
+        <div className="bg-white border border-slate-200/80 rounded-lg p-3.5 sm:p-4 transition-all">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-medium text-slate-500 uppercase tracking-wider">
               Rejected
-            </p>
-            <p className="text-2xl font-medium text-red-600">
+            </span>
+            <div className="w-8 h-8 rounded-md bg-rose-50 text-rose-600 flex items-center justify-center">
+              <XCircle className="w-4 h-4" />
+            </div>
+          </div>
+          <div className="mt-2 flex items-baseline gap-2">
+            <span className="text-2xl font-bold tracking-tight text-rose-700 tabular-nums">
               {isLoading ? "—" : rejectedCount}
-            </p>
+            </span>
+            <span className="text-xs text-slate-400">declined</span>
           </div>
         </div>
       </div>

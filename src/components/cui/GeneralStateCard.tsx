@@ -2,6 +2,7 @@
 
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { useEffect, useState } from "react";
+import { Users } from "lucide-react";
 
 export type GeneralStateCardProps = {
   title: string;
@@ -35,7 +36,7 @@ const GeneralStateCard = ({
   }, [items]);
 
   return (
-    <div className={`grid gap-4 ${className}`}>
+    <div className={`grid gap-3 sm:gap-4 ${className}`}>
       {items.map((item, idx) => {
         const itemId = item.id || `card-${idx}`;
         const active = isActiveTab(itemId);
@@ -44,41 +45,53 @@ const GeneralStateCard = ({
           <div
             key={itemId}
             onClick={() => handleTab(itemId)}
-            className={`group relative overflow-hidden p-5 rounded-lg border transition-all duration-200 cursor-pointer select-none ${
+            className={`bg-white border rounded-lg p-3.5 sm:p-4 transition-all cursor-pointer select-none ${
               active
-                ? "bg-white border-slate-900 ring-2 ring-slate-900/10 shadow-md"
-                : "bg-white border-slate-200/90 hover:border-slate-400 hover:shadow-xs"
+                ? "border-slate-900 ring-2 ring-slate-900/10 shadow-xs"
+                : "border-slate-200/80 hover:border-slate-300"
             }`}
           >
-            {/* Top Active Accent Bar */}
-            {active && (
-              <div className="absolute top-0 left-0 right-0 h-1 bg-slate-900 rounded-t-2xl" />
-            )}
-
-            {/* Header: Title */}
-            <div className="flex items-center justify-between gap-2 mb-2">
-              <h3
-                className={`text-[11px] font-bold uppercase tracking-wider transition-colors duration-200 ${
-                  active ? "text-slate-900" : "text-slate-500 group-hover:text-slate-700"
+            {/* Header: Title & Icon */}
+            <div className="flex items-center justify-between gap-2">
+              <span
+                className={`text-xs font-medium uppercase tracking-wider truncate transition-colors ${
+                  active ? "text-slate-900 font-semibold" : "text-slate-500"
                 }`}
               >
                 {item.title}
-              </h3>
+              </span>
+              <div
+                className={`w-8 h-8 rounded-md flex items-center justify-center shrink-0 transition-colors ${
+                  active
+                    ? "bg-slate-900 text-white"
+                    : "bg-slate-100 text-slate-600"
+                }`}
+              >
+                {item.icon ? (
+                  typeof item.icon === "function" ? (
+                    <item.icon className="w-4 h-4" />
+                  ) : (
+                    item.icon
+                  )
+                ) : (
+                  <Users className="w-4 h-4" />
+                )}
+              </div>
             </div>
 
-            {/* Value */}
-            <p className="text-2xl sm:text-3xl font-extrabold tracking-tight tabular-nums text-slate-900">
-              {typeof item.value === "number"
-                ? item.value.toLocaleString()
-                : item.value}
-            </p>
-
-            {/* Description */}
-            {item.description && (
-              <p className="text-xs text-slate-500 font-medium mt-1 line-clamp-2">
-                {item.description}
-              </p>
-            )}
+            {/* Value & Subtext */}
+            <div className="mt-2 flex items-baseline gap-2">
+              <span className="text-2xl font-bold tracking-tight text-slate-900 tabular-nums">
+                {typeof item.value === "number"
+                  ? item.value.toLocaleString()
+                  : item.value}
+              </span>
+              {item.description && (
+                <span className="text-xs text-slate-400 truncate font-normal">
+                  {item.description}
+                </span>
+              )}
+            </div>
           </div>
         );
       })}

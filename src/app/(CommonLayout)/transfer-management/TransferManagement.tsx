@@ -86,7 +86,7 @@ const TransferManagement = () => {
   ];
 
   return (
-    <div className='pt-10 px-8 space-y-4'>
+    <div className="w-full p-4 sm:p-6 lg:p-8 space-y-6 pb-16">
       <GeneralStateCard items={items} className='grid-cols-4' />
 
       <div className="bg-white rounded-md py-4 flex flex-col">

@@ -318,7 +318,7 @@ export default function AdminManagementPage() {
   };
 
   return (
-    <div className="py-8 px-6 space-y-6 pb-16">
+    <div className="w-full p-4 sm:p-6 lg:p-8 space-y-6 pb-16">
       {/* Metric Cards - Official Dashboard Component */}
       <GeneralStateCard items={statsItems} className="grid-cols-1 sm:grid-cols-3" />
 

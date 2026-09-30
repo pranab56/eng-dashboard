@@ -124,7 +124,7 @@ const ParentManagement = () => {
   };
 
   return (
-    <div className="p-4 sm:p-6 lg:pt-10 lg:px-8 space-y-4 sm:space-y-6">
+    <div className="w-full p-4 sm:p-6 lg:p-8 space-y-6 pb-16">
       {/* State Summary Cards */}
       <div className="w-full">
         <GeneralStateCard items={summaryItems} className="grid-cols-1 sm:grid-cols-3" />

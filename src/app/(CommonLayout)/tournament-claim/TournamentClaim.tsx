@@ -115,7 +115,7 @@ export default function TournamentClaim() {
   ];
 
   return (
-    <div className="py-10 px-8 space-y-6 pb-16">
+    <div className="w-full p-4 sm:p-6 lg:p-8 space-y-6 pb-16">
       {/* State Banner Card */}
       <div className="flex items-end">
         <div className="w-full">

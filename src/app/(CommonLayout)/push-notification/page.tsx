@@ -218,7 +218,7 @@ export default function PushNotificationPage() {
   };
 
   return (
-    <div className="w-full p-4 sm:p-5 space-y-5">
+    <div className="w-full p-4 sm:p-6 lg:p-8 space-y-6 pb-16">
       {/* Top Metric Cards */}
       <GeneralStateCard className="grid-cols-1 md:grid-cols-3" items={stateCardsData} />
 

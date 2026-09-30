@@ -43,7 +43,7 @@ const Notification = () => {
 
 
   return (
-    <div className='pt-10 px-8 space-y-4 pb-10'>
+    <div className="w-full p-4 sm:p-6 lg:p-8 space-y-6 pb-16">
       <div className="flex flex-wrap items-center justify-end">
         <CustomModal
           title="Send New Notification"

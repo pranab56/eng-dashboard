@@ -2,7 +2,6 @@
 "use client";
 
 import CustomPagination from "@/components/cui/CustomPagination";
-import TableHeader from "@/components/cui/TableHeader";
 import DeleteConfirmModal from "@/components/modals/DeleteConfirmModal";
 import SocialMediaModal from "@/components/modals/SocialMediaModal";
 import CustomTable from "@/components/table/CustomTable";
@@ -50,7 +49,7 @@ const SocialMediaManagement = () => {
   useEffect(() => {
     setHeaders({
       title: "Social Media Management",
-      des: "Manage official social media links and platforms.",
+      des: "Manage official social media links, public routing channels, and connected handles.",
     });
   }, [setHeaders]);
 
@@ -86,7 +85,7 @@ const SocialMediaManagement = () => {
         }).unwrap();
         if (res.success !== false) {
           toast.success(
-            res.message || "Social media link updated successfully!"
+            res.message || "Social media link updated successfully"
           );
           setIsModalOpen(false);
           setEditingItem(null);
@@ -97,7 +96,7 @@ const SocialMediaManagement = () => {
         const res = await createSocialMedia(data).unwrap();
         if (res.success !== false) {
           toast.success(
-            res.message || "Social media link created successfully!"
+            res.message || "Social media link created successfully"
           );
           setIsModalOpen(false);
           setEditingItem(null);
@@ -121,7 +120,7 @@ const SocialMediaManagement = () => {
     try {
       const res = await deleteSocialMedia(deleteId).unwrap();
       if (res.success !== false) {
-        toast.success(res.message || "Social media link deleted successfully!");
+        toast.success(res.message || "Social media link deleted successfully");
         setIsDeleteModalOpen(false);
         setDeleteId(null);
       } else {
@@ -137,93 +136,110 @@ const SocialMediaManagement = () => {
   const activeCount = links.filter((l) => l.status === true).length;
   const inactiveCount = links.filter((l) => l.status === false).length;
 
-  const tableHeaderPayload = {
-    title: "Official Social Media Links",
-    des: "List of active and inactive social links.",
-    url: "",
-  };
-
   const columns = getSocialColumns(handleOpenEditModal, handleOpenDeleteModal);
 
   return (
-    <div className="py-10 px-8 space-y-6 pb-16">
-      {/* Stats Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <div className="bg-white rounded-xl p-5 shadow-sm border border-gray-100 flex items-center gap-4">
-          <div className="w-12 h-12 rounded-xl bg-blue-50 flex items-center justify-center flex-shrink-0">
-            <Share2 className="w-6 h-6 text-blue-600" />
-          </div>
-          <div>
-            <p className="text-xs text-gray-400 font-medium . tracking-wide">
+    <div className="w-full p-4 sm:p-6 lg:p-8 space-y-6 pb-16">
+      {/* 1. Executive Summary KPI Strip */}
+      <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
+        {/* Total Platforms */}
+        <div className="bg-white border border-slate-200/80 rounded-lg p-3.5 sm:p-4 transition-all">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-medium text-slate-500 uppercase tracking-wider">
               Total Platforms
-            </p>
-            <p className="text-2xl font-medium text-gray-900">
+            </span>
+            <div className="w-8 h-8 rounded-md bg-slate-100 text-slate-600 flex items-center justify-center">
+              <Share2 className="w-4 h-4" />
+            </div>
+          </div>
+          <div className="mt-2 flex items-baseline gap-2">
+            <span className="text-2xl font-bold tracking-tight text-slate-900 tabular-nums">
               {isLoading ? "—" : totalCount}
-            </p>
+            </span>
+            <span className="text-xs text-slate-400">channels</span>
           </div>
         </div>
 
-        <div className="bg-white rounded-xl p-5 shadow-sm border border-gray-100 flex items-center gap-4">
-          <div className="w-12 h-12 rounded-xl bg-green-50 flex items-center justify-center flex-shrink-0">
-            <CheckCircle2 className="w-6 h-6 text-green-600" />
-          </div>
-          <div>
-            <p className="text-xs text-gray-400 font-medium . tracking-wide">
+        {/* Active Links */}
+        <div className="bg-white border border-slate-200/80 rounded-lg p-3.5 sm:p-4 transition-all">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-medium text-slate-500 uppercase tracking-wider">
               Active Links
-            </p>
-            <p className="text-2xl font-medium text-green-600">
+            </span>
+            <div className="w-8 h-8 rounded-md bg-emerald-50 text-emerald-600 flex items-center justify-center">
+              <CheckCircle2 className="w-4 h-4" />
+            </div>
+          </div>
+          <div className="mt-2 flex items-baseline gap-2">
+            <span className="text-2xl font-bold tracking-tight text-emerald-700 tabular-nums">
               {isLoading ? "—" : activeCount}
-            </p>
+            </span>
+            <span className="inline-flex items-center gap-1 text-[11px] font-medium text-emerald-600">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+              Live
+            </span>
           </div>
         </div>
 
-        <div className="bg-white rounded-xl p-5 shadow-sm border border-gray-100 flex items-center gap-4">
-          <div className="w-12 h-12 rounded-xl bg-gray-100 flex items-center justify-center flex-shrink-0">
-            <XCircle className="w-6 h-6 text-gray-500" />
-          </div>
-          <div>
-            <p className="text-xs text-gray-400 font-medium . tracking-wide">
+        {/* Inactive Links */}
+        <div className="bg-white border border-slate-200/80 rounded-lg p-3.5 sm:p-4 transition-all col-span-2 lg:col-span-1">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-medium text-slate-500 uppercase tracking-wider">
               Inactive Links
-            </p>
-            <p className="text-2xl font-medium text-gray-600">
+            </span>
+            <div className="w-8 h-8 rounded-md bg-slate-100 text-slate-500 flex items-center justify-center">
+              <XCircle className="w-4 h-4" />
+            </div>
+          </div>
+          <div className="mt-2 flex items-baseline gap-2">
+            <span className="text-2xl font-bold tracking-tight text-slate-700 tabular-nums">
               {isLoading ? "—" : inactiveCount}
-            </p>
+            </span>
+            <span className="text-xs text-slate-400">disabled</span>
           </div>
         </div>
       </div>
 
-      {/* Main Content Table Card */}
-      <div className="bg-white rounded-xl shadow-sm border border-gray-100 py-4 flex flex-col">
-        <div className="flex-1">
-          {/* Header Bar with Title & Add Button */}
-          <div className="px-6 flex flex-wrap items-center justify-between gap-4 border-b border-gray-100 pb-4">
-            <TableHeader payload={tableHeaderPayload} />
-
-            <div className="flex items-center gap-3 flex-wrap">
-              {/* Add Button */}
-              <button
-                type="button"
-                onClick={handleOpenAddModal}
-                className="px-4 py-2 bg-black hover:bg-gray-800 text-white text-sm font-semibold rounded-lg transition-all shadow-sm flex items-center gap-2 cursor-pointer"
-              >
-                <Plus className="w-4 h-4" />
-                <span>Add Social Link</span>
-              </button>
+      {/* 2. Main Registry Table Card */}
+      <div className="bg-white rounded-lg border border-slate-200/80 shadow-2xs overflow-hidden flex flex-col">
+        {/* Integrated Toolbar */}
+        <div className="p-4 sm:p-5 border-b border-slate-200/80 flex flex-col sm:flex-row sm:items-center justify-between gap-3.5">
+          <div>
+            <div className="flex items-center gap-2">
+              <h2 className="text-sm font-semibold text-slate-900 tracking-tight">
+                Official Social Channels
+              </h2>
+              <span className="text-[10px] px-1.5 py-0.5 rounded-full font-semibold bg-slate-100 text-slate-600">
+                {totalCount} total
+              </span>
             </div>
+            <p className="text-xs text-slate-500 mt-0.5">
+              Configured public handles routing to official social and messaging profiles.
+            </p>
           </div>
 
-          <div className="pt-4 px-4 overflow-hidden">
-            <CustomTable<TSocialMedia>
-              columns={columns}
-              data={links}
-              isLoading={isLoading}
-            />
-          </div>
+          <button
+            type="button"
+            onClick={handleOpenAddModal}
+            className="inline-flex items-center gap-1.5 h-9 px-3.5 bg-slate-900 hover:bg-slate-800 text-white text-xs font-semibold rounded-md transition-all shadow-2xs cursor-pointer shrink-0"
+          >
+            <Plus className="w-3.5 h-3.5" />
+            <span>Add Social Link</span>
+          </button>
+        </div>
+
+        {/* Table Content */}
+        <div className="overflow-x-auto">
+          <CustomTable<TSocialMedia>
+            columns={columns}
+            data={links}
+            isLoading={isLoading}
+          />
         </div>
 
         {/* Pagination */}
         {pagination.totalPage > 1 && (
-          <div className="pt-4 border-t border-gray-100">
+          <div className="p-4 border-t border-slate-200/80">
             <CustomPagination TOTAL_PAGES={pagination.totalPage} />
           </div>
         )}
@@ -245,7 +261,7 @@ const SocialMediaManagement = () => {
         onConfirm={handleConfirmDelete}
         isLoading={isDeleting}
         title="Delete Social Media Link"
-        description="Are you sure you want to delete this social media link? This action cannot be undone."
+        description="Are you sure you want to delete this social media channel? This will remove the link from public member profiles and the mobile app footer."
       />
     </div>
   );

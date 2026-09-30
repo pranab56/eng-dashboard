@@ -118,7 +118,7 @@ const LeagueTeamManagement = () => {
   const tableData: any[] = leagueTeamData?.data || [];
 
   return (
-    <div className="px-8 pt-10 space-y-4">
+    <div className="w-full p-4 sm:p-6 lg:p-8 space-y-6 pb-16">
       <div className="flex flex-wrap items-center justify-end gap-4 p-4">
         <Link href="/league-team/create-league-team">
           <CreateButton text="Add Team to League" />

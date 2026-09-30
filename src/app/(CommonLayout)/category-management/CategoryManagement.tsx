@@ -644,7 +644,7 @@ export default function CategoryManagement() {
   );
 
   return (
-    <div className="p-4 sm:p-6 md:p-8 space-y-8 bg-gray-50/40 min-h-screen">
+    <div className="w-full p-4 sm:p-6 lg:p-8 space-y-6 pb-16">
       {/* Executive Header Banner */}
       <div className="bg-white p-6 md:p-7 rounded-2xl border border-gray-100 shadow-sm">
         <div className="flex items-center gap-3">

@@ -205,7 +205,7 @@ const IncompleteAccounts = () => {
   );
 
   return (
-    <div className='py-10 px-8 space-y-6 pb-16'>
+    <div className="w-full p-4 sm:p-6 lg:p-8 space-y-6 pb-16">
       <GeneralStateCard items={items} className='grid-cols-4' />
 
       <div className="bg-white rounded-md py-4 flex flex-col space-y-4 shadow-sm border border-gray-100">

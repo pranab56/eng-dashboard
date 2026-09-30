@@ -170,7 +170,7 @@ const GalleryManagement = () => {
   );
 
   return (
-    <div className="py-10 px-8 space-y-6 pb-16">
+    <div className="w-full p-4 sm:p-6 lg:p-8 space-y-6 pb-16">
       {/* Stats Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-2xl">
         <div className="bg-white rounded-xl p-5 shadow-sm border border-gray-100 flex items-center gap-4">

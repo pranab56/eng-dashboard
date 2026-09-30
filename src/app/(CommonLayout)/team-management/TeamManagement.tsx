@@ -178,79 +178,79 @@ const TeamManagement = () => {
   const totalEconomy = teamAnalytics?.totalCoins ?? 0;
 
   return (
-    <div className="pt-6 px-6 sm:px-8 space-y-6 max-w-[1600px] mx-auto pb-16">
-      {/* 4 KPI Summary Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+    <div className="w-full p-4 sm:p-6 lg:p-8 space-y-6 pb-16">
+      {/* 1. Executive Summary KPI Strip */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
         {/* Total Squads */}
-        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg p-4">
+        <div className="bg-white border border-slate-200/80 rounded-lg p-3.5 sm:p-4 transition-all">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-medium text-slate-500 dark:text-slate-400">
+            <span className="text-xs font-medium text-slate-500 uppercase tracking-wider">
               Total Squads
             </span>
-            <div className="w-8 h-8 rounded-md bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-600 dark:text-slate-300">
+            <div className="w-8 h-8 rounded-md bg-slate-100 text-slate-600 flex items-center justify-center">
               <Shield className="w-4 h-4" />
             </div>
           </div>
-          <p className="text-2xl font-semibold text-slate-900 dark:text-slate-100 mt-2">
-            {totalCount}
-          </p>
-          <span className="text-[11px] text-slate-400 mt-1 block">
-            Registered football clubs
-          </span>
+          <div className="mt-2 flex items-baseline gap-2">
+            <span className="text-2xl font-bold tracking-tight text-slate-900 tabular-nums">
+              {totalCount}
+            </span>
+            <span className="text-xs text-slate-400">clubs</span>
+          </div>
         </div>
 
-        {/* Active Leagues */}
-        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg p-4">
+        {/* Leagues Covered */}
+        <div className="bg-white border border-slate-200/80 rounded-lg p-3.5 sm:p-4 transition-all">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-medium text-slate-500 dark:text-slate-400">
+            <span className="text-xs font-medium text-slate-500 uppercase tracking-wider">
               Leagues Covered
             </span>
-            <div className="w-8 h-8 rounded-md bg-amber-50 dark:bg-amber-950/40 flex items-center justify-center text-amber-600 dark:text-amber-400">
+            <div className="w-8 h-8 rounded-md bg-amber-50 text-amber-600 flex items-center justify-center">
               <Trophy className="w-4 h-4" />
             </div>
           </div>
-          <p className="text-2xl font-semibold text-amber-600 dark:text-amber-400 mt-2">
-            {totalLeaguesCount}
-          </p>
-          <span className="text-[11px] text-slate-400 mt-1 block">
-            Competition divisions
-          </span>
+          <div className="mt-2 flex items-baseline gap-2">
+            <span className="text-2xl font-bold tracking-tight text-amber-700 tabular-nums">
+              {totalLeaguesCount}
+            </span>
+            <span className="text-xs text-slate-400">divisions</span>
+          </div>
         </div>
 
-        {/* Assigned Managers */}
-        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg p-4">
+        {/* Club Managers */}
+        <div className="bg-white border border-slate-200/80 rounded-lg p-3.5 sm:p-4 transition-all">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-medium text-slate-500 dark:text-slate-400">
+            <span className="text-xs font-medium text-slate-500 uppercase tracking-wider">
               Club Managers
             </span>
-            <div className="w-8 h-8 rounded-md bg-blue-50 dark:bg-blue-950/40 flex items-center justify-center text-blue-600 dark:text-blue-400">
+            <div className="w-8 h-8 rounded-md bg-blue-50 text-blue-600 flex items-center justify-center">
               <Users className="w-4 h-4" />
             </div>
           </div>
-          <p className="text-2xl font-semibold text-blue-600 dark:text-blue-400 mt-2">
-            {totalManagersCount}
-          </p>
-          <span className="text-[11px] text-slate-400 mt-1 block">
-            Registered team leaders
-          </span>
+          <div className="mt-2 flex items-baseline gap-2">
+            <span className="text-2xl font-bold tracking-tight text-blue-700 tabular-nums">
+              {totalManagersCount}
+            </span>
+            <span className="text-xs text-slate-400">registered</span>
+          </div>
         </div>
 
-        {/* Squad Coins */}
-        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg p-4">
+        {/* Total Coin Economy */}
+        <div className="bg-white border border-slate-200/80 rounded-lg p-3.5 sm:p-4 transition-all">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-medium text-slate-500 dark:text-slate-400">
+            <span className="text-xs font-medium text-slate-500 uppercase tracking-wider">
               Total Coin Economy
             </span>
-            <div className="w-8 h-8 rounded-md bg-emerald-50 dark:bg-emerald-950/40 flex items-center justify-center text-emerald-600 dark:text-emerald-400">
+            <div className="w-8 h-8 rounded-md bg-emerald-50 text-emerald-600 flex items-center justify-center">
               <Coins className="w-4 h-4" />
             </div>
           </div>
-          <p className="text-2xl font-semibold text-emerald-600 dark:text-emerald-400 mt-2">
-            {totalEconomy.toLocaleString()}
-          </p>
-          <span className="text-[11px] text-slate-400 mt-1 block">
-            Circulating squad currency
-          </span>
+          <div className="mt-2 flex items-baseline gap-2">
+            <span className="text-2xl font-bold tracking-tight text-emerald-700 tabular-nums">
+              {totalEconomy.toLocaleString()}
+            </span>
+            <span className="text-xs text-slate-400">coins</span>
+          </div>
         </div>
       </div>
 

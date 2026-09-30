@@ -576,7 +576,7 @@ const MatchManagement = () => {
   };
 
   return (
-    <div className="py-10 px-8 space-y-6 pb-16">
+    <div className="w-full p-4 sm:p-6 lg:p-8 space-y-6 pb-16">
       {/* Top Header & Create Button */}
       <div className="flex flex-wrap items-center justify-between gap-4 p-4 bg-white rounded-xl border border-gray-100 shadow-sm">
         <div>

@@ -80,33 +80,40 @@ const TableManagement = () => {
   }, []);
 
   return (
-    <div className="py-8 px-6 lg:px-8 space-y-6 pb-16 max-w-[1600px] mx-auto">
-      {/* Stats Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
-        <div className="bg-white rounded-xl p-5 shadow-xs border border-gray-200 flex items-center gap-4">
-          <div className="w-11 h-11 rounded-lg bg-blue-50 flex items-center justify-center shrink-0">
-            <Trophy className="w-5 h-5 text-blue-600" />
-          </div>
-          <div>
-            <p className="text-xs text-gray-500 font-medium tracking-wide">
+    <div className="w-full p-4 sm:p-6 lg:p-8 space-y-6 pb-16">
+      {/* 1. Executive Summary KPI Strip */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+        <div className="bg-white border border-slate-200/80 rounded-lg p-3.5 sm:p-4 transition-all">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-medium text-slate-500 uppercase tracking-wider">
               Active Leagues
-            </p>
-            <p className="text-2xl font-bold text-gray-900">
+            </span>
+            <div className="w-8 h-8 rounded-md bg-amber-50 text-amber-600 flex items-center justify-center">
+              <Trophy className="w-4 h-4" />
+            </div>
+          </div>
+          <div className="mt-2 flex items-baseline gap-2">
+            <span className="text-2xl font-bold tracking-tight text-slate-900 tabular-nums">
               {isLoading ? "..." : totalLeagues}
-            </p>
+            </span>
+            <span className="text-xs text-slate-400">competitions</span>
           </div>
         </div>
-        <div className="bg-white rounded-xl p-5 shadow-xs border border-gray-200 flex items-center gap-4">
-          <div className="w-11 h-11 rounded-lg bg-gray-100 flex items-center justify-center shrink-0">
-            <Users className="w-5 h-5 text-gray-700" />
-          </div>
-          <div>
-            <p className="text-xs text-gray-500 font-medium tracking-wide">
+
+        <div className="bg-white border border-slate-200/80 rounded-lg p-3.5 sm:p-4 transition-all">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-medium text-slate-500 uppercase tracking-wider">
               Teams in League
-            </p>
-            <p className="text-2xl font-bold text-gray-900">
+            </span>
+            <div className="w-8 h-8 rounded-md bg-blue-50 text-blue-600 flex items-center justify-center">
+              <Users className="w-4 h-4" />
+            </div>
+          </div>
+          <div className="mt-2 flex items-baseline gap-2">
+            <span className="text-2xl font-bold tracking-tight text-slate-900 tabular-nums">
               {isLoading ? "..." : totalTeams}
-            </p>
+            </span>
+            <span className="text-xs text-slate-400">clubs</span>
           </div>
         </div>
       </div>

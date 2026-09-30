@@ -165,79 +165,82 @@ const EngtvManagement = () => {
   const columns = getEngtvColumns(handleView, handleDelete);
 
   return (
-    <div className="pt-6 px-6 sm:px-8 space-y-6 max-w-[1600px] mx-auto">
-      {/* KPI Summary Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+    <div className="w-full p-4 sm:p-6 lg:p-8 space-y-6 pb-16">
+      {/* 1. Executive Summary KPI Strip */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
         {/* Total Videos */}
-        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg p-4">
+        <div className="bg-white border border-slate-200/80 rounded-lg p-3.5 sm:p-4 transition-all">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-medium text-slate-500 dark:text-slate-400">
+            <span className="text-xs font-medium text-slate-500 uppercase tracking-wider">
               Total Videos
             </span>
-            <div className="w-8 h-8 rounded-md bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-600 dark:text-slate-300">
+            <div className="w-8 h-8 rounded-md bg-slate-100 text-slate-600 flex items-center justify-center">
               <Tv className="w-4 h-4" />
             </div>
           </div>
-          <p className="text-2xl font-semibold text-slate-900 dark:text-slate-100 mt-2">
-            {totalCount}
-          </p>
-          <span className="text-[11px] text-slate-400 mt-1 block">
-            Across all categories
-          </span>
+          <div className="mt-2 flex items-baseline gap-2">
+            <span className="text-2xl font-bold tracking-tight text-slate-900 tabular-nums">
+              {totalCount}
+            </span>
+            <span className="text-xs text-slate-400">videos</span>
+          </div>
         </div>
 
         {/* Published */}
-        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg p-4">
+        <div className="bg-white border border-slate-200/80 rounded-lg p-3.5 sm:p-4 transition-all">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-medium text-slate-500 dark:text-slate-400">
+            <span className="text-xs font-medium text-slate-500 uppercase tracking-wider">
               Published
             </span>
-            <div className="w-8 h-8 rounded-md bg-emerald-50 dark:bg-emerald-950/40 flex items-center justify-center text-emerald-600 dark:text-emerald-400">
+            <div className="w-8 h-8 rounded-md bg-emerald-50 text-emerald-600 flex items-center justify-center">
               <CheckCircle2 className="w-4 h-4" />
             </div>
           </div>
-          <p className="text-2xl font-semibold text-emerald-600 dark:text-emerald-400 mt-2">
-            {publishedCount}
-          </p>
-          <span className="text-[11px] text-slate-400 mt-1 block">
-            Publicly accessible
-          </span>
+          <div className="mt-2 flex items-baseline gap-2">
+            <span className="text-2xl font-bold tracking-tight text-emerald-700 tabular-nums">
+              {publishedCount}
+            </span>
+            <span className="inline-flex items-center gap-1 text-[11px] font-medium text-emerald-600">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+              Live
+            </span>
+          </div>
         </div>
 
         {/* Highlights */}
-        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg p-4">
+        <div className="bg-white border border-slate-200/80 rounded-lg p-3.5 sm:p-4 transition-all">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-medium text-slate-500 dark:text-slate-400">
+            <span className="text-xs font-medium text-slate-500 uppercase tracking-wider">
               Featured Highlights
             </span>
-            <div className="w-8 h-8 rounded-md bg-amber-50 dark:bg-amber-950/40 flex items-center justify-center text-amber-600 dark:text-amber-400">
+            <div className="w-8 h-8 rounded-md bg-amber-50 text-amber-600 flex items-center justify-center">
               <Star className="w-4 h-4 fill-amber-500" />
             </div>
           </div>
-          <p className="text-2xl font-semibold text-amber-600 dark:text-amber-400 mt-2">
-            {highlightsCount}
-          </p>
-          <span className="text-[11px] text-slate-400 mt-1 block">
-            Pinned to top priority
-          </span>
+          <div className="mt-2 flex items-baseline gap-2">
+            <span className="text-2xl font-bold tracking-tight text-amber-700 tabular-nums">
+              {highlightsCount}
+            </span>
+            <span className="text-xs text-slate-400">featured</span>
+          </div>
         </div>
 
         {/* Drafts */}
-        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg p-4">
+        <div className="bg-white border border-slate-200/80 rounded-lg p-3.5 sm:p-4 transition-all">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-medium text-slate-500 dark:text-slate-400">
+            <span className="text-xs font-medium text-slate-500 uppercase tracking-wider">
               Drafts
             </span>
-            <div className="w-8 h-8 rounded-md bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-500 dark:text-slate-400">
+            <div className="w-8 h-8 rounded-md bg-slate-100 text-slate-500 flex items-center justify-center">
               <Clock className="w-4 h-4" />
             </div>
           </div>
-          <p className="text-2xl font-semibold text-slate-700 dark:text-slate-300 mt-2">
-            {draftsCount}
-          </p>
-          <span className="text-[11px] text-slate-400 mt-1 block">
-            Unpublished / In review
-          </span>
+          <div className="mt-2 flex items-baseline gap-2">
+            <span className="text-2xl font-bold tracking-tight text-slate-700 tabular-nums">
+              {draftsCount}
+            </span>
+            <span className="text-xs text-slate-400">review</span>
+          </div>
         </div>
       </div>
 
