@@ -1,51 +1,78 @@
+/* eslint-disable react-hooks/exhaustive-deps */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
-import CreateButton from "@/components/buttons/CreateButton";
+import React, { useEffect, useState, useMemo } from "react";
+import { useSearchParams, useRouter, usePathname } from "next/navigation";
+import dayjs from "dayjs";
+import {
+  Trophy,
+  Calendar,
+  ChevronDown,
+  ChevronRight,
+  GitBranch,
+  Search,
+  X,
+  Plus,
+  Award,
+  UserCheck,
+  RotateCcw,
+  Activity,
+  CalendarClock,
+  CheckCircle2,
+  Coins,
+  ChevronsDownUp,
+  ChevronsUpDown,
+} from "lucide-react";
+import { FiEdit, FiEye, FiTrash2 } from "react-icons/fi";
+import { toast } from "sonner";
+
 import CustomPagination from "@/components/cui/CustomPagination";
-import GeneralStateCard from "@/components/cui/GeneralStateCard";
-import TableTitle from "@/components/titles/TableTitle";
 import {
   useCreateTourNamentsMutation,
   useDeleteTourNamentsMutation,
   useGetAllTournamentsQuery,
+  useGetTournamentAnalyticsQuery,
   useUpdateTourNamentsMutation,
 } from "@/features/tournaments/tournamentsApi";
 import { useHeaders } from "@/hooks/useHeaders";
 import { TTournament, TPositionReward } from "@/types/columnTypes";
 import { getErrorMessage } from "@/utils/getErrorMessage";
-import dayjs from "dayjs";
-import { FiEdit, FiEye, FiTrash2 } from "react-icons/fi";
-import {
-  Trophy,
-  Calendar,
-  Sparkles,
-  ChevronDown,
-  ChevronRight,
-  GitBranch,
-  Search,
-  Loader2,
-  FolderPlus,
-  Award,
-  UserCheck,
-  Check,
-  ChevronsUpDown,
-} from "lucide-react";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { useSearchParams } from "next/navigation";
-import { useEffect, useState, useMemo } from "react";
-import { toast } from "sonner";
 import DeleteConfirmModal from "../match-management/DeleteConfirmModal";
 import TournamentFormModal from "./TournamentFormModal";
 import TournamentViewModal from "./TournamentViewModal";
 import TournamentRedeemedWinnersModal from "./TournamentRedeemedWinnersModal";
 
+type StatusTab = "ALL" | "active" | "upcoming" | "completed";
+
 export default function Tournaments() {
   const { setHeaders } = useHeaders();
+  const router = useRouter();
+  const pathname = usePathname();
   const searchParams = useSearchParams();
   const page = searchParams.get("page") || "1";
 
-  // API Hooks
-  const { data: tournamentRes, isLoading } = useGetAllTournamentsQuery(page);
+  // Search & Filter States
+  const [searchTerm, setSearchTerm] = useState("");
+  const [statusFilter, setStatusFilter] = useState<StatusTab>("ALL");
+  const [expandedNodes, setExpandedNodes] = useState<Record<string, boolean>>({});
+
+  // 1. Backend-calculated analytics (accurate across all pages)
+  const { data: analyticsData } = useGetTournamentAnalyticsQuery(undefined);
+  const backendStats = analyticsData?.data || {
+    total: 0,
+    active: 0,
+    upcoming: 0,
+    completed: 0,
+  };
+
+  // 2. Server-side paginated & filtered tournament query
+  const { data: tournamentRes, isLoading } = useGetAllTournamentsQuery({
+    page: page,
+    searchValue: searchTerm,
+    status: statusFilter === "ALL" ? "" : statusFilter,
+  });
+
   const [createTourNaments, { isLoading: isCreating }] =
     useCreateTourNamentsMutation();
   const [updateTourNaments, { isLoading: isUpdating }] =
@@ -69,23 +96,32 @@ export default function Tournaments() {
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [deletingId, setDeletingId] = useState<string | null>(null);
 
-  // Search & Filter States
-  const [searchTerm, setSearchTerm] = useState("");
-  const [statusFilter, setStatusFilter] = useState<string>("ALL");
-  const [statusPopoverOpen, setStatusPopoverOpen] = useState(false);
-  const [expandedNodes, setExpandedNodes] = useState<Record<string, boolean>>({});
-
   useEffect(() => {
     setHeaders({
-      title: "Tournaments",
-      des: "Manage and monitor official tournament events, schedules, and prize positions.",
+      title: "Tournament Hierarchy",
+      des: "Visual node structure and reward tree branches for competitive events.",
     });
   }, [setHeaders]);
 
-  const rawTournaments: TTournament[] = useMemo(
-    () => tournamentRes?.data || [],
-    [tournamentRes]
-  );
+  const rawTournaments: TTournament[] = useMemo(() => {
+    if (Array.isArray(tournamentRes?.data)) {
+      return tournamentRes.data;
+    }
+    if (Array.isArray(tournamentRes?.data?.result)) {
+      return tournamentRes.data.result;
+    }
+    return [];
+  }, [tournamentRes]);
+
+  // Initial expand: expand first tournament by default for immediate preview
+  useEffect(() => {
+    if (rawTournaments.length > 0 && Object.keys(expandedNodes).length === 0) {
+      const firstId = rawTournaments[0]._id || (rawTournaments[0] as any).id;
+      if (firstId) {
+        setExpandedNodes({ [firstId]: true });
+      }
+    }
+  }, [rawTournaments]);
 
   const toggleNodeExpand = (id: string) => {
     setExpandedNodes((prev) => ({
@@ -94,24 +130,45 @@ export default function Tournaments() {
     }));
   };
 
-  // Filtered Tournaments
-  const filteredTournaments = useMemo(() => {
-    return rawTournaments.filter((t) => {
-      const matchesSearch =
-        !searchTerm.trim() ||
-        (t.title || "").toLowerCase().includes(searchTerm.toLowerCase().trim()) ||
-        (t.description || "").toLowerCase().includes(searchTerm.toLowerCase().trim()) ||
-        (t.positionRewards || []).some((r) =>
-          r.positionName.toLowerCase().includes(searchTerm.toLowerCase().trim())
-        );
-
-      const matchesStatus =
-        statusFilter === "ALL" ||
-        (t.status || "upcoming").toLowerCase() === statusFilter.toLowerCase();
-
-      return matchesSearch && matchesStatus;
+  const handleToggleExpandAll = () => {
+    const allExpanded = rawTournaments.every(
+      (t) => expandedNodes[t._id || (t as any).id || ""]
+    );
+    const nextState: Record<string, boolean> = {};
+    rawTournaments.forEach((t) => {
+      const id = t._id || (t as any).id || "";
+      nextState[id] = !allExpanded;
     });
-  }, [rawTournaments, searchTerm, statusFilter]);
+    setExpandedNodes(nextState);
+  };
+
+  const handleTabChange = (tab: StatusTab) => {
+    setStatusFilter(tab);
+    if (page !== "1") {
+      const params = new URLSearchParams(searchParams.toString());
+      params.set("page", "1");
+      router.push(`${pathname}?${params.toString()}`);
+    }
+  };
+
+  const handleSearchChange = (value: string) => {
+    setSearchTerm(value);
+    if (page !== "1") {
+      const params = new URLSearchParams(searchParams.toString());
+      params.set("page", "1");
+      router.push(`${pathname}?${params.toString()}`);
+    }
+  };
+
+  const handleResetFilters = () => {
+    setStatusFilter("ALL");
+    setSearchTerm("");
+    if (page !== "1") {
+      const params = new URLSearchParams(searchParams.toString());
+      params.set("page", "1");
+      router.push(`${pathname}?${params.toString()}`);
+    }
+  };
 
   // Handlers
   const handleView = (tournament: TTournament) => {
@@ -139,7 +196,6 @@ export default function Tournaments() {
     setIsDeleteModalOpen(true);
   };
 
-  // Submit Action
   const handleFormSubmit = async (data: {
     title: string;
     description: string;
@@ -182,7 +238,6 @@ export default function Tournaments() {
     }
   };
 
-  // Confirm Delete Action
   const handleConfirmDelete = async () => {
     if (!deletingId) return;
     try {
@@ -197,136 +252,328 @@ export default function Tournaments() {
     }
   };
 
-  const totalTournaments =
-    tournamentRes?.pagination?.total || rawTournaments.length;
+  const totalPages =
+    tournamentRes?.pagination?.totalPage ||
+    tournamentRes?.data?.meta?.totalPage ||
+    1;
 
-  const cardItems = [
-    {
-      title: "Total Tournaments",
-      value: totalTournaments,
-      id: "t1",
-      description: "Official registered competitive tournaments",
-    },
-  ];
+  const totalRecords =
+    tournamentRes?.pagination?.total ||
+    tournamentRes?.data?.meta?.total ||
+    backendStats.total;
+
+  const hasActiveFilters =
+    statusFilter !== "ALL" || searchTerm.trim().length > 0;
+
+  const allExpanded =
+    rawTournaments.length > 0 &&
+    rawTournaments.every((t) => expandedNodes[t._id || (t as any).id || ""]);
 
   return (
-    <div className="py-10 px-8 space-y-6 pb-16">
-      {/* Executive Banner & State Card */}
-      <div className="flex items-end">
-        <div className="w-full">
-          <GeneralStateCard items={cardItems} className="grid-cols-4" />
+    <div className="p-4 sm:p-6 lg:p-8 space-y-6 max-w-[1600px] mx-auto">
+      {/* 1. Executive Summary KPI Strip */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+        {/* Total Tournaments */}
+        <div className="bg-white border border-slate-200/80 rounded-lg p-3.5 sm:p-4 transition-all">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-medium text-slate-500 uppercase tracking-wider">
+              Total Tournaments
+            </span>
+            <div className="w-8 h-8 rounded-md bg-slate-100 text-slate-600 flex items-center justify-center">
+              <Trophy className="w-4 h-4" />
+            </div>
+          </div>
+          <div className="mt-2 flex items-baseline gap-2">
+            <span className="text-2xl font-bold tracking-tight text-slate-900 tabular-nums">
+              {backendStats.total}
+            </span>
+            <span className="text-xs text-slate-400">competitions</span>
+          </div>
+        </div>
+
+        {/* Ongoing */}
+        <div className="bg-white border border-slate-200/80 rounded-lg p-3.5 sm:p-4 transition-all">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-medium text-slate-500 uppercase tracking-wider">
+              Ongoing
+            </span>
+            <div className="w-8 h-8 rounded-md bg-emerald-50 text-emerald-600 flex items-center justify-center">
+              <Activity className="w-4 h-4" />
+            </div>
+          </div>
+          <div className="mt-2 flex items-baseline gap-2">
+            <span className="text-2xl font-bold tracking-tight text-emerald-700 tabular-nums">
+              {backendStats.active}
+            </span>
+            <span className="inline-flex items-center gap-1 text-[11px] font-medium text-emerald-600">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+              Live
+            </span>
+          </div>
+        </div>
+
+        {/* Upcoming */}
+        <div className="bg-white border border-slate-200/80 rounded-lg p-3.5 sm:p-4 transition-all">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-medium text-slate-500 uppercase tracking-wider">
+              Upcoming
+            </span>
+            <div className="w-8 h-8 rounded-md bg-blue-50 text-blue-600 flex items-center justify-center">
+              <CalendarClock className="w-4 h-4" />
+            </div>
+          </div>
+          <div className="mt-2 flex items-baseline gap-2">
+            <span className="text-2xl font-bold tracking-tight text-blue-700 tabular-nums">
+              {backendStats.upcoming}
+            </span>
+            <span className="text-xs text-slate-400">scheduled</span>
+          </div>
+        </div>
+
+        {/* Completed */}
+        <div className="bg-white border border-slate-200/80 rounded-lg p-3.5 sm:p-4 transition-all">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-medium text-slate-500 uppercase tracking-wider">
+              Completed
+            </span>
+            <div className="w-8 h-8 rounded-md bg-slate-100 text-slate-500 flex items-center justify-center">
+              <CheckCircle2 className="w-4 h-4" />
+            </div>
+          </div>
+          <div className="mt-2 flex items-baseline gap-2">
+            <span className="text-2xl font-bold tracking-tight text-slate-700 tabular-nums">
+              {backendStats.completed}
+            </span>
+            <span className="text-xs text-slate-400">finished</span>
+          </div>
         </div>
       </div>
 
-      {/* Main Tree Container Card */}
-      <div className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm space-y-6">
-        {/* Header Toolbar */}
-        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 pb-4 border-b border-gray-100">
-          <div>
-            <TableTitle payload={{ title: "Tournament Tree Hierarchy" }} />
-            <p className="text-xs text-gray-400 mt-1">
-              Visual node structure for tournament events and prize position branches
-            </p>
+      {/* 2. Main Tournament Tree Hierarchy Panel */}
+      <div className="bg-white rounded-lg border border-slate-200/80 shadow-2xs overflow-hidden flex flex-col">
+        {/* Integrated Toolbar */}
+        <div className="p-4 sm:p-5 border-b border-slate-200/80 flex flex-col lg:flex-row lg:items-center justify-between gap-3.5">
+          {/* Status Tabs */}
+          <div className="flex items-center gap-1.5 overflow-x-auto pb-1 lg:pb-0 scrollbar-none">
+            <button
+              type="button"
+              onClick={() => handleTabChange("ALL")}
+              className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium transition-colors cursor-pointer shrink-0 ${
+                statusFilter === "ALL"
+                  ? "bg-slate-900 text-white shadow-2xs"
+                  : "text-slate-600 hover:text-slate-900 hover:bg-slate-100"
+              }`}
+            >
+              <span>All Tournaments</span>
+              <span
+                className={`text-[10px] px-1.5 py-0.5 rounded-full font-semibold ${
+                  statusFilter === "ALL"
+                    ? "bg-slate-800 text-slate-200"
+                    : "bg-slate-100 text-slate-500"
+                }`}
+              >
+                {backendStats.total}
+              </span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => handleTabChange("active")}
+              className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium transition-colors cursor-pointer shrink-0 ${
+                statusFilter === "active"
+                  ? "bg-emerald-700 text-white shadow-2xs"
+                  : "text-slate-600 hover:text-slate-900 hover:bg-slate-100"
+              }`}
+            >
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
+              <span>Ongoing</span>
+              <span
+                className={`text-[10px] px-1.5 py-0.5 rounded-full font-semibold ${
+                  statusFilter === "active"
+                    ? "bg-emerald-800 text-emerald-100"
+                    : "bg-slate-100 text-slate-500"
+                }`}
+              >
+                {backendStats.active}
+              </span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => handleTabChange("upcoming")}
+              className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium transition-colors cursor-pointer shrink-0 ${
+                statusFilter === "upcoming"
+                  ? "bg-blue-700 text-white shadow-2xs"
+                  : "text-slate-600 hover:text-slate-900 hover:bg-slate-100"
+              }`}
+            >
+              <span className="w-1.5 h-1.5 rounded-full bg-blue-400" />
+              <span>Upcoming</span>
+              <span
+                className={`text-[10px] px-1.5 py-0.5 rounded-full font-semibold ${
+                  statusFilter === "upcoming"
+                    ? "bg-blue-800 text-blue-100"
+                    : "bg-slate-100 text-slate-500"
+                }`}
+              >
+                {backendStats.upcoming}
+              </span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => handleTabChange("completed")}
+              className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium transition-colors cursor-pointer shrink-0 ${
+                statusFilter === "completed"
+                  ? "bg-slate-800 text-white shadow-2xs"
+                  : "text-slate-600 hover:text-slate-900 hover:bg-slate-100"
+              }`}
+            >
+              <span className="w-1.5 h-1.5 rounded-full bg-slate-400" />
+              <span>Completed</span>
+              <span
+                className={`text-[10px] px-1.5 py-0.5 rounded-full font-semibold ${
+                  statusFilter === "completed"
+                    ? "bg-slate-700 text-slate-200"
+                    : "bg-slate-100 text-slate-500"
+                }`}
+              >
+                {backendStats.completed}
+              </span>
+            </button>
           </div>
 
-          <div className="flex items-center gap-3 w-4/12">
-            {/* Search Bar */}
-            <div className="relative">
-              <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+          {/* Search + Controls */}
+          <div className="flex items-center gap-2.5 w-full lg:w-auto">
+            {/* Search Input */}
+            <div className="relative flex-1 sm:w-64 md:w-72">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 size-3.5 pointer-events-none" />
               <input
                 type="text"
                 value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                placeholder="Search tournaments or ranks..."
-                className="w-full pl-10 pr-4 py-3.5 bg-gray-50 border border-gray-200 rounded-lg text-xs font-medium text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-black/10 focus:border-black transition-all"
+                onChange={(e) => handleSearchChange(e.target.value)}
+                placeholder="Search tournament, rank..."
+                className="w-full pl-8.5 pr-8 py-1.5 bg-slate-50/60 border border-slate-200 rounded-md text-xs text-slate-900 placeholder:text-slate-400 outline-none focus:bg-white focus:border-slate-400 focus:ring-1 focus:ring-slate-400 transition-all"
               />
-            </div>
-
-            {/* Status Filter Combobox */}
-            <Popover open={statusPopoverOpen} onOpenChange={setStatusPopoverOpen}>
-              <PopoverTrigger asChild>
+              {searchTerm && (
                 <button
                   type="button"
-                  className="h-12 px-3.5 py-3.5 bg-gray-50 border border-gray-200 rounded-xl text-xs font-semibold text-gray-700 flex items-center justify-between gap-2 hover:bg-gray-100 transition-all cursor-pointer min-w-[125px]"
+                  onClick={() => handleSearchChange("")}
+                  className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 cursor-pointer p-0.5"
+                  title="Clear search"
                 >
-                  <span className="capitalize">
-                    {statusFilter === "ALL" ? "All Status" : statusFilter}
-                  </span>
-                  <ChevronsUpDown className="w-3.5 h-3.5 text-gray-400 shrink-0" />
+                  <X className="size-3" />
                 </button>
-              </PopoverTrigger>
-              <PopoverContent className="w-36 p-1 bg-white border border-gray-200 shadow-xl rounded-xl z-50">
-                {[
-                  { label: "All Status", value: "ALL" },
-                  { label: "Upcoming", value: "upcoming" },
-                  { label: "Ongoing", value: "ongoing" },
-                  { label: "Completed", value: "completed" },
-                ].map((opt) => (
-                  <button
-                    key={opt.value}
-                    type="button"
-                    onClick={() => {
-                      setStatusFilter(opt.value);
-                      setStatusPopoverOpen(false);
-                    }}
-                    className={`w-full px-3 py-3 text-xs rounded-lg flex items-center justify-between transition-colors cursor-pointer text-left ${
-                      statusFilter === opt.value
-                        ? "bg-black text-white font-medium"
-                        : "text-gray-700 hover:bg-gray-100"
-                    }`}
-                  >
-                    <span>{opt.label}</span>
-                    {statusFilter === opt.value && (
-                      <Check className="w-3.5 h-3.5 text-white shrink-0" />
-                    )}
-                  </button>
-                ))}
-              </PopoverContent>
-            </Popover>
-
-            {/* Create Tournament Button */}
-            <div className="w-5/12">
-              <CreateButton
-                text="Create Tournament"
-                onClick={handleOpenCreateModal}
-                className="py-3"
-              />
+              )}
             </div>
-          </div>
-        </div>
 
-        {/* Tree Nodes List Section */}
-        {isLoading ? (
-          <div className="bg-gray-50/50 rounded-2xl border border-gray-100 p-12 text-center flex flex-col items-center justify-center gap-3">
-            <Loader2 className="w-8 h-8 text-amber-500 animate-spin" />
-            <p className="text-xs font-medium text-gray-500">
-              Loading tournament tree structure...
-            </p>
-          </div>
-        ) : filteredTournaments.length === 0 ? (
-          <div className="bg-gray-50/50 rounded-2xl border border-gray-100 p-12 text-center flex flex-col items-center justify-center gap-3">
-            <div className="w-12 h-12 rounded-2xl bg-amber-50 border border-amber-100 flex items-center justify-center text-amber-600">
-              <FolderPlus className="w-6 h-6" />
-            </div>
-            <h4 className="text-base font-medium text-gray-800">
-              No Tournaments Found
-            </h4>
-            <p className="text-xs text-gray-400 max-w-xs">
-              {searchTerm || statusFilter !== "ALL"
-                ? "No tournament matches your search or status filter criteria."
-                : "Create your first tournament to build the hierarchy tree."}
-            </p>
+            {/* Expand / Collapse All Toggle */}
+            {rawTournaments.length > 0 && (
+              <button
+                type="button"
+                onClick={handleToggleExpandAll}
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white border border-slate-200 rounded-md hover:bg-slate-50 active:scale-98 transition-all text-xs font-semibold text-slate-700 shadow-2xs cursor-pointer shrink-0"
+                title={allExpanded ? "Collapse All Nodes" : "Expand All Nodes"}
+              >
+                {allExpanded ? (
+                  <>
+                    <ChevronsDownUp className="w-3.5 h-3.5 text-slate-500" />
+                    <span className="hidden sm:inline">Collapse</span>
+                  </>
+                ) : (
+                  <>
+                    <ChevronsUpDown className="w-3.5 h-3.5 text-slate-500" />
+                    <span className="hidden sm:inline">Expand</span>
+                  </>
+                )}
+              </button>
+            )}
+
+            {/* Create Tournament Action Button */}
             <button
               type="button"
               onClick={handleOpenCreateModal}
-              className="mt-2 px-4 py-2 bg-black text-white text-xs font-medium rounded-xl hover:bg-gray-800 transition-all cursor-pointer shadow-sm"
+              className="inline-flex items-center justify-center gap-1.5 px-3.5 py-1.5 bg-slate-900 text-white rounded-md hover:bg-slate-800 active:scale-98 transition-all text-xs font-semibold shadow-2xs border border-slate-900 cursor-pointer shrink-0 select-none"
             >
-              + Create Tournament
+              <Plus className="w-3.5 h-3.5 text-slate-300" />
+              <span>Create Tournament</span>
             </button>
           </div>
+        </div>
+
+        {/* Active Filter Hint */}
+        {hasActiveFilters && (
+          <div className="px-5 py-2 bg-slate-50/60 border-b border-slate-200/60 flex items-center justify-between text-xs text-slate-600">
+            <div className="flex items-center gap-2">
+              <span className="font-medium text-slate-700">Active filter:</span>
+              {statusFilter !== "ALL" && (
+                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-white border border-slate-200 text-slate-700 font-medium capitalize">
+                  Status: {statusFilter}
+                </span>
+              )}
+              {searchTerm && (
+                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-white border border-slate-200 text-slate-700 font-medium">
+                  Search: &ldquo;{searchTerm}&rdquo;
+                </span>
+              )}
+              <span className="text-slate-400">
+                ({totalRecords} total matching)
+              </span>
+            </div>
+            <button
+              type="button"
+              onClick={handleResetFilters}
+              className="inline-flex items-center gap-1 text-slate-500 hover:text-slate-800 text-[11px] font-medium cursor-pointer"
+            >
+              <RotateCcw className="w-3 h-3" />
+              <span>Reset</span>
+            </button>
+          </div>
+        )}
+
+        {/* Tree Nodes List Section */}
+        {isLoading ? (
+          <div className="p-10 space-y-4 animate-pulse">
+            <div className="h-20 bg-slate-100 rounded-lg" />
+            <div className="h-20 bg-slate-100 rounded-lg" />
+            <div className="h-20 bg-slate-100 rounded-lg" />
+          </div>
+        ) : rawTournaments.length === 0 ? (
+          <div className="py-14 px-4 text-center">
+            <div className="w-10 h-10 rounded-full bg-slate-100 text-slate-400 flex items-center justify-center mx-auto mb-3">
+              <Trophy className="w-5 h-5" />
+            </div>
+            <h3 className="text-sm font-semibold text-slate-900">
+              No tournaments found
+            </h3>
+            <p className="text-xs text-slate-500 mt-1 max-w-sm mx-auto">
+              {hasActiveFilters
+                ? "No tournament matches your selected search or status criteria. Try resetting filters."
+                : "No tournaments have been registered yet. Click 'Create Tournament' to establish your first event."}
+            </p>
+            {hasActiveFilters ? (
+              <button
+                type="button"
+                onClick={handleResetFilters}
+                className="mt-3.5 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium border border-slate-200 text-slate-700 hover:bg-slate-50 cursor-pointer"
+              >
+                <RotateCcw className="w-3 h-3" />
+                <span>Reset Filters</span>
+              </button>
+            ) : (
+              <button
+                type="button"
+                onClick={handleOpenCreateModal}
+                className="mt-3.5 inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-slate-900 text-white rounded-md text-xs font-semibold hover:bg-slate-800 transition-colors shadow-2xs cursor-pointer"
+              >
+                <Plus className="w-3.5 h-3.5 text-slate-300" />
+                <span>Create First Tournament</span>
+              </button>
+            )}
+          </div>
         ) : (
-          <div className="space-y-6">
-            {filteredTournaments.map((tournament) => {
+          <div className="p-4 sm:p-5 space-y-3.5 bg-slate-50/30">
+            {rawTournaments.map((tournament) => {
               const nodeKey = tournament._id || (tournament as any).id || "";
               const isExpanded = !!expandedNodes[nodeKey];
               const rewards = tournament.positionRewards || [];
@@ -338,28 +585,47 @@ export default function Tournaments() {
                 ? dayjs(tournament.endDate).format("DD MMM, YYYY")
                 : "N/A";
 
-              const status = (tournament.status || "upcoming").toLowerCase();
-              let badgeStyle = "bg-amber-50 text-amber-700 border-amber-200";
-              if (status === "ongoing" || status === "active") {
-                badgeStyle = "bg-emerald-50 text-emerald-700 border-emerald-200";
-              } else if (status === "completed" || status === "finished") {
-                badgeStyle = "bg-purple-50 text-purple-700 border-purple-200";
+              const rawStatus = (tournament.status || "upcoming").toLowerCase();
+              const isLive = rawStatus === "active" || rawStatus === "ongoing";
+              const isDone = rawStatus === "completed" || rawStatus === "finished";
+
+              let statusBadge = {
+                label: "Upcoming",
+                dot: "bg-blue-500",
+                classes: "bg-blue-50 text-blue-700 border-blue-200",
+              };
+              if (isLive) {
+                statusBadge = {
+                  label: "Ongoing",
+                  dot: "bg-emerald-500",
+                  classes: "bg-emerald-50 text-emerald-700 border-emerald-200",
+                };
+              } else if (isDone) {
+                statusBadge = {
+                  label: "Completed",
+                  dot: "bg-slate-400",
+                  classes: "bg-slate-100 text-slate-700 border-slate-200",
+                };
               }
 
               return (
                 <div
                   key={nodeKey}
-                  className="rounded-2xl border border-gray-100 bg-white shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden"
+                  className="rounded-lg border border-slate-200/90 bg-white shadow-2xs overflow-hidden transition-all"
                 >
-                  {/* Root Node Container */}
-                  <div className="p-5 flex flex-col md:flex-row md:items-center justify-between gap-4 bg-gray-50/40 border-b border-gray-100">
-                    <div className="flex items-start gap-3.5 min-w-0">
+                  {/* Root Node Header */}
+                  <div className="p-3.5 sm:p-4 flex flex-col md:flex-row md:items-center justify-between gap-3 bg-white">
+                    <div className="flex items-start gap-3 min-w-0">
                       {/* Expand / Collapse Button */}
                       <button
                         type="button"
                         onClick={() => toggleNodeExpand(nodeKey)}
-                        className="mt-1 p-1 rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-600 transition-colors cursor-pointer shrink-0"
-                        title={isExpanded ? "Collapse Tree" : "Expand Tree"}
+                        className={`mt-0.5 p-1 rounded-md text-slate-500 hover:text-slate-900 transition-colors cursor-pointer shrink-0 ${
+                          isExpanded
+                            ? "bg-slate-100 text-slate-900"
+                            : "hover:bg-slate-100"
+                        }`}
+                        title={isExpanded ? "Collapse Branches" : "Expand Branches"}
                       >
                         {isExpanded ? (
                           <ChevronDown className="w-4 h-4" />
@@ -368,141 +634,181 @@ export default function Tournaments() {
                         )}
                       </button>
 
-                      {/* Tournament Icon */}
-                      <div className="w-11 h-11 rounded-xl bg-amber-50 border border-amber-200 text-amber-600 flex items-center justify-center font-medium shrink-0 shadow-sm">
-                        <Trophy className="w-5 h-5" />
-                      </div>
-
-                      {/* Info & Status */}
-                      <div className="space-y-1 min-w-0">
-                        <div className="flex items-center gap-2.5 flex-wrap">
-                          <h3 className="font-medium text-gray-900 text-base leading-snug truncate">
-                            {tournament.title}
-                          </h3>
-                          <span
-                            className={`px-2.5 py-0.5 rounded-full text-[10px] font-medium tracking-wider border ${badgeStyle}`}
+                      {/* Tournament Identity */}
+                      <div className="min-w-0">
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <button
+                            type="button"
+                            onClick={() => toggleNodeExpand(nodeKey)}
+                            className="text-left font-bold text-slate-900 text-xs sm:text-sm hover:text-slate-700 transition-colors cursor-pointer truncate"
                           >
-                            {status}
+                            {tournament.title}
+                          </button>
+
+                          <span
+                            className={`inline-flex items-center gap-1.5 px-2 py-0.2 rounded-full text-[11px] font-semibold border ${statusBadge.classes}`}
+                          >
+                            <span
+                              className={`w-1.5 h-1.5 rounded-full ${statusBadge.dot} ${
+                                isLive ? "animate-pulse" : ""
+                              }`}
+                            />
+                            {statusBadge.label}
                           </span>
+
+                          <span className="text-[11px] font-medium text-slate-500 bg-slate-100 px-2 py-0.2 rounded border border-slate-200/80 inline-flex items-center gap-1">
+                            <GitBranch className="w-3 h-3 text-slate-400" />
+                            {rewards.length} Ranks
+                          </span>
+
+                          {tournament.prizeCoins !== undefined && (
+                            <span className="text-[11px] font-semibold text-slate-700 bg-slate-50 px-2 py-0.2 rounded border border-slate-200 inline-flex items-center gap-1">
+                              <Coins className="w-3 h-3 text-amber-500" />
+                              {tournament.prizeCoins.toLocaleString()} Coins
+                            </span>
+                          )}
                         </div>
 
-                        {tournament.description && (
-                          <p className="text-xs text-gray-500 line-clamp-1 font-normal">
-                            {tournament.description}
-                          </p>
-                        )}
+                        {/* Subtitle / Schedule Row */}
+                        <div className="flex items-center gap-3 mt-1.5 text-xs text-slate-500 flex-wrap">
+                          <div className="flex items-center gap-1 text-[11px]">
+                            <Calendar className="w-3 h-3 text-slate-400" />
+                            <span>
+                              {start} &mdash; {end}
+                            </span>
+                          </div>
 
-                        <div className="flex items-center gap-1.5 text-xs text-gray-400 font-medium">
-                          <Calendar className="w-3.5 h-3.5 text-gray-400 shrink-0" />
-                          <span>
-                            {start} &mdash; {end}
-                          </span>
+                          {tournament.description && (
+                            <>
+                              <span className="text-slate-300">·</span>
+                              <span className="text-[11px] text-slate-400 truncate max-w-md">
+                                {tournament.description}
+                              </span>
+                            </>
+                          )}
                         </div>
                       </div>
                     </div>
 
-                    {/* Root Action Buttons */}
-                    <div className="flex items-center gap-2 self-end md:self-auto shrink-0">
-                      <span className="text-xs font-medium text-gray-400 bg-gray-100 px-2.5 py-1 rounded-lg flex items-center gap-1">
-                        <GitBranch className="w-3 h-3 text-purple-500" />
-                        {rewards.length} Ranks
-                      </span>
+                    {/* Node Action Buttons */}
+                    <div className="flex items-center gap-1.5 self-end md:self-auto shrink-0 pt-2 md:pt-0 border-t md:border-t-0 border-slate-100 w-full md:w-auto justify-end">
+                      <button
+                        type="button"
+                        onClick={() => handleViewWinners(tournament)}
+                        className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-md text-xs font-semibold text-emerald-700 bg-emerald-50 hover:bg-emerald-100/80 border border-emerald-200 transition-colors cursor-pointer shadow-2xs"
+                        title="View Redeemed Winners"
+                      >
+                        <UserCheck className="w-3.5 h-3.5 text-emerald-600" />
+                        <span>Winners</span>
+                      </button>
 
                       <button
                         type="button"
                         onClick={() => handleView(tournament)}
-                        className="p-2 rounded-xl text-gray-500 hover:text-blue-600 hover:bg-blue-50 border border-gray-200 transition-colors cursor-pointer"
-                        title="View Details & QR Codes"
+                        className="p-1.5 text-slate-500 hover:text-slate-900 hover:bg-slate-100 rounded-md border border-slate-200 transition-colors cursor-pointer"
+                        title="View QR Codes & Rewards"
                       >
-                        <FiEye className="w-4 h-4" />
+                        <FiEye className="w-3.5 h-3.5" />
                       </button>
-                      <button
-                        type="button"
-                        onClick={() => handleViewWinners(tournament)}
-                        className="p-2 rounded-xl text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50 border border-emerald-200 transition-colors cursor-pointer flex items-center gap-1 font-semibold text-xs px-2.5"
-                        title="View Redeemed Winners"
-                      >
-                        <UserCheck className="w-4 h-4" />
-                        <span className="hidden sm:inline">Winners</span>
-                      </button>
+
                       <button
                         type="button"
                         onClick={() => handleOpenEditModal(tournament)}
-                        className="p-2 rounded-xl text-gray-500 hover:text-emerald-600 hover:bg-emerald-50 border border-gray-200 transition-colors cursor-pointer"
+                        className="p-1.5 text-slate-500 hover:text-amber-600 hover:bg-amber-50 rounded-md border border-slate-200 transition-colors cursor-pointer"
                         title="Edit Tournament"
                       >
-                        <FiEdit className="w-4 h-4" />
+                        <FiEdit className="w-3.5 h-3.5" />
                       </button>
+
                       <button
                         type="button"
                         onClick={() => handleDeleteTrigger(nodeKey)}
-                        className="p-2 rounded-xl text-gray-500 hover:text-red-600 hover:bg-red-50 border border-gray-200 transition-colors cursor-pointer"
+                        className="p-1.5 text-slate-500 hover:text-rose-600 hover:bg-rose-50 rounded-md border border-slate-200 transition-colors cursor-pointer"
                         title="Delete Tournament"
                       >
-                        <FiTrash2 className="w-4 h-4" />
+                        <FiTrash2 className="w-3.5 h-3.5" />
                       </button>
                     </div>
                   </div>
 
-                  {/* Tree Children (Position Rewards Branch Nodes) */}
+                  {/* Tree Hierarchy Children (Position Rewards Branch Nodes) */}
                   {isExpanded && (
-                    <div className="p-6 bg-white space-y-3 relative border-t border-gray-50">
-                      {/* Visual Tree Vertical Main Stem Connector */}
-                      <div className="absolute left-10 top-6 bottom-8 w-0.5 bg-gradient-to-b from-amber-200 via-gray-200 to-transparent pointer-events-none" />
-
-                      <div className="flex items-center gap-2 text-xs font-medium text-gray-400 tracking-wider ml-8 mb-4">
-                        <Award className="w-4 h-4 text-amber-500" />
-                        <span>Position Rewards Tree Branches ({rewards.length})</span>
+                    <div className="p-4 sm:p-5 bg-slate-50/60 border-t border-slate-200/80 space-y-2.5">
+                      <div className="flex items-center justify-between text-xs text-slate-500 mb-2 font-medium">
+                        <span className="flex items-center gap-1.5">
+                          <Award className="w-3.5 h-3.5 text-slate-500" />
+                          <span>Placement Rank Hierarchy ({rewards.length} branches)</span>
+                        </span>
+                        <span className="text-[11px] text-slate-400">
+                          Scan QR Code to redeem coins
+                        </span>
                       </div>
 
                       {rewards.length === 0 ? (
-                        <div className="ml-8 text-xs text-gray-400 italic bg-gray-50 p-3 rounded-xl">
-                          No position rewards configured for this tournament.
+                        <div className="text-xs text-slate-400 italic bg-white p-3 rounded-md border border-slate-200">
+                          No position rewards configured for this tournament event.
                         </div>
                       ) : (
-                        <div className="space-y-3 pl-8 relative">
-                          {rewards.map((reward, rIdx) => {
-                            let iconMark = "#" + reward.position;
-                            let cardStyle = "bg-gray-50 border-gray-200 text-gray-800";
-                            let pointsStyle = "bg-blue-50 text-blue-700 border-blue-100";
+                        <div className="space-y-2 relative pl-5">
+                          {/* Tree Vertical Guide Line */}
+                          <div className="absolute left-2.5 top-3 bottom-3 w-px bg-slate-200" />
 
-                            if (reward.position === 1) {
-                              iconMark = "🥇";
-                              cardStyle = "bg-amber-50/60 border-amber-200 text-amber-950";
-                              pointsStyle = "bg-amber-100 text-amber-800 border-amber-300";
-                            } else if (reward.position === 2) {
-                              iconMark = "🥈";
-                              cardStyle = "bg-slate-50 border-slate-200 text-slate-900";
-                              pointsStyle = "bg-slate-100 text-slate-800 border-slate-300";
-                            } else if (reward.position === 3) {
-                              iconMark = "🥉";
-                              cardStyle = "bg-orange-50/60 border-orange-200 text-orange-950";
-                              pointsStyle = "bg-orange-100 text-orange-800 border-orange-300";
+                          {rewards.map((reward, rIdx) => {
+                            const is1st = reward.position === 1;
+                            const is2nd = reward.position === 2;
+                            const is3rd = reward.position === 3;
+
+                            let rankBadge = (
+                              <span className="text-[11px] font-bold px-2 py-0.5 rounded bg-slate-100 text-slate-700 border border-slate-200">
+                                Rank #{reward.position}
+                              </span>
+                            );
+
+                            if (is1st) {
+                              rankBadge = (
+                                <span className="text-[11px] font-bold px-2 py-0.5 rounded bg-amber-50 text-amber-800 border border-amber-300">
+                                  1st Place
+                                </span>
+                              );
+                            } else if (is2nd) {
+                              rankBadge = (
+                                <span className="text-[11px] font-bold px-2 py-0.5 rounded bg-slate-100 text-slate-800 border border-slate-300">
+                                  2nd Place
+                                </span>
+                              );
+                            } else if (is3rd) {
+                              rankBadge = (
+                                <span className="text-[11px] font-bold px-2 py-0.5 rounded bg-amber-50/60 text-amber-900 border border-amber-200">
+                                  3rd Place
+                                </span>
+                              );
                             }
 
                             return (
                               <div
                                 key={rIdx}
-                                className={`p-3.5 rounded-2xl border flex items-center justify-between transition-all relative ${cardStyle}`}
+                                className="relative flex items-center justify-between p-2.5 sm:p-3 bg-white rounded-md border border-slate-200 shadow-2xs hover:border-slate-300 transition-colors gap-3"
                               >
-                                {/* Tree Branch Curved Stem Connector */}
-                                <div className="absolute -left-8 top-1/2 -translate-y-1/2 w-8 h-0.5 bg-gray-200 pointer-events-none" />
+                                {/* Tree Horizontal Connector Branch */}
+                                <div className="absolute -left-2.5 top-1/2 -translate-y-1/2 w-2.5 h-px bg-slate-200" />
 
-                                <div className="flex items-center gap-3">
-                                  <span className="text-xl shrink-0">{iconMark}</span>
+                                <div className="flex items-center gap-2.5 min-w-0">
+                                  {rankBadge}
                                   <div>
-                                    <h5 className="font-bold text-xs">
+                                    <h5 className="font-semibold text-xs text-slate-900 truncate">
                                       {reward.positionName}
                                     </h5>
-                                    <p className="text-[10px] text-gray-500 font-normal">
-                                      Placement Rank Position #{reward.position}
+                                    <p className="text-[10px] text-slate-400 font-mono">
+                                      Official rank position #{reward.position}
                                     </p>
                                   </div>
                                 </div>
 
-                                <div className={`px-3 py-1 rounded-xl text-xs font-black border flex items-center gap-1 shrink-0 ${pointsStyle}`}>
-                                  <Sparkles className="w-3.5 h-3.5 text-amber-500" />
-                                  <span>{reward.points} Points</span>
+                                <div className="flex items-center gap-1.5 shrink-0">
+                                  <span className="inline-flex items-center gap-1 text-xs font-bold text-slate-900 bg-slate-50 border border-slate-200 px-2.5 py-1 rounded shadow-2xs">
+                                    <Coins className="w-3 h-3 text-amber-500" />
+                                    <span>{reward.points.toLocaleString()} Coins</span>
+                                  </span>
                                 </div>
                               </div>
                             );
@@ -518,11 +824,14 @@ export default function Tournaments() {
         )}
 
         {/* Custom Pagination Footer */}
-        <div className="pt-6 px-2 border-t border-gray-100">
-          <CustomPagination
-            TOTAL_PAGES={tournamentRes?.pagination?.totalPage || tournamentRes?.data?.meta?.totalPage || 1}
-            qryName="page"
-          />
+        <div className="px-5 py-3.5 border-t border-slate-200/80 flex flex-col sm:flex-row items-center justify-between gap-4 bg-slate-50/40">
+          <div className="text-xs text-slate-500 font-medium">
+            Showing <span className="font-semibold text-slate-800">{rawTournaments.length}</span>{" "}
+            on this page of{" "}
+            <span className="font-semibold text-slate-800">{totalRecords}</span>{" "}
+            total {statusFilter !== "ALL" ? `${statusFilter} ` : ""}tournaments
+          </div>
+          <CustomPagination TOTAL_PAGES={totalPages} qryName="page" />
         </div>
       </div>
 
@@ -555,8 +864,8 @@ export default function Tournaments() {
         onClose={() => setIsDeleteModalOpen(false)}
         onConfirm={handleConfirmDelete}
         isLoading={isDeleting}
-        title="Confirm Tournament Deletion"
-        description="Are you sure you want to delete this tournament? This action cannot be undone."
+        title="Delete Tournament"
+        description="Are you sure you want to permanently delete this tournament and its prize tree branches? This action cannot be undone."
       />
     </div>
   );

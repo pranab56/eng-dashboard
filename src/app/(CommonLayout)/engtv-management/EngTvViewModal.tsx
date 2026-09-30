@@ -1,28 +1,30 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-"use client"
+"use client";
 
-import React from 'react';
+import React from "react";
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import dayjs from 'dayjs';
-import relativeTime from 'dayjs/plugin/relativeTime';
-import { TEngtv } from '@/types/columnTypes';
-import { getYouTubeEmbedUrl } from '@/utils/getYouTubeEmbedUrl';
-import { baseURL } from '@/utils/BaseURL';
+import { baseURL } from "@/utils/BaseURL";
+import { formatImagePath } from "@/utils/formatImagePath";
+import { getYouTubeEmbedUrl } from "@/utils/getYouTubeEmbedUrl";
+import dayjs from "dayjs";
+import relativeTime from "dayjs/plugin/relativeTime";
 import {
   X,
   Tv,
   Calendar,
   Clock,
   Tag,
-  Sparkles,
+  Star,
   Film,
+  Hash,
   CheckCircle2,
-} from 'lucide-react';
+  AlertCircle,
+} from "lucide-react";
+import { TEngtv } from "@/types/columnTypes";
 
 dayjs.extend(relativeTime);
 
@@ -32,7 +34,11 @@ interface EngTvViewModalProps {
   onClose: () => void;
 }
 
-const EngTvViewModal: React.FC<EngTvViewModalProps> = ({ video, isOpen, onClose }) => {
+const EngTvViewModal: React.FC<EngTvViewModalProps> = ({
+  video,
+  isOpen,
+  onClose,
+}) => {
   if (!video) return null;
 
   const catVal = video.category as any;
@@ -40,100 +46,99 @@ const EngTvViewModal: React.FC<EngTvViewModalProps> = ({ video, isOpen, onClose 
     typeof catVal === "object" && catVal
       ? catVal.name
       : typeof catVal === "string"
-        ? catVal
-        : "";
+      ? catVal
+      : "";
 
   const subVal = (video as any).subCategory;
   const subName =
     typeof subVal === "object" && subVal
       ? subVal.name
       : typeof subVal === "string"
-        ? subVal
-        : "";
+      ? subVal
+      : "";
 
-  const isPublished = (video.status || '').toLowerCase() === 'publish' || (video.status || '').toLowerCase() === 'published';
+  const youtubeEmbed = getYouTubeEmbedUrl(video.videoUrl);
+  const posterUrl = video.thumbnail ? formatImagePath(video.thumbnail) : "";
 
-  const posterUrl = video.thumbnail
-    ? video.thumbnail.startsWith('http')
-      ? video.thumbnail
-      : baseURL + video.thumbnail
-    : undefined;
-
-  const youtubeEmbed = video.videoUrl ? getYouTubeEmbedUrl(video.videoUrl) : null;
   const videoSrc = video.videoUrl
-    ? video.videoUrl.startsWith('http')
+    ? video.videoUrl.startsWith("http")
       ? video.videoUrl
       : baseURL + video.videoUrl
-    : '';
+    : "";
+
+  const isPublished = video.status?.toLowerCase() === "publish";
+  const isDraft = video.status?.toLowerCase() === "draft";
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent showCloseButton={false} className="sm:max-w-2xl bg-white rounded-3xl p-0 overflow-hidden border-none shadow-2xl max-h-[92vh] flex flex-col">
-        {/* Clean Light Header Banner (Matches User Management Style) */}
-        <DialogHeader className="bg-slate-50/80 p-5 sm:p-6 border-b border-slate-100 relative text-left">
-          <button
-            type="button"
-            onClick={onClose}
-            className="absolute top-4 right-4 p-2 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 hover:text-slate-900 transition-all cursor-pointer z-30"
-            title="Close Modal"
-          >
-            <X className="w-4 h-4" />
-          </button>
-
-          <div className="flex items-center gap-4">
-            {/* Header TV Icon Box */}
-            <div className="w-14 h-14 rounded-2xl bg-red-50 border border-red-100 overflow-hidden flex items-center justify-center shrink-0 shadow-xs text-red-600">
-              <Tv className="w-6 h-6" />
+      <DialogContent
+        showCloseButton={false}
+        className="sm:max-w-2xl bg-white dark:bg-slate-900 rounded-lg p-0 overflow-hidden border border-slate-200 dark:border-slate-800 shadow-xl max-h-[90vh] flex flex-col"
+      >
+        {/* Modal Header */}
+        <DialogHeader className="px-5 py-4 border-b border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/50 flex-row items-center justify-between space-y-0 text-left">
+          <div className="flex items-center gap-3 min-w-0 pr-4">
+            <div className="w-9 h-9 rounded-md bg-slate-200 dark:bg-slate-700/60 flex items-center justify-center shrink-0 text-slate-700 dark:text-slate-200">
+              <Tv className="w-4 h-4" />
             </div>
-
-            <div className="flex-1 pr-6 min-w-0">
-              <div className="flex items-center gap-2 flex-wrap">
-                <span className="px-2.5 py-0.5 rounded-full text-[10px] font-semibold uppercase bg-slate-100 text-slate-700 border border-slate-200">
-                  ENG TV Network
+            <div className="min-w-0">
+              <div className="flex items-center gap-2 flex-wrap mb-1">
+                <span className="px-2 py-0.5 rounded text-[11px] font-medium tracking-wide uppercase bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700">
+                  ENG TV
                 </span>
 
                 {catName && (
-                  <span className="px-2.5 py-0.5 rounded-full text-[10px] font-semibold uppercase bg-indigo-50 text-indigo-700 border border-indigo-200">
+                  <span className="px-2 py-0.5 rounded text-[11px] font-medium bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700">
                     {catName}
                   </span>
                 )}
 
                 {subName && (
-                  <span className="px-2.5 py-0.5 rounded-full text-[10px] font-semibold uppercase bg-amber-50 text-amber-700 border border-amber-200">
+                  <span className="px-2 py-0.5 rounded text-[11px] font-medium bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-700">
                     {subName}
                   </span>
                 )}
 
-                <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-semibold uppercase border ${
-                  isPublished
-                    ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
-                    : 'bg-amber-50 text-amber-700 border-amber-200'
-                }`}>
-                  {video.status || 'Draft'}
+                <span
+                  className={`px-2 py-0.5 rounded text-[11px] font-medium uppercase border ${
+                    isPublished
+                      ? "bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950/40 dark:text-emerald-400 dark:border-emerald-800"
+                      : isDraft
+                      ? "bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-950/40 dark:text-amber-400 dark:border-amber-800"
+                      : "bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-950/40 dark:text-blue-400 dark:border-blue-800"
+                  }`}
+                >
+                  {video.status || "Draft"}
                 </span>
+
+                {video.isHighlight && (
+                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[11px] font-medium bg-amber-50 text-amber-700 border border-amber-200 dark:bg-amber-950/40 dark:text-amber-400 dark:border-amber-800">
+                    <Star className="w-3 h-3 fill-amber-500 text-amber-500" />
+                    Highlight
+                  </span>
+                )}
               </div>
 
-              <DialogTitle className="text-lg sm:text-xl font-bold text-slate-900 mt-1 truncate">
+              <DialogTitle className="text-base sm:text-lg font-semibold text-slate-900 dark:text-slate-100 truncate">
                 {video.title}
               </DialogTitle>
-
-              <p className="text-xs text-slate-500 font-medium mt-0.5 flex items-center gap-2">
-                <span>Created {video.createdAt ? dayjs(video.createdAt).format('MMM DD, YYYY') : 'N/A'}</span>
-                {video.publishDateTime && (
-                  <>
-                    <span>•</span>
-                    <span>Scheduled {dayjs(video.publishDateTime).fromNow()}</span>
-                  </>
-                )}
-              </p>
             </div>
           </div>
+
+          <button
+            type="button"
+            onClick={onClose}
+            className="w-8 h-8 rounded-md border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-500 hover:text-slate-800 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700 flex items-center justify-center transition-colors cursor-pointer shrink-0"
+            title="Close Modal"
+          >
+            <X className="w-4 h-4" />
+          </button>
         </DialogHeader>
 
-        {/* Modal Body Container */}
-        <div className="p-6 space-y-5 overflow-y-auto custom-scrollbar flex-1 text-slate-800">
+        {/* Modal Body */}
+        <div className="p-5 space-y-4 overflow-y-auto flex-1 text-slate-800 dark:text-slate-200">
           {/* Video Stream Container */}
-          <div className="aspect-video bg-slate-950 rounded-2xl overflow-hidden shadow-md border border-slate-800 relative group">
+          <div className="aspect-video bg-black rounded-lg overflow-hidden border border-slate-200 dark:border-slate-800 relative">
             {youtubeEmbed ? (
               <iframe
                 src={youtubeEmbed}
@@ -151,83 +156,81 @@ const EngTvViewModal: React.FC<EngTvViewModalProps> = ({ video, isOpen, onClose 
               />
             ) : (
               <div className="w-full h-full flex flex-col items-center justify-center text-slate-500 space-y-2">
-                <Film className="w-10 h-10 stroke-1" />
-                <span className="text-xs font-medium">No video stream URL provided</span>
+                <Film className="w-8 h-8 stroke-1 text-slate-400" />
+                <span className="text-xs">No video stream URL provided</span>
               </div>
             )}
           </div>
 
           {/* Description Section */}
-          <div className="bg-slate-50/80 rounded-2xl p-5 border border-slate-200/80 space-y-2">
-            <div className="flex items-center gap-2 pb-2 border-b border-slate-200/60">
-              <Sparkles className="w-4 h-4 text-red-600" />
-              <h4 className="text-xs font-bold uppercase tracking-wider text-slate-800">
-                Video Overview & Synopsis
+          {video.description && (
+            <div className="rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/40 p-4 space-y-1.5">
+              <h4 className="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                Description & Synopsis
               </h4>
+              <p className="text-xs sm:text-sm text-slate-700 dark:text-slate-300 leading-relaxed whitespace-pre-wrap">
+                {video.description}
+              </p>
             </div>
-            <p className="text-xs sm:text-sm text-slate-700 leading-relaxed font-medium">
-              {video.description || 'No video description provided.'}
-            </p>
-          </div>
+          )}
 
-          {/* Broadcast & Channel Specifications */}
-          <div className="bg-slate-50/80 rounded-2xl p-5 border border-slate-200/80 space-y-3">
-            <div className="flex items-center gap-2 pb-2 border-b border-slate-200/60">
-              <Film className="w-4 h-4 text-red-600" />
-              <h4 className="text-xs font-bold uppercase tracking-wider text-slate-800">
-                Broadcast & Channel Details
-              </h4>
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
-              <div className="p-3 bg-white rounded-xl border border-slate-200/60 space-y-1">
-                <span className="text-[11px] font-semibold text-slate-400 flex items-center gap-1">
-                  <Calendar className="w-3.5 h-3.5 text-red-500" /> Created Date
+          {/* Metadata Grid */}
+          <div className="rounded-lg border border-slate-200 dark:border-slate-800 divide-y divide-slate-100 dark:divide-slate-800 text-xs">
+            <div className="grid grid-cols-1 sm:grid-cols-2 divide-y sm:divide-y-0 sm:divide-x divide-slate-100 dark:divide-slate-800">
+              <div className="p-3 flex items-center justify-between">
+                <span className="text-slate-500 dark:text-slate-400 flex items-center gap-1.5">
+                  <Calendar className="w-3.5 h-3.5 text-slate-400" /> Created Date
                 </span>
-                <p className="font-bold text-slate-800">
-                  {video.createdAt ? dayjs(video.createdAt).format("DD MMMM YYYY, h:mm A") : "N/A"}
-                </p>
+                <span className="font-medium text-slate-900 dark:text-slate-100">
+                  {video.createdAt
+                    ? dayjs(video.createdAt).format("DD MMM YYYY, h:mm A")
+                    : "N/A"}
+                </span>
               </div>
 
-              <div className="p-3 bg-white rounded-xl border border-slate-200/60 space-y-1">
-                <span className="text-[11px] font-semibold text-slate-400 flex items-center gap-1">
-                  <Clock className="w-3.5 h-3.5 text-red-500" /> Publish Date
+              <div className="p-3 flex items-center justify-between">
+                <span className="text-slate-500 dark:text-slate-400 flex items-center gap-1.5">
+                  <Clock className="w-3.5 h-3.5 text-slate-400" /> Publish Schedule
                 </span>
-                <p className="font-bold text-slate-800">
-                  {video.publishDateTime ? dayjs(video.publishDateTime).format("DD MMMM YYYY, h:mm A") : "Immediate Publication"}
-                </p>
+                <span className="font-medium text-slate-900 dark:text-slate-100">
+                  {video.publishDateTime
+                    ? dayjs(video.publishDateTime).format("DD MMM YYYY, h:mm A")
+                    : "Immediate"}
+                </span>
               </div>
+            </div>
 
-              <div className="p-3 bg-white rounded-xl border border-slate-200/60 space-y-1">
-                <span className="text-[11px] font-semibold text-slate-400 flex items-center gap-1">
-                  <Tag className="w-3.5 h-3.5 text-red-500" /> Primary Category
+            <div className="grid grid-cols-1 sm:grid-cols-2 divide-y sm:divide-y-0 sm:divide-x divide-slate-100 dark:divide-slate-800">
+              <div className="p-3 flex items-center justify-between">
+                <span className="text-slate-500 dark:text-slate-400 flex items-center gap-1.5">
+                  <Tag className="w-3.5 h-3.5 text-slate-400" /> Category
                 </span>
-                <p className="font-bold text-slate-800">
+                <span className="font-medium text-slate-900 dark:text-slate-100">
                   {catName || "General Broadcast"}
-                </p>
+                </span>
               </div>
 
-              <div className="p-3 bg-white rounded-xl border border-slate-200/60 space-y-1">
-                <span className="text-[11px] font-semibold text-slate-400 flex items-center gap-1">
-                  <Tv className="w-3.5 h-3.5 text-red-500" /> Network Channel
+              <div className="p-3 flex items-center justify-between">
+                <span className="text-slate-500 dark:text-slate-400 flex items-center gap-1.5">
+                  <Hash className="w-3.5 h-3.5 text-slate-400" /> Display Order
                 </span>
-                <p className="font-bold text-slate-800 flex items-center gap-1">
-                  <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" /> ENG Official TV Stream
-                </p>
+                <span className="font-medium text-slate-900 dark:text-slate-100">
+                  {typeof video.order === "number" ? video.order : 0}
+                </span>
               </div>
             </div>
           </div>
         </div>
 
-        {/* Modal Footer (Matches User Management Style) */}
-        <div className="p-4 sm:p-5 bg-slate-50 border-t border-slate-100 flex items-center justify-between">
-          <p className="text-xs text-slate-500 font-medium flex items-center gap-1">
-            <Tv className="w-3.5 h-3.5 text-slate-400" /> Official ENG Broadcast
-          </p>
+        {/* Modal Footer */}
+        <div className="px-5 py-3.5 bg-slate-50 dark:bg-slate-800/50 border-t border-slate-200 dark:border-slate-800 flex items-center justify-between">
+          <span className="text-xs text-slate-500 dark:text-slate-400 font-mono text-[11px]">
+            ID: {video._id}
+          </span>
           <button
             type="button"
             onClick={onClose}
-            className="px-4 py-2 bg-slate-200 hover:bg-slate-300 text-slate-700 text-xs font-semibold rounded-xl transition-all cursor-pointer"
+            className="px-4 py-1.5 bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 text-xs font-medium rounded-md border border-slate-200 dark:border-slate-700 transition-colors cursor-pointer"
           >
             Close
           </button>

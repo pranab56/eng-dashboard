@@ -1,14 +1,25 @@
-"use client"
+"use client";
+
+import React from "react";
 import {
   Dialog,
   DialogContent,
-  DialogTitle
+  DialogHeader,
+  DialogTitle,
 } from "@/components/ui/dialog";
-import dayjs from 'dayjs';
-import relativeTime from 'dayjs/plugin/relativeTime';
-import Image from 'next/image';
-import { formatImagePath } from '@/utils/formatImagePath';
-import { MapPin, Calendar } from 'lucide-react';
+import dayjs from "dayjs";
+import relativeTime from "dayjs/plugin/relativeTime";
+import Image from "next/image";
+import { formatImagePath } from "@/utils/formatImagePath";
+import {
+  MapPin,
+  Calendar,
+  Clock,
+  X,
+  CalendarDays,
+  Send,
+  Image as ImageIcon,
+} from "lucide-react";
 
 dayjs.extend(relativeTime);
 
@@ -18,85 +29,155 @@ interface EventViewModalProps {
   onClose: () => void;
 }
 
-const EventViewModal = ({ event, isOpen, onClose }: EventViewModalProps) => {
+const EventViewModal: React.FC<EventViewModalProps> = ({
+  event,
+  isOpen,
+  onClose,
+}) => {
   if (!event) return null;
+
+  const isPublished = event.status?.toLowerCase() === "publish";
+  const isDraft = event.status?.toLowerCase() === "draft";
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-3xl bg-white rounded-xl p-0 overflow-hidden border-none shadow-2xl">
-
-        {/* Cover Image Section */}
-        <div className="relative h-64 w-full bg-gray-100">
-          {event.image ? (
-            <Image src={formatImagePath(event.image)} alt="event cover" fill quality={100} className="object-cover" />
-          ) : (
-            <div className="w-full h-full flex items-center justify-center text-gray-300 font-black text-xl bg-gray-50 . tracking-widest">
-              NO IMAGE PROVIDED
+      <DialogContent
+        showCloseButton={false}
+        className="sm:max-w-2xl bg-white dark:bg-slate-900 rounded-lg p-0 overflow-hidden border border-slate-200 dark:border-slate-800 shadow-xl max-h-[90vh] flex flex-col"
+      >
+        {/* Modal Header */}
+        <DialogHeader className="px-5 py-4 border-b border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/50 flex-row items-center justify-between space-y-0 text-left">
+          <div className="flex items-center gap-3 min-w-0 pr-4">
+            <div className="w-9 h-9 rounded-md bg-slate-200 dark:bg-slate-700/60 flex items-center justify-center shrink-0 text-slate-700 dark:text-slate-200">
+              <CalendarDays className="w-4 h-4" />
             </div>
-          )}
-          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
+            <div className="min-w-0">
+              <div className="flex items-center gap-2 flex-wrap mb-1">
+                <span className="px-2 py-0.5 rounded text-[11px] font-medium tracking-wide uppercase bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700">
+                  Event
+                </span>
 
-          <div className="absolute bottom-6 left-10 right-10">
-            <div className="flex items-center gap-3 mb-2">
-              <span className="px-3 py-1 bg-yellow-600 text-white rounded-full text-[10px] font-black . tracking-widest">
-                Event
-              </span>
-              <span className={`px-3 py-1 rounded-full text-[10px] font-black . tracking-widest border ${event.status === 'publish' ? 'bg-green-500 text-white' : 'bg-orange-500 text-white'
-                }`}>
-                {event.status}
-              </span>
+                <span
+                  className={`px-2 py-0.5 rounded text-[11px] font-medium uppercase border ${
+                    isPublished
+                      ? "bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950/40 dark:text-emerald-400 dark:border-emerald-800"
+                      : isDraft
+                      ? "bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-950/40 dark:text-amber-400 dark:border-amber-800"
+                      : "bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-950/40 dark:text-blue-400 dark:border-blue-800"
+                  }`}
+                >
+                  {event.status || "Draft"}
+                </span>
+              </div>
+
+              <DialogTitle className="text-base sm:text-lg font-semibold text-slate-900 dark:text-slate-100 truncate">
+                {event.title}
+              </DialogTitle>
             </div>
-            <DialogTitle className="text-3xl font-black text-white leading-tight tracking-tight shadow-sm">
-              {event.title}
-            </DialogTitle>
           </div>
-        </div>
 
-        <div className="px-10 py-10 space-y-8">
-          {/* Metadata Row */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 bg-gray-50 p-4 rounded-xl border border-gray-100">
-            <div className="flex items-center gap-3">
-              <div className="p-2 bg-yellow-100 rounded-lg text-yellow-600">
-                <MapPin className="w-5 h-5" />
-              </div>
-              <div>
-                <p className="text-[10px] font-black text-gray-400 . tracking-widest">Location</p>
-                <p className="text-sm font-medium text-gray-900">{event.location || "N/A"}</p>
-              </div>
-            </div>
+          <button
+            type="button"
+            onClick={onClose}
+            className="w-8 h-8 rounded-md border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-500 hover:text-slate-800 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700 flex items-center justify-center transition-colors cursor-pointer shrink-0"
+            title="Close Modal"
+          >
+            <X className="w-4 h-4" />
+          </button>
+        </DialogHeader>
 
-            <div className="flex items-center gap-3">
-              <div className="p-2 bg-blue-100 rounded-lg text-blue-600">
-                <Calendar className="w-5 h-5" />
+        {/* Modal Body */}
+        <div className="p-5 space-y-4 overflow-y-auto flex-1 text-slate-800 dark:text-slate-200">
+          {/* Cover Media Section */}
+          <div className="relative aspect-[21/9] sm:aspect-[16/7] w-full bg-slate-100 dark:bg-slate-800 rounded-lg overflow-hidden border border-slate-200 dark:border-slate-800">
+            {event.image ? (
+              <Image
+                src={formatImagePath(event.image)}
+                alt="event cover"
+                fill
+                quality={90}
+                className="object-cover"
+              />
+            ) : (
+              <div className="w-full h-full flex flex-col items-center justify-center text-slate-400 dark:text-slate-500 space-y-1">
+                <ImageIcon className="w-8 h-8 stroke-1" />
+                <span className="text-xs">No cover image attached</span>
               </div>
-              <div>
-                <p className="text-[10px] font-black text-gray-400 . tracking-widest">Event Date</p>
-                <p className="text-sm font-medium text-gray-900">
-                  {event.eventDate ? dayjs(event.eventDate).format("DD MMMM, YYYY") : "N/A"}
-                </p>
-                <p className="text-[9px] text-gray-400 font-medium .">
-                  {event.eventDate ? dayjs(event.eventDate).format("hh:mm A") : ""}
-                </p>
-              </div>
-            </div>
+            )}
           </div>
 
           {/* Description Section */}
-          <div className="space-y-4">
-            <h3 className="text-sm font-medium text-gray-400">Event Details</h3>
-            <div className="bg-gray-50 rounded-sm p-6 border border-gray-100 font-medium text-gray-700 whitespace-pre-wrap">
-              {event.description}
+          {event.description && (
+            <div className="rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/40 p-4 space-y-1.5">
+              <h4 className="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                Event Description
+              </h4>
+              <p className="text-xs sm:text-sm text-slate-700 dark:text-slate-300 leading-relaxed whitespace-pre-wrap">
+                {event.description}
+              </p>
             </div>
-          </div>
+          )}
 
-          {/* Publication Date */}
-          <div className="flex items-center justify-between border-t border-gray-100 pt-6">
-            <div className="text-left">
-              <p className="text-[10px] font-black text-gray-400 . tracking-widest">Publication Date</p>
-              <p className="text-sm font-medium text-gray-900">{dayjs(event.publishDateTime).format("DD MMMM YYYY")}</p>
-              <p className="text-[9px] text-gray-400 font-medium .">{dayjs(event.publishDateTime).fromNow()}</p>
+          {/* Metadata Grid */}
+          <div className="rounded-lg border border-slate-200 dark:border-slate-800 divide-y divide-slate-100 dark:divide-slate-800 text-xs">
+            <div className="grid grid-cols-1 sm:grid-cols-2 divide-y sm:divide-y-0 sm:divide-x divide-slate-100 dark:divide-slate-800">
+              <div className="p-3 flex items-center justify-between">
+                <span className="text-slate-500 dark:text-slate-400 flex items-center gap-1.5">
+                  <MapPin className="w-3.5 h-3.5 text-slate-400" /> Location / Venue
+                </span>
+                <span className="font-medium text-slate-900 dark:text-slate-100 text-right truncate max-w-[200px]">
+                  {event.location || "N/A"}
+                </span>
+              </div>
+
+              <div className="p-3 flex items-center justify-between">
+                <span className="text-slate-500 dark:text-slate-400 flex items-center gap-1.5">
+                  <Calendar className="w-3.5 h-3.5 text-slate-400" /> Event Date
+                </span>
+                <span className="font-medium text-slate-900 dark:text-slate-100">
+                  {event.eventDate
+                    ? dayjs(event.eventDate).format("DD MMM YYYY, h:mm A")
+                    : "N/A"}
+                </span>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 divide-y sm:divide-y-0 sm:divide-x divide-slate-100 dark:divide-slate-800">
+              <div className="p-3 flex items-center justify-between">
+                <span className="text-slate-500 dark:text-slate-400 flex items-center gap-1.5">
+                  <Send className="w-3.5 h-3.5 text-slate-400" /> Publish Release
+                </span>
+                <span className="font-medium text-slate-900 dark:text-slate-100">
+                  {event.publishDateTime
+                    ? dayjs(event.publishDateTime).format("DD MMM YYYY, h:mm A")
+                    : "Immediate"}
+                </span>
+              </div>
+
+              <div className="p-3 flex items-center justify-between">
+                <span className="text-slate-500 dark:text-slate-400 flex items-center gap-1.5">
+                  <Clock className="w-3.5 h-3.5 text-slate-400" /> Relative Time
+                </span>
+                <span className="font-medium text-slate-900 dark:text-slate-100">
+                  {event.eventDate ? dayjs(event.eventDate).fromNow() : "N/A"}
+                </span>
+              </div>
             </div>
           </div>
+        </div>
+
+        {/* Modal Footer */}
+        <div className="px-5 py-3.5 bg-slate-50 dark:bg-slate-800/50 border-t border-slate-200 dark:border-slate-800 flex items-center justify-between">
+          <span className="text-xs text-slate-500 dark:text-slate-400 font-mono text-[11px]">
+            ID: {event._id}
+          </span>
+          <button
+            type="button"
+            onClick={onClose}
+            className="px-4 py-1.5 bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 text-xs font-medium rounded-md border border-slate-200 dark:border-slate-700 transition-colors cursor-pointer"
+          >
+            Close
+          </button>
         </div>
       </DialogContent>
     </Dialog>

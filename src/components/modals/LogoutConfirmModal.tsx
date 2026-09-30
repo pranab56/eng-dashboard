@@ -1,12 +1,13 @@
-"use client"
-import { Button } from '@/components/ui/button';
+"use client";
+
+import React from "react";
 import {
   Dialog,
   DialogContent,
   DialogTitle,
   DialogDescription,
 } from "@/components/ui/dialog";
-import { LogOut } from 'lucide-react';
+import { LogOut } from "lucide-react";
 
 interface LogoutConfirmModalProps {
   isOpen: boolean;
@@ -15,60 +16,58 @@ interface LogoutConfirmModalProps {
   isLoading?: boolean;
 }
 
-const LogoutConfirmModal = ({
+const LogoutConfirmModal: React.FC<LogoutConfirmModalProps> = ({
   isOpen,
   onClose,
   onConfirm,
-  isLoading = false
-}: LogoutConfirmModalProps) => {
+  isLoading = false,
+}) => {
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-md bg-white rounded-2xl p-0 overflow-hidden border-none shadow-2xl animate-in zoom-in-95 duration-200">
-        <div className="p-8">
-          <div className="flex flex-col items-center text-center space-y-4">
-            {/* Logout Icon Container */}
-            <div className="relative">
-              <div className="absolute inset-0 bg-red-100 rounded-full animate-ping opacity-20 scale-150"></div>
-              <div className="relative w-20 h-20 bg-red-50 rounded-full flex items-center justify-center">
-                <LogOut className="w-10 h-10 text-red-500" />
-              </div>
-            </div>
-
-            <div className="space-y-2">
-              <DialogTitle className="text-2xl font-medium text-gray-900 leading-tight">
-                Confirm Logout
-
-              </DialogTitle>
-              <DialogDescription className="text-gray-500 text-sm leading-relaxed px-4">
-                Are you sure you want to log out of your account?
-              </DialogDescription>
-            </div>
+      <DialogContent
+        showCloseButton={false}
+        className="max-w-md bg-white dark:bg-slate-900 rounded-lg p-6 border border-slate-200 dark:border-slate-800 shadow-xl"
+      >
+        <div className="flex flex-col items-center text-center space-y-3">
+          {/* Subtle Logout Icon */}
+          <div className="w-10 h-10 rounded-full bg-red-50 dark:bg-red-950/40 border border-red-100 dark:border-red-900/40 flex items-center justify-center text-red-600 dark:text-red-400">
+            <LogOut className="w-5 h-5" />
           </div>
 
-          <div className="flex gap-4 mt-8">
-            <Button
-              variant="outline"
-              onClick={onClose}
-              disabled={isLoading}
-              className="flex-1 h-12 rounded-xl cursor-pointer text-gray-600 font-medium hover:bg-gray-50 border-gray-200 transition-all duration-200"
-            >
-              Cancel
-            </Button>
-            <Button
-              onClick={onConfirm}
-              disabled={isLoading}
-              className="flex-1 h-12 rounded-xl bg-red-600 cursor-pointer hover:bg-red-700 text-white font-medium shadow-lg shadow-red-200 transition-all duration-200 flex items-center justify-center gap-2"
-            >
-              {isLoading ? (
-                <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
-              ) : (
-                <>
-                  <LogOut className="w-4 h-4" />
-                  Log Out
-                </>
-              )}
-            </Button>
+          <div className="space-y-1.5 w-full">
+            <DialogTitle className="text-base font-semibold text-slate-900 dark:text-slate-100">
+              Confirm Sign Out
+            </DialogTitle>
+            <DialogDescription className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed max-w-sm mx-auto">
+              Are you sure you want to end your active session and sign out of ENG Sports Events?
+            </DialogDescription>
           </div>
+        </div>
+
+        <div className="flex items-center gap-2.5 mt-6 pt-3 border-t border-slate-100 dark:border-slate-800">
+          <button
+            type="button"
+            onClick={onClose}
+            disabled={isLoading}
+            className="flex-1 h-9 rounded-md text-xs font-medium border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 transition-colors cursor-pointer disabled:opacity-50"
+          >
+            Cancel
+          </button>
+          <button
+            type="button"
+            onClick={onConfirm}
+            disabled={isLoading}
+            className="flex-1 h-9 rounded-md text-xs font-medium bg-red-600 hover:bg-red-700 text-white transition-colors cursor-pointer flex items-center justify-center gap-1.5 disabled:opacity-50"
+          >
+            {isLoading ? (
+              <div className="w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+            ) : (
+              <>
+                <LogOut className="w-3.5 h-3.5" />
+                <span>Sign Out</span>
+              </>
+            )}
+          </button>
         </div>
       </DialogContent>
     </Dialog>
