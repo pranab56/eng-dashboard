@@ -1,13 +1,12 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-"use client"
-import React from 'react';
+"use client";
+
+import React from "react";
+import Image from "next/image";
 import { ColumnDef } from "@tanstack/react-table";
 import { TUserManagement } from "@/types/columnTypes";
-import { HiOutlineTrash } from "react-icons/hi";
-import { FiEye } from "react-icons/fi";
 import { formatImagePath } from "@/utils/formatImagePath";
-import Image from "next/image";
-import { Users, Sparkles } from "lucide-react";
+import { Eye, Trash2, Users, User, CheckCircle2 } from "lucide-react";
 import dayjs from "dayjs";
 
 export const getParentColumns = (
@@ -16,32 +15,38 @@ export const getParentColumns = (
 ): ColumnDef<TUserManagement>[] => [
   {
     accessorKey: "userName",
-    header: () => <div className="min-w-[200px]">Parent Account Owner</div>,
+    header: () => <div className="min-w-[200px] text-slate-700 font-semibold text-xs">Parent Account Owner</div>,
     cell: ({ row }) => {
       const profileUrl = formatImagePath(row.original.profile || row.original.profilePic);
-      const name = row.original.firstName ? `${row.original.firstName} ${row.original.lastName || ''}`.trim() : (row.original.userName || row.original.name || 'Parent Account');
+      const name = row.original.firstName
+        ? `${row.original.firstName} ${row.original.lastName || ""}`.trim()
+        : (row.original.userName || row.original.name || "Parent Account");
       const initials = name.charAt(0).toUpperCase();
 
       return (
-        <div className="flex items-center gap-3 min-w-[200px]">
-          <div className="relative w-10 h-10 rounded-full bg-indigo-50 border border-indigo-200 overflow-hidden flex items-center justify-center shrink-0">
+        <div className="flex items-center gap-2.5 py-1 min-w-[200px]">
+          <div className="relative h-8 w-8 rounded-full bg-slate-100 border border-slate-200 overflow-hidden flex items-center justify-center shrink-0">
             {profileUrl ? (
               <Image
                 src={profileUrl}
                 alt={name}
                 fill
-                sizes="40px"
+                sizes="32px"
                 className="object-cover"
               />
             ) : (
-              <span className="text-sm font-bold text-indigo-700">{initials}</span>
+              <span className="text-[11px] font-semibold text-slate-600 uppercase select-none">
+                {initials}
+              </span>
             )}
           </div>
           <div className="min-w-0">
-            <p className="font-bold text-slate-900 text-xs truncate max-w-[180px]">{name}</p>
-            <p className="text-[11px] text-slate-500 font-medium truncate max-w-[180px]">{row.original.email || 'No email provided'}</p>
+            <p className="font-semibold text-slate-900 text-xs truncate max-w-[180px]">{name}</p>
+            <p className="text-[11px] text-slate-400 font-normal truncate max-w-[180px]">
+              {row.original.email || "No email provided"}
+            </p>
             {row.original.phone && (
-              <p className="text-[10px] text-slate-400 font-medium">{row.original.phone}</p>
+              <p className="text-[10px] text-slate-400 font-normal tabular-nums">{row.original.phone}</p>
             )}
           </div>
         </div>
@@ -50,13 +55,13 @@ export const getParentColumns = (
   },
   {
     accessorKey: "myPlayers",
-    header: () => <div className="min-w-[260px]">Registered Child Players & Plans</div>,
+    header: () => <div className="min-w-[240px] text-slate-700 font-semibold text-xs">Linked Children & Plans</div>,
     cell: ({ row }) => {
       const children = row.original.myPlayers || (row.original as any).children || [];
       if (!children || children.length === 0) {
         return (
-          <span className="text-[11px] font-semibold text-slate-400 bg-slate-50 px-2.5 py-1 rounded-md border border-slate-200">
-            No players added yet
+          <span className="text-[11px] font-medium text-slate-400 bg-slate-50 px-2 py-0.5 rounded border border-slate-200">
+            No players added
           </span>
         );
       }
@@ -65,31 +70,33 @@ export const getParentColumns = (
       const remainingCount = children.length - 3;
 
       return (
-        <div className="flex flex-col gap-1.5 min-w-[260px] max-w-[360px] whitespace-normal">
+        <div className="flex flex-col gap-1.5 min-w-[240px] max-w-[340px] py-1">
           {displayChildren.map((child: any, idx: number) => {
-            const childName = child.firstName ? `${child.firstName} ${child.lastName || ''}`.trim() : (child.userName || `Player ${idx + 1}`);
+            const childName = child.firstName
+              ? `${child.firstName} ${child.lastName || ""}`.trim()
+              : (child.userName || `Player ${idx + 1}`);
             const childSub = child.subscription || child.activeSubscription;
 
             return (
               <div
                 key={child._id || idx}
-                className="flex items-center justify-between gap-2 p-1.5 rounded-lg text-xs bg-slate-50 border border-slate-200 shadow-2xs"
+                className="flex items-center justify-between gap-2 px-2 py-1 rounded bg-slate-50 border border-slate-200 text-xs"
               >
                 <div className="flex items-center gap-1.5 min-w-0 flex-1">
-                  <Users className="w-3.5 h-3.5 text-indigo-600 shrink-0" />
-                  <span className="font-bold text-slate-900 truncate">{childName}</span>
+                  <User className="w-3 h-3 text-slate-500 shrink-0" />
+                  <span className="font-medium text-slate-800 truncate text-[11px]">{childName}</span>
                   {child.position && (
-                    <span className="text-[10px] text-slate-500 font-medium shrink-0">({child.position})</span>
+                    <span className="text-[10px] text-slate-400 shrink-0">({child.position})</span>
                   )}
                 </div>
 
                 {childSub ? (
-                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-bold bg-emerald-50 text-emerald-800 border border-emerald-200 shrink-0">
-                    <Sparkles className="w-2.5 h-2.5 text-emerald-600" />
-                    {childSub.packageName || 'Active'} • £{childSub.price}
+                  <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200 shrink-0">
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                    {childSub.packageName || "Active"} • £{childSub.price}
                   </span>
                 ) : (
-                  <span className="px-1.5 py-0.5 rounded text-[9px] font-semibold bg-slate-100 text-slate-500 border border-slate-200 shrink-0">
+                  <span className="px-1.5 py-0.5 rounded text-[9px] font-medium bg-slate-100 text-slate-500 border border-slate-200 shrink-0">
                     Free / Unpaid
                   </span>
                 )}
@@ -97,8 +104,8 @@ export const getParentColumns = (
             );
           })}
           {remainingCount > 0 && (
-            <span className="text-[10px] font-medium text-indigo-600 bg-indigo-50 border border-indigo-200 rounded px-2 py-0.5 w-fit">
-              +{remainingCount} more player{remainingCount > 1 ? 's' : ''}
+            <span className="text-[10px] font-medium text-slate-600 bg-slate-100 border border-slate-200 rounded px-1.5 py-0.5 w-fit">
+              +{remainingCount} more player{remainingCount > 1 ? "s" : ""}
             </span>
           )}
         </div>
@@ -107,7 +114,7 @@ export const getParentColumns = (
   },
   {
     accessorKey: "subscription",
-    header: () => <div className="min-w-[180px]">Subscription Status</div>,
+    header: () => <div className="min-w-[170px] text-slate-700 font-semibold text-xs">Subscription Entitlement</div>,
     cell: ({ row }) => {
       const children = row.original.myPlayers || (row.original as any).children || [];
       const paidChildren = children.filter((c: any) => Boolean(c.subscription || c.activeSubscription || c.isPaid));
@@ -115,20 +122,20 @@ export const getParentColumns = (
 
       if (paidChildren.length === 0 && !parentDirectSub) {
         return (
-          <span className="text-[11px] font-semibold text-slate-400 bg-slate-100 px-2.5 py-1 rounded-full border border-slate-200">
-            No Active Subscriptions
+          <span className="text-[11px] font-medium text-slate-400 bg-slate-50 px-2 py-0.5 rounded border border-slate-200">
+            No Active Plan
           </span>
         );
       }
 
       return (
-        <div className="flex flex-col gap-1 min-w-[180px] whitespace-normal">
-          <span className="inline-flex items-center gap-1.5 text-xs font-bold text-emerald-800 bg-emerald-50 px-2.5 py-1 rounded-lg border border-emerald-200 w-fit shadow-2xs">
-            <Sparkles className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
-            {paidChildren.length} {paidChildren.length === 1 ? 'Player Subscribed' : 'Players Subscribed'}
+        <div className="flex flex-col gap-1 min-w-[170px] py-1">
+          <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200 w-fit">
+            <CheckCircle2 className="w-3 h-3 text-emerald-600 shrink-0" />
+            {paidChildren.length} {paidChildren.length === 1 ? "Player Subscribed" : "Players Subscribed"}
           </span>
           <span className="text-[10px] text-slate-500 font-medium">
-            {paidChildren.map((c: any) => `${c.firstName || 'Player'}: £${(c.subscription || c.activeSubscription)?.price ?? 10}`).join(' • ')}
+            {paidChildren.map((c: any) => `${c.firstName || "Player"}: £${(c.subscription || c.activeSubscription)?.price ?? 10}`).join(" • ")}
           </span>
         </div>
       );
@@ -136,33 +143,34 @@ export const getParentColumns = (
   },
   {
     accessorKey: "createdAt",
-    header: () => <div className="min-w-[120px]">Joined Date</div>,
+    header: () => <div className="min-w-[110px] text-slate-700 font-semibold text-xs">Joined Date</div>,
     cell: ({ row }) => (
-      <span className="text-xs font-semibold text-slate-600 whitespace-nowrap">
+      <span className="text-xs font-medium text-slate-600 whitespace-nowrap tabular-nums">
         {row.original.createdAt ? dayjs(row.original.createdAt).format("MMM DD, YYYY") : "N/A"}
       </span>
     ),
   },
   {
     id: "action",
-    header: () => <div className="text-center min-w-[80px]">Action</div>,
+    header: () => <div className="text-right pr-4 text-slate-700 font-semibold text-xs">Actions</div>,
+    enableSorting: false,
     cell: ({ row }) => (
-      <div className="flex items-center justify-center gap-2 min-w-[80px]">
+      <div className="flex items-center justify-end gap-1 pr-2">
         <button
           type="button"
           onClick={() => onViewParent(row.original)}
-          className="flex items-center justify-center h-8 w-8 rounded-md bg-blue-50 hover:bg-blue-100 text-blue-600 transition-colors duration-200 cursor-pointer"
+          className="flex items-center justify-center h-7 w-7 rounded border border-slate-200 bg-white hover:bg-slate-50 text-slate-600 hover:text-slate-900 transition-colors cursor-pointer"
           title="View Parent & Child Details"
         >
-          <FiEye className="size-4" />
+          <Eye className="w-3.5 h-3.5" />
         </button>
         <button
           type="button"
           onClick={() => onDeleteParent(row.original)}
-          className="flex items-center justify-center h-8 w-8 rounded-md bg-red-50 hover:bg-red-100 text-red-600 transition-colors duration-200 cursor-pointer"
+          className="flex items-center justify-center h-7 w-7 rounded border border-slate-200 bg-white hover:bg-rose-50 text-slate-600 hover:text-rose-600 transition-colors cursor-pointer"
           title="Delete Parent Account"
         >
-          <HiOutlineTrash className="size-4" />
+          <Trash2 className="w-3.5 h-3.5" />
         </button>
       </div>
     ),

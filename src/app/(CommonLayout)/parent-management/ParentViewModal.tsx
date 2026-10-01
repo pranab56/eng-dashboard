@@ -1,15 +1,16 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-"use client"
-import React, { useState } from 'react';
+"use client";
+
+import React, { useState } from "react";
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import Image from 'next/image';
-import { TUserManagement } from '@/types/columnTypes';
-import { formatImagePath } from '@/utils/formatImagePath';
+import Image from "next/image";
+import { TUserManagement } from "@/types/columnTypes";
+import { formatImagePath } from "@/utils/formatImagePath";
 import {
   Mail,
   User,
@@ -17,14 +18,15 @@ import {
   Phone,
   X,
   Users,
-  Sparkles,
   Check,
   Copy,
   Building2,
   Coins,
-} from 'lucide-react';
-import dayjs from 'dayjs';
-import { toast } from 'sonner';
+  MapPin,
+  Calendar,
+} from "lucide-react";
+import dayjs from "dayjs";
+import { toast } from "sonner";
 
 interface ParentViewModalProps {
   parent: TUserManagement | null;
@@ -43,68 +45,45 @@ const ParentViewModal: React.FC<ParentViewModalProps> = ({
 
   const profileUrl = formatImagePath(parent.profile || (parent as any).profilePic);
   const fullName = parent.firstName
-    ? `${parent.firstName} ${parent.lastName || ''}`.trim()
-    : ((parent as any).userName || (parent as any).name || 'Parent Account Owner');
+    ? `${parent.firstName} ${parent.lastName || ""}`.trim()
+    : ((parent as any).userName || (parent as any).name || "Parent Account Owner");
 
   const initials = fullName.charAt(0).toUpperCase();
   const children = parent.myPlayers || (parent as any).children || [];
 
   const handleCopyText = async (text: string, label: string) => {
     if (!text) return;
-    let copied = false;
     try {
-      if (typeof navigator !== 'undefined' && navigator.clipboard && navigator.clipboard.writeText) {
+      if (typeof navigator !== "undefined" && navigator.clipboard && navigator.clipboard.writeText) {
         await navigator.clipboard.writeText(text);
-        copied = true;
       }
-    } catch {
-      copied = false;
-    }
-
-    if (!copied) {
-      try {
-        const textArea = document.createElement('textarea');
-        textArea.value = text;
-        textArea.style.position = 'fixed';
-        textArea.style.opacity = '0';
-        textArea.style.top = '0';
-        textArea.style.left = '0';
-        document.body.appendChild(textArea);
-        textArea.focus();
-        textArea.select();
-        copied = document.execCommand('copy');
-        document.body.removeChild(textArea);
-      } catch {
-        copied = false;
-      }
-    }
-
-    if (copied) {
       setCopiedField(label);
       toast.success(`${label} copied to clipboard`);
       setTimeout(() => setCopiedField(null), 2000);
-    } else {
+    } catch {
       toast.error(`Failed to copy ${label}`);
     }
   };
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent showCloseButton={false} className="sm:max-w-3xl bg-white rounded-3xl p-0 overflow-hidden border-none shadow-2xl max-h-[92vh] flex flex-col">
-
-        {/* Header Banner */}
-        <DialogHeader className="bg-indigo-50/80 p-5 sm:p-6 border-b border-indigo-100 relative">
+      <DialogContent
+        showCloseButton={false}
+        className="sm:max-w-3xl bg-white rounded-lg p-0 overflow-hidden border border-slate-200 shadow-xl max-h-[90vh] flex flex-col"
+      >
+        {/* Modal Header */}
+        <DialogHeader className="p-4 sm:p-5 border-b border-slate-200 bg-white relative">
           <button
             type="button"
             onClick={onClose}
-            className="absolute top-4 right-4 p-2 rounded-full bg-white/80 hover:bg-white text-slate-500 hover:text-slate-900 transition-all cursor-pointer z-30 shadow-xs"
-            title="Close Modal"
+            className="absolute top-4 right-4 h-7 w-7 rounded border border-slate-200 bg-white hover:bg-slate-50 text-slate-500 hover:text-slate-900 flex items-center justify-center transition-colors cursor-pointer"
+            title="Close dialog"
           >
-            <X className="w-4 h-4" />
+            <X className="w-3.5 h-3.5" />
           </button>
 
-          <div className="flex items-center gap-4">
-            <div className="relative w-16 h-16 rounded-2xl bg-white border border-indigo-200 overflow-hidden flex items-center justify-center shrink-0 shadow-sm">
+          <div className="flex items-center gap-3.5 pr-8">
+            <div className="relative h-12 w-12 rounded-full bg-slate-100 border border-slate-200 overflow-hidden flex items-center justify-center shrink-0">
               {profileUrl ? (
                 <Image
                   src={profileUrl}
@@ -113,90 +92,91 @@ const ParentViewModal: React.FC<ParentViewModalProps> = ({
                   className="object-cover"
                 />
               ) : (
-                <span className="text-2xl font-bold text-indigo-700">{initials}</span>
+                <span className="text-base font-semibold text-slate-600 uppercase select-none">
+                  {initials}
+                </span>
               )}
             </div>
 
-            <div>
-              <DialogTitle className="text-xl font-bold text-slate-900 flex items-center gap-2">
+            <div className="min-w-0">
+              <DialogTitle className="text-base font-bold text-slate-900 flex items-center gap-1.5 truncate">
                 {fullName}
                 {parent.verified && (
-                  <ShieldCheck className="w-5 h-5 text-emerald-600 shrink-0" />
+                  <span title="Verified Account"><ShieldCheck className="w-4 h-4 text-emerald-600 shrink-0" /></span>
                 )}
               </DialogTitle>
-              <p className="text-xs text-slate-500 font-medium mt-0.5 flex items-center gap-2">
-                <span>{parent.email || 'Parent Account Owner'}</span>
+              <div className="flex flex-wrap items-center gap-2 mt-0.5 text-xs text-slate-500">
+                <span className="truncate">{parent.email || "No email on record"}</span>
                 {parent.createdAt && (
                   <>
                     <span>•</span>
-                    <span>Member since {dayjs(parent.createdAt).format('MMM DD, YYYY')}</span>
+                    <span className="tabular-nums">
+                      Joined {dayjs(parent.createdAt).format("MMM DD, YYYY")}
+                    </span>
                   </>
                 )}
-              </p>
-
-              <div className="flex items-center gap-2 mt-2">
-                <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase bg-indigo-100 text-indigo-800 border border-indigo-200">
-                  Parent Account Owner
-                </span>
-
-                <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase bg-blue-50 text-blue-700 border border-blue-200">
-                  {children.length} {children.length === 1 ? 'Child Player' : 'Child Players'}
-                </span>
               </div>
             </div>
           </div>
         </DialogHeader>
 
-        {/* Modal Body Container */}
-        <div className="p-6 space-y-5 overflow-y-auto max-h-[68vh] hide-scrollbar text-slate-800">
+        {/* Modal Body */}
+        <div className="p-4 sm:p-6 space-y-4 overflow-y-auto max-h-[calc(90vh-130px)] text-slate-800">
+          {/* Primary Parent Contact Strip */}
+          <div className="border border-slate-200 rounded-md p-3.5 bg-slate-50/50 space-y-2.5">
+            <span className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider block">
+              Parent Contact & Account Details
+            </span>
 
-          {/* Primary Parent Contact Card */}
-          <div className="bg-slate-50/70 border border-slate-200/80 rounded-2xl p-4 space-y-3">
-            <h3 className="text-xs font-bold text-slate-900 uppercase tracking-wider flex items-center gap-1.5">
-              <User className="w-4 h-4 text-slate-600" /> Parent Profile Information
-            </h3>
-
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
               <div>
-                <p className="text-[11px] font-semibold text-slate-500">Full Name</p>
-                <p className="text-xs font-bold text-slate-900">{fullName}</p>
+                <span className="text-[11px] text-slate-400 block">Username / Account</span>
+                <span className="font-semibold text-slate-900 mt-0.5 block truncate">
+                  {(parent as any).userName || "N/A"}
+                </span>
               </div>
 
               <div>
-                <p className="text-[11px] font-semibold text-slate-500">Email Address</p>
-                <div className="flex items-center gap-1">
-                  <p className="text-xs font-semibold text-slate-800 truncate flex items-center gap-1">
-                    <Mail className="w-3.5 h-3.5 text-indigo-600 shrink-0" />
-                    {parent.email || 'N/A'}
-                  </p>
+                <span className="text-[11px] text-slate-400 block">Email Address</span>
+                <div className="flex items-center gap-1 mt-0.5">
+                  <Mail className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+                  <span className="font-medium text-slate-800 truncate">{parent.email || "N/A"}</span>
                   {parent.email && (
                     <button
                       type="button"
-                      onClick={() => handleCopyText(parent.email!, 'Parent Email')}
-                      className="p-1 text-slate-400 hover:text-slate-700 transition-colors cursor-pointer"
+                      onClick={() => handleCopyText(parent.email!, "Parent Email")}
+                      className="p-0.5 text-slate-400 hover:text-slate-700 cursor-pointer"
                       title="Copy Email"
                     >
-                      {copiedField === 'Parent Email' ? <Check className="w-3 h-3 text-emerald-600" /> : <Copy className="w-3 h-3" />}
+                      {copiedField === "Parent Email" ? (
+                        <Check className="w-3 h-3 text-emerald-600" />
+                      ) : (
+                        <Copy className="w-3 h-3" />
+                      )}
                     </button>
                   )}
                 </div>
               </div>
 
               <div>
-                <p className="text-[11px] font-semibold text-slate-500">Contact Phone</p>
-                <div className="flex items-center gap-1">
-                  <p className="text-xs font-semibold text-slate-800 flex items-center gap-1">
-                    <Phone className="w-3.5 h-3.5 text-indigo-600 shrink-0" />
-                    {parent.phone || 'N/A'}
-                  </p>
+                <span className="text-[11px] text-slate-400 block">Contact Phone</span>
+                <div className="flex items-center gap-1 mt-0.5">
+                  <Phone className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+                  <span className="font-medium text-slate-800 tabular-nums truncate">
+                    {parent.phone || "N/A"}
+                  </span>
                   {parent.phone && (
                     <button
                       type="button"
-                      onClick={() => handleCopyText(parent.phone!, 'Parent Phone')}
-                      className="p-1 text-slate-400 hover:text-slate-700 transition-colors cursor-pointer"
+                      onClick={() => handleCopyText(parent.phone!, "Parent Phone")}
+                      className="p-0.5 text-slate-400 hover:text-slate-700 cursor-pointer"
                       title="Copy Phone"
                     >
-                      {copiedField === 'Parent Phone' ? <Check className="w-3 h-3 text-emerald-600" /> : <Copy className="w-3 h-3" />}
+                      {copiedField === "Parent Phone" ? (
+                        <Check className="w-3 h-3 text-emerald-600" />
+                      ) : (
+                        <Copy className="w-3 h-3" />
+                      )}
                     </button>
                   )}
                 </div>
@@ -204,109 +184,117 @@ const ParentViewModal: React.FC<ParentViewModalProps> = ({
             </div>
           </div>
 
-          {/* Registered Child Players Section */}
+          {/* Linked Child Players Section */}
           <div className="space-y-3">
-            <div className="flex items-center justify-between">
-              <h3 className="text-xs font-bold text-slate-900 uppercase tracking-wider flex items-center gap-1.5">
-                <Users className="w-4 h-4 text-indigo-600" /> Registered Child Players ({children.length})
-              </h3>
+            <div className="flex items-center justify-between pb-1 border-b border-slate-200">
+              <div className="flex items-center gap-2">
+                <Users className="w-4 h-4 text-slate-600" />
+                <h3 className="text-xs font-bold text-slate-900 uppercase tracking-wider">
+                  Linked Child Players ({children.length})
+                </h3>
+              </div>
+              <span className="text-[11px] text-slate-500">
+                {children.filter((c: any) => Boolean(c.subscription || c.isPaid)).length} with active subscription
+              </span>
             </div>
 
             {children.length === 0 ? (
-              <div className="text-center py-8 bg-slate-50 rounded-2xl border border-slate-100">
-                <Users className="w-8 h-8 text-slate-300 mx-auto mb-2" />
-                <p className="text-xs font-semibold text-slate-600">No child players added under this parent yet</p>
+              <div className="p-6 text-center border border-dashed border-slate-200 rounded-md bg-slate-50/50">
+                <User className="w-6 h-6 text-slate-300 mx-auto mb-1.5" />
+                <p className="text-xs font-semibold text-slate-700">No Child Players Linked</p>
+                <p className="text-[11px] text-slate-400 mt-0.5">
+                  This parent has not completed registration for any children yet.
+                </p>
               </div>
             ) : (
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+              <div className="grid grid-cols-1 gap-2.5">
                 {children.map((child: any, idx: number) => {
                   const childName = child.firstName
-                    ? `${child.firstName} ${child.lastName || ''}`.trim()
-                    : (child.userName || `Player ${idx + 1}`);
-                  const childPic = formatImagePath(child.profile || child.profilePic);
-                  const childTeam = child.selectTeam;
+                    ? `${child.firstName} ${child.lastName || ""}`.trim()
+                    : (child.userName || `Child Player ${idx + 1}`);
+                  const childProfile = formatImagePath(child.profile || child.profilePic);
+                  const childSub = child.subscription || child.activeSubscription;
+                  const isPaid = Boolean(childSub || child.isPaid);
 
                   return (
                     <div
                       key={child._id || idx}
-                      className="bg-white border border-slate-200 rounded-2xl p-3.5 shadow-2xs hover:border-indigo-200 transition-all space-y-2.5"
+                      className="border border-slate-200 rounded-md p-3.5 bg-white flex flex-col sm:flex-row sm:items-center justify-between gap-3"
                     >
+                      {/* Left: Player Identity */}
                       <div className="flex items-center gap-3">
-                        <div className="relative w-11 h-11 rounded-xl bg-slate-100 border border-slate-200 overflow-hidden flex items-center justify-center shrink-0">
-                          {childPic ? (
+                        <div className="relative h-10 w-10 rounded-full bg-slate-100 border border-slate-200 overflow-hidden flex items-center justify-center shrink-0">
+                          {childProfile ? (
                             <Image
-                              src={childPic}
+                              src={childProfile}
                               alt={childName}
                               fill
                               className="object-cover"
                             />
                           ) : (
-                            <span className="text-sm font-bold text-slate-600">{childName.charAt(0).toUpperCase()}</span>
+                            <span className="text-xs font-bold text-slate-500 uppercase select-none">
+                              {childName.charAt(0)}
+                            </span>
                           )}
                         </div>
 
-                        <div className="flex-1 min-w-0">
-                          <p className="text-xs font-bold text-slate-900 truncate">{childName}</p>
-                          <div className="flex items-center gap-1.5 mt-0.5">
-                            {child.position && (
-                              <span className="text-[10px] font-semibold text-indigo-700 bg-indigo-50 px-2 py-0.2 rounded border border-indigo-200">
-                                {child.position}
-                              </span>
-                            )}
-                            {child.ageGroup && (
-                              <span className="text-[10px] font-semibold text-blue-700 bg-blue-50 px-2 py-0.2 rounded border border-blue-200">
-                                {child.ageGroup}
+                        <div className="min-w-0">
+                          <div className="flex items-center gap-1.5">
+                            <span className="font-semibold text-slate-900 text-xs truncate">
+                              {childName}
+                            </span>
+                            {child.status && (
+                              <span
+                                className={`text-[10px] font-semibold px-1.5 py-0.2 rounded border ${
+                                  child.status === "APPROVED"
+                                    ? "bg-emerald-50 text-emerald-700 border-emerald-200"
+                                    : "bg-slate-100 text-slate-600 border-slate-200"
+                                }`}
+                              >
+                                {child.status}
                               </span>
                             )}
                           </div>
+
+                          <div className="flex flex-wrap items-center gap-2 mt-0.5 text-[11px] text-slate-500">
+                            {child.position && <span>{child.position}</span>}
+                            {child.ageGroup && (
+                              <>
+                                <span>•</span>
+                                <span className="font-medium text-slate-700">{child.ageGroup}</span>
+                              </>
+                            )}
+                            {child.selectTeam?.teamName && (
+                              <>
+                                <span>•</span>
+                                <span className="text-slate-700 font-medium">
+                                  {child.selectTeam.teamName}
+                                </span>
+                              </>
+                            )}
+                          </div>
                         </div>
-
-                        <span className={`px-2 py-0.5 rounded-md text-[9px] font-bold uppercase border shrink-0 ${
-                          child.status === 'APPROVED' ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 'bg-amber-50 text-amber-700 border-amber-200'
-                        }`}>
-                          {child.status || 'PENDING'}
-                        </span>
                       </div>
 
-                      {/* Individual Child Subscription Details */}
-                      <div className="bg-slate-50 p-2 rounded-xl border border-slate-100 flex items-center justify-between text-[11px]">
-                        <span className="text-slate-500 font-semibold flex items-center gap-1">
-                          <Sparkles className="w-3 h-3 text-emerald-600" />
-                          Plan:
-                        </span>
-                        {(() => {
-                          const childSub = child.subscription || child.activeSubscription;
-                          if (!childSub) {
-                            return (
-                              <span className="font-medium text-slate-400 bg-white px-2 py-0.5 rounded border border-slate-200 text-[10px]">
-                                Free / Unsubscribed
-                              </span>
-                            );
-                          }
-                          const pName = childSub.packageName || childSub.package?.title || childSub.package?.packageName || childSub.package?.name || 'Active Plan';
-                          const pPrice = childSub.price ?? childSub.package?.price ?? 0;
-                          return (
-                            <span className="font-bold text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200 text-[10px]">
-                              {pName} • £{pPrice}
-                            </span>
-                          );
-                        })()}
-                      </div>
-
-                      <div className="pt-1.5 border-t border-slate-100 grid grid-cols-2 gap-2 text-[11px]">
-                        <div>
-                          <span className="text-slate-400 font-medium text-[10px] block">Assigned Team</span>
-                          <span className="font-semibold text-slate-800 flex items-center gap-1 truncate">
-                            <Building2 className="w-3 h-3 text-indigo-500 shrink-0" />
-                            {childTeam?.teamName || childTeam?.shortName || 'Not Assigned'}
+                      {/* Right: Subscription & Coins */}
+                      <div className="flex flex-wrap items-center gap-2 pt-2 sm:pt-0 border-t sm:border-t-0 border-slate-100">
+                        {/* Subscription Pill */}
+                        {isPaid && childSub ? (
+                          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[11px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                            {childSub.packageName || "ENG Subscription"} • £{childSub.price ?? 0}
                           </span>
-                        </div>
+                        ) : (
+                          <span className="px-2 py-0.5 rounded text-[11px] font-medium bg-slate-100 text-slate-500 border border-slate-200">
+                            Free / No Plan
+                          </span>
+                        )}
 
-                        <div>
-                          <span className="text-slate-400 font-medium text-[10px] block">ENG Coins</span>
-                          <span className="font-semibold text-amber-800 flex items-center gap-1">
-                            <Coins className="w-3 h-3 text-amber-600 shrink-0" />
-                            {Number(child.engCoine || child.coin || 0)} Coins
+                        {/* Coin Balance */}
+                        <div className="inline-flex items-center gap-1 px-2 py-0.5 rounded border border-slate-200 bg-slate-50 text-slate-700 text-[11px]">
+                          <Coins className="w-3 h-3 text-slate-500" />
+                          <span className="font-semibold tabular-nums">
+                            {Number(child.engCoine ?? child.coin ?? 0).toLocaleString()}
                           </span>
                         </div>
                       </div>
@@ -316,17 +304,16 @@ const ParentViewModal: React.FC<ParentViewModalProps> = ({
               </div>
             )}
           </div>
-
         </div>
 
-        {/* Footer */}
-        <div className="bg-slate-50 p-4 border-t border-slate-100 flex justify-end">
+        {/* Modal Footer */}
+        <div className="p-3 sm:px-5 border-t border-slate-200 bg-slate-50 flex items-center justify-end">
           <button
             type="button"
             onClick={onClose}
-            className="px-5 py-2.5 rounded-xl border border-slate-200 text-xs font-semibold text-slate-700 hover:bg-slate-100 transition-colors cursor-pointer"
+            className="h-8 px-3 rounded-md border border-slate-200 bg-white hover:bg-slate-100 text-slate-700 text-xs font-medium transition-colors cursor-pointer"
           >
-            Close Window
+            Close
           </button>
         </div>
       </DialogContent>

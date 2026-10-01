@@ -1,9 +1,7 @@
 import { baseApi } from "../../utils/apiBaseQuery";
 
-
 export const galleryApi = baseApi.injectEndpoints({
     endpoints: (builder) => ({
-
         createGallery: builder.mutation({
             query: (data) => ({
                 url: "/gallery",
@@ -12,8 +10,6 @@ export const galleryApi = baseApi.injectEndpoints({
             }),
             invalidatesTags: ["gallery"]
         }),
-
-
 
         updateGallery: builder.mutation({
             query: ({ data, id }) => ({
@@ -41,6 +37,19 @@ export const galleryApi = baseApi.injectEndpoints({
             providesTags: ["gallery"]
         }),
 
+        getGalleryOverview: builder.query({
+            query: ({ category } = {}) => {
+                let url = "/gallery/overview";
+                if (category && category !== "ALL") {
+                    url += `?category=${encodeURIComponent(category)}`;
+                }
+                return {
+                    url,
+                    method: "GET",
+                };
+            },
+            providesTags: ["gallery"]
+        }),
 
         deleteGallery: builder.mutation({
             query: (id) => ({
@@ -67,7 +76,6 @@ export const galleryApi = baseApi.injectEndpoints({
             }),
             invalidatesTags: ["gallery"]
         }),
-
 
         getAllCategory: builder.query({
             query: () => ({
@@ -100,6 +108,7 @@ export const {
     useCreateGalleryMutation,
     useUpdateGalleryMutation,
     useGetAllGalleryQuery,
+    useGetGalleryOverviewQuery,
     useDeleteGalleryMutation,
     useCreateCategoryMutation,
     useCreateSubCategoryMutation,

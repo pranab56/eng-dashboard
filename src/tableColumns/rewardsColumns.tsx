@@ -1,9 +1,10 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import React from "react";
 import { ColumnDef } from "@tanstack/react-table";
 import Image from "next/image";
 import Link from "next/link";
-import { FiEdit, FiEye, FiTrash2 } from "react-icons/fi";
-import { QrCode, Users } from "lucide-react";
-import { formatImagePath } from '../utils/formatImagePath';
+import { Eye, Pencil, Trash2, QrCode, Users, Coffee, Package } from "lucide-react";
+import { formatImagePath } from "../utils/formatImagePath";
 
 export const getRewardsColumns = (
   onView: (reward: any) => void,
@@ -13,88 +14,190 @@ export const getRewardsColumns = (
 ): ColumnDef<any>[] => [
   {
     accessorKey: "brand",
-    header: () => <div className="">Reward Details</div>,
-    cell: ({ row }) => (
-      <div className="flex items-center gap-3">
-        {row.original.image ? (
-          <Image src={formatImagePath(row.original.image)} alt="reward" width={100} height={100} className="w-12 h-12 rounded-xl border border-gray-100 object-cover" />
-        ) : (
-          <div className="w-12 h-12 rounded-xl bg-gray-50 border border-gray-100 flex items-center justify-center text-[10px] font-black text-gray-300">VOID</div>
-        )}
-        <div className="flex flex-col">
-          <span className="font-medium text-gray-900 leading-tight">{row.getValue("brand")}</span>
-          <span className="text-[10px] text-gray-400 font-medium . tracking-widest mt-0.5">{row.original.productType}</span>
-        </div>
-      </div>
-    ),
-  },
-  {
-    accessorKey: "point",
-    header: () => <div className="text-center">Points</div>,
-    cell: ({ row }) => (
-      <div className="flex items-center justify-center gap-1">
-        <span className="font-black text-gray-900">{row.getValue("point")}</span>
-        <span className="text-[10px] font-medium text-gray-400 . tracking-tighter">pts</span>
-      </div>
-    ),
-  },
-  {
-    accessorKey: "status",
-    header: () => <div className="text-center">Status</div>,
+    header: () => <span className="font-semibold text-xs text-slate-700">Reward Item</span>,
     cell: ({ row }) => {
-      const status = row.getValue("status") as string;
+      const reward = row.original;
+      const isCoffee = reward.productType === "Coffee";
+      const imageSrc = reward.image ? formatImagePath(reward.image) : null;
+
       return (
-        <div className="flex justify-center">
-          <div className={`px-3 py-1 rounded-full text-[10px] font-black . tracking-widest border inline-block ${status === 'publish' ? 'bg-green-50 text-green-600 border-green-100' : 'bg-orange-50 text-orange-600 border-orange-100'
-            }`}>
-            {status}
+        <div className="flex items-center gap-3">
+          <div className="relative w-10 h-10 rounded-md border border-slate-200 bg-slate-50 overflow-hidden flex items-center justify-center shrink-0">
+            {imageSrc ? (
+              <Image
+                src={imageSrc}
+                alt={reward.brand || "Reward"}
+                fill
+                className="object-contain p-1"
+              />
+            ) : isCoffee ? (
+              <Coffee className="w-5 h-5 text-amber-600" />
+            ) : (
+              <Package className="w-5 h-5 text-slate-400" />
+            )}
+          </div>
+          <div className="min-w-0">
+            <p className="font-semibold text-xs sm:text-sm text-slate-900 truncate">
+              {reward.brand}
+            </p>
+            <p className="text-[11px] text-slate-500 font-medium truncate mt-0.5">
+              {isCoffee ? "Instant QR Code" : "Physical Merchandise"}
+            </p>
           </div>
         </div>
       );
     },
   },
   {
+    accessorKey: "productType",
+    header: () => <span className="font-semibold text-xs text-slate-700">Category</span>,
+    cell: ({ row }) => {
+      const isCoffee = row.original.productType === "Coffee";
+      return (
+        <div className="flex items-center">
+          <span
+            className={`inline-flex items-center gap-1 px-2 py-0.5 rounded text-[11px] font-medium border ${
+              isCoffee
+                ? "bg-amber-50 text-amber-800 border-amber-200"
+                : "bg-slate-100 text-slate-700 border-slate-200"
+            }`}
+          >
+            {isCoffee ? (
+              <>
+                <Coffee className="w-3 h-3 text-amber-600" />
+                <span>Coffee</span>
+              </>
+            ) : (
+              <>
+                <Package className="w-3 h-3 text-slate-500" />
+                <span>Merchandise</span>
+              </>
+            )}
+          </span>
+        </div>
+      );
+    },
+  },
+  {
+    accessorKey: "point",
+    header: () => <span className="font-semibold text-xs text-slate-700">Points Cost</span>,
+    cell: ({ row }) => {
+      const point = row.original.point ?? 0;
+      const formatted = Number(point).toLocaleString();
+      return (
+        <div className="flex items-baseline gap-1">
+          <span className="font-semibold text-xs sm:text-sm text-slate-900 tabular-nums">
+            {formatted}
+          </span>
+          <span className="text-[11px] text-slate-400 font-medium">pts</span>
+        </div>
+      );
+    },
+  },
+  {
+    id: "claims",
+    header: () => <span className="font-semibold text-xs text-slate-700">Redemptions</span>,
+    cell: ({ row }) => {
+      const reward = row.original;
+      const isCoffee = reward.productType === "Coffee";
+      const count = Array.isArray(reward.redeemedUsers) ? reward.redeemedUsers.length : 0;
+
+      if (isCoffee) {
+        return (
+          <span className="inline-flex items-center gap-1 text-xs font-medium text-slate-700 tabular-nums">
+            <Users className="w-3.5 h-3.5 text-slate-400" />
+            <span>{count} claims</span>
+          </span>
+        );
+      }
+
+      return (
+        <span className="text-xs text-slate-400 font-medium">
+          Order dispatch
+        </span>
+      );
+    },
+  },
+  {
+    accessorKey: "status",
+    header: () => <span className="font-semibold text-xs text-slate-700">Status</span>,
+    cell: ({ row }) => {
+      const status = (row.getValue("status") as string) || "publish";
+      const isPublished = status.toLowerCase() === "publish" || status.toLowerCase() === "active";
+
+      return (
+        <span
+          className={`inline-flex items-center px-2 py-0.5 rounded text-[11px] font-medium border capitalize ${
+            isPublished
+              ? "bg-emerald-50 text-emerald-700 border-emerald-200"
+              : "bg-slate-100 text-slate-600 border-slate-200"
+          }`}
+        >
+          {status}
+        </span>
+      );
+    },
+  },
+  {
     id: "action",
-    size: 150,
-    header: () => <div className="text-right">Action</div>,
-    cell: ({ row }) => (
-      <div className="flex items-center justify-end gap-2">
-        {onShowQr && row.original.productType === "Coffee" && (
+    header: () => <span className="sr-only">Actions</span>,
+    cell: ({ row }) => {
+      const reward = row.original;
+      const isCoffee = reward.productType === "Coffee";
+
+      return (
+        <div className="flex items-center justify-end gap-1">
+          {onShowQr && isCoffee && (
+            <button
+              type="button"
+              onClick={() => onShowQr(reward)}
+              title="View QR Code"
+              className="p-1.5 rounded-md border border-slate-200 text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-colors cursor-pointer"
+            >
+              <QrCode className="w-3.5 h-3.5 text-amber-700" />
+            </button>
+          )}
+
+          {onShowHistory && isCoffee && (
+            <button
+              type="button"
+              onClick={() => onShowHistory(reward)}
+              title="Redeemed Users History"
+              className="p-1.5 rounded-md border border-slate-200 text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-colors cursor-pointer"
+            >
+              <Users className="w-3.5 h-3.5 text-slate-600" />
+            </button>
+          )}
+
           <button
-            onClick={() => onShowQr(row.original)}
-            title="View Coffee QR Code"
-            className="flex items-center justify-center h-9 w-9 rounded-sm bg-amber-50 hover:bg-amber-100 text-amber-700 transition-colors duration-300 cursor-pointer border border-amber-200"
+            type="button"
+            onClick={() => onView(reward)}
+            title="View Details"
+            className="p-1.5 rounded-md border border-slate-200 text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-colors cursor-pointer"
           >
-            <QrCode className="size-4 text-amber-600" />
+            <Eye className="w-3.5 h-3.5" />
           </button>
-        )}
-        {onShowHistory && row.original.productType === "Coffee" && (
+
+          <Link href={`/rewards-redemption/create-reward/?id=${reward._id}`}>
+            <button
+              type="button"
+              title="Edit Reward"
+              className="p-1.5 rounded-md border border-slate-200 text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-colors cursor-pointer"
+            >
+              <Pencil className="w-3.5 h-3.5" />
+            </button>
+          </Link>
+
           <button
-            onClick={() => onShowHistory(row.original)}
-            title="View Redeemed Users History"
-            className="flex items-center justify-center h-9 w-9 rounded-sm bg-blue-50 hover:bg-blue-100 text-blue-700 transition-colors duration-300 cursor-pointer border border-blue-200"
+            type="button"
+            onClick={() => onDelete(reward._id)}
+            title="Delete Reward"
+            className="p-1.5 rounded-md border border-slate-200 text-slate-500 hover:text-rose-600 hover:border-rose-200 hover:bg-rose-50 transition-colors cursor-pointer"
           >
-            <Users className="size-4 text-blue-600" />
+            <Trash2 className="w-3.5 h-3.5" />
           </button>
-        )}
-        <button
-          onClick={() => onView(row.original)}
-          className="flex items-center justify-center h-9 w-9 rounded-sm bg-[#F3F3F3] hover:bg-gray-200 transition-colors duration-300 cursor-pointer text-gray-800"
-        >
-          <FiEye className="size-5 font-medium" />
-        </button>
-        <Link href={`/rewards-redemption/create-reward/?id=${row.original._id}`}>
-          <button className="flex items-center justify-center h-9 w-9 rounded-sm bg-[#F3F3F3] hover:bg-gray-200 transition-colors duration-300 cursor-pointer text-gray-800">
-            <FiEdit className="size-5 font-medium" />
-          </button>
-        </Link>
-        <button
-          onClick={() => onDelete(row.original._id)}
-          className="flex items-center justify-center h-9 w-9 rounded-sm bg-[#F3F3F3] hover:bg-red-50 hover:text-red-600 transition-colors duration-300 cursor-pointer"
-        >
-          <FiTrash2 className="size-5 font-medium" />
-        </button>
-      </div>
-    ),
-  }
-]
+        </div>
+      );
+    },
+  },
+];

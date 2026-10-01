@@ -76,6 +76,13 @@ export const userApi = baseApi.injectEndpoints({
       invalidatesTags: ["user"]
     }),
 
+    getParentOverview: builder.query({
+      query: () => ({
+        url: "/user-management/parents/overview",
+        method: "GET",
+      }),
+      providesTags: ["user", "parent"],
+    }),
     getAllParents: builder.query({
       query: (params) => {
         let pageNumber = 1;
@@ -162,6 +169,7 @@ export const userApi = baseApi.injectEndpoints({
 export const {
   useGetUserQuery,
   useGetAllParentsQuery,
+  useGetParentOverviewQuery,
   useGetIncompleteUsersQuery,
   useGetIncompleteUsersAnalyticsQuery,
   useAssignTeamToUserMutation,

@@ -10,6 +10,14 @@ export const tableApi = baseApi.injectEndpoints({
       }),
       providesTags: ["table"],
     }),
+    getTableOverview: builder.query({
+      query: (params) => ({
+        url: `/point-table/overview`,
+        method: "GET",
+        params,
+      }),
+      providesTags: ["table"],
+    }),
     updateTableStanding: builder.mutation({
       query: (data) => ({
         url: `/point-table`,
@@ -32,6 +40,7 @@ export const tableApi = baseApi.injectEndpoints({
 // Export hooks
 export const {
   useGetAllTableQuery,
+  useGetTableOverviewQuery,
   useUpdateTableStandingMutation,
   useResetTableStandingMutation,
 } = tableApi;

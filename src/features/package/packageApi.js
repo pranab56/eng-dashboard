@@ -1,6 +1,5 @@
 import { baseApi } from "../../utils/apiBaseQuery";
 
-
 export const packageApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
     createPackage: builder.mutation({
@@ -29,6 +28,20 @@ export const packageApi = baseApi.injectEndpoints({
       providesTags: ["package"]
     }),
 
+    getPackageOverview: builder.query({
+      query: ({ userType } = {}) => {
+        let url = "/package/overview";
+        if (userType && userType !== "ALL") {
+          url += `?userType=${encodeURIComponent(userType)}`;
+        }
+        return {
+          url,
+          method: "GET",
+        };
+      },
+      providesTags: ["package"]
+    }),
+
     togglePackageStatus: builder.mutation({
       query: ({ id }) => ({
         url: `/package/toggle/${id}`,
@@ -44,5 +57,6 @@ export const {
   useCreatePackageMutation,
   useUpdatePackageMutation,
   useGetAllPackageQuery,
+  useGetPackageOverviewQuery,
   useTogglePackageStatusMutation
 } = packageApi;

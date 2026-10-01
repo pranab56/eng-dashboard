@@ -1,54 +1,78 @@
 import { ColumnDef } from "@tanstack/react-table";
 import Image from "next/image";
 import { formatImagePath } from "../utils/formatImagePath";
-import { Edit3 } from "lucide-react";
+import { Pencil } from "lucide-react";
 
 export const getTableColumns = (
   onEdit?: (standing: any) => void
 ): ColumnDef<any>[] => [
   {
     id: "rank",
-    header: () => <div className="text-center font-semibold">#</div>,
-    cell: ({ row }) => (
-      <div className="text-center font-semibold text-gray-700">
-        {row.index + 1}
+    header: () => (
+      <div className="text-center text-xs font-semibold text-slate-600 uppercase tracking-wider py-1">
+        Pos
       </div>
     ),
+    cell: ({ row }) => {
+      const pos = row.index + 1;
+      let badgeStyle = "text-slate-500 font-medium";
+      if (pos === 1) {
+        badgeStyle = "bg-blue-50 text-blue-700 border border-blue-200 font-bold";
+      } else if (pos <= 4) {
+        badgeStyle = "bg-slate-100 text-slate-700 border border-slate-200 font-semibold";
+      }
+
+      return (
+        <div className="flex items-center justify-center">
+          <span
+            className={`w-6 h-6 rounded flex items-center justify-center text-xs font-mono tabular-nums ${badgeStyle}`}
+          >
+            {pos}
+          </span>
+        </div>
+      );
+    },
   },
   {
     accessorKey: "team",
-    header: () => <div className="font-semibold">Team</div>,
+    header: () => (
+      <div className="text-left text-xs font-semibold text-slate-600 uppercase tracking-wider py-1">
+        Club / Team
+      </div>
+    ),
     cell: ({ row }) => {
       const team = row.original.team;
       const isManual = row.original.isManual;
       return (
-        <div className="flex items-center gap-2.5">
+        <div className="flex items-center gap-3 py-0.5">
           {team?.teamLogo ? (
-            <Image
-              src={formatImagePath(team.teamLogo)}
-              alt="logo"
-              width={36}
-              height={36}
-              className="w-8 h-8 rounded-full border border-gray-200 object-cover"
-            />
+            <div className="w-8 h-8 rounded-full border border-slate-200 overflow-hidden bg-white shrink-0 flex items-center justify-center">
+              <Image
+                src={formatImagePath(team.teamLogo)}
+                alt={team?.teamName || "Club crest"}
+                width={32}
+                height={32}
+                className="w-full h-full object-cover"
+              />
+            </div>
           ) : (
-            <div className="w-8 h-8 rounded-full bg-gray-100 border border-gray-200 flex items-center justify-center text-[10px] font-medium text-gray-500">
-              {team?.shortName || "FC"}
+            <div className="w-8 h-8 rounded-full bg-slate-100 border border-slate-200 flex items-center justify-center text-[10px] font-mono font-semibold text-slate-600 shrink-0">
+              {team?.shortName?.slice(0, 3) || "FC"}
             </div>
           )}
-          <div className="flex flex-col">
-            <div className="flex items-center gap-1.5">
-              <span className="font-medium text-gray-900 leading-tight">
-                {team?.teamName || "Team"}
+          <div className="flex flex-col min-w-0">
+            <div className="flex items-center gap-2 flex-wrap">
+              <span className="font-semibold text-slate-900 text-sm truncate max-w-[200px] sm:max-w-xs">
+                {team?.teamName || "Unnamed Team"}
               </span>
               {isManual && (
-                <span className="text-[10px] text-gray-400 font-normal">
-                  (Manual)
+                <span className="inline-flex items-center px-1.5 py-0.2 rounded text-[10px] font-medium bg-amber-50 text-amber-700 border border-amber-200/80">
+                  Manual Override
                 </span>
               )}
             </div>
             {team?.shortName && (
-              <span className="text-[11px] text-gray-400">
+              <span className="text-[11px] font-mono text-slate-400">
                 {team.shortName}
               </span>
             )}
@@ -59,80 +83,140 @@ export const getTableColumns = (
   },
   {
     accessorKey: "played",
-    header: () => <div className="text-center font-semibold">P</div>,
+    header: () => (
+      <div
+        className="text-center text-xs font-semibold text-slate-600 uppercase tracking-wider py-1"
+        title="Matches Played"
+      >
+        P
+      </div>
+    ),
     cell: ({ row }) => (
-      <div className="text-center font-medium text-gray-800">
-        {row.getValue("played")}
+      <div className="text-center font-mono text-xs font-medium text-slate-800 tabular-nums">
+        {row.getValue("played") ?? 0}
       </div>
     ),
   },
   {
     accessorKey: "win",
-    header: () => <div className="text-center font-semibold">W</div>,
+    header: () => (
+      <div
+        className="text-center text-xs font-semibold text-slate-600 uppercase tracking-wider py-1"
+        title="Matches Won"
+      >
+        W
+      </div>
+    ),
     cell: ({ row }) => (
-      <div className="text-center text-gray-600">
-        {row.getValue("win")}
+      <div className="text-center font-mono text-xs text-slate-600 tabular-nums">
+        {row.getValue("win") ?? 0}
       </div>
     ),
   },
   {
     accessorKey: "draw",
-    header: () => <div className="text-center font-semibold">D</div>,
+    header: () => (
+      <div
+        className="text-center text-xs font-semibold text-slate-600 uppercase tracking-wider py-1"
+        title="Matches Drawn"
+      >
+        D
+      </div>
+    ),
     cell: ({ row }) => (
-      <div className="text-center text-gray-600">
-        {row.getValue("draw")}
+      <div className="text-center font-mono text-xs text-slate-600 tabular-nums">
+        {row.getValue("draw") ?? 0}
       </div>
     ),
   },
   {
     accessorKey: "loss",
-    header: () => <div className="text-center font-semibold">L</div>,
+    header: () => (
+      <div
+        className="text-center text-xs font-semibold text-slate-600 uppercase tracking-wider py-1"
+        title="Matches Lost"
+      >
+        L
+      </div>
+    ),
     cell: ({ row }) => (
-      <div className="text-center text-gray-600">
-        {row.getValue("loss")}
+      <div className="text-center font-mono text-xs text-slate-600 tabular-nums">
+        {row.getValue("loss") ?? 0}
       </div>
     ),
   },
   {
     accessorKey: "goalsFor",
-    header: () => <div className="text-center font-semibold">GF</div>,
+    header: () => (
+      <div
+        className="text-center text-xs font-semibold text-slate-600 uppercase tracking-wider py-1"
+        title="Goals For (Scored)"
+      >
+        GF
+      </div>
+    ),
     cell: ({ row }) => (
-      <div className="text-center text-gray-600">
+      <div className="text-center font-mono text-xs text-slate-600 tabular-nums">
         {row.original.goalsFor ?? 0}
       </div>
     ),
   },
   {
     accessorKey: "goalsAgainst",
-    header: () => <div className="text-center font-semibold">GA</div>,
+    header: () => (
+      <div
+        className="text-center text-xs font-semibold text-slate-600 uppercase tracking-wider py-1"
+        title="Goals Against (Conceded)"
+      >
+        GA
+      </div>
+    ),
     cell: ({ row }) => (
-      <div className="text-center text-gray-600">
+      <div className="text-center font-mono text-xs text-slate-600 tabular-nums">
         {row.original.goalsAgainst ?? 0}
       </div>
     ),
   },
   {
     accessorKey: "goalDifference",
-    header: () => <div className="text-center font-semibold">GD</div>,
+    header: () => (
+      <div
+        className="text-center text-xs font-semibold text-slate-600 uppercase tracking-wider py-1"
+        title="Goal Difference"
+      >
+        GD
+      </div>
+    ),
     cell: ({ row }) => {
       const gd = Number(row.getValue("goalDifference") ?? 0);
+      const sign = gd > 0 ? `+${gd}` : gd;
+      const colorClass =
+        gd > 0
+          ? "text-emerald-700 font-semibold"
+          : gd < 0
+          ? "text-rose-600 font-semibold"
+          : "text-slate-400 font-normal";
+
       return (
-        <div
-          className={`text-center font-medium ${
-            gd > 0 ? "text-emerald-600" : gd < 0 ? "text-red-600" : "text-gray-500"
-          }`}
-        >
-          {gd > 0 ? `+${gd}` : gd}
+        <div className={`text-center font-mono text-xs tabular-nums ${colorClass}`}>
+          {sign}
         </div>
       );
     },
   },
   {
     accessorKey: "points",
-    header: () => <div className="text-center font-semibold">PTS</div>,
+    header: () => (
+      <div
+        className="text-center text-xs font-bold text-slate-900 uppercase tracking-wider py-1"
+        title="Total Points"
+      >
+        PTS
+      </div>
+    ),
     cell: ({ row }) => (
-      <div className="text-center font-bold text-gray-900">
-        {row.getValue("points")}
+      <div className="text-center font-mono text-sm font-bold text-slate-950 tabular-nums">
+        {row.getValue("points") ?? 0}
       </div>
     ),
   },
@@ -140,16 +224,20 @@ export const getTableColumns = (
     ? [
         {
           id: "action",
-          header: () => <div className="text-right font-semibold pr-3">Action</div>,
+          header: () => (
+            <div className="text-right text-xs font-semibold text-slate-600 uppercase tracking-wider pr-3 py-1">
+              Action
+            </div>
+          ),
           cell: ({ row }: any) => (
             <div className="flex items-center justify-end pr-1">
               <button
                 type="button"
                 onClick={() => onEdit(row.original)}
-                className="inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-medium text-gray-700 hover:text-blue-600 bg-white border border-gray-200 hover:border-blue-300 rounded-md transition-colors cursor-pointer"
-                title="Edit standing"
+                className="inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-medium text-slate-700 hover:text-slate-900 bg-white hover:bg-slate-50 border border-slate-200 hover:border-slate-300 rounded-md transition-colors cursor-pointer shadow-2xs"
+                title="Edit table standing"
               >
-                <Edit3 className="w-3.5 h-3.5" />
+                <Pencil className="w-3.5 h-3.5 text-slate-500" />
                 <span>Edit</span>
               </button>
             </div>

@@ -1,6 +1,7 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
-import React from "react";
+import React, { useState, useMemo } from "react";
 import {
   Dialog,
   DialogContent,
@@ -11,7 +12,7 @@ import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 import Image from "next/image";
 import { formatImagePath } from "@/utils/formatImagePath";
-import { X, Coffee, Users, Sparkles } from "lucide-react";
+import { X, Coffee, Users, Search } from "lucide-react";
 
 dayjs.extend(relativeTime);
 
@@ -26,83 +27,131 @@ const RewardRedeemedHistoryModal: React.FC<RewardRedeemedHistoryModalProps> = ({
   isOpen,
   onClose,
 }) => {
-  if (!reward) return null;
+  const [searchTerm, setSearchTerm] = useState("");
 
-  const redeemedUsers: any[] = reward.redeemedUsers || [];
-  const totalCount = redeemedUsers.length;
+  const redeemedUsers: any[] = useMemo(() => {
+    return reward?.redeemedUsers || [];
+  }, [reward]);
+
+  const filteredUsers = useMemo(() => {
+    if (!searchTerm.trim()) return redeemedUsers;
+    const q = searchTerm.toLowerCase().trim();
+
+    return redeemedUsers.filter((ru: any) => {
+      const userObj = ru.user;
+      if (!userObj) return false;
+
+      const name = (
+        userObj.fullName ||
+        [userObj.firstName, userObj.lastName].filter(Boolean).join(" ") ||
+        userObj.userName ||
+        ""
+      ).toLowerCase();
+
+      const email = (
+        userObj.email ||
+        userObj.emergencyEmail ||
+        userObj.parentId?.email ||
+        ""
+      ).toLowerCase();
+
+      return name.includes(q) || email.includes(q);
+    });
+  }, [redeemedUsers, searchTerm]);
+
+  if (!reward) return null;
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent
         showCloseButton={false}
-        className="sm:max-w-2xl bg-white rounded-3xl p-0 overflow-hidden border-none shadow-2xl max-h-[90vh] flex flex-col animate-in zoom-in-95 duration-200"
+        className="sm:max-w-2xl bg-white rounded-lg p-0 overflow-hidden border border-slate-200 shadow-lg text-slate-900 flex flex-col max-h-[85vh]"
       >
-        {/* 🧼 CLEAN LIGHT HEADER */}
-        <DialogHeader className="bg-slate-50 p-5 sm:p-6 border-b border-slate-100 relative shrink-0">
+        {/* Header */}
+        <DialogHeader className="px-5 py-4 border-b border-slate-100 bg-slate-50/70 flex flex-row items-center justify-between shrink-0">
+          <div className="flex items-center gap-2.5 min-w-0">
+            <div className="w-7 h-7 rounded border border-amber-200 bg-amber-50 text-amber-800 flex items-center justify-center shrink-0">
+              <Coffee className="w-4 h-4" />
+            </div>
+            <div className="min-w-0">
+              <div className="flex items-center gap-2">
+                <DialogTitle className="text-sm sm:text-base font-semibold text-slate-900 truncate">
+                  {reward.brand}
+                </DialogTitle>
+                <span className="px-2 py-0.5 rounded text-[10px] font-semibold bg-slate-100 text-slate-700 border border-slate-200 tabular-nums">
+                  {redeemedUsers.length} claims
+                </span>
+              </div>
+              <p className="text-[11px] text-slate-500 font-medium">
+                Redemption history log ({Number(reward.point || 0).toLocaleString()} pts per claim)
+              </p>
+            </div>
+          </div>
+
           <button
             type="button"
             onClick={onClose}
-            className="absolute top-4 right-4 p-2 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 hover:text-slate-900 transition-all cursor-pointer z-30"
+            className="p-1 rounded-md text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors cursor-pointer"
+            title="Close"
           >
             <X className="w-4 h-4" />
           </button>
-
-          <div className="flex items-center gap-4">
-            <div className="w-12 h-12 rounded-2xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-600 shrink-0 shadow-sm">
-              <Coffee className="w-6 h-6" />
-            </div>
-
-            <div className="space-y-0.5">
-              <DialogTitle className="text-lg sm:text-xl font-bold text-slate-900 flex items-center gap-2">
-                <span>{reward.brand}</span>
-                <span className="text-xs font-semibold text-slate-500 font-normal">
-                  ({reward.productType || "Reward"})
-                </span>
-              </DialogTitle>
-
-              <div className="flex items-center gap-2 text-xs font-medium text-slate-500">
-                <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-amber-50 text-amber-800 border border-amber-200">
-                  <Users className="w-3 h-3 text-amber-600" />
-                  {totalCount} Total Redemption{totalCount === 1 ? "" : "s"}
-                </span>
-                <span>•</span>
-                <span className="flex items-center gap-1 font-bold text-slate-700">
-                  <Sparkles className="w-3.5 h-3.5 text-amber-500" />
-                  {reward.point || 0} pts
-                </span>
-              </div>
-            </div>
-          </div>
         </DialogHeader>
 
-        {/* 📜 REDEEMED USERS LIST BODY */}
-        <div className="p-6 sm:p-8 space-y-4 overflow-y-auto max-h-[72vh] hide-scrollbar text-slate-800 flex-1">
-          {redeemedUsers.length > 0 ? (
-            <div className="space-y-3">
-              {redeemedUsers.map((ru: any, idx: number) => {
+        {/* Filter Toolbar */}
+        {redeemedUsers.length > 0 && (
+          <div className="px-5 py-2.5 border-b border-slate-100 bg-white shrink-0">
+            <div className="relative w-full">
+              <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400 w-3.5 h-3.5" />
+              <input
+                type="text"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                placeholder="Filter by player name or email..."
+                className="w-full h-8 pl-8 pr-3 bg-white border border-slate-200 rounded-md text-xs text-slate-900 placeholder:text-slate-400 outline-none focus:border-slate-400 focus:ring-1 focus:ring-slate-400 transition-colors"
+              />
+            </div>
+          </div>
+        )}
+
+        {/* User Claims List */}
+        <div className="p-4 sm:p-5 overflow-y-auto flex-1 space-y-2">
+          {redeemedUsers.length === 0 ? (
+            <div className="py-12 px-4 text-center">
+              <div className="w-9 h-9 rounded-md bg-slate-100 text-slate-400 flex items-center justify-center mx-auto mb-2">
+                <Users className="w-4 h-4" />
+              </div>
+              <p className="text-xs font-semibold text-slate-800">No redemptions yet</p>
+              <p className="text-[11px] text-slate-400 max-w-xs mx-auto mt-0.5">
+                When players scan the QR code to claim this item, their claim records will appear here.
+              </p>
+            </div>
+          ) : filteredUsers.length === 0 ? (
+            <div className="py-8 text-center text-xs text-slate-500">
+              No redeemed records matched &ldquo;{searchTerm}&rdquo;
+            </div>
+          ) : (
+            <div className="border border-slate-200 rounded-md overflow-hidden bg-white divide-y divide-slate-100">
+              {filteredUsers.map((ru: any, idx: number) => {
                 const userObj = ru.user;
                 const isPopulated = typeof userObj === "object" && userObj !== null;
 
                 const playerName = isPopulated
-                  ? (
-                      userObj.fullName ||
-                      [userObj.firstName, userObj.lastName].filter(Boolean).join(" ").trim() ||
-                      userObj.userName ||
-                      "Player"
-                    )
-                  : "Player";
+                  ? userObj.fullName ||
+                    [userObj.firstName, userObj.lastName].filter(Boolean).join(" ").trim() ||
+                    userObj.userName ||
+                    "Registered Player"
+                  : "Registered Player";
 
                 const getValidEmail = (val?: string | null) =>
                   val && typeof val === "string" && val.includes("@") ? val : "";
 
                 const parentObj = typeof userObj?.parentId === "object" ? userObj.parentId : null;
                 const playerEmail = isPopulated
-                  ? (
-                      getValidEmail(userObj.email) ||
-                      getValidEmail(userObj.emergencyEmail) ||
-                      getValidEmail(parentObj?.email) ||
-                      getValidEmail(parentObj?.emergencyEmail)
-                    )
+                  ? getValidEmail(userObj.email) ||
+                    getValidEmail(userObj.emergencyEmail) ||
+                    getValidEmail(parentObj?.email) ||
+                    getValidEmail(parentObj?.emergencyEmail)
                   : "";
 
                 const playerPic = isPopulated && userObj.profile ? formatImagePath(userObj.profile) : null;
@@ -111,10 +160,10 @@ const RewardRedeemedHistoryModal: React.FC<RewardRedeemedHistoryModalProps> = ({
                 return (
                   <div
                     key={idx}
-                    className="p-4 bg-slate-50/80 hover:bg-slate-100/80 border border-slate-200/80 rounded-2xl flex items-center justify-between transition-all gap-4 shadow-sm"
+                    className="p-3 sm:px-4 flex items-center justify-between gap-3 hover:bg-slate-50/70 transition-colors"
                   >
-                    <div className="flex items-center gap-3.5 min-w-0">
-                      <div className="relative w-11 h-11 rounded-xl bg-white border border-slate-200 overflow-hidden flex items-center justify-center shrink-0 shadow-sm text-xs font-bold text-slate-700">
+                    <div className="flex items-center gap-3 min-w-0">
+                      <div className="relative w-8 h-8 rounded-md border border-slate-200 bg-slate-100 overflow-hidden flex items-center justify-center shrink-0 text-[11px] font-semibold text-slate-600">
                         {playerPic ? (
                           <Image
                             src={playerPic}
@@ -128,47 +177,46 @@ const RewardRedeemedHistoryModal: React.FC<RewardRedeemedHistoryModalProps> = ({
                       </div>
 
                       <div className="min-w-0">
-                        <h5 className="font-bold text-xs sm:text-sm text-slate-900 truncate">
+                        <p className="text-xs font-semibold text-slate-900 truncate leading-tight">
                           {playerName}
-                        </h5>
+                        </p>
                         {playerEmail && (
-                          <p className="text-xs text-slate-500 font-medium truncate mt-0.5">
+                          <p className="text-[11px] text-slate-500 truncate mt-0.5">
                             {playerEmail}
                           </p>
                         )}
                       </div>
                     </div>
 
-                    <div className="text-right shrink-0 space-y-1">
-                      <div className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-black bg-amber-50 text-amber-700 border border-amber-200">
-                        <Coffee className="w-3 h-3 text-amber-600" />
-                        <span>Redeemed</span>
-                      </div>
-                      <p className="text-[10px] text-slate-400 font-semibold block">
+                    <div className="text-right shrink-0">
+                      <span className="inline-flex items-center gap-1 px-1.5 py-0.2 rounded text-[10px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                        Claimed
+                      </span>
+                      <p className="text-[10px] text-slate-400 font-medium tabular-nums mt-0.5">
                         {ru.redeemedAt
                           ? dayjs(ru.redeemedAt).format("MMM DD, YYYY • hh:mm A")
-                          : "Redeemed"}
+                          : "Recently"}
                       </p>
                     </div>
                   </div>
                 );
               })}
             </div>
-          ) : (
-            <div className="p-12 text-center space-y-3 bg-slate-50 rounded-2xl border border-slate-200/80">
-              <div className="w-12 h-12 rounded-2xl bg-amber-50 text-amber-600 mx-auto flex items-center justify-center border border-amber-100">
-                <Coffee className="w-6 h-6" />
-              </div>
-              <div className="space-y-1">
-                <h4 className="font-bold text-sm text-slate-900">
-                  No Redemptions Yet
-                </h4>
-                <p className="text-xs text-slate-500 font-medium max-w-xs mx-auto">
-                  No players have redeemed this Coffee reward item yet. When players scan the QR code, their claim history will appear here.
-                </p>
-              </div>
-            </div>
           )}
+        </div>
+
+        {/* Footer */}
+        <div className="px-5 py-3 border-t border-slate-100 bg-slate-50/50 flex items-center justify-between shrink-0">
+          <span className="text-xs text-slate-500 font-medium">
+            Showing {filteredUsers.length} of {redeemedUsers.length} redemptions
+          </span>
+          <button
+            type="button"
+            onClick={onClose}
+            className="h-8 px-4 rounded-md bg-slate-900 hover:bg-slate-800 text-white text-xs font-medium transition-colors cursor-pointer"
+          >
+            Close
+          </button>
         </div>
       </DialogContent>
     </Dialog>

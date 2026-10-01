@@ -3,6 +3,13 @@ import { baseApi } from "../../utils/apiBaseQuery";
 
 export const playerApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
+    getPlayerOverview: builder.query({
+      query: () => ({
+        url: "/player/overview",
+        method: "GET",
+      }),
+      providesTags: ["player"],
+    }),
     getAllPlayer: builder.query({
       query: (params = {}) => {
         const queryParams = new URLSearchParams();
@@ -116,6 +123,7 @@ export const playerApi = baseApi.injectEndpoints({
 // Export hooks
 export const {
   useGetAllPlayerQuery,
+  useGetPlayerOverviewQuery,
   useCreatePlayerEconomyMutation,
   useGetPlayerEconomyQuery,
   useUpdateEngCoinBudgetMutation,

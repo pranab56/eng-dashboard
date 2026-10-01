@@ -363,7 +363,7 @@ const PlayerEditModal = ({ player, isOpen, onClose }: PlayerEditModalProps) => {
 
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
               <div className="bg-slate-50 border border-slate-200 rounded-xl p-3">
-                <label className="text-[11px] font-bold text-slate-600 block mb-1">⚽ Total Goals</label>
+                <label className="text-[11px] font-bold text-slate-600 block mb-1">Goals</label>
                 <input
                   type="number"
                   min="0"
@@ -374,7 +374,7 @@ const PlayerEditModal = ({ player, isOpen, onClose }: PlayerEditModalProps) => {
               </div>
 
               <div className="bg-slate-50 border border-slate-200 rounded-xl p-3">
-                <label className="text-[11px] font-bold text-slate-600 block mb-1">👟 Total Assists</label>
+                <label className="text-[11px] font-bold text-slate-600 block mb-1">Assists</label>
                 <input
                   type="number"
                   min="0"
@@ -385,7 +385,7 @@ const PlayerEditModal = ({ player, isOpen, onClose }: PlayerEditModalProps) => {
               </div>
 
               <div className="bg-emerald-50/50 border border-emerald-200 rounded-xl p-3">
-                <label className="text-[11px] font-bold text-emerald-800 block mb-1">🛡️ Clean Sheets</label>
+                <label className="text-[11px] font-bold text-emerald-800 block mb-1">Clean Sheets</label>
                 <input
                   type="number"
                   min="0"
@@ -396,7 +396,7 @@ const PlayerEditModal = ({ player, isOpen, onClose }: PlayerEditModalProps) => {
               </div>
 
               <div className="bg-slate-50 border border-slate-200 rounded-xl p-3">
-                <label className="text-[11px] font-bold text-slate-600 block mb-1">🏟️ Matches Played</label>
+                <label className="text-[11px] font-bold text-slate-600 block mb-1">Matches Played</label>
                 <input
                   type="number"
                   min="0"
@@ -407,7 +407,7 @@ const PlayerEditModal = ({ player, isOpen, onClose }: PlayerEditModalProps) => {
               </div>
 
               <div className="bg-amber-50/50 border border-amber-200 rounded-xl p-3">
-                <label className="text-[11px] font-bold text-amber-800 block mb-1">🟨 Yellow Cards</label>
+                <label className="text-[11px] font-bold text-amber-800 block mb-1">Yellow Cards</label>
                 <input
                   type="number"
                   min="0"
@@ -418,7 +418,7 @@ const PlayerEditModal = ({ player, isOpen, onClose }: PlayerEditModalProps) => {
               </div>
 
               <div className="bg-rose-50/50 border border-rose-200 rounded-xl p-3">
-                <label className="text-[11px] font-bold text-rose-800 block mb-1">🟥 Red Cards</label>
+                <label className="text-[11px] font-bold text-rose-800 block mb-1">Red Cards</label>
                 <input
                   type="number"
                   min="0"
@@ -429,7 +429,7 @@ const PlayerEditModal = ({ player, isOpen, onClose }: PlayerEditModalProps) => {
               </div>
 
               <div className="bg-purple-50/50 border border-purple-200 rounded-xl p-3 col-span-2">
-                <label className="text-[11px] font-bold text-purple-800 block mb-1">⭐ Player of the Day</label>
+                <label className="text-[11px] font-bold text-purple-800 block mb-1">Player of the Day Awards</label>
                 <input
                   type="number"
                   min="0"

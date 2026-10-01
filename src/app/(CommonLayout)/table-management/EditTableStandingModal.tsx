@@ -19,8 +19,7 @@ import {
   Loader2,
   RotateCcw,
   Check,
-  RefreshCw,
-  Trophy,
+  Calculator,
 } from "lucide-react";
 
 interface EditTableStandingModalProps {
@@ -85,7 +84,7 @@ export const EditTableStandingModal: React.FC<EditTableStandingModalProps> = ({
     }
   }, [isOpen, standing]);
 
-  // Recalculate helper (standard football math)
+  // Football math auto-calculator (Played = W+D+L, GD = GF-GA, PTS = W*3 + D)
   const handleAutoCalculate = () => {
     const computedPlayed = win + draw + loss;
     const computedGD = goalsFor - goalsAgainst;
@@ -93,7 +92,7 @@ export const EditTableStandingModal: React.FC<EditTableStandingModalProps> = ({
     setPlayed(computedPlayed);
     setGoalDifference(computedGD);
     setPoints(computedPts);
-    toast.info("Recalculated: Played=" + computedPlayed + ", GD=" + computedGD + ", PTS=" + computedPts);
+    toast.info(`Recalculated: Played=${computedPlayed}, GD=${computedGD}, PTS=${computedPts}`);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -122,7 +121,7 @@ export const EditTableStandingModal: React.FC<EditTableStandingModalProps> = ({
       };
 
       const res = await updateTableStanding(payload).unwrap();
-      toast.success(res?.message || "Table standing updated successfully");
+      toast.success(res?.message || "Standing record updated successfully");
       if (onSuccess) onSuccess();
       onClose();
     } catch (err: any) {
@@ -150,36 +149,42 @@ export const EditTableStandingModal: React.FC<EditTableStandingModalProps> = ({
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent
         showCloseButton={false}
-        className="sm:max-w-lg w-full bg-white rounded-xl p-0 overflow-hidden border border-gray-200 shadow-xl text-gray-900"
+        className="sm:max-w-lg w-full bg-white rounded-lg p-0 overflow-hidden border border-slate-200 shadow-lg text-slate-900"
       >
         {/* Header */}
-        <div className="px-6 py-4 border-b border-gray-200 bg-gray-50 flex items-center justify-between">
+        <div className="px-6 py-4 border-b border-slate-200/80 bg-slate-50/60 flex items-center justify-between">
           <div className="flex items-center gap-3">
             {team?.teamLogo ? (
-              <Image
-                src={formatImagePath(team.teamLogo)}
-                alt="logo"
-                width={40}
-                height={40}
-                className="w-10 h-10 rounded-full border border-gray-200 object-cover bg-white"
-              />
+              <div className="w-10 h-10 rounded-full border border-slate-200 bg-white overflow-hidden shrink-0 flex items-center justify-center">
+                <Image
+                  src={formatImagePath(team.teamLogo)}
+                  alt={team?.teamName || "Club crest"}
+                  width={40}
+                  height={40}
+                  className="w-full h-full object-cover"
+                />
+              </div>
             ) : (
-              <div className="w-10 h-10 rounded-full bg-gray-200 border border-gray-300 flex items-center justify-center text-xs font-semibold text-gray-600">
-                {team?.shortName || "FC"}
+              <div className="w-10 h-10 rounded-full bg-slate-100 border border-slate-200 flex items-center justify-center text-xs font-mono font-semibold text-slate-600 shrink-0">
+                {team?.shortName?.slice(0, 3) || "FC"}
               </div>
             )}
             <div>
               <div className="flex items-center gap-2">
-                <DialogTitle className="text-base font-semibold text-gray-900">
+                <DialogTitle className="text-base font-semibold text-slate-900">
                   {team?.teamName || "Edit Standing"}
                 </DialogTitle>
-                {standing?.isManual && (
-                  <span className="px-2 py-0.5 rounded text-[11px] font-medium bg-gray-200 text-gray-700">
-                    Manual
+                {standing?.isManual ? (
+                  <span className="px-1.5 py-0.2 rounded text-[10px] font-medium bg-amber-50 text-amber-700 border border-amber-200">
+                    Manual Override
+                  </span>
+                ) : (
+                  <span className="px-1.5 py-0.2 rounded text-[10px] font-medium bg-slate-100 text-slate-600 border border-slate-200">
+                    Match Computed
                   </span>
                 )}
               </div>
-              <p className="text-xs text-gray-500 mt-0.5">
+              <p className="text-xs text-slate-500 mt-0.5 font-mono">
                 {league?.leagueName} {league?.season ? `(${league.season})` : ""}
               </p>
             </div>
@@ -188,24 +193,24 @@ export const EditTableStandingModal: React.FC<EditTableStandingModalProps> = ({
           <button
             type="button"
             onClick={onClose}
-            className="p-1.5 rounded-md text-gray-400 hover:text-gray-700 hover:bg-gray-200 transition-colors cursor-pointer"
+            className="p-1.5 rounded-md text-slate-400 hover:text-slate-700 hover:bg-slate-200/60 transition-colors cursor-pointer"
           >
             <X className="w-4 h-4" />
           </button>
         </div>
 
         {/* Form Body */}
-        <form onSubmit={handleSubmit} className="p-6 space-y-6">
+        <form onSubmit={handleSubmit} className="p-6 space-y-5">
           {/* Section 1: Matches */}
-          <div>
-            <div className="flex items-center justify-between mb-2.5">
-              <span className="text-xs font-semibold text-gray-700 uppercase tracking-wider">
+          <div className="space-y-2">
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-semibold text-slate-600 uppercase tracking-wider">
                 Match Record
               </span>
             </div>
-            <div className="grid grid-cols-4 gap-3">
+            <div className="grid grid-cols-4 gap-2.5">
               <div>
-                <label className="text-[11px] font-medium text-gray-500 block mb-1">
+                <label className="text-[11px] font-medium text-slate-500 block mb-1">
                   Played (P)
                 </label>
                 <input
@@ -213,12 +218,12 @@ export const EditTableStandingModal: React.FC<EditTableStandingModalProps> = ({
                   min="0"
                   value={played}
                   onChange={(e) => setPlayed(Math.max(0, parseInt(e.target.value) || 0))}
-                  className="w-full bg-white border border-gray-300 rounded-lg px-3 py-2 text-center text-sm font-semibold text-gray-900 focus:outline-none focus:border-blue-600 focus:ring-1 focus:ring-blue-600"
+                  className="w-full bg-white border border-slate-200 rounded-md px-2.5 py-1.5 text-center text-sm font-mono font-semibold text-slate-900 focus:outline-none focus:border-slate-400 focus:ring-1 focus:ring-slate-400"
                 />
               </div>
 
               <div>
-                <label className="text-[11px] font-medium text-gray-500 block mb-1">
+                <label className="text-[11px] font-medium text-slate-500 block mb-1">
                   Won (W)
                 </label>
                 <input
@@ -226,12 +231,12 @@ export const EditTableStandingModal: React.FC<EditTableStandingModalProps> = ({
                   min="0"
                   value={win}
                   onChange={(e) => setWin(Math.max(0, parseInt(e.target.value) || 0))}
-                  className="w-full bg-white border border-gray-300 rounded-lg px-3 py-2 text-center text-sm font-semibold text-gray-900 focus:outline-none focus:border-blue-600 focus:ring-1 focus:ring-blue-600"
+                  className="w-full bg-white border border-slate-200 rounded-md px-2.5 py-1.5 text-center text-sm font-mono font-semibold text-slate-900 focus:outline-none focus:border-slate-400 focus:ring-1 focus:ring-slate-400"
                 />
               </div>
 
               <div>
-                <label className="text-[11px] font-medium text-gray-500 block mb-1">
+                <label className="text-[11px] font-medium text-slate-500 block mb-1">
                   Drawn (D)
                 </label>
                 <input
@@ -239,12 +244,12 @@ export const EditTableStandingModal: React.FC<EditTableStandingModalProps> = ({
                   min="0"
                   value={draw}
                   onChange={(e) => setDraw(Math.max(0, parseInt(e.target.value) || 0))}
-                  className="w-full bg-white border border-gray-300 rounded-lg px-3 py-2 text-center text-sm font-semibold text-gray-900 focus:outline-none focus:border-blue-600 focus:ring-1 focus:ring-blue-600"
+                  className="w-full bg-white border border-slate-200 rounded-md px-2.5 py-1.5 text-center text-sm font-mono font-semibold text-slate-900 focus:outline-none focus:border-slate-400 focus:ring-1 focus:ring-slate-400"
                 />
               </div>
 
               <div>
-                <label className="text-[11px] font-medium text-gray-500 block mb-1">
+                <label className="text-[11px] font-medium text-slate-500 block mb-1">
                   Lost (L)
                 </label>
                 <input
@@ -252,31 +257,31 @@ export const EditTableStandingModal: React.FC<EditTableStandingModalProps> = ({
                   min="0"
                   value={loss}
                   onChange={(e) => setLoss(Math.max(0, parseInt(e.target.value) || 0))}
-                  className="w-full bg-white border border-gray-300 rounded-lg px-3 py-2 text-center text-sm font-semibold text-gray-900 focus:outline-none focus:border-blue-600 focus:ring-1 focus:ring-blue-600"
+                  className="w-full bg-white border border-slate-200 rounded-md px-2.5 py-1.5 text-center text-sm font-mono font-semibold text-slate-900 focus:outline-none focus:border-slate-400 focus:ring-1 focus:ring-slate-400"
                 />
               </div>
             </div>
           </div>
 
           {/* Section 2: Goals & Points */}
-          <div>
-            <div className="flex items-center justify-between mb-2.5">
-              <span className="text-xs font-semibold text-gray-700 uppercase tracking-wider">
-                Goals & Points
+          <div className="space-y-2">
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-semibold text-slate-600 uppercase tracking-wider">
+                Goals & Standings
               </span>
               <button
                 type="button"
                 onClick={handleAutoCalculate}
-                className="text-xs font-medium text-blue-600 hover:text-blue-800 inline-flex items-center gap-1 cursor-pointer"
-                title="Recalculate Played, GD and Points from W, D, L, GF, GA"
+                className="text-xs font-medium text-blue-600 hover:text-blue-700 inline-flex items-center gap-1 cursor-pointer"
+                title="Recalculate Played, GD and PTS automatically"
               >
-                <RefreshCw className="w-3 h-3" />
-                <span>Recalculate PTS & GD</span>
+                <Calculator className="w-3.5 h-3.5" />
+                <span>Auto-Calculate</span>
               </button>
             </div>
-            <div className="grid grid-cols-4 gap-3">
+            <div className="grid grid-cols-4 gap-2.5">
               <div>
-                <label className="text-[11px] font-medium text-gray-500 block mb-1">
+                <label className="text-[11px] font-medium text-slate-500 block mb-1">
                   Goals For (GF)
                 </label>
                 <input
@@ -284,12 +289,12 @@ export const EditTableStandingModal: React.FC<EditTableStandingModalProps> = ({
                   min="0"
                   value={goalsFor}
                   onChange={(e) => setGoalsFor(Math.max(0, parseInt(e.target.value) || 0))}
-                  className="w-full bg-white border border-gray-300 rounded-lg px-3 py-2 text-center text-sm font-semibold text-gray-900 focus:outline-none focus:border-blue-600 focus:ring-1 focus:ring-blue-600"
+                  className="w-full bg-white border border-slate-200 rounded-md px-2.5 py-1.5 text-center text-sm font-mono font-semibold text-slate-900 focus:outline-none focus:border-slate-400 focus:ring-1 focus:ring-slate-400"
                 />
               </div>
 
               <div>
-                <label className="text-[11px] font-medium text-gray-500 block mb-1">
+                <label className="text-[11px] font-medium text-slate-500 block mb-1">
                   Goals Against (GA)
                 </label>
                 <input
@@ -297,24 +302,24 @@ export const EditTableStandingModal: React.FC<EditTableStandingModalProps> = ({
                   min="0"
                   value={goalsAgainst}
                   onChange={(e) => setGoalsAgainst(Math.max(0, parseInt(e.target.value) || 0))}
-                  className="w-full bg-white border border-gray-300 rounded-lg px-3 py-2 text-center text-sm font-semibold text-gray-900 focus:outline-none focus:border-blue-600 focus:ring-1 focus:ring-blue-600"
+                  className="w-full bg-white border border-slate-200 rounded-md px-2.5 py-1.5 text-center text-sm font-mono font-semibold text-slate-900 focus:outline-none focus:border-slate-400 focus:ring-1 focus:ring-slate-400"
                 />
               </div>
 
               <div>
-                <label className="text-[11px] font-medium text-gray-500 block mb-1">
+                <label className="text-[11px] font-medium text-slate-500 block mb-1">
                   Goal Diff (GD)
                 </label>
                 <input
                   type="number"
                   value={goalDifference}
                   onChange={(e) => setGoalDifference(parseInt(e.target.value) || 0)}
-                  className="w-full bg-white border border-gray-300 rounded-lg px-3 py-2 text-center text-sm font-semibold text-gray-900 focus:outline-none focus:border-blue-600 focus:ring-1 focus:ring-blue-600"
+                  className="w-full bg-white border border-slate-200 rounded-md px-2.5 py-1.5 text-center text-sm font-mono font-semibold text-slate-900 focus:outline-none focus:border-slate-400 focus:ring-1 focus:ring-slate-400"
                 />
               </div>
 
               <div>
-                <label className="text-[11px] font-bold text-gray-700 block mb-1">
+                <label className="text-[11px] font-bold text-slate-700 block mb-1">
                   Points (PTS)
                 </label>
                 <input
@@ -322,27 +327,28 @@ export const EditTableStandingModal: React.FC<EditTableStandingModalProps> = ({
                   min="0"
                   value={points}
                   onChange={(e) => setPoints(Math.max(0, parseInt(e.target.value) || 0))}
-                  className="w-full bg-gray-50 border border-gray-300 rounded-lg px-3 py-2 text-center text-sm font-bold text-gray-900 focus:outline-none focus:border-blue-600 focus:ring-1 focus:ring-blue-600"
+                  className="w-full bg-slate-50 border border-slate-300 rounded-md px-2.5 py-1.5 text-center text-sm font-mono font-bold text-slate-950 focus:outline-none focus:border-slate-400 focus:ring-1 focus:ring-slate-400"
                 />
               </div>
             </div>
           </div>
 
           {/* Footer Actions */}
-          <div className="pt-3 border-t border-gray-200 flex items-center justify-between">
+          <div className="pt-4 border-t border-slate-200/80 flex items-center justify-between">
             {standing?.isManual ? (
               <button
                 type="button"
                 onClick={handleResetToAuto}
                 disabled={isResetting || isUpdating}
-                className="inline-flex items-center gap-1.5 px-3 py-2 text-xs font-medium text-red-600 hover:text-red-700 hover:bg-red-50 rounded-lg transition-colors cursor-pointer disabled:opacity-50"
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-rose-600 hover:text-rose-700 hover:bg-rose-50 border border-rose-200 rounded-md transition-colors cursor-pointer disabled:opacity-50"
+                title="Wipe manual override and recalculate from match engine"
               >
                 {isResetting ? (
                   <Loader2 className="w-3.5 h-3.5 animate-spin" />
                 ) : (
                   <RotateCcw className="w-3.5 h-3.5" />
                 )}
-                <span>Reset to Match Results</span>
+                <span>Reset to Matches</span>
               </button>
             ) : (
               <div />
@@ -353,24 +359,24 @@ export const EditTableStandingModal: React.FC<EditTableStandingModalProps> = ({
                 type="button"
                 onClick={onClose}
                 disabled={isUpdating || isResetting}
-                className="px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 rounded-lg transition-colors cursor-pointer"
+                className="px-3 py-1.5 text-xs font-medium text-slate-600 hover:text-slate-800 hover:bg-slate-100 rounded-md transition-colors cursor-pointer"
               >
                 Cancel
               </button>
               <button
                 type="submit"
                 disabled={isUpdating || isResetting}
-                className="inline-flex items-center gap-1.5 px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg shadow-xs transition-colors cursor-pointer disabled:opacity-50"
+                className="inline-flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-semibold text-white bg-slate-900 hover:bg-slate-800 rounded-md transition-colors cursor-pointer disabled:opacity-50 shadow-2xs"
               >
                 {isUpdating ? (
                   <>
-                    <Loader2 className="w-4 h-4 animate-spin" />
+                    <Loader2 className="w-3.5 h-3.5 animate-spin" />
                     <span>Saving...</span>
                   </>
                 ) : (
                   <>
-                    <Check className="w-4 h-4" />
-                    <span>Save Changes</span>
+                    <Check className="w-3.5 h-3.5" />
+                    <span>Save Standing</span>
                   </>
                 )}
               </button>

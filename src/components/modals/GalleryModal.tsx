@@ -17,6 +17,9 @@ import {
   Check,
   ChevronsUpDown,
   Search,
+  Folder,
+  Layers,
+  Sparkles,
 } from "lucide-react";
 import React, { useEffect, useState } from "react";
 
@@ -59,8 +62,15 @@ export default function GalleryModal({
 
   useEffect(() => {
     if (editingItem) {
-      setSelectedCategory(editingItem.category || "");
-      setSelectedSubCategory(editingItem.subCategory || "");
+      const catVal = typeof editingItem.category === 'object' && editingItem.category 
+        ? (editingItem.category as any)._id || (editingItem.category as any).id
+        : editingItem.category || "";
+      const subVal = typeof editingItem.subCategory === 'object' && editingItem.subCategory 
+        ? (editingItem.subCategory as any)._id || (editingItem.subCategory as any).id
+        : editingItem.subCategory || "";
+
+      setSelectedCategory(catVal);
+      setSelectedSubCategory(subVal);
       setStatus(editingItem.status || "active");
       setPreviewUrl(formatImagePath(editingItem.image));
       setSelectedFile(null);
@@ -82,7 +92,7 @@ export default function GalleryModal({
     const file = e.target.files?.[0];
     if (file) {
       if (!file.type.startsWith("image/")) {
-        setErrorMsg("Please select a valid image file");
+        setErrorMsg("Please select a valid image file (PNG, JPG, WEBP)");
         return;
       }
       setSelectedFile(file);
@@ -120,12 +130,12 @@ export default function GalleryModal({
     setErrorMsg("");
 
     if (!selectedCategory) {
-      setErrorMsg("Please select a Category");
+      setErrorMsg("Please select a category for this media item.");
       return;
     }
 
     if (!editingItem && !selectedFile) {
-      setErrorMsg("Please select an image file to upload");
+      setErrorMsg("Please select an image file to upload.");
       return;
     }
 
@@ -138,39 +148,34 @@ export default function GalleryModal({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-in fade-in duration-200">
-      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg overflow-hidden border border-gray-100 animate-in zoom-in-95 duration-200">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-xs p-4 animate-in fade-in duration-150">
+      <div className="bg-white rounded-xl shadow-xl w-full max-w-lg overflow-hidden border border-slate-200 animate-in zoom-in-95 duration-150">
         {/* Header */}
-        <div className="px-6 py-4 border-b border-gray-100 flex items-center justify-between bg-gray-50/50">
-          <div className="flex items-center gap-2.5">
-            <div className="w-9 h-9 rounded-lg bg-blue-50 flex items-center justify-center text-blue-600">
-              <ImageIcon className="w-5 h-5" />
-            </div>
-            <div>
-              <h3 className="font-medium text-gray-900 text-lg">
-                {editingItem ? "Edit Gallery Item" : "Add New Gallery Item"}
-              </h3>
-              <p className="text-xs text-gray-500">
-                Upload image and configure category & status settings
-              </p>
-            </div>
+        <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between">
+          <div>
+            <h3 className="text-base font-bold text-slate-900 tracking-tight">
+              {editingItem ? "Edit Gallery Item" : "Upload Gallery Photo"}
+            </h3>
+            <p className="text-xs text-slate-500 mt-0.5">
+              Specify media album, category tag, and visibility status.
+            </p>
           </div>
           <button
             type="button"
             onClick={onClose}
             disabled={isLoading}
-            className="p-1.5 rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors cursor-pointer"
+            className="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors cursor-pointer"
           >
-            <X className="w-5 h-5" />
+            <X className="w-4 h-4" />
           </button>
         </div>
 
         {/* Form */}
-        <form onSubmit={handleSubmit} className="p-6 space-y-5">
-          {/* Image Upload Dropzone */}
-          <div className="space-y-2">
-            <label className="block text-sm font-semibold text-gray-800">
-              Image File {!editingItem && <span className="text-red-500">*</span>}
+        <form onSubmit={handleSubmit} className="p-6 space-y-4">
+          {/* Image Upload Area */}
+          <div className="space-y-1.5">
+            <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider">
+              Photo Asset {!editingItem && <span className="text-rose-500">*</span>}
             </label>
 
             <div className="relative group">
@@ -184,30 +189,30 @@ export default function GalleryModal({
               />
               <label
                 htmlFor="gallery-image-input"
-                className="flex flex-col items-center justify-center w-full min-h-[150px] border-2 border-dashed border-gray-200 hover:border-blue-400 bg-gray-50/50 hover:bg-blue-50/30 rounded-xl transition-all cursor-pointer overflow-hidden relative"
+                className="flex flex-col items-center justify-center w-full min-h-[140px] border border-dashed border-slate-300 hover:border-slate-400 bg-slate-50/50 hover:bg-slate-50 rounded-xl transition-all cursor-pointer overflow-hidden relative"
               >
                 {previewUrl ? (
-                  <div className="relative w-full h-40 group-hover:opacity-90 transition-opacity">
+                  <div className="relative w-full h-44 group-hover:opacity-95 transition-opacity">
                     <img
                       src={previewUrl}
                       alt="Preview"
                       className="w-full h-full object-cover"
                     />
-                    <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center text-white gap-1">
-                      <Upload className="w-6 h-6" />
-                      <span className="text-xs font-semibold">Change Image</span>
+                    <div className="absolute inset-0 bg-slate-900/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white gap-2">
+                      <Upload className="w-4 h-4" />
+                      <span className="text-xs font-semibold">Change Photo</span>
                     </div>
                   </div>
                 ) : (
-                  <div className="flex flex-col items-center justify-center p-6 text-center">
-                    <div className="w-12 h-12 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
-                      <Upload className="w-6 h-6" />
+                  <div className="flex flex-col items-center justify-center p-5 text-center">
+                    <div className="w-10 h-10 rounded-lg bg-white border border-slate-200 text-slate-500 flex items-center justify-center mb-2 shadow-2xs">
+                      <Upload className="w-4 h-4" />
                     </div>
-                    <p className="text-sm font-semibold text-gray-700">
-                      Click to upload image
+                    <p className="text-xs font-semibold text-slate-800">
+                      Click to choose an image file
                     </p>
-                    <p className="text-xs text-gray-400 mt-1">
-                      PNG, JPG, WEBP, GIF up to 10MB
+                    <p className="text-[11px] text-slate-400 mt-0.5">
+                      PNG, JPG, WEBP up to 10MB
                     </p>
                   </div>
                 )}
@@ -215,43 +220,40 @@ export default function GalleryModal({
             </div>
           </div>
 
-          {/* Step 1: Parent Category Selection */}
-          <div className="space-y-2">
-            <label className="block text-sm font-semibold text-gray-800">
-              Category <span className="text-red-500">*</span>
+          {/* Category Dropdown */}
+          <div className="space-y-1.5">
+            <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider">
+              Category Album <span className="text-rose-500">*</span>
             </label>
-            <Popover
-              open={parentPopoverOpen}
-              onOpenChange={setParentPopoverOpen}
-            >
+            <Popover open={parentPopoverOpen} onOpenChange={setParentPopoverOpen}>
               <PopoverTrigger asChild>
                 <button
                   type="button"
                   disabled={isLoading}
-                  className="w-full h-11 px-3.5 bg-gray-50 border border-gray-200 rounded-lg text-sm flex items-center justify-between font-medium text-gray-800 hover:bg-gray-100/70 focus:outline-none focus:border-blue-500 transition-all cursor-pointer disabled:opacity-50"
+                  className="w-full h-10 px-3 bg-white border border-slate-200 rounded-lg text-xs flex items-center justify-between font-medium text-slate-800 hover:bg-slate-50 focus:outline-none focus:border-slate-400 focus:ring-1 focus:ring-slate-400 transition-all cursor-pointer disabled:opacity-50"
                 >
                   <span className="truncate">
                     {selectedParentObj
                       ? selectedParentObj.name
                       : categoriesList.length === 0
                         ? "No category available"
-                        : "Select Category..."}
+                        : "Select Album / Category..."}
                   </span>
-                  <ChevronsUpDown className="w-4 h-4 text-gray-400 shrink-0 ml-2" />
+                  <ChevronsUpDown className="w-3.5 h-3.5 text-slate-400 shrink-0 ml-2" />
                 </button>
               </PopoverTrigger>
-              <PopoverContent className="w-[var(--radix-popover-trigger-width)] p-0 bg-white border border-gray-200 shadow-xl rounded-xl overflow-hidden z-[60]">
-                <div className="p-2 border-b border-gray-100 relative flex items-center">
-                  <Search className="w-4 h-4 text-gray-400 absolute left-3.5" />
+              <PopoverContent className="w-[var(--radix-popover-trigger-width)] p-0 bg-white border border-slate-200 shadow-xl rounded-xl overflow-hidden z-[60]">
+                <div className="p-2 border-b border-slate-100 relative flex items-center">
+                  <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3.5" />
                   <input
                     type="text"
                     placeholder="Search category..."
                     value={parentSearch}
                     onChange={(e) => setParentSearch(e.target.value)}
-                    className="w-full pl-9 pr-3 py-1.5 bg-gray-50 border border-gray-100 rounded-md text-xs focus:outline-none focus:border-blue-500 transition-colors"
+                    className="w-full pl-8 pr-3 py-1.5 bg-slate-50 border border-slate-200 rounded-lg text-xs text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-slate-400 transition-colors"
                   />
                 </div>
-                <div className="max-h-56 overflow-y-auto p-1 space-y-0.5">
+                <div className="max-h-48 overflow-y-auto p-1 space-y-0.5">
                   {filteredParentCategories.map((cat) => {
                     const catId = cat._id || cat.id || "";
                     const isSelected = selectedCategory === catId;
@@ -260,7 +262,7 @@ export default function GalleryModal({
                       e.preventDefault();
                       e.stopPropagation();
                       setSelectedCategory(catId);
-                      setSelectedSubCategory(""); // Reset subcategory
+                      setSelectedSubCategory("");
                       setParentPopoverOpen(false);
                       setParentSearch("");
                     };
@@ -271,24 +273,21 @@ export default function GalleryModal({
                         type="button"
                         onPointerDown={handleSelect}
                         onClick={handleSelect}
-                        className={`w-full px-3 py-2 text-xs rounded-md flex items-center justify-between transition-colors cursor-pointer text-left ${isSelected
-                            ? "bg-blue-50 text-blue-600 font-semibold"
-                            : "text-gray-700 hover:bg-gray-50"
-                          }`}
+                        className={`w-full px-2.5 py-1.5 text-xs rounded-md flex items-center justify-between transition-colors cursor-pointer text-left ${
+                          isSelected
+                            ? "bg-slate-900 text-white font-medium"
+                            : "text-slate-700 hover:bg-slate-100"
+                        }`}
                       >
-                        <span>{cat.name}</span>
-                        {isSelected && (
-                          <Check className="w-3.5 h-3.5 text-blue-600" />
-                        )}
+                        <span className="truncate">{cat.name}</span>
+                        {isSelected && <Check className="w-3.5 h-3.5 text-white shrink-0 ml-1.5" />}
                       </button>
                     );
                   })}
 
                   {filteredParentCategories.length === 0 && (
-                    <p className="p-3 text-center text-xs text-gray-400 font-medium">
-                      {categoriesList.length === 0
-                        ? "No category available"
-                        : "No matching categories found"}
+                    <p className="p-3 text-center text-xs text-slate-400">
+                      No categories found
                     </p>
                   )}
                 </div>
@@ -296,39 +295,37 @@ export default function GalleryModal({
             </Popover>
           </div>
 
-          {/* Step 2: SubCategory Selection (Only if Parent Category has children) */}
+          {/* SubCategory Dropdown */}
           {selectedCategory && subCategoriesList.length > 0 && (
-            <div className="space-y-2 animate-in fade-in duration-200">
-              <label className="block text-sm font-semibold text-gray-800">
-                SubCategory <span className="text-gray-400 text-xs font-normal">(Optional)</span>
+            <div className="space-y-1.5 animate-in fade-in duration-150">
+              <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider">
+                SubCategory <span className="text-slate-400 font-normal lowercase">(optional)</span>
               </label>
               <Popover open={subPopoverOpen} onOpenChange={setSubPopoverOpen}>
                 <PopoverTrigger asChild>
                   <button
                     type="button"
                     disabled={isLoading}
-                    className="w-full h-11 px-3.5 bg-gray-50 border border-gray-200 rounded-lg text-sm flex items-center justify-between font-medium text-gray-800 hover:bg-gray-100/70 focus:outline-none focus:border-blue-500 transition-all cursor-pointer disabled:opacity-50"
+                    className="w-full h-10 px-3 bg-white border border-slate-200 rounded-lg text-xs flex items-center justify-between font-medium text-slate-800 hover:bg-slate-50 focus:outline-none focus:border-slate-400 transition-all cursor-pointer disabled:opacity-50"
                   >
                     <span className="truncate">
-                      {selectedSubObj
-                        ? selectedSubObj.name
-                        : "Select SubCategory..."}
+                      {selectedSubObj ? selectedSubObj.name : "Select SubCategory..."}
                     </span>
-                    <ChevronsUpDown className="w-4 h-4 text-gray-400 shrink-0 ml-2" />
+                    <ChevronsUpDown className="w-3.5 h-3.5 text-slate-400 shrink-0 ml-2" />
                   </button>
                 </PopoverTrigger>
-                <PopoverContent className="w-[var(--radix-popover-trigger-width)] p-0 bg-white border border-gray-200 shadow-xl rounded-xl overflow-hidden z-[60]">
-                  <div className="p-2 border-b border-gray-100 relative flex items-center">
-                    <Search className="w-4 h-4 text-gray-400 absolute left-3.5" />
+                <PopoverContent className="w-[var(--radix-popover-trigger-width)] p-0 bg-white border border-slate-200 shadow-xl rounded-xl overflow-hidden z-[60]">
+                  <div className="p-2 border-b border-slate-100 relative flex items-center">
+                    <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3.5" />
                     <input
                       type="text"
                       placeholder="Search subcategory..."
                       value={subSearch}
                       onChange={(e) => setSubSearch(e.target.value)}
-                      className="w-full pl-9 pr-3 py-1.5 bg-gray-50 border border-gray-100 rounded-md text-xs focus:outline-none focus:border-blue-500 transition-colors"
+                      className="w-full pl-8 pr-3 py-1.5 bg-slate-50 border border-slate-200 rounded-lg text-xs text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-slate-400 transition-colors"
                     />
                   </div>
-                  <div className="max-h-56 overflow-y-auto p-1 space-y-0.5">
+                  <div className="max-h-48 overflow-y-auto p-1 space-y-0.5">
                     {filteredSubCategories.map((sub) => {
                       const subId = sub._id || sub.id || "";
                       const isSelected = selectedSubCategory === subId;
@@ -347,21 +344,20 @@ export default function GalleryModal({
                           type="button"
                           onPointerDown={handleSelectSub}
                           onClick={handleSelectSub}
-                          className={`w-full px-3 py-2 text-xs rounded-md flex items-center justify-between transition-colors cursor-pointer text-left ${isSelected
-                              ? "bg-blue-50 text-blue-600 font-semibold"
-                              : "text-gray-700 hover:bg-gray-50"
-                            }`}
+                          className={`w-full px-2.5 py-1.5 text-xs rounded-md flex items-center justify-between transition-colors cursor-pointer text-left ${
+                            isSelected
+                              ? "bg-slate-900 text-white font-medium"
+                              : "text-slate-700 hover:bg-slate-100"
+                          }`}
                         >
-                          <span>{sub.name}</span>
-                          {isSelected && (
-                            <Check className="w-3.5 h-3.5 text-blue-600" />
-                          )}
+                          <span className="truncate">{sub.name}</span>
+                          {isSelected && <Check className="w-3.5 h-3.5 text-white shrink-0 ml-1.5" />}
                         </button>
                       );
                     })}
 
                     {filteredSubCategories.length === 0 && (
-                      <p className="p-3 text-center text-xs text-gray-400 font-medium">
+                      <p className="p-3 text-center text-xs text-slate-400">
                         No subcategories found
                       </p>
                     )}
@@ -372,62 +368,60 @@ export default function GalleryModal({
           )}
 
           {/* Status Selection */}
-          <div className="space-y-2">
-            <label className="block text-sm font-semibold text-gray-800">
-              Status <span className="text-red-500">*</span>
+          <div className="space-y-1.5">
+            <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider">
+              Visibility Status <span className="text-rose-500">*</span>
             </label>
-            <div className="flex gap-4">
-              <label className="flex items-center gap-2 cursor-pointer text-sm font-medium text-gray-700">
-                <input
-                  type="radio"
-                  name="status"
-                  value="active"
-                  checked={status === "active"}
-                  onChange={() => setStatus("active")}
-                  disabled={isLoading}
-                  className="w-4 h-4 text-blue-600 focus:ring-blue-500"
-                />
+            <div className="inline-flex items-center p-1 bg-slate-100 border border-slate-200 rounded-lg gap-1">
+              <button
+                type="button"
+                onClick={() => setStatus("active")}
+                className={`px-3.5 py-1.5 text-xs font-semibold rounded-md transition-colors cursor-pointer ${
+                  status === "active"
+                    ? "bg-white text-emerald-700 shadow-2xs"
+                    : "text-slate-600 hover:text-slate-900"
+                }`}
+              >
                 Active
-              </label>
-              <label className="flex items-center gap-2 cursor-pointer text-sm font-medium text-gray-700">
-                <input
-                  type="radio"
-                  name="status"
-                  value="inactive"
-                  checked={status === "inactive"}
-                  onChange={() => setStatus("inactive")}
-                  disabled={isLoading}
-                  className="w-4 h-4 text-blue-600 focus:ring-blue-500"
-                />
+              </button>
+              <button
+                type="button"
+                onClick={() => setStatus("inactive")}
+                className={`px-3.5 py-1.5 text-xs font-semibold rounded-md transition-colors cursor-pointer ${
+                  status === "inactive"
+                    ? "bg-white text-slate-800 shadow-2xs"
+                    : "text-slate-600 hover:text-slate-900"
+                }`}
+              >
                 Inactive
-              </label>
+              </button>
             </div>
           </div>
 
           {/* Validation Error Message */}
           {errorMsg && (
-            <p className="text-sm font-medium text-red-500 bg-red-50 p-3 rounded-lg border border-red-100">
+            <div className="text-xs text-rose-700 bg-rose-50 p-2.5 rounded-lg border border-rose-200">
               {errorMsg}
-            </p>
+            </div>
           )}
 
           {/* Modal Actions */}
-          <div className="flex items-center justify-end gap-3 pt-2">
+          <div className="flex items-center justify-end gap-2 pt-3 border-t border-slate-100">
             <button
               type="button"
               onClick={onClose}
               disabled={isLoading}
-              className="px-5 py-2.5 rounded-xl border border-gray-200 text-gray-600 hover:bg-gray-50 text-sm font-semibold transition-colors cursor-pointer"
+              className="px-3.5 py-2 rounded-lg border border-slate-200 text-slate-700 hover:bg-slate-50 text-xs font-medium transition-colors cursor-pointer"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={isLoading}
-              className="px-6 py-2.5 rounded-xl bg-black text-white hover:bg-gray-800 text-sm font-semibold transition-all shadow-md shadow-gray-200 flex items-center gap-2 cursor-pointer disabled:opacity-50"
+              className="px-4 py-2 rounded-lg bg-slate-900 text-white hover:bg-slate-800 text-xs font-semibold transition-colors shadow-2xs flex items-center gap-1.5 cursor-pointer disabled:opacity-50"
             >
-              {isLoading && <Loader2 className="w-4 h-4 animate-spin" />}
-              <span>{editingItem ? "Save Changes" : "Create Item"}</span>
+              {isLoading && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
+              <span>{editingItem ? "Save Changes" : "Upload Photo"}</span>
             </button>
           </div>
         </form>

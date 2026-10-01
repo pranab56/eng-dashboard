@@ -64,46 +64,46 @@ const formatTransactionCategory = (cat: string) => {
   switch (cat) {
     case "MATCH_GOAL":
     case "GOAL":
-      return { label: "Goal Scored", icon: "⚽", bg: "bg-emerald-50 text-emerald-700 border-emerald-200" };
+      return { label: "Goal Scored", icon: "", bg: "bg-emerald-50 text-emerald-700 border-emerald-200" };
     case "MATCH_ASSIST":
     case "ASSIST":
-      return { label: "Goal Assist", icon: "👟", bg: "bg-blue-50 text-blue-700 border-blue-200" };
+      return { label: "Goal Assist", icon: "", bg: "bg-blue-50 text-blue-700 border-blue-200" };
     case "MATCH_CLEAN_SHEET":
     case "CLEAN_SHEET":
-      return { label: "Clean Sheet", icon: "🛡️", bg: "bg-teal-50 text-teal-700 border-teal-200" };
+      return { label: "Clean Sheet", icon: "", bg: "bg-teal-50 text-teal-700 border-teal-200" };
     case "MATCH_POTD":
     case "PLAYER_OF_THE_DAY":
-      return { label: "Player of Day", icon: "⭐", bg: "bg-amber-50 text-amber-700 border-amber-200" };
+      return { label: "Player of Day", icon: "", bg: "bg-amber-50 text-amber-700 border-amber-200" };
     case "PLAYING_MATCH":
     case "ATTEND_MATCH":
-      return { label: "Match Appearance", icon: "🏟️", bg: "bg-sky-50 text-sky-700 border-sky-200" };
+      return { label: "Match Appearance", icon: "", bg: "bg-sky-50 text-sky-700 border-sky-200" };
     case "MATCH_RATING":
-      return { label: "Match Rating", icon: "🌟", bg: "bg-amber-50 text-amber-700 border-amber-200" };
+      return { label: "Match Rating", icon: "", bg: "bg-amber-50 text-amber-700 border-amber-200" };
     case "YELLOW_CARD_PENALTY":
-      return { label: "Yellow Card", icon: "🟨", bg: "bg-amber-50 text-amber-700 border-amber-200" };
+      return { label: "Yellow Card", icon: "", bg: "bg-amber-50 text-amber-700 border-amber-200" };
     case "RED_CARD_PENALTY":
     case "PENALTY_CARD":
-      return { label: "Red Card", icon: "🟥", bg: "bg-rose-50 text-rose-700 border-rose-200" };
+      return { label: "Red Card", icon: "", bg: "bg-rose-50 text-rose-700 border-rose-200" };
     case "FOUL_PENALTY":
-      return { label: "Foul Penalty", icon: "⚠️", bg: "bg-orange-50 text-orange-700 border-orange-200" };
+      return { label: "Foul Penalty", icon: "", bg: "bg-orange-50 text-orange-700 border-orange-200" };
     case "SIN_BIN_PENALTY":
-      return { label: "Sin Bin", icon: "⏱️", bg: "bg-purple-50 text-purple-700 border-purple-200" };
+      return { label: "Sin Bin", icon: "", bg: "bg-purple-50 text-purple-700 border-purple-200" };
     case "DISRESPECT_TO_REFEREE":
-      return { label: "Referee Dispute", icon: "🚫", bg: "bg-rose-50 text-rose-700 border-rose-200" };
+      return { label: "Referee Dispute", icon: "", bg: "bg-rose-50 text-rose-700 border-rose-200" };
     case "GROSS_MISCONDUCT":
-      return { label: "Gross Misconduct", icon: "🛑", bg: "bg-rose-50 text-rose-700 border-rose-200" };
+      return { label: "Gross Misconduct", icon: "", bg: "bg-rose-50 text-rose-700 border-rose-200" };
     case "SUBSCRIPTION_BONUS":
-      return { label: "Plan Bonus", icon: "🎁", bg: "bg-purple-50 text-purple-700 border-purple-200" };
+      return { label: "Plan Bonus", icon: "", bg: "bg-purple-50 text-purple-700 border-purple-200" };
     case "PRODUCT_PURCHASE":
-      return { label: "Reward Order", icon: "🛍️", bg: "bg-rose-50 text-rose-700 border-rose-200" };
+      return { label: "Reward Order", icon: "", bg: "bg-rose-50 text-rose-700 border-rose-200" };
     case "ADMIN_ADJUSTMENT":
-      return { label: "Admin Adjustment", icon: "⚖️", bg: "bg-indigo-50 text-indigo-700 border-indigo-200" };
+      return { label: "Admin Adjustment", icon: "", bg: "bg-indigo-50 text-indigo-700 border-indigo-200" };
     case "REFEREE_REVIEW":
-      return { label: "Manager Review", icon: "📋", bg: "bg-slate-50 text-slate-700 border-slate-200" };
+      return { label: "Manager Review", icon: "", bg: "bg-slate-50 text-slate-700 border-slate-200" };
     case "ROLLBACK":
-      return { label: "Rollback Reversal", icon: "🔄", bg: "bg-slate-50 text-slate-700 border-slate-200" };
+      return { label: "Rollback Reversal", icon: "", bg: "bg-slate-50 text-slate-700 border-slate-200" };
     default:
-      return { label: cat ? cat.replace(/_/g, " ") : "Transaction", icon: "🪙", bg: "bg-slate-50 text-slate-700 border-slate-200" };
+      return { label: cat ? cat.replace(/_/g, " ") : "Transaction", icon: "", bg: "bg-slate-50 text-slate-700 border-slate-200" };
   }
 };
 
@@ -1074,49 +1074,49 @@ const PlayerViewModal: React.FC<PlayerViewModalProps> = ({
                 ) : (
                   <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                     <div className="bg-white border border-slate-200 rounded-xl p-3.5 text-center shadow-2xs">
-                      <span className="text-xl mb-1 block">⚽</span>
+                      
                       <p className="text-[11px] font-medium text-slate-500 uppercase tracking-wider">Goals</p>
                       <p className="text-xl font-bold text-slate-900 mt-0.5">{statsObj.goals ?? 0}</p>
                     </div>
 
                     <div className="bg-white border border-slate-200 rounded-xl p-3.5 text-center shadow-2xs">
-                      <span className="text-xl mb-1 block">👟</span>
+                      
                       <p className="text-[11px] font-medium text-slate-500 uppercase tracking-wider">Assists</p>
                       <p className="text-xl font-bold text-slate-900 mt-0.5">{statsObj.assists ?? 0}</p>
                     </div>
 
                     <div className="bg-white border border-slate-200 rounded-xl p-3.5 text-center shadow-2xs">
-                      <span className="text-xl mb-1 block">🛡️</span>
+                      
                       <p className="text-[11px] font-medium text-slate-500 uppercase tracking-wider">Clean Sheets</p>
                       <p className="text-xl font-bold text-emerald-700 mt-0.5">{statsObj.cleanSheets ?? 0}</p>
                     </div>
 
                     <div className="bg-white border border-slate-200 rounded-xl p-3.5 text-center shadow-2xs">
-                      <span className="text-xl mb-1 block">🏟️</span>
+                      
                       <p className="text-[11px] font-medium text-slate-500 uppercase tracking-wider">Matches</p>
                       <p className="text-xl font-bold text-slate-900 mt-0.5">{statsObj.matchesPlayed ?? 0}</p>
                     </div>
 
                     <div className="bg-white border border-slate-200 rounded-xl p-3.5 text-center shadow-2xs">
-                      <span className="text-xl mb-1 block">🟨</span>
+                      
                       <p className="text-[11px] font-medium text-slate-500 uppercase tracking-wider">Yellow Cards</p>
                       <p className="text-xl font-bold text-amber-700 mt-0.5">{statsObj.yellowCards ?? 0}</p>
                     </div>
 
                     <div className="bg-white border border-slate-200 rounded-xl p-3.5 text-center shadow-2xs">
-                      <span className="text-xl mb-1 block">🟥</span>
+                      
                       <p className="text-[11px] font-medium text-slate-500 uppercase tracking-wider">Red Cards</p>
                       <p className="text-xl font-bold text-rose-700 mt-0.5">{statsObj.redCards ?? 0}</p>
                     </div>
 
                     <div className="bg-white border border-slate-200 rounded-xl p-3.5 text-center shadow-2xs">
-                      <span className="text-xl mb-1 block">⭐</span>
+                      
                       <p className="text-[11px] font-medium text-slate-500 uppercase tracking-wider">POTD Awards</p>
                       <p className="text-xl font-bold text-purple-700 mt-0.5">{statsObj.playerOfTheDay ?? 0}</p>
                     </div>
 
                     <div className="bg-white border border-slate-200 rounded-xl p-3.5 text-center shadow-2xs">
-                      <span className="text-xl mb-1 block">🏆</span>
+                      
                       <p className="text-[11px] font-medium text-slate-500 uppercase tracking-wider">Points</p>
                       <p className="text-xl font-bold text-blue-700 mt-0.5">{statsObj.points ?? 0}</p>
                     </div>
@@ -1305,7 +1305,7 @@ const PlayerViewModal: React.FC<PlayerViewModalProps> = ({
                                 </td>
                                 <td className="py-2.5 px-4 whitespace-nowrap text-slate-500">
                                   <span className="text-[11px] font-semibold">
-                                    {tx.balanceBefore ?? "-"} ➔{" "}
+                                    {tx.balanceBefore ?? "-"} &rarr;{" "}
                                     <strong className="text-slate-800 font-bold">
                                       {tx.balanceAfter}
                                     </strong>
@@ -1329,7 +1329,7 @@ const PlayerViewModal: React.FC<PlayerViewModalProps> = ({
                                       )}
                                       {tx.fixture && (
                                         <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-medium bg-slate-100 text-slate-600 border border-slate-200/70">
-                                          🏟️ {tx.fixture}
+                                          {tx.fixture}
                                         </span>
                                       )}
                                     </div>
