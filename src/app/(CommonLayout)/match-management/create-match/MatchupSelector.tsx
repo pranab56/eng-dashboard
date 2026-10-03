@@ -1,25 +1,34 @@
 "use client";
 
-import { ChevronDown } from 'lucide-react';
-import Image from 'next/image';
-import { useEffect, useRef, useState } from 'react';
-import { formatImagePath } from '../../../../utils/formatImagePath';
-import { Team } from './CreateMatch';
+import { ChevronDown, Search, ArrowLeftRight, Shield } from "lucide-react";
+import Image from "next/image";
+import { useEffect, useRef, useState, useMemo } from "react";
+import { formatImagePath } from "../../../../utils/formatImagePath";
 
-// Sub-component for the Individual Team Selection
+export interface Team {
+  value: string;
+  name: string;
+  logo: string | null;
+}
+
+// Sub-component for individual Team Selection Card
 export const TeamCard = ({
   label,
+  role = "home",
   selectedTeam,
   onSelect,
   teams,
 }: {
   label: string;
+  role?: "home" | "away";
   selectedTeam: Team | null;
   teams: Team[];
   onSelect: (team: Team) => void;
 }) => {
   const [open, setOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
   const ref = useRef<HTMLDivElement>(null);
+  const searchInputRef = useRef<HTMLInputElement>(null);
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -32,38 +41,72 @@ export const TeamCard = ({
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  return (
-    <div className="flex flex-col items-center bg-gray-100 p-8 rounded-3xl w-full md:w-72">
-      <span className="text-gray-500 font-medium mb-6 tracking-wide">{label}</span>
+  // Focus search input on open
+  useEffect(() => {
+    if (open) {
+      setTimeout(() => {
+        searchInputRef.current?.focus();
+      }, 50);
+    } else {
+      setSearchQuery("");
+    }
+  }, [open]);
 
-      {/* Logo Container */}
-      <div className="bg-white p-2 rounded-3xl shadow-sm mb-8 w-40 h-40 flex items-center justify-center relative overflow-hidden">
-        {selectedTeam?.logo ? (
-          <Image
-            src={formatImagePath(selectedTeam.logo)}
-            alt={selectedTeam.name}
-            width={120}
-            height={120}
-            className="object-contain transition-opacity duration-300 rounded-3xl"
-          />
-        ) : (
-          <div className="w-full h-full flex items-center justify-center bg-gray-50 rounded-3xl">
-            <span className="text-3xl font-black text-gray-300">
-              {selectedTeam?.name?.[0] || '?'}
-            </span>
-          </div>
-        )}
+  // Filtered teams list based on search query
+  const filteredTeams = useMemo(() => {
+    if (!searchQuery.trim()) return teams;
+    const q = searchQuery.toLowerCase().trim();
+    return teams.filter((t) => t.name.toLowerCase().includes(q));
+  }, [teams, searchQuery]);
+
+  return (
+    <div className="flex-1 bg-white border border-slate-200 rounded-lg p-4 sm:p-5 flex flex-col items-center justify-between shadow-2xs relative">
+      {/* Top Header Badge */}
+      <div className="w-full flex items-center justify-between pb-3 border-b border-slate-100">
+        <span className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider">
+          {label}
+        </span>
+        <span
+          className={`text-[10px] font-semibold px-2 py-0.5 rounded border uppercase tracking-wider ${
+            role === "home"
+              ? "bg-slate-100 text-slate-800 border-slate-200"
+              : "bg-slate-100 text-slate-700 border-slate-200"
+          }`}
+        >
+          {role === "home" ? "Home" : "Away"}
+        </span>
       </div>
 
-      {/* Team Name */}
-      {selectedTeam && (
-        <p className="text-sm font-medium text-gray-700 mb-3 text-center">{selectedTeam.name}</p>
-      )}
+      {/* Team Crest / Logo Display */}
+      <div className="my-4 flex flex-col items-center">
+        <div className="w-20 h-20 rounded-lg bg-slate-50 border border-slate-200 flex items-center justify-center p-2.5 relative shadow-2xs">
+          {selectedTeam?.logo ? (
+            <Image
+              src={formatImagePath(selectedTeam.logo)}
+              alt={selectedTeam.name}
+              width={64}
+              height={64}
+              className="object-contain max-h-full max-w-full"
+            />
+          ) : selectedTeam ? (
+            <div className="w-full h-full flex items-center justify-center text-slate-400 font-bold text-xl uppercase">
+              {selectedTeam.name.slice(0, 2)}
+            </div>
+          ) : (
+            <Shield className="w-8 h-8 text-slate-300 stroke-[1.5]" />
+          )}
+        </div>
 
-      {/* Custom Styled Dropdown */}
+        {/* Selected Team Name */}
+        <p className="text-sm font-semibold text-slate-900 text-center truncate max-w-[200px] h-5 mt-1">
+          {selectedTeam ? selectedTeam.name : "No team selected"}
+        </p>
+      </div>
+
+      {/* Dropdown Selector */}
       <div className="relative w-full" ref={ref}>
         {teams.length === 0 ? (
-          <div className="w-full py-3 px-4 rounded-xl bg-gray-200 text-gray-400 text-sm text-center font-medium">
+          <div className="w-full h-9 px-3 rounded-md bg-slate-100 border border-slate-200 text-slate-400 text-xs flex items-center justify-center font-medium">
             No teams available
           </div>
         ) : (
@@ -71,48 +114,83 @@ export const TeamCard = ({
             {/* Trigger Button */}
             <button
               type="button"
-              onClick={() => setOpen(prev => !prev)}
-              className="w-full flex items-center justify-between bg-white py-3 px-4 rounded-xl text-gray-800 font-medium shadow-sm focus:outline-none focus:ring-2 focus:ring-gray-300 cursor-pointer transition-all"
+              onClick={() => setOpen((prev) => !prev)}
+              className={`w-full h-9 flex items-center justify-between px-3 bg-white border rounded-md text-xs font-medium transition-colors cursor-pointer select-none ${
+                open
+                  ? "border-slate-500 ring-2 ring-slate-900/5"
+                  : "border-slate-200 hover:border-slate-300 text-slate-800"
+              }`}
             >
-              <span className={selectedTeam ? "text-gray-800" : "text-gray-400"}>
-                {selectedTeam ? selectedTeam.name : "Select team"}
+              <span className="truncate pr-2">
+                {selectedTeam ? selectedTeam.name : "Select team..."}
               </span>
               <ChevronDown
-                className={`w-5 h-5 text-gray-500 transition-transform duration-200 ${open ? "rotate-180" : ""}`}
+                className={`w-4 h-4 text-slate-400 shrink-0 transition-transform duration-150 ${
+                  open ? "rotate-180 text-slate-600" : ""
+                }`}
               />
             </button>
 
-            {/* Dropdown Panel */}
+            {/* Dropdown Menu */}
             {open && (
-              <div className="absolute z-50 mt-2 w-full bg-white rounded-xl shadow-xl border border-gray-100 max-h-56 overflow-y-auto">
-                {teams.map((team) => (
-                  <button
-                    key={team.value}
-                    type="button"
-                    onClick={() => {
-                      onSelect(team);
-                      setOpen(false);
-                    }}
-                    className={`w-full flex items-center gap-3 px-4 py-3 text-sm text-left transition-colors hover:bg-gray-50 cursor-pointer
-                      ${selectedTeam?.value === team.value ? "bg-gray-100 font-semibold text-gray-900" : "text-gray-700"}`}
-                  >
-                    {/* Mini Logo */}
-                    <div className="w-7 h-7 rounded-full bg-gray-100 flex items-center justify-center flex-shrink-0 overflow-hidden">
-                      {team.logo ? (
-                        <Image
-                          src={formatImagePath(team.logo)}
-                          alt={team.name}
-                          width={28}
-                          height={28}
-                          className="object-contain"
-                        />
-                      ) : (
-                        <span className="text-xs font-bold text-gray-400">{team.name?.[0]}</span>
-                      )}
+              <div className="absolute z-50 mt-1.5 w-full bg-white rounded-lg shadow-xl border border-slate-200 p-1.5 animate-in fade-in zoom-in-95 duration-100">
+                {/* Search Input */}
+                <div className="relative mb-1 px-1">
+                  <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+                  <input
+                    ref={searchInputRef}
+                    type="text"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    placeholder="Search team..."
+                    className="w-full h-8 pl-8 pr-2 text-xs bg-slate-50 border border-slate-200 rounded-md text-slate-800 placeholder-slate-400 focus:outline-none focus:border-slate-400 focus:bg-white"
+                  />
+                </div>
+
+                {/* Team Options */}
+                <div className="max-h-52 overflow-y-auto space-y-0.5 pr-0.5">
+                  {filteredTeams.length === 0 ? (
+                    <div className="py-4 text-center text-xs text-slate-400">
+                      No matching teams
                     </div>
-                    <span>{team.name}</span>
-                  </button>
-                ))}
+                  ) : (
+                    filteredTeams.map((team) => {
+                      const isSelected = selectedTeam?.value === team.value;
+                      return (
+                        <button
+                          key={team.value}
+                          type="button"
+                          onClick={() => {
+                            onSelect(team);
+                            setOpen(false);
+                          }}
+                          className={`w-full flex items-center gap-2.5 px-2.5 py-1.5 rounded-md text-xs text-left transition-colors cursor-pointer ${
+                            isSelected
+                              ? "bg-slate-100 text-slate-900 font-semibold"
+                              : "text-slate-700 hover:bg-slate-50"
+                          }`}
+                        >
+                          <div className="w-6 h-6 rounded bg-slate-100 border border-slate-200 flex items-center justify-center shrink-0 overflow-hidden">
+                            {team.logo ? (
+                              <Image
+                                src={formatImagePath(team.logo)}
+                                alt={team.name}
+                                width={22}
+                                height={22}
+                                className="object-contain"
+                              />
+                            ) : (
+                              <span className="text-[10px] font-bold text-slate-400">
+                                {team.name?.[0] || "?"}
+                              </span>
+                            )}
+                          </div>
+                          <span className="truncate flex-1">{team.name}</span>
+                        </button>
+                      );
+                    })
+                  )}
+                </div>
               </div>
             )}
           </>
@@ -121,3 +199,67 @@ export const TeamCard = ({
     </div>
   );
 };
+
+// Full Matchup Selector Component with Home, VS / Swap, and Away
+interface MatchupSelectorProps {
+  homeTeam: Team | null;
+  awayTeam: Team | null;
+  homeTeamOptions: Team[];
+  awayTeamOptions: Team[];
+  onSelectHome: (team: Team) => void;
+  onSelectAway: (team: Team) => void;
+  onSwapTeams?: () => void;
+}
+
+export const MatchupSelector = ({
+  homeTeam,
+  awayTeam,
+  homeTeamOptions,
+  awayTeamOptions,
+  onSelectHome,
+  onSelectAway,
+  onSwapTeams,
+}: MatchupSelectorProps) => {
+  return (
+    <div className="w-full flex flex-col md:flex-row items-center gap-4">
+      {/* Home Team Card */}
+      <TeamCard
+        label="Home Fixture"
+        role="home"
+        selectedTeam={homeTeam}
+        onSelect={onSelectHome}
+        teams={homeTeamOptions}
+      />
+
+      {/* VS & Swap Action in center */}
+      <div className="flex flex-row md:flex-col items-center justify-center gap-2 shrink-0 py-2">
+        <div className="w-10 h-10 rounded-full bg-slate-100 border border-slate-200 flex items-center justify-center text-xs font-bold text-slate-600 shadow-2xs select-none">
+          VS
+        </div>
+
+        {onSwapTeams && (
+          <button
+            type="button"
+            onClick={onSwapTeams}
+            disabled={!homeTeam && !awayTeam}
+            className="p-1.5 rounded-md border border-slate-200 bg-white hover:bg-slate-50 text-slate-500 hover:text-slate-800 disabled:opacity-40 disabled:cursor-not-allowed transition-colors cursor-pointer shadow-2xs"
+            title="Swap Home and Away teams"
+          >
+            <ArrowLeftRight className="w-3.5 h-3.5" />
+          </button>
+        )}
+      </div>
+
+      {/* Away Team Card */}
+      <TeamCard
+        label="Away Fixture"
+        role="away"
+        selectedTeam={awayTeam}
+        onSelect={onSelectAway}
+        teams={awayTeamOptions}
+      />
+    </div>
+  );
+};
+
+export default MatchupSelector;

@@ -19,8 +19,8 @@ import {
   Plus,
   ChevronDown,
   Check,
-  MapPin,
-  Flame,
+  ArrowUpDown,
+  Layers,
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -230,6 +230,8 @@ const MatchManagement = () => {
   const urlPageParam = searchParams.get("matchPage");
 
   // Filters State
+  const [matchTypeFilter, setMatchTypeFilter] = useState<string>("ALL");
+  const [sortFilter, setSortFilter] = useState<string>("-createdAt");
   const [leagueFilter, setLeagueFilter] = useState<string>("ALL");
   const [dateFilter, setDateFilter] = useState<string>("ALL");
   const [statusFilter, setStatusFilter] = useState<string>("ALL");
@@ -249,6 +251,8 @@ const MatchManagement = () => {
       const saved = sessionStorage.getItem("match_management_filters");
       if (saved) {
         const parsed = JSON.parse(saved);
+        if (parsed.matchTypeFilter !== undefined) setMatchTypeFilter(parsed.matchTypeFilter);
+        if (parsed.sortFilter !== undefined) setSortFilter(parsed.sortFilter);
         if (parsed.leagueFilter !== undefined) setLeagueFilter(parsed.leagueFilter);
         if (parsed.dateFilter !== undefined) setDateFilter(parsed.dateFilter);
         if (parsed.statusFilter !== undefined) setStatusFilter(parsed.statusFilter);
@@ -277,6 +281,8 @@ const MatchManagement = () => {
     if (!isFiltersRestored) return;
     try {
       const stateToSave = {
+        matchTypeFilter,
+        sortFilter,
         leagueFilter,
         dateFilter,
         statusFilter,
@@ -293,6 +299,8 @@ const MatchManagement = () => {
     }
   }, [
     isFiltersRestored,
+    matchTypeFilter,
+    sortFilter,
     leagueFilter,
     dateFilter,
     statusFilter,
@@ -310,6 +318,18 @@ const MatchManagement = () => {
       params.delete("matchPage");
       router.replace(`${pathname}?${params.toString()}`);
     }
+  };
+
+  const handleSetMatchTypeFilter = (val: string, opt?: OptionItem) => {
+    resetPageInUrl();
+    setMatchTypeFilter(val);
+    if (opt) setFilterLabels((prev) => ({ ...prev, matchType: opt.label }));
+  };
+
+  const handleSetSortFilter = (val: string, opt?: OptionItem) => {
+    resetPageInUrl();
+    setSortFilter(val);
+    if (opt) setFilterLabels((prev) => ({ ...prev, sort: opt.label }));
   };
 
   const handleSetLeagueFilter = (val: string, opt?: OptionItem) => {
@@ -379,6 +399,20 @@ const MatchManagement = () => {
   const allTeams: any[] = teamData?.data?.result || teamData?.data || [];
   const venueList: any[] = venueCategoryData?.data || [];
 
+  const matchTypeOptions: OptionItem[] = [
+    { label: "Type : All Matches", value: "ALL" },
+    { label: "League Match", value: "league" },
+    { label: "Cup Match", value: "cup" },
+    { label: "Friendly Match", value: "friendly" },
+  ];
+
+  const sortOptions: OptionItem[] = [
+    { label: "Sort : Recently Added (Newest)", value: "-createdAt" },
+    { label: "Sort : Kickoff (Upcoming First)", value: "matchDate" },
+    { label: "Sort : Kickoff (Latest First)", value: "-matchDate" },
+    { label: "Sort : Oldest Added", value: "createdAt" },
+  ];
+
   const competitionOptions: OptionItem[] = useMemo(() => {
     const list: OptionItem[] = [
       { label: "Competition : All", value: "ALL" },
@@ -394,6 +428,7 @@ const MatchManagement = () => {
   }, [allLeagues, leagueFilter, filterLabels.league]);
 
   const { data: scheduleDatesData } = useGetMatchScheduleDatesQuery({
+    ...(matchTypeFilter !== "ALL" && { matchType: matchTypeFilter }),
     ...(leagueFilter !== "ALL" && { league: leagueFilter, leagueId: leagueFilter }),
     ...(teamFilter !== "ALL" && { team: teamFilter, teamId: teamFilter }),
     ...(statusFilter !== "ALL" && { status: statusFilter }),
@@ -480,6 +515,8 @@ const MatchManagement = () => {
 
   const queryParams = {
     page,
+    ...(matchTypeFilter !== "ALL" && { matchType: matchTypeFilter }),
+    ...(sortFilter && { sort: sortFilter }),
     ...(leagueFilter !== "ALL" && { league: leagueFilter, leagueId: leagueFilter }),
     ...(statusFilter !== "ALL" && { status: statusFilter }),
     ...(isExactDate && { matchDate: dateFilter }),
@@ -525,6 +562,8 @@ const MatchManagement = () => {
   }, [setHeaders]);
 
   const handleResetFilters = () => {
+    setMatchTypeFilter("ALL");
+    setSortFilter("-createdAt");
     setLeagueFilter("ALL");
     setDateFilter("ALL");
     setStatusFilter("ALL");
@@ -607,6 +646,8 @@ const MatchManagement = () => {
   const totalPages = matchData?.pagination?.totalPage || 1;
 
   const hasActiveFilters =
+    matchTypeFilter !== "ALL" ||
+    sortFilter !== "-createdAt" ||
     leagueFilter !== "ALL" ||
     dateFilter !== "ALL" ||
     statusFilter !== "ALL" ||
@@ -684,7 +725,7 @@ const MatchManagement = () => {
             <span className="text-xs text-slate-500">matches</span>
           </div>
           <p className="text-[11px] text-slate-400 mt-1">
-            All registered league and cup fixtures
+            All registered league, cup, and friendly fixtures
           </p>
         </div>
 
@@ -752,7 +793,7 @@ const MatchManagement = () => {
         <div className="flex items-center justify-between pb-3 border-b border-slate-100">
           <div className="flex items-center gap-2 text-slate-800 font-semibold text-xs uppercase tracking-wider">
             <Filter className="w-3.5 h-3.5 text-slate-500" />
-            <span>Fixture Filters</span>
+            <span>Fixture Filters & Sorting</span>
           </div>
           {hasActiveFilters && (
             <button
@@ -767,7 +808,17 @@ const MatchManagement = () => {
         </div>
 
         {/* Top Dropdowns Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
+          {/* Match Type Filter */}
+          <CustomSearchableSelect
+            label="Match Type"
+            value={matchTypeFilter}
+            onChange={handleSetMatchTypeFilter}
+            options={matchTypeOptions}
+            placeholder="Type : All"
+          />
+
+          {/* Competition / League */}
           <CustomSearchableSelect
             label="Competition"
             value={leagueFilter}
@@ -776,6 +827,7 @@ const MatchManagement = () => {
             placeholder="Competition : All"
           />
 
+          {/* Schedule Date */}
           <CustomSearchableSelect
             label="Schedule Date"
             value={dateFilter}
@@ -784,6 +836,7 @@ const MatchManagement = () => {
             placeholder="Date : All"
           />
 
+          {/* Match Status */}
           <CustomSearchableSelect
             label="Match Status"
             value={statusFilter}
@@ -792,14 +845,16 @@ const MatchManagement = () => {
             placeholder="Status : All"
           />
 
+          {/* Date Range Status */}
           <CustomSearchableSelect
             label="Date Range Status"
             value={matchDateStatusFilter}
             onChange={handleSetMatchDateStatusFilter}
             options={matchDateStatusOptions}
-            placeholder="Match Date Status : All"
+            placeholder="Range : All"
           />
 
+          {/* Venue Location */}
           <CustomSearchableSelect
             label="Venue Location"
             value={venueFilter}
@@ -809,31 +864,43 @@ const MatchManagement = () => {
           />
         </div>
 
-        {/* Secondary Filter Row: Team Select, Checkbox, Search */}
-        <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3 pt-3 border-t border-slate-100">
-          {/* Team Dropdown */}
-          <div className="w-full md:w-72">
-            <CustomSearchableSelect
-              value={teamFilter}
-              onChange={handleSetTeamFilter}
-              options={teamOptions}
-              placeholder="Team : All"
-            />
-          </div>
+        {/* Secondary Filter Row: Team Select, Sort, Checkbox, Search */}
+        <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3 pt-3 border-t border-slate-100 flex-wrap">
+          <div className="flex items-center gap-3 flex-1 flex-wrap">
+            {/* Team Dropdown */}
+            <div className="w-full sm:w-64">
+              <CustomSearchableSelect
+                value={teamFilter}
+                onChange={handleSetTeamFilter}
+                options={teamOptions}
+                placeholder="Team : All"
+              />
+            </div>
 
-          {/* Unplayed Only Checkbox */}
-          <label className="flex items-center gap-2 text-xs font-medium text-slate-700 cursor-pointer select-none">
-            <input
-              type="checkbox"
-              checked={unplayedOnly}
-              onChange={(e) => {
-                resetPageInUrl();
-                setUnplayedOnly(e.target.checked);
-              }}
-              className="w-3.5 h-3.5 rounded border-slate-300 text-slate-900 focus:ring-slate-900 cursor-pointer"
-            />
-            <span>Show unplayed fixtures only</span>
-          </label>
+            {/* Sort Order Selector */}
+            <div className="w-full sm:w-64">
+              <CustomSearchableSelect
+                value={sortFilter}
+                onChange={handleSetSortFilter}
+                options={sortOptions}
+                placeholder="Sort : Recently Added"
+              />
+            </div>
+
+            {/* Unplayed Only Checkbox */}
+            <label className="flex items-center gap-2 text-xs font-medium text-slate-700 cursor-pointer select-none">
+              <input
+                type="checkbox"
+                checked={unplayedOnly}
+                onChange={(e) => {
+                  resetPageInUrl();
+                  setUnplayedOnly(e.target.checked);
+                }}
+                className="w-3.5 h-3.5 rounded border-slate-300 text-slate-900 focus:ring-slate-900 cursor-pointer"
+              />
+              <span>Unplayed fixtures only</span>
+            </label>
+          </div>
 
           {/* Search Term Input */}
           <div className="relative w-full md:w-64">
@@ -868,8 +935,8 @@ const MatchManagement = () => {
               fixtures (Page {page} of {totalPages})
             </span>
             {hasActiveFilters && (
-              <span className="text-slate-600">
-                Filtered view active
+              <span className="text-slate-600 font-medium">
+                Filtered view active • Sorted by {filterLabels.sort || "Recently Added"}
               </span>
             )}
           </div>
