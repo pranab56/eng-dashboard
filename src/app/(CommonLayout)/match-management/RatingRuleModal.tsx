@@ -1,4 +1,5 @@
-﻿"use client";
+"use client";
+
 import React, { useEffect, useState } from "react";
 import {
   Dialog,
@@ -11,15 +12,22 @@ import {
   useUpdateMatchFeedbackSettingMutation,
 } from "@/features/match/matchApi";
 import { toast } from "sonner";
-import { Clock, ShieldCheck, X, Sparkles, CheckCircle2 } from "lucide-react";
+import { X, Loader2 } from "lucide-react";
 
 interface RatingRuleModalProps {
   isOpen: boolean;
   onClose: () => void;
 }
 
+const PRESET_HOURS = [
+  { label: "24h", value: 24 },
+  { label: "48h", value: 48 },
+  { label: "72h", value: 72 },
+  { label: "7 Days", value: 168 },
+];
+
 const RatingRuleModal = ({ isOpen, onClose }: RatingRuleModalProps) => {
-  const { data: settingData } =
+  const { data: settingData, isLoading: isFetching } =
     useGetMatchFeedbackSettingQuery(undefined, { skip: !isOpen });
   const [updateMatchFeedbackSetting, { isLoading: isSaving }] =
     useUpdateMatchFeedbackSettingMutation();
@@ -50,11 +58,11 @@ const RatingRuleModal = ({ isOpen, onClose }: RatingRuleModalProps) => {
       if (res?.success) {
         toast.success(
           isRestricted
-            ? `Feedback rule updated: ${feedbackHours} hours allowed.`
-            : "Feedback restriction disabled: Coaches & referees can rate anytime!"
+            ? `Feedback rule updated: ${feedbackHours}-hour submission window.`
+            : "Feedback restriction disabled: Open submission enabled."
         );
       } else {
-        toast.success("Settings saved successfully!");
+        toast.success("Settings saved successfully.");
       }
       onClose();
     } catch (error: any) {
@@ -66,28 +74,24 @@ const RatingRuleModal = ({ isOpen, onClose }: RatingRuleModalProps) => {
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent
         showCloseButton={false}
-        className="sm:max-w-xl w-full bg-white rounded-3xl p-0 overflow-hidden border-none shadow-2xl animate-in zoom-in-95 duration-200"
+        className="sm:max-w-lg w-full bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-lg p-0 overflow-hidden"
       >
         {/* Header */}
-        <DialogHeader className="bg-slate-50 p-6 border-b border-slate-100 relative shrink-0 flex flex-row items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-600">
-              <Clock className="w-5 h-5" />
-            </div>
-            <div>
-              <DialogTitle className="text-lg font-bold text-slate-800">
-                Match Rating & Feedback Rule
-              </DialogTitle>
-              <p className="text-xs text-slate-500">
-                Set or disable the time limit for coaches and referees to submit ratings.
-              </p>
-            </div>
+        <DialogHeader className="px-6 py-4 border-b border-slate-100 dark:border-slate-800 flex flex-row items-center justify-between">
+          <div className="space-y-0.5">
+            <DialogTitle className="text-base font-semibold text-slate-900 dark:text-slate-100">
+              Match Rating & Feedback Rule
+            </DialogTitle>
+            <p className="text-xs text-slate-500 dark:text-slate-400">
+              Configure submission deadlines for coach and referee post-match evaluations.
+            </p>
           </div>
 
           <button
             type="button"
             onClick={onClose}
-            className="w-8 h-8 rounded-full bg-white border border-slate-200 flex items-center justify-center text-slate-400 hover:text-slate-700 transition-colors shadow-xs cursor-pointer"
+            aria-label="Close dialog"
+            className="h-8 w-8 inline-flex items-center justify-center rounded-md text-slate-400 hover:text-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 dark:hover:text-slate-200 transition-colors cursor-pointer"
           >
             <X className="w-4 h-4" />
           </button>
@@ -95,93 +99,91 @@ const RatingRuleModal = ({ isOpen, onClose }: RatingRuleModalProps) => {
 
         {/* Content */}
         <div className="p-6 space-y-6">
-          {/* Status Badge */}
-          <div className="flex items-center justify-between p-4 rounded-2xl bg-slate-50 border border-slate-100">
-            <div className="space-y-0.5">
-              <span className="text-xs font-bold text-slate-700 block">
-                Current Restriction Status
-              </span>
-              <span className="text-xs text-slate-500 block">
-                {isRestricted
-                  ? `Ratings allowed within ${feedbackHours} hours after match finishes.`
-                  : "No restriction. Coaches & referees can rate anytime!"}
-              </span>
-            </div>
-            {isRestricted ? (
-              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800">
-                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
-                <span>Restricted</span>
-              </span>
-            ) : (
-              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-amber-100 text-amber-800">
-                <Sparkles className="w-3.5 h-3.5 text-amber-600" />
-                <span>Unlimited</span>
-              </span>
-            )}
-          </div>
-
-          {/* Restriction Toggle */}
-          <div className="flex items-center justify-between p-4 rounded-2xl border border-slate-200/80 bg-white shadow-xs">
-            <div className="space-y-1 max-w-[80%]">
-              <span className="text-sm font-bold text-slate-900 block">
-                Enforce Time Restriction
-              </span>
-              <p className="text-xs text-slate-500 leading-relaxed">
-                {isRestricted
-                  ? "Submissions are locked once the time window expires."
-                  : "Restriction is DISABLED. Coaches will never see 'Already done' or expiration errors."}
+          {/* Restriction Switch Row */}
+          <div className="flex items-start justify-between gap-4">
+            <div className="space-y-1">
+              <div className="flex items-center gap-2">
+                <label
+                  htmlFor="restriction-toggle"
+                  className="text-sm font-medium text-slate-900 dark:text-slate-100 cursor-pointer"
+                >
+                  Enforce Time Restriction
+                </label>
+                <span
+                  className={`inline-flex items-center px-2 py-0.5 rounded text-[11px] font-medium ${
+                    isRestricted
+                      ? "bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300"
+                      : "bg-amber-50 text-amber-700 dark:bg-amber-950/40 dark:text-amber-400"
+                  }`}
+                >
+                  {isRestricted ? "Restricted" : "Open Window"}
+                </span>
+              </div>
+              <p className="text-xs text-slate-500 dark:text-slate-400 leading-normal max-w-sm">
+                When enabled, ratings and feedback must be submitted within the specified time window after a match ends.
               </p>
             </div>
 
-            {/* Switch button */}
+            {/* Custom Accessible Toggle */}
             <button
+              id="restriction-toggle"
               type="button"
               role="switch"
               aria-checked={isRestricted}
               onClick={() => setIsRestricted((prev) => !prev)}
-              className={`relative inline-flex h-7 w-14 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${
-                isRestricted ? "bg-amber-500" : "bg-slate-300"
+              className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus-visible:ring-2 focus-visible:ring-slate-950 focus-visible:ring-offset-2 ${
+                isRestricted ? "bg-slate-900 dark:bg-slate-100" : "bg-slate-200 dark:bg-slate-700"
               }`}
             >
               <span
-                className={`pointer-events-none inline-block h-6 w-6 transform rounded-full bg-white shadow-md ring-0 transition duration-200 ease-in-out ${
-                  isRestricted ? "translate-x-7" : "translate-x-0"
+                className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white dark:bg-slate-900 shadow-sm ring-0 transition duration-200 ease-in-out ${
+                  isRestricted ? "translate-x-5 dark:bg-slate-900" : "translate-x-0"
                 }`}
               />
             </button>
           </div>
 
-          {/* Configurable Hours (Active if restricted) */}
-          <div className={`space-y-4 transition-all duration-200 ${isRestricted ? "opacity-100" : "opacity-50 pointer-events-none"}`}>
-            <div>
-              <label className="block text-xs font-bold text-slate-700 mb-1.5">
-                Feedback Window (Hours)
-              </label>
-              <div className="flex items-center gap-3">
-                <input
-                  type="number"
-                  min="1"
-                  max="720"
-                  disabled={!isRestricted}
-                  value={feedbackHours}
-                  onChange={(e) => setFeedbackHours(Math.max(1, parseInt(e.target.value) || 1))}
-                  className="w-32 bg-white border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm font-bold text-slate-800 focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 shadow-xs text-center"
-                />
-                <div className="flex flex-wrap gap-1.5">
-                  {[
-                    { label: "24h", val: 24 },
-                    { label: "48h", val: 48 },
-                    { label: "72h", val: 72 },
-                    { label: "7 Days", val: 168 },
-                  ].map((preset) => (
+          <div className="h-px bg-slate-100 dark:bg-slate-800" />
+
+          {/* Submission Window Configuration */}
+          {isRestricted ? (
+            <div className="space-y-3">
+              <div>
+                <label className="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">
+                  Submission Window (Hours)
+                </label>
+                <p className="text-xs text-slate-500 dark:text-slate-400 mb-2.5">
+                  Allowed duration after final whistle for coaches and referees to complete ratings.
+                </p>
+              </div>
+
+              <div className="flex flex-wrap items-center gap-2">
+                <div className="relative">
+                  <input
+                    type="number"
+                    min="1"
+                    max="720"
+                    value={feedbackHours}
+                    onChange={(e) =>
+                      setFeedbackHours(Math.max(1, parseInt(e.target.value, 10) || 1))
+                    }
+                    className="h-8.5 w-24 rounded-md border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-3 text-sm text-slate-900 dark:text-slate-100 font-medium focus:border-slate-900 dark:focus:border-slate-100 focus:outline-none focus:ring-1 focus:ring-slate-900 dark:focus:ring-slate-100"
+                  />
+                  <span className="absolute right-2.5 top-1/2 -translate-y-1/2 text-xs text-slate-400 pointer-events-none">
+                    hrs
+                  </span>
+                </div>
+
+                <div className="flex items-center gap-1.5">
+                  {PRESET_HOURS.map((preset) => (
                     <button
-                      key={preset.val}
+                      key={preset.value}
                       type="button"
-                      onClick={() => setFeedbackHours(preset.val)}
-                      className={`px-3 py-2 rounded-xl text-xs font-bold border transition-all cursor-pointer ${
-                        feedbackHours === preset.val
-                          ? "bg-amber-500 text-white border-amber-500 shadow-xs"
-                          : "bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-100"
+                      onClick={() => setFeedbackHours(preset.value)}
+                      className={`h-8.5 px-3 text-xs font-medium rounded-md border transition-colors cursor-pointer ${
+                        feedbackHours === preset.value
+                          ? "bg-slate-900 text-white border-slate-900 dark:bg-slate-100 dark:text-slate-900 dark:border-slate-100"
+                          : "bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700"
                       }`}
                     >
                       {preset.label}
@@ -190,40 +192,38 @@ const RatingRuleModal = ({ isOpen, onClose }: RatingRuleModalProps) => {
                 </div>
               </div>
             </div>
-
-            <div className="p-3 bg-slate-50 border border-slate-200 rounded-xl">
-              <span className="text-[11px] font-bold text-slate-500 block uppercase tracking-wider">
-                Timezone Standard
-              </span>
-              <span className="text-xs font-bold text-slate-800 flex items-center gap-2 mt-0.5">
-                <span>🇬🇧 Europe/London (UK Time)</span>
-                <span className="text-[10px] px-1.5 py-0.5 rounded bg-amber-100 text-amber-800 font-semibold">Fixed</span>
-              </span>
+          ) : (
+            <div className="p-3.5 rounded-lg bg-slate-50 dark:bg-slate-800/50 border border-slate-200/80 dark:border-slate-800 text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
+              Time restriction is turned off. Evaluators can submit ratings and feedback at any point after the match without encountering an expiration block.
             </div>
+          )}
+
+          {/* Timezone Information */}
+          <div className="pt-1 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between text-xs">
+            <span className="text-slate-500 dark:text-slate-400">System Timezone</span>
+            <span className="font-medium text-slate-700 dark:text-slate-300">
+              {feedbackTimezone} (UTC)
+            </span>
           </div>
         </div>
 
-        {/* Footer actions */}
-        <div className="bg-slate-50 p-4 border-t border-slate-100 flex items-center justify-end gap-3">
+        {/* Footer Actions */}
+        <div className="px-6 py-3.5 bg-slate-50 dark:bg-slate-800/40 border-t border-slate-100 dark:border-slate-800 flex items-center justify-end gap-2.5">
           <button
             type="button"
             onClick={onClose}
-            className="px-4 py-2 text-xs font-bold text-slate-600 hover:bg-slate-100 rounded-xl transition-colors cursor-pointer"
+            className="h-8.5 px-3.5 text-xs font-medium text-slate-700 dark:text-slate-300 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 rounded-md transition-colors cursor-pointer"
           >
             Cancel
           </button>
           <button
             type="button"
-            disabled={isSaving}
+            disabled={isSaving || isFetching}
             onClick={handleSave}
-            className="px-6 py-2 bg-amber-500 hover:bg-amber-600 text-white text-xs font-bold rounded-xl transition-all shadow-md shadow-amber-500/20 cursor-pointer disabled:opacity-50 flex items-center gap-2"
+            className="h-8.5 px-4 text-xs font-medium text-white bg-slate-900 hover:bg-slate-800 dark:bg-slate-100 dark:text-slate-900 dark:hover:bg-slate-200 rounded-md transition-colors shadow-2xs cursor-pointer disabled:opacity-50 inline-flex items-center gap-1.5"
           >
-            {isSaving ? <span>Saving...</span> : (
-              <>
-                <ShieldCheck className="w-4 h-4" />
-                <span>Save Rule</span>
-              </>
-            )}
+            {isSaving && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
+            <span>Save Changes</span>
           </button>
         </div>
       </DialogContent>
