@@ -68,7 +68,7 @@ const VerifyOtp = () => {
   };
 
   return (
-    <div className="w-full">
+    <div className="min-h-screen bg-slate-950 flex flex-col justify-center items-center py-12 px-4 sm:px-6 antialiased"><div className="w-full max-w-[420px] bg-white rounded-2xl border border-slate-200/90 shadow-2xl p-6 sm:p-8">
       <div className="text-center mb-6">
         <h1 className="text-xl font-semibold text-slate-900 tracking-tight">Verify Code</h1>
         <p className="text-xs text-slate-500 mt-1">
@@ -145,7 +145,7 @@ const VerifyOtp = () => {
         <ShieldCheck className="w-3.5 h-3.5 text-slate-400 shrink-0" />
         <span>Enterprise Access &bull; Strict Role Authorization</span>
       </div>
-    </div>
+    </div></div>
   );
 };
 
