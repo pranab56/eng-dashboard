@@ -4,8 +4,11 @@ import { Suspense } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
+import { ArrowLeft, Loader2, RotateCw, ShieldCheck } from "lucide-react";
+import Link from "next/link";
+import { useRouter, useSearchParams } from "next/navigation";
+import toast from "react-hot-toast";
 
-import { Button } from "@/components/ui/button";
 import {
   Form,
   FormControl,
@@ -14,55 +17,43 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp";
-import { Loader } from "lucide-react";
-import Link from 'next/link';
-import { useRouter, useSearchParams } from "next/navigation";
-import toast from 'react-hot-toast';
-import { useResendOTPMutation, useVerifyEmailMutation } from '../../../../features/auth/authApi';
+import { useResendOTPMutation, useVerifyEmailMutation } from "../../../../features/auth/authApi";
 
+const verifyOtpSchema = z.object({
+  verifyOtp: z.string().min(6, { message: "Please enter all 6 digits." }),
+});
 
+type VerifyOtpFormValues = z.infer<typeof verifyOtpSchema>;
 
-
-// Schema
-const contactUsFormSchema = z
-  .object({
-    verifyOtp: z.string(),
-  });
-
-// Type
-type ContactUsFormValues = z.infer<typeof contactUsFormSchema>;
-
-const defaultValues: Partial<ContactUsFormValues> = {
+const defaultValues: Partial<VerifyOtpFormValues> = {
   verifyOtp: "",
 };
 
 const VerifyOtp = () => {
   const searchParams = useSearchParams();
-  const email = searchParams.get("email");
+  const email = searchParams.get("email") || "";
   const router = useRouter();
   const [verifyEmail, { isLoading }] = useVerifyEmailMutation();
   const [reSendOTP, { isLoading: isResendLoading }] = useResendOTPMutation();
 
-
-  const form = useForm<ContactUsFormValues>({
-    resolver: zodResolver(contactUsFormSchema),
+  const form = useForm<VerifyOtpFormValues>({
+    resolver: zodResolver(verifyOtpSchema),
     defaultValues,
     mode: "onChange",
   });
 
-  async function onSubmit(data: ContactUsFormValues) {
+  async function onSubmit(data: VerifyOtpFormValues) {
     try {
-      const res = await verifyEmail({ email: email, oneTimeCode: data.verifyOtp }).unwrap();
+      const res = await verifyEmail({ email, oneTimeCode: data.verifyOtp }).unwrap();
       if (res.success) {
-        toast.success(res.message);
-        router.push(`/auth/reset-password?token=${res.data}`)
+        toast.success(res.message || "Code verified successfully");
+        router.push(`/auth/reset-password?token=${encodeURIComponent(res.data)}`);
       }
     } catch (error: unknown) {
-      const err = error as { message?: string };
-      console.error("Verification error:", err?.message);
-      toast.error(err?.message || "Verification failed");
+      const err = error as { message?: string; data?: { message?: string } };
+      console.error("Verification error:", err);
+      toast.error(err?.data?.message || err?.message || "Verification failed");
     }
-
   }
 
   const handleResendOTP = async () => {
@@ -76,69 +67,91 @@ const VerifyOtp = () => {
     }
   };
 
-
   return (
-    <>
-      <h2 className="text-2xl md:text-3xl xl:text-4xl font-medium text-gray-800 pb-12">Verify OTP</h2>
+    <div className="w-full">
+      <div className="text-center mb-6">
+        <h1 className="text-xl font-semibold text-slate-900 tracking-tight">Verify Code</h1>
+        <p className="text-xs text-slate-500 mt-1">
+          Enter the 6-digit verification code sent to{" "}
+          <strong className="text-slate-800 font-semibold">{email || "your email"}</strong>
+        </p>
+      </div>
 
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-
-          {/* Email */}
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5">
           <FormField
             control={form.control}
             name="verifyOtp"
             render={({ field }) => (
-              <FormItem>
+              <FormItem className="flex flex-col items-center">
                 <FormControl>
                   <InputOTP maxLength={6} {...field}>
-                    <InputOTPGroup className="">
-                      <InputOTPSlot index={0} />
-                      <InputOTPSlot index={1} />
-                      <InputOTPSlot index={2} />
-                      <InputOTPSlot index={3} />
-                      <InputOTPSlot index={4} />
-                      <InputOTPSlot index={5} />
+                    <InputOTPGroup className="gap-2">
+                      <InputOTPSlot index={0} className="w-10 h-11 text-base rounded-md border-slate-200" />
+                      <InputOTPSlot index={1} className="w-10 h-11 text-base rounded-md border-slate-200" />
+                      <InputOTPSlot index={2} className="w-10 h-11 text-base rounded-md border-slate-200" />
+                      <InputOTPSlot index={3} className="w-10 h-11 text-base rounded-md border-slate-200" />
+                      <InputOTPSlot index={4} className="w-10 h-11 text-base rounded-md border-slate-200" />
+                      <InputOTPSlot index={5} className="w-10 h-11 text-base rounded-md border-slate-200" />
                     </InputOTPGroup>
                   </InputOTP>
                 </FormControl>
-                <FormMessage />
+                <FormMessage className="text-[11px] text-red-600 font-medium mt-1" />
               </FormItem>
             )}
           />
 
-          {/* Submit Button */}
-          <Button variant="blackBtn" type="submit" size="xl" className="w-full max-w-[450px]">
-            {isLoading && <Loader className='w-5 h-5 animate-spin mr-2' />} Submit
-          </Button>
+          <button
+            type="submit"
+            disabled={isLoading}
+            className="w-full h-10 rounded-lg bg-slate-900 hover:bg-slate-800 active:bg-black text-white text-sm font-semibold transition-all shadow-xs flex items-center justify-center gap-2 cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed select-none"
+          >
+            {isLoading ? (
+              <>
+                <Loader2 className="w-4 h-4 animate-spin text-white" />
+                <span>Verifying...</span>
+              </>
+            ) : (
+              <span>Verify Code</span>
+            )}
+          </button>
 
-          <div className="flex justify-center text-sm items-center gap-1">
-            <span className="text-gray-600">Didn't receive the code?</span>
+          <div className="flex items-center justify-center gap-1.5 text-xs text-slate-500">
+            <span>Did not receive the code?</span>
             <button
               type="button"
               onClick={handleResendOTP}
               disabled={isResendLoading}
-              className="text-gray-700 hover:text-gray-900 font-medium disabled:opacity-50"
+              className="inline-flex items-center gap-1 font-semibold text-slate-900 hover:text-slate-700 disabled:opacity-50 cursor-pointer"
             >
-              {isResendLoading ? "Resending..." : "Resend OTP"}
+              <RotateCw className={`w-3 h-3 ${isResendLoading ? "animate-spin" : ""}`} />
+              <span>{isResendLoading ? "Sending..." : "Resend"}</span>
             </button>
           </div>
 
-          <div className="relative -top-2 flex justify-center text-sm items-center">
-            <Link href="/auth/login" className="text-gray-700 hover:text-gray-500 font-semibold">
-              Back to Login
+          <div className="pt-2 flex justify-center items-center">
+            <Link
+              href="/auth/login"
+              className="inline-flex items-center gap-1.5 text-xs font-medium text-slate-600 hover:text-slate-900 transition-colors"
+            >
+              <ArrowLeft className="w-3.5 h-3.5" />
+              <span>Back to Sign In</span>
             </Link>
           </div>
-
         </form>
       </Form>
-    </>
+
+      <div className="pt-4 mt-4 border-t border-slate-100 flex items-center justify-center gap-1.5 text-[11px] text-slate-400">
+        <ShieldCheck className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+        <span>Enterprise Access &bull; Strict Role Authorization</span>
+      </div>
+    </div>
   );
 };
 
 export default function VerifyOtpPage() {
   return (
-    <Suspense fallback={<div className="text-center p-6 text-gray-500"></div>}>
+    <Suspense fallback={<div className="text-center p-6 text-slate-400 text-xs">Loading verification...</div>}>
       <VerifyOtp />
     </Suspense>
   );

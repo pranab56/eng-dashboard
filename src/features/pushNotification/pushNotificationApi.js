@@ -65,6 +65,58 @@ export const pushNotificationApi = baseApi.injectEndpoints({
             }),
             invalidatesTags: ["pushNotification"]
         }),
+
+        // 🔔 Dynamic Match Reminder Endpoints
+        getMatchReminderSettings: builder.query({
+            query: () => ({
+                url: "/push-notification/match-reminders/settings",
+                method: "GET",
+            }),
+            providesTags: ["matchReminder"]
+        }),
+
+        updateMatchReminderSettings: builder.mutation({
+            query: (data) => ({
+                url: "/push-notification/match-reminders/settings",
+                method: "PATCH",
+                body: data,
+            }),
+            invalidatesTags: ["matchReminder"]
+        }),
+
+        getUpcomingMatchesPreview: builder.query({
+            query: (params) => {
+                let queryString = "";
+                if (params) {
+                    const searchParams = new URLSearchParams();
+                    if (params.page) searchParams.append("page", params.page);
+                    if (params.limit) searchParams.append("limit", params.limit);
+                    if (params.status) searchParams.append("status", params.status);
+                    queryString = `?${searchParams.toString()}`;
+                }
+                return {
+                    url: `/push-notification/match-reminders/upcoming${queryString}`,
+                    method: "GET",
+                };
+            },
+            providesTags: ["matchReminder"]
+        }),
+
+        triggerMatchRemindersNow: builder.mutation({
+            query: () => ({
+                url: "/push-notification/match-reminders/trigger-now",
+                method: "POST",
+            }),
+            invalidatesTags: ["matchReminder"]
+        }),
+
+        sendSingleMatchReminderNow: builder.mutation({
+            query: (matchId) => ({
+                url: `/push-notification/match-reminders/send-single/${matchId}`,
+                method: "POST",
+            }),
+            invalidatesTags: ["matchReminder"]
+        }),
     }),
 });
 
@@ -76,4 +128,9 @@ export const {
     useSendScheduledNowPushNotificationMutation,
     useDeletePushNotificationMutation,
     useDeleteAllPushNotificationMutation,
+    useGetMatchReminderSettingsQuery,
+    useUpdateMatchReminderSettingsMutation,
+    useGetUpcomingMatchesPreviewQuery,
+    useTriggerMatchRemindersNowMutation,
+    useSendSingleMatchReminderNowMutation,
 } = pushNotificationApi;

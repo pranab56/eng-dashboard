@@ -3,10 +3,13 @@ import { Toaster as HotToaster } from "react-hot-toast";
 
 export default function AuthLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <div className="bg-white h-screen flex items-center justify-center">
-      <div className="w-full max-w-[600px] mx-auto flex text-center justify-center py-8 px-2">
-        <div className="bg-white px-2 sm:px-4 md:px-8 py-6 md:py-8 w-full customShadow2">
+    <div className="min-h-screen bg-slate-50 flex flex-col justify-center py-12 px-4 sm:px-6 lg:px-8 antialiased">
+      <div className="w-full max-w-[440px] mx-auto">
+        <div className="bg-white rounded-xl border border-slate-200/90 shadow-xs p-6 sm:p-8">
           {children}
+        </div>
+        <div className="mt-6 text-center text-xs text-slate-400 font-medium">
+          &copy; {new Date().getFullYear()} ENG Sports. All rights reserved.
         </div>
       </div>
       <SonnerToaster position="top-right" richColors />

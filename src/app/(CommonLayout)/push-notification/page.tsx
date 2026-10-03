@@ -14,6 +14,7 @@ import GeneralStateCard, { GeneralStateCardProps } from "@/components/cui/Genera
 import CreateButton from "@/components/buttons/CreateButton";
 import CustomPagination from "@/components/cui/CustomPagination";
 import CreatePushNotificationModal from "@/components/modals/CreatePushNotificationModal";
+import MatchRemindersSection from "@/components/pushNotification/MatchRemindersSection";
 import DeleteConfirmModal from "@/components/modals/DeleteConfirmModal";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
@@ -49,6 +50,7 @@ export default function PushNotificationPage() {
   const searchParams = useSearchParams();
   const page = searchParams.get("page") || "1";
 
+  const [activeMainTab, setActiveMainTab] = useState<"BROADCASTS" | "MATCH_REMINDERS">("BROADCASTS");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isClearAllModalOpen, setIsClearAllModalOpen] = useState(false);
   const [deleteTargetId, setDeleteTargetId] = useState<string | null>(null);
@@ -222,7 +224,40 @@ export default function PushNotificationPage() {
       {/* Top Metric Cards */}
       <GeneralStateCard className="grid-cols-1 md:grid-cols-3" items={stateCardsData} />
 
-      {/* Main Content Box */}
+      {/* Primary Section Switcher */}
+      <div className="flex items-center gap-1.5 p-1 rounded-xl bg-slate-200/80 w-fit">
+        <button
+          type="button"
+          onClick={() => setActiveMainTab("BROADCASTS")}
+          className={`flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+            activeMainTab === "BROADCASTS"
+              ? "bg-white text-slate-900 shadow-xs"
+              : "text-slate-600 hover:text-slate-900"
+          }`}
+        >
+          <Bell className="w-3.5 h-3.5 text-amber-600" />
+          <span>Broadcasts & Scheduled Push</span>
+        </button>
+
+        <button
+          type="button"
+          onClick={() => setActiveMainTab("MATCH_REMINDERS")}
+          className={`flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+            activeMainTab === "MATCH_REMINDERS"
+              ? "bg-white text-slate-900 shadow-xs"
+              : "text-slate-600 hover:text-slate-900"
+          }`}
+        >
+          <Clock className="w-3.5 h-3.5 text-amber-600" />
+          <span>Automated Match Reminders</span>
+        </button>
+      </div>
+
+      {/* Conditional Rendering between Views */}
+      {activeMainTab === "MATCH_REMINDERS" ? (
+        <MatchRemindersSection />
+      ) : (
+      /* Main Content Box */
       <div className="bg-white rounded-xl border border-slate-200 p-5 sm:p-6 shadow-xs space-y-5">
         {/* Header Controls: Bell Icon, Title on Left, Action Buttons on Right */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-100">
@@ -564,6 +599,7 @@ export default function PushNotificationPage() {
           <CustomPagination TOTAL_PAGES={paginationInfo.totalPage || 1} qryName="page" />
         </div>
       </div>
+      )}
 
       {/* Create Modal */}
       <CreatePushNotificationModal isOpen={isModalOpen} setIsOpen={setIsModalOpen} />

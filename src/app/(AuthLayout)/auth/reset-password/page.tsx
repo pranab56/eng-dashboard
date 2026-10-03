@@ -4,8 +4,10 @@ import { Suspense, useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
+import { Eye, EyeOff, Loader2, Lock, ShieldCheck } from "lucide-react";
+import { useRouter, useSearchParams } from "next/navigation";
+import toast from "react-hot-toast";
 
-import { Button } from "@/components/ui/button";
 import {
   Form,
   FormControl,
@@ -15,13 +17,9 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Eye, EyeOff, Loader } from "lucide-react";
-import { useRouter, useSearchParams } from "next/navigation";
-import toast from 'react-hot-toast';
-import { useResetPasswordMutation } from '../../../../features/auth/authApi';
+import { useResetPasswordMutation } from "../../../../features/auth/authApi";
 
-// Schema
-const contactUsFormSchema = z
+const resetPasswordSchema = z
   .object({
     password: z.string().min(6, {
       message: "Password must be at least 6 characters.",
@@ -35,10 +33,9 @@ const contactUsFormSchema = z
     path: ["confirmPassword"],
   });
 
-// Type
-type ContactUsFormValues = z.infer<typeof contactUsFormSchema>;
+type ResetPasswordFormValues = z.infer<typeof resetPasswordSchema>;
 
-const defaultValues: Partial<ContactUsFormValues> = {
+const defaultValues: Partial<ResetPasswordFormValues> = {
   password: "",
   confirmPassword: "",
 };
@@ -48,62 +45,72 @@ const ResetPassword = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const searchParams = useSearchParams();
-  const token = searchParams.get("token");
+  const token = searchParams.get("token") || "";
   const [resetPassword, { isLoading }] = useResetPasswordMutation();
 
-  const form = useForm<ContactUsFormValues>({
-    resolver: zodResolver(contactUsFormSchema),
+  const form = useForm<ResetPasswordFormValues>({
+    resolver: zodResolver(resetPasswordSchema),
     defaultValues,
     mode: "onChange",
   });
 
-  async function onSubmit(data: ContactUsFormValues) {
+  async function onSubmit(data: ResetPasswordFormValues) {
     try {
-      // Simulate API call
-      const res = await resetPassword({ token: token, newPassword: data.password, confirmPassword: data.confirmPassword }).unwrap();
+      const res = await resetPassword({
+        token,
+        newPassword: data.password,
+        confirmPassword: data.confirmPassword,
+      }).unwrap();
       if (res.success) {
-        toast.success(res.message);
-        router.push("/auth/login")
+        toast.success(res.message || "Password updated successfully");
+        router.push("/auth/login");
       }
     } catch (error: unknown) {
-      const err = error as { message?: string };
-      console.error("Reset error:", err?.message);
-      toast.error(err?.message || "Something went wrong");
+      const err = error as { message?: string; data?: { message?: string } };
+      console.error("Reset error:", err);
+      toast.error(err?.data?.message || err?.message || "Failed to reset password");
     }
   }
 
   return (
-    <>
-      <h2 className="text-2xl md:text-3xl xl:text-4xl font-medium text-gray-700 pb-12">Reset Password</h2>
+    <div className="w-full">
+      <div className="text-center mb-6">
+        <h1 className="text-xl font-semibold text-slate-900 tracking-tight">Set New Password</h1>
+        <p className="text-xs text-slate-500 mt-1">
+          Create a secure password for your administrator account
+        </p>
+      </div>
 
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-
-          {/* Password */}
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+          {/* New Password */}
           <FormField
             control={form.control}
             name="password"
             render={({ field }) => (
-              <FormItem>
-                <FormLabel className="text-gray-700 text-lg">New Password</FormLabel>
+              <FormItem className="space-y-1.5 text-left">
+                <FormLabel className="text-xs font-semibold text-slate-700">New Password</FormLabel>
                 <FormControl>
                   <div className="relative">
                     <Input
-                      variant="borderblack"
                       type={showPassword ? "text" : "password"}
-                      placeholder="Enter password"
-                      className="pr-10"
+                      autoComplete="new-password"
+                      placeholder="Enter new password"
+                      className="h-10 text-sm pl-9 pr-10 rounded-lg border-slate-200 focus-visible:ring-slate-900 focus-visible:border-slate-900 transition-colors"
                       {...field}
                     />
-                    <div
-                      className="absolute right-3 top-1/2 -translate-y-1/2 cursor-pointer text-gray-600 hover:text-gray-700 z-10"
-                      onClick={() => setShowPassword(prev => !prev)}
+                    <Lock className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword((prev) => !prev)}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-colors cursor-pointer p-0.5"
+                      aria-label={showPassword ? "Hide password" : "Show password"}
                     >
-                      {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
-                    </div>
+                      {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                    </button>
                   </div>
                 </FormControl>
-                <FormMessage />
+                <FormMessage className="text-[11px] text-red-600 font-medium mt-1" />
               </FormItem>
             )}
           />
@@ -113,43 +120,62 @@ const ResetPassword = () => {
             control={form.control}
             name="confirmPassword"
             render={({ field }) => (
-              <FormItem>
-                <FormLabel className="text-gray-700 text-lg">Confirm Password</FormLabel>
+              <FormItem className="space-y-1.5 text-left">
+                <FormLabel className="text-xs font-semibold text-slate-700">Confirm Password</FormLabel>
                 <FormControl>
                   <div className="relative">
                     <Input
-                      variant="borderblack"
                       type={showConfirmPassword ? "text" : "password"}
-                      placeholder="Enter confirm password"
-                      className="pr-10"
+                      autoComplete="new-password"
+                      placeholder="Confirm new password"
+                      className="h-10 text-sm pl-9 pr-10 rounded-lg border-slate-200 focus-visible:ring-slate-900 focus-visible:border-slate-900 transition-colors"
                       {...field}
                     />
-                    <div
-                      className="absolute right-3 top-1/2 -translate-y-1/2 cursor-pointer text-gray-600 hover:text-gray-700 z-10"
-                      onClick={() => setShowConfirmPassword(prev => !prev)}
+                    <Lock className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+                    <button
+                      type="button"
+                      onClick={() => setShowConfirmPassword((prev) => !prev)}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-colors cursor-pointer p-0.5"
+                      aria-label={showConfirmPassword ? "Hide password" : "Show password"}
                     >
-                      {showConfirmPassword ? <EyeOff size={20} /> : <Eye size={20} />}
-                    </div>
+                      {showConfirmPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                    </button>
                   </div>
                 </FormControl>
-                <FormMessage />
+                <FormMessage className="text-[11px] text-red-600 font-medium mt-1" />
               </FormItem>
             )}
           />
 
           {/* Submit Button */}
-          <Button variant="blackBtn" type="submit" size="xl" className="w-full">
-            {isLoading && <Loader className='w-5 h-5 animate-spin mr-2' />} Save
-          </Button>
+          <button
+            type="submit"
+            disabled={isLoading}
+            className="w-full h-10 rounded-lg bg-slate-900 hover:bg-slate-800 active:bg-black text-white text-sm font-semibold transition-all shadow-xs flex items-center justify-center gap-2 cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed select-none mt-2"
+          >
+            {isLoading ? (
+              <>
+                <Loader2 className="w-4 h-4 animate-spin text-white" />
+                <span>Updating Password...</span>
+              </>
+            ) : (
+              <span>Update Password</span>
+            )}
+          </button>
         </form>
       </Form>
-    </>
+
+      <div className="pt-4 mt-4 border-t border-slate-100 flex items-center justify-center gap-1.5 text-[11px] text-slate-400">
+        <ShieldCheck className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+        <span>Enterprise Access &bull; Strict Role Authorization</span>
+      </div>
+    </div>
   );
 };
 
 export default function ResetPasswordPage() {
   return (
-    <Suspense fallback={<div className="text-center p-6 text-gray-500"></div>}>
+    <Suspense fallback={<div className="text-center p-6 text-slate-400 text-xs">Loading password reset...</div>}>
       <ResetPassword />
     </Suspense>
   );
