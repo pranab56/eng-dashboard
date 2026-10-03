@@ -1,6 +1,7 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import { DashboardOverviewSkeleton } from "@/components/dashboard/DashboardOverviewSkeleton";
 import { useGetOverviewQuery } from "@/features/overview/overviewApi";
 import { useGetProfileQuery } from "@/features/profile/profileApi";
 import { useHeaders } from "@/hooks/useHeaders";
@@ -212,6 +213,10 @@ export default function Home() {
     ],
     [stats]
   );
+
+  if (isLoading) {
+    return <DashboardOverviewSkeleton />;
+  }
 
   return (
     <div className="p-4 sm:p-6 lg:p-8 space-y-6 w-full">

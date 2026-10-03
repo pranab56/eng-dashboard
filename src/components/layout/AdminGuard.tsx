@@ -116,6 +116,19 @@ export default function AdminGuard({ children }: { children: React.ReactNode }) 
     setIsAuthorized(true);
   }, [dispatch, router, pathname, profileUser]);
 
+  if (isAuthorized === null) {
+    return (
+      <div className="flex h-screen w-full items-center justify-center bg-slate-50">
+        <div className="flex flex-col items-center gap-3">
+          <div className="w-8 h-8 border-3 border-slate-900 border-t-transparent rounded-full animate-spin" />
+          <span className="text-xs font-semibold uppercase tracking-wider text-slate-500">
+            Verifying Session...
+          </span>
+        </div>
+      </div>
+    );
+  }
+
   if (isAuthorized === false) {
     return null;
   }

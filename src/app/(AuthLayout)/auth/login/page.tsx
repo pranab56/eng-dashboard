@@ -307,8 +307,8 @@ const Login = () => {
   const dispatch = useDispatch();
   const [login, { isLoading }] = useLoginMutation();
 
-  // 🌊 Silky Smooth Physics-Based 3D LERP Parallax with Atmospheric Drift
-  const [parallax, setParallax] = useState({ x: 0, y: 0 });
+  // 🌊 Autonomous Physics-Based 3D Engine: Continuous Cinematic Sway + Interactive Mouse Parallax
+  const [parallax, setParallax] = useState({ x: 0, y: 0, time: 0 });
   const targetParallax = React.useRef({ x: 0, y: 0 });
   const currentParallax = React.useRef({ x: 0, y: 0 });
   const rafRef = React.useRef<number | null>(null);
@@ -317,21 +317,25 @@ const Login = () => {
     let startTime = performance.now();
 
     const animate = (now: number) => {
-      // Subtle cinematic atmospheric floating drift (simulates gentle stadium breeze)
       const elapsed = (now - startTime) * 0.001;
-      const driftX = Math.sin(elapsed * 0.7) * 0.12;
-      const driftY = Math.cos(elapsed * 0.5) * 0.1;
 
-      // Ultra-smooth linear interpolation (LERP factor 0.065)
-      const targetX = targetParallax.current.x + driftX;
-      const targetY = targetParallax.current.y + driftY;
+      // 🌊 Continuous organic stadium camera sway (composite harmonic wave)
+      // Generates vibrant, natural autonomous movement across all axes
+      const autoDriftX = Math.sin(elapsed * 0.95) * 0.7 + Math.sin(elapsed * 0.42) * 0.25;
+      const autoDriftY = Math.cos(elapsed * 0.75) * 0.6 + Math.sin(elapsed * 0.31) * 0.25;
 
-      currentParallax.current.x += (targetX - currentParallax.current.x) * 0.065;
-      currentParallax.current.y += (targetY - currentParallax.current.y) * 0.065;
+      // Seamlessly combine autonomous movement with mouse interaction
+      const targetX = targetParallax.current.x * 0.65 + autoDriftX * 0.65;
+      const targetY = targetParallax.current.y * 0.55 + autoDriftY * 0.55;
+
+      // Silky-smooth LERP (Linear Interpolation)
+      currentParallax.current.x += (targetX - currentParallax.current.x) * 0.055;
+      currentParallax.current.y += (targetY - currentParallax.current.y) * 0.055;
 
       setParallax({
         x: Number(currentParallax.current.x.toFixed(4)),
         y: Number(currentParallax.current.y.toFixed(4)),
+        time: elapsed,
       });
 
       rafRef.current = requestAnimationFrame(animate);
@@ -435,19 +439,19 @@ const Login = () => {
         onMouseLeave={handleMouseLeave}
         className="w-full lg:w-[55%] min-h-[460px] lg:min-h-screen relative overflow-hidden bg-gradient-to-b from-slate-950 via-slate-900 to-[#030712] flex flex-col justify-between p-6 sm:p-10 lg:p-14 text-white border-b lg:border-b-0 lg:border-r border-slate-800/80"
       >
-        {/* Soft Volumetric Stadium Floodlights */}
+        {/* Soft Volumetric Stadium Floodlights (Dynamic Pulsing Aura) */}
         <div
           className="absolute -top-24 -left-24 w-96 h-96 bg-emerald-500/10 rounded-full blur-[100px] pointer-events-none"
           style={{
-            transform: `translate(${parallax.x * -15}px, ${parallax.y * -15}px)`,
-            transition: "transform 0.5s ease-out",
+            transform: `translate(${parallax.x * -18}px, ${parallax.y * -18}px)`,
+            opacity: 0.65 + Math.sin(parallax.time * 1.2) * 0.25,
           }}
         />
         <div
           className="absolute top-1/4 -right-24 w-96 h-96 bg-cyan-500/10 rounded-full blur-[110px] pointer-events-none"
           style={{
-            transform: `translate(${parallax.x * 20}px, ${parallax.y * 20}px)`,
-            transition: "transform 0.5s ease-out",
+            transform: `translate(${parallax.x * 22}px, ${parallax.y * 22}px)`,
+            opacity: 0.65 + Math.cos(parallax.time * 1.1) * 0.25,
           }}
         />
 
@@ -485,12 +489,11 @@ const Login = () => {
             className="relative w-full max-w-[480px] h-[240px] sm:h-[280px] flex items-center justify-center pointer-events-none"
             style={{ perspective: "1000px" }}
           >
-            {/* The 3D Tilted Football Pitch */}
+            {/* The 3D Tilted Football Pitch (Autonomous & Interactive Tilt) */}
             <div
               className="relative w-[360px] sm:w-[420px] h-[190px] sm:h-[220px] rounded-xl overflow-hidden border border-emerald-500/30 shadow-[0_20px_60px_rgba(0,0,0,0.8)]"
               style={{
-                transform: `rotateX(${52 - parallax.y * 6}deg) rotateZ(${-14 + parallax.x * 6}deg) translateZ(0px)`,
-                transition: "transform 0.4s cubic-bezier(0.2, 0, 0, 1)",
+                transform: `rotateX(${50 - parallax.y * 10}deg) rotateZ(${-14 + parallax.x * 9}deg) translateZ(0px)`,
                 transformStyle: "preserve-3d",
                 background: "linear-gradient(135deg, #064e3b 0%, #047857 50%, #065f46 100%)",
               }}
@@ -541,22 +544,21 @@ const Login = () => {
               <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-white/10 pointer-events-none" />
             </div>
 
-            {/* ⚽ 3D Football Resting on Pitch */}
+            {/* ⚽ 3D Football Hovering on Pitch (Autonomous Floating Levitation) */}
             <div
               className="absolute z-20"
               style={{
-                transform: `translate(${40 + parallax.x * 12}px, ${20 + parallax.y * 10}px)`,
-                transition: "transform 0.35s ease-out",
+                transform: `translate(${38 + parallax.x * 16}px, ${16 + parallax.y * 12 + Math.sin(parallax.time * 2.2) * 7}px)`,
               }}
             >
               <Football3D />
             </div>
 
-            {/* Floating Metric Badge 1: Tournament Operations */}
+            {/* Floating Metric Badge 1: Tournament Operations (Autonomous Drift) */}
             <div
-              className="absolute -top-4 -right-2 sm:right-2 z-30 bg-slate-900/90 backdrop-blur-md border border-slate-700/80 rounded-xl p-3 shadow-2xl transition-transform duration-300"
+              className="absolute -top-4 -right-2 sm:right-2 z-30 bg-slate-900/90 backdrop-blur-md border border-slate-700/80 rounded-xl p-3 shadow-2xl"
               style={{
-                transform: `translate(${parallax.x * -18}px, ${parallax.y * -14}px)`,
+                transform: `translate(${parallax.x * -22 + Math.sin(parallax.time * 1.5) * 7}px, ${parallax.y * -16 + Math.cos(parallax.time * 1.2) * 6}px)`,
               }}
             >
               <div className="flex items-center gap-3">
@@ -574,11 +576,11 @@ const Login = () => {
               </div>
             </div>
 
-            {/* Floating Metric Badge 2: Real-Time Engine */}
+            {/* Floating Metric Badge 2: Real-Time Engine (Autonomous Drift) */}
             <div
-              className="absolute -bottom-6 -left-2 sm:left-4 z-30 bg-slate-900/90 backdrop-blur-md border border-slate-700/80 rounded-xl p-3 shadow-2xl transition-transform duration-300"
+              className="absolute -bottom-6 -left-2 sm:left-4 z-30 bg-slate-900/90 backdrop-blur-md border border-slate-700/80 rounded-xl p-3 shadow-2xl"
               style={{
-                transform: `translate(${parallax.x * 16}px, ${parallax.y * 12}px)`,
+                transform: `translate(${parallax.x * 20 + Math.cos(parallax.time * 1.6) * 6}px, ${parallax.y * 16 + Math.sin(parallax.time * 1.4) * 6}px)`,
               }}
             >
               <div className="flex items-center gap-3">
