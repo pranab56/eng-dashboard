@@ -633,12 +633,6 @@ const Login = () => {
             <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
             <span>Console v2.4 &bull; Production</span>
           </div>
-          <Link
-            href="/auth/forgot-password"
-            className="text-xs font-semibold text-slate-600 hover:text-slate-900 transition-colors"
-          >
-            Need Help?
-          </Link>
         </div>
 
         {/* Center Main Form */}
