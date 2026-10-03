@@ -164,11 +164,13 @@ export default function Sidebar({ isMobile = false }: SidebarProps) {
   // Determine if collapsed mode applies (mobile drawer is never collapsed)
   const collapsed = !isMobile && isCollapsed;
 
+  const roleDisplay = (user?.role || "ADMINISTRATOR").replace("_", " ");
+
   return (
-    <TooltipProvider delayDuration={150}>
-      <div className="h-full flex flex-col bg-[#0b0c10] text-slate-300 select-none overflow-hidden">
+    <TooltipProvider delayDuration={120}>
+      <div className="h-full flex flex-col bg-[#090a0f] text-zinc-300 select-none overflow-hidden">
         {/* Top Header: Brand & Collapse Toggle */}
-        <div className="h-16 px-3 flex items-center justify-between border-b border-white/[0.08] bg-[#07080a] shrink-0">
+        <div className="h-15 px-3.5 flex items-center justify-between border-b border-white/[0.06] bg-[#07080c] shrink-0">
           {!collapsed ? (
             <>
               <Link
@@ -179,17 +181,17 @@ export default function Sidebar({ isMobile = false }: SidebarProps) {
                 {logo ? (
                   <Image
                     src={logo}
-                    width={180}
-                    height={48}
+                    width={160}
+                    height={40}
                     alt="ENG Sports"
-                    className="w-[105px] h-auto object-contain transition-transform duration-200 group-hover:scale-102"
+                    className="w-[98px] h-auto object-contain transition-opacity duration-150 group-hover:opacity-90"
                     priority
                   />
                 ) : (
-                  <span className="font-bold text-sm tracking-wider text-white">ENG ADMIN</span>
+                  <span className="font-bold text-sm tracking-wide text-white">ENG SPORTS</span>
                 )}
-                <span className="hidden sm:inline-block px-1.5 py-0.5 rounded text-[10px] font-bold tracking-wider bg-amber-500/10 text-amber-400 border border-amber-500/20">
-                  PORTAL
+                <span className="hidden sm:inline-flex items-center px-1.5 py-0.5 rounded text-[9px] font-semibold tracking-wider text-zinc-400 bg-white/[0.04] border border-white/[0.08] uppercase">
+                  Admin
                 </span>
               </Link>
 
@@ -198,11 +200,11 @@ export default function Sidebar({ isMobile = false }: SidebarProps) {
                 <button
                   type="button"
                   onClick={closeMobile}
-                  className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-white/[0.06] transition-colors cursor-pointer"
+                  className="h-7.5 w-7.5 rounded-md flex items-center justify-center text-zinc-400 hover:text-white hover:bg-white/[0.06] transition-colors cursor-pointer"
                   title="Close sidebar"
                   aria-label="Close sidebar"
                 >
-                  <X className="w-5 h-5" />
+                  <X className="w-4 h-4" />
                 </button>
               ) : (
                 <Tooltip>
@@ -210,13 +212,15 @@ export default function Sidebar({ isMobile = false }: SidebarProps) {
                     <button
                       type="button"
                       onClick={toggleCollapse}
-                      className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-white/[0.06] transition-colors cursor-pointer"
+                      className="h-7.5 w-7.5 rounded-md flex items-center justify-center text-zinc-400 hover:text-white hover:bg-white/[0.06] transition-colors cursor-pointer"
                       aria-label="Collapse sidebar"
                     >
                       <PanelLeftClose className="w-4 h-4" />
                     </button>
                   </TooltipTrigger>
-                  <TooltipContent side="right">Collapse sidebar</TooltipContent>
+                  <TooltipContent side="right" className="text-[11px] bg-zinc-900 border-zinc-800 text-zinc-200">
+                    Collapse sidebar
+                  </TooltipContent>
                 </Tooltip>
               )}
             </>
@@ -228,13 +232,15 @@ export default function Sidebar({ isMobile = false }: SidebarProps) {
                   <button
                     type="button"
                     onClick={toggleCollapse}
-                    className="w-10 h-10 rounded-lg flex items-center justify-center text-slate-400 hover:text-white hover:bg-white/[0.06] transition-colors cursor-pointer"
+                    className="h-9 w-9 rounded-md flex items-center justify-center text-zinc-400 hover:text-white hover:bg-white/[0.06] transition-colors cursor-pointer"
                     aria-label="Expand sidebar"
                   >
                     <PanelLeftOpen className="w-4 h-4" />
                   </button>
                 </TooltipTrigger>
-                <TooltipContent side="right">Expand sidebar</TooltipContent>
+                <TooltipContent side="right" className="text-[11px] bg-zinc-900 border-zinc-800 text-zinc-200">
+                  Expand sidebar
+                </TooltipContent>
               </Tooltip>
             </div>
           )}
@@ -244,19 +250,20 @@ export default function Sidebar({ isMobile = false }: SidebarProps) {
         {!collapsed && (
           <div className="px-3 pt-3 pb-1 shrink-0">
             <div className="relative">
-              <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-500 pointer-events-none" />
+              <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-zinc-500 pointer-events-none" />
               <input
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Search navigation..."
-                className="w-full bg-white/[0.04] hover:bg-white/[0.06] focus:bg-white/[0.08] text-xs text-white placeholder-slate-500 rounded-lg pl-8 pr-7 py-2 border border-white/[0.08] focus:border-amber-500/50 focus:outline-hidden transition-colors"
+                className="w-full h-8 bg-zinc-900/60 hover:bg-zinc-900 focus:bg-zinc-900 text-xs text-zinc-100 placeholder-zinc-500 rounded-md pl-8 pr-7 border border-white/[0.06] focus:border-zinc-700 focus:outline-hidden transition-colors"
               />
               {searchQuery && (
                 <button
                   type="button"
                   onClick={() => setSearchQuery("")}
-                  className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white cursor-pointer"
+                  className="absolute right-2 top-1/2 -translate-y-1/2 p-0.5 text-zinc-400 hover:text-white cursor-pointer rounded"
+                  aria-label="Clear search"
                 >
                   <X className="w-3.5 h-3.5" />
                 </button>
@@ -266,30 +273,27 @@ export default function Sidebar({ isMobile = false }: SidebarProps) {
         )}
 
         {/* Navigation Section List */}
-        <div className="flex-1 overflow-y-auto px-2.5 py-2 space-y-3 min-h-0 custom-sidebar-scroll">
+        <div className="flex-1 overflow-y-auto px-2.5 py-2.5 space-y-4 min-h-0 custom-sidebar-scroll">
           {filteredSections.length === 0 ? (
-            <div className="py-8 text-center text-xs text-slate-500">
-              No matching pages found
+            <div className="py-10 text-center text-xs text-zinc-500">
+              No navigation items match
             </div>
           ) : (
             filteredSections.map((section, sIdx) => (
-              <div key={section.id} className="space-y-0.5">
+              <div key={section.id} className="space-y-1">
                 {/* Section Header */}
                 {!collapsed ? (
-                  <div className="px-2 pt-2 pb-1 flex items-center justify-between">
-                    <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 font-mono">
+                  <div className="px-2 py-1">
+                    <span className="text-[10px] font-semibold uppercase tracking-wider text-zinc-500">
                       {section.title}
-                    </span>
-                    <span className="text-[9px] font-semibold text-slate-500 bg-white/[0.04] px-1.5 py-0.5 rounded">
-                      {section.items.length}
                     </span>
                   </div>
                 ) : (
-                  sIdx > 0 && <div className="my-1.5 border-t border-white/[0.06]" />
+                  sIdx > 0 && <div className="my-2 border-t border-white/[0.06]" />
                 )}
 
                 {/* Section Items */}
-                <div className="space-y-1">
+                <div className="space-y-0.5">
                   {section.items.map((item: TMenuItem) => {
                     const Icon = item.icon;
                     const hasChildren = Boolean(item.children && item.children.length > 0);
@@ -310,29 +314,31 @@ export default function Sidebar({ isMobile = false }: SidebarProps) {
                                 <DropdownMenuTrigger asChild>
                                   <button
                                     type="button"
-                                    className={`w-10 h-10 mx-auto rounded-lg flex items-center justify-center transition-colors cursor-pointer ${
+                                    className={`w-9 h-9 mx-auto rounded-md flex items-center justify-center transition-colors cursor-pointer ${
                                       isParentActive
-                                        ? "bg-amber-500/15 text-amber-400 border border-amber-500/30"
-                                        : "text-slate-400 hover:text-white hover:bg-white/[0.06]"
+                                        ? "bg-white/[0.08] text-white border border-white/[0.12]"
+                                        : "text-zinc-400 hover:text-zinc-100 hover:bg-white/[0.04]"
                                     }`}
                                     aria-label={item.title}
                                   >
-                                    <Icon className="w-4 h-4 shrink-0" />
+                                    <Icon className={`w-4 h-4 shrink-0 ${isParentActive ? "text-amber-400" : ""}`} />
                                   </button>
                                 </DropdownMenuTrigger>
                               </TooltipTrigger>
-                              <TooltipContent side="right">{item.title}</TooltipContent>
+                              <TooltipContent side="right" className="text-[11px] bg-zinc-900 border-zinc-800 text-zinc-200">
+                                {item.title}
+                              </TooltipContent>
                             </Tooltip>
 
                             <DropdownMenuContent
                               side="right"
-                              sideOffset={12}
-                              className="w-48 bg-slate-900 border border-slate-700/80 text-slate-100 p-1 rounded-lg shadow-xl"
+                              sideOffset={10}
+                              className="w-50 bg-[#0d0e14] border border-white/[0.08] text-zinc-100 p-1.5 rounded-lg shadow-xl"
                             >
-                              <DropdownMenuLabel className="text-[11px] font-bold text-slate-400 uppercase tracking-wider px-2 py-1">
+                              <DropdownMenuLabel className="text-[10px] font-semibold text-zinc-400 uppercase tracking-wider px-2 py-1">
                                 {item.title}
                               </DropdownMenuLabel>
-                              <DropdownMenuSeparator className="bg-slate-800 my-1" />
+                              <DropdownMenuSeparator className="bg-white/[0.06] my-1" />
                               {item.children?.map((child) => {
                                 const isSubActive = isActive(child.label);
                                 const ChildIcon = child.icon;
@@ -341,13 +347,15 @@ export default function Sidebar({ isMobile = false }: SidebarProps) {
                                     <Link
                                       href={child.label}
                                       onClick={handleLinkClick}
-                                      className={`w-full flex items-center gap-2 px-2.5 py-1.5 rounded-md text-xs transition-colors cursor-pointer ${
+                                      className={`w-full flex items-center gap-2 px-2 py-1.5 rounded-md text-xs transition-colors cursor-pointer ${
                                         isSubActive
-                                          ? "bg-amber-500/15 text-amber-400 font-semibold"
-                                          : "text-slate-300 hover:bg-slate-800 hover:text-white"
+                                          ? "bg-white/[0.08] text-white font-medium"
+                                          : "text-zinc-400 hover:text-white hover:bg-white/[0.04]"
                                       }`}
                                     >
-                                      {ChildIcon && <ChildIcon className="w-3.5 h-3.5 shrink-0" />}
+                                      {ChildIcon && (
+                                        <ChildIcon className={`w-3.5 h-3.5 shrink-0 ${isSubActive ? "text-amber-400" : "text-zinc-500"}`} />
+                                      )}
                                       <span className="truncate">{child.title}</span>
                                     </Link>
                                   </DropdownMenuItem>
@@ -364,23 +372,18 @@ export default function Sidebar({ isMobile = false }: SidebarProps) {
                             <Link
                               href={item.label || "#"}
                               onClick={handleLinkClick}
-                              className={`w-10 h-10 mx-auto rounded-lg flex items-center justify-center transition-colors cursor-pointer ${
+                              className={`w-9 h-9 mx-auto rounded-md flex items-center justify-center transition-colors cursor-pointer ${
                                 isParentActive
-                                  ? "bg-amber-500/15 text-amber-400 border border-amber-500/30"
-                                  : "text-slate-400 hover:text-white hover:bg-white/[0.06]"
+                                  ? "bg-white/[0.08] text-white border border-white/[0.12]"
+                                  : "text-zinc-400 hover:text-zinc-100 hover:bg-white/[0.04]"
                               }`}
                               aria-label={item.title}
                             >
-                              <Icon className="w-4 h-4 shrink-0" />
+                              <Icon className={`w-4 h-4 shrink-0 ${isParentActive ? "text-amber-400" : ""}`} />
                             </Link>
                           </TooltipTrigger>
-                          <TooltipContent side="right">
-                            <div className="flex items-center gap-1.5">
-                              <span>{item.title}</span>
-                              {isParentActive && (
-                                <span className="w-1.5 h-1.5 rounded-full bg-amber-400 shrink-0" />
-                              )}
-                            </div>
+                          <TooltipContent side="right" className="text-[11px] bg-zinc-900 border-zinc-800 text-zinc-200">
+                            {item.title}
                           </TooltipContent>
                         </Tooltip>
                       );
@@ -395,29 +398,27 @@ export default function Sidebar({ isMobile = false }: SidebarProps) {
                           <button
                             type="button"
                             onClick={() => toggleSubMenu(item.id)}
-                            className={`group w-full flex items-center justify-between py-2 px-2.5 rounded-lg transition-colors cursor-pointer text-xs ${
+                            className={`group relative w-full flex items-center justify-between h-8.5 px-2.5 rounded-md transition-colors cursor-pointer text-xs ${
                               isParentActive
-                                ? "bg-amber-500/15 text-amber-400 font-semibold border-l-2 border-amber-400"
-                                : "text-slate-300 hover:text-white hover:bg-white/[0.05]"
+                                ? "bg-white/[0.06] text-white font-medium"
+                                : "text-zinc-400 hover:text-zinc-100 hover:bg-white/[0.03]"
                             }`}
                           >
                             <div className="flex items-center gap-2.5 min-w-0">
-                              <span
-                                className={`p-1 rounded transition-colors ${
+                              <Icon
+                                className={`w-4 h-4 shrink-0 transition-colors ${
                                   isParentActive
-                                    ? "text-amber-400 bg-amber-500/10"
-                                    : "text-slate-400 group-hover:text-slate-200"
+                                    ? "text-amber-400"
+                                    : "text-zinc-500 group-hover:text-zinc-300"
                                 }`}
-                              >
-                                <Icon className="w-4 h-4 shrink-0" />
-                              </span>
+                              />
                               <span className="truncate">{item.title}</span>
                             </div>
                             <ChevronDown
                               className={`w-3.5 h-3.5 shrink-0 transition-transform duration-200 ${
                                 isOpen
-                                  ? "rotate-180 text-amber-400"
-                                  : "text-slate-500 group-hover:text-slate-300"
+                                  ? "rotate-180 text-zinc-300"
+                                  : "text-zinc-500 group-hover:text-zinc-300"
                               }`}
                             />
                           </button>
@@ -425,10 +426,10 @@ export default function Sidebar({ isMobile = false }: SidebarProps) {
                           {/* Nested Submenu */}
                           <div
                             className={`overflow-hidden transition-all duration-200 ease-in-out ${
-                              isOpen ? "max-h-60 opacity-100 mt-1 mb-1" : "max-h-0 opacity-0"
+                              isOpen ? "max-h-72 opacity-100 mt-0.5 mb-1" : "max-h-0 opacity-0"
                             }`}
                           >
-                            <div className="ml-4 pl-3 border-l border-white/[0.08] space-y-0.5">
+                            <div className="ml-4.5 pl-2.5 border-l border-zinc-800/80 space-y-0.5">
                               {item.children?.map((child) => {
                                 const isSubActive = isActive(child.label);
                                 const ChildIcon = child.icon;
@@ -438,22 +439,22 @@ export default function Sidebar({ isMobile = false }: SidebarProps) {
                                     href={child.label}
                                     key={child.id}
                                     onClick={handleLinkClick}
-                                    className={`group flex items-center gap-2 py-1.5 px-2.5 rounded-md text-xs transition-colors ${
+                                    className={`group flex items-center gap-2 h-7.5 px-2 rounded-md text-[12px] transition-colors ${
                                       isSubActive
-                                        ? "text-amber-400 font-semibold bg-white/[0.08]"
-                                        : "text-slate-400 hover:text-white hover:bg-white/[0.04]"
+                                        ? "text-white font-medium bg-white/[0.08]"
+                                        : "text-zinc-400 hover:text-zinc-200 hover:bg-white/[0.03]"
                                     }`}
                                   >
                                     {ChildIcon ? (
                                       <ChildIcon
-                                        className={`w-3.5 h-3.5 shrink-0 ${
-                                          isSubActive ? "text-amber-400" : "text-slate-500"
+                                        className={`w-3.5 h-3.5 shrink-0 transition-colors ${
+                                          isSubActive ? "text-amber-400" : "text-zinc-500 group-hover:text-zinc-400"
                                         }`}
                                       />
                                     ) : (
                                       <span
-                                        className={`w-1.5 h-1.5 rounded-full shrink-0 ${
-                                          isSubActive ? "bg-amber-400" : "bg-slate-600"
+                                        className={`w-1 h-1 rounded-full shrink-0 ${
+                                          isSubActive ? "bg-amber-400 ring-2 ring-amber-400/20" : "bg-zinc-600"
                                         }`}
                                       />
                                     )}
@@ -472,28 +473,26 @@ export default function Sidebar({ isMobile = false }: SidebarProps) {
                         href={item.label || "#"}
                         key={item.id}
                         onClick={handleLinkClick}
-                        className={`group flex items-center justify-between py-2 px-2.5 rounded-lg transition-colors cursor-pointer text-xs ${
+                        className={`group relative flex items-center justify-between h-8.5 px-2.5 rounded-md transition-colors cursor-pointer text-xs ${
                           isParentActive
-                            ? "bg-amber-500/15 text-amber-400 font-semibold border-l-2 border-amber-400"
-                            : "text-slate-300 hover:text-white hover:bg-white/[0.05]"
+                            ? "bg-white/[0.08] text-white font-medium"
+                            : "text-zinc-400 hover:text-zinc-100 hover:bg-white/[0.03]"
                         }`}
                       >
                         <div className="flex items-center gap-2.5 min-w-0">
-                          <span
-                            className={`p-1 rounded transition-colors ${
+                          <Icon
+                            className={`w-4 h-4 shrink-0 transition-colors ${
                               isParentActive
-                                ? "text-amber-400 bg-amber-500/10"
-                                : "text-slate-400 group-hover:text-slate-200"
+                                ? "text-amber-400"
+                                : "text-zinc-500 group-hover:text-zinc-300"
                             }`}
-                          >
-                            <Icon className="w-4 h-4 shrink-0" />
-                          </span>
+                          />
                           <span className="truncate">{item.title}</span>
                         </div>
 
-                        {/* Active Accent Dot */}
+                        {/* Crisp Active Bar indicator */}
                         {isParentActive && (
-                          <span className="w-1.5 h-1.5 rounded-full bg-amber-400 shrink-0" />
+                          <span className="w-1 h-3.5 rounded-full bg-amber-400 shrink-0" />
                         )}
                       </Link>
                     );
@@ -505,61 +504,113 @@ export default function Sidebar({ isMobile = false }: SidebarProps) {
         </div>
 
         {/* Bottom User / Account Section */}
-        <div className="p-3 border-t border-white/[0.08] bg-[#07080a] shrink-0">
+        <div className="p-2.5 border-t border-white/[0.06] bg-[#07080c] shrink-0">
           {!collapsed ? (
             /* Expanded User Section */
-            <div className="space-y-2">
-              <Link
-                href="/profile"
-                onClick={handleLinkClick}
-                className="flex items-center gap-2.5 p-2 rounded-lg bg-white/[0.03] hover:bg-white/[0.06] transition-colors group cursor-pointer border border-white/[0.06]"
-              >
-                <div className="w-8 h-8 rounded-full overflow-hidden bg-slate-800 border border-white/10 shrink-0 flex items-center justify-center">
-                  {user?.profile ? (
-                    <Image
-                      src={formatImagePath(user.profile)}
-                      width={64}
-                      height={64}
-                      alt="Avatar"
-                      className="w-full h-full object-cover"
-                    />
-                  ) : (
-                    <ShieldCheck className="w-4 h-4 text-amber-400" />
-                  )}
-                </div>
-                <div className="min-w-0 flex-1">
-                  <p className="text-xs font-semibold text-white truncate group-hover:text-amber-300 transition-colors">
-                    {user?.userName || user?.firstName || "ENG Admin"}
-                  </p>
-                  <div className="flex items-center gap-1.5">
-                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 shrink-0" />
-                    <span className="text-[10px] text-slate-400 uppercase tracking-wide truncate">
-                      {user?.role?.replace("_", " ") || "Administrator"}
-                    </span>
+            <div className="flex items-center justify-between gap-2 p-1.5 rounded-lg bg-white/[0.02] border border-white/[0.04]">
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <button
+                    type="button"
+                    className="flex items-center gap-2.5 min-w-0 flex-1 text-left p-1 rounded-md hover:bg-white/[0.04] transition-colors cursor-pointer"
+                  >
+                    <div className="w-8 h-8 rounded-full overflow-hidden bg-zinc-800 border border-white/10 shrink-0 flex items-center justify-center">
+                      {user?.profile ? (
+                        <Image
+                          src={formatImagePath(user.profile)}
+                          width={64}
+                          height={64}
+                          alt="Avatar"
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        <ShieldCheck className="w-4 h-4 text-zinc-400" />
+                      )}
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <p className="text-xs font-medium text-zinc-200 truncate">
+                        {user?.userName || user?.firstName || "ENG Admin"}
+                      </p>
+                      <p className="text-[10px] text-zinc-500 uppercase tracking-wider truncate">
+                        {roleDisplay}
+                      </p>
+                    </div>
+                  </button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent
+                  side="top"
+                  align="start"
+                  sideOffset={8}
+                  className="w-56 bg-[#0d0e14] border border-white/[0.08] text-zinc-100 p-1.5 rounded-lg shadow-2xl"
+                >
+                  <div className="px-2 py-1.5">
+                    <p className="text-xs font-semibold text-white truncate">
+                      {user?.userName || user?.firstName || "ENG Admin"}
+                    </p>
+                    <p className="text-[10px] text-zinc-400 truncate">{user?.email || "admin@eng.com"}</p>
+                    <div className="mt-1.5 inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[9px] font-semibold bg-white/[0.06] text-zinc-300 border border-white/[0.08] uppercase tracking-wider">
+                      {roleDisplay}
+                    </div>
                   </div>
-                </div>
-              </Link>
+                  <DropdownMenuSeparator className="bg-white/[0.06] my-1" />
+                  <DropdownMenuItem asChild>
+                    <Link
+                      href="/profile"
+                      onClick={handleLinkClick}
+                      className="w-full flex items-center gap-2 px-2 py-1.5 rounded-md text-xs text-zinc-300 hover:bg-white/[0.06] hover:text-white cursor-pointer"
+                    >
+                      <User className="w-3.5 h-3.5 text-zinc-400" />
+                      <span>My Profile</span>
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <Link
+                      href="/settings"
+                      onClick={handleLinkClick}
+                      className="w-full flex items-center gap-2 px-2 py-1.5 rounded-md text-xs text-zinc-300 hover:bg-white/[0.06] hover:text-white cursor-pointer"
+                    >
+                      <Sliders className="w-3.5 h-3.5 text-zinc-400" />
+                      <span>Settings</span>
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator className="bg-white/[0.06] my-1" />
+                  <DropdownMenuItem
+                    onClick={() => setIsLogoutModalOpen(true)}
+                    className="w-full flex items-center gap-2 px-2 py-1.5 rounded-md text-xs text-rose-400 hover:bg-rose-500/10 hover:text-rose-300 cursor-pointer"
+                  >
+                    <LogOut className="w-3.5 h-3.5" />
+                    <span>Sign Out</span>
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
 
-              {/* Sign Out Button */}
-              <button
-                type="button"
-                onClick={() => setIsLogoutModalOpen(true)}
-                className="w-full flex items-center justify-center gap-2 py-2 px-3 rounded-lg bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 hover:text-rose-300 border border-rose-500/20 transition-colors cursor-pointer font-semibold text-xs"
-              >
-                <LogOut className="w-3.5 h-3.5" />
-                <span>Sign Out</span>
-              </button>
+              {/* Compact Quick Sign Out Button */}
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <button
+                    type="button"
+                    onClick={() => setIsLogoutModalOpen(true)}
+                    className="h-7.5 w-7.5 rounded-md flex items-center justify-center text-zinc-400 hover:text-rose-400 hover:bg-rose-500/10 transition-colors cursor-pointer shrink-0"
+                    aria-label="Sign Out"
+                  >
+                    <LogOut className="w-3.5 h-3.5" />
+                  </button>
+                </TooltipTrigger>
+                <TooltipContent side="top" className="text-[11px] bg-zinc-900 border-zinc-800 text-zinc-200">
+                  Sign Out
+                </TooltipContent>
+              </Tooltip>
             </div>
           ) : (
             /* Collapsed User Section */
-            <div className="flex flex-col items-center gap-2">
+            <div className="flex flex-col items-center">
               <DropdownMenu>
                 <Tooltip>
                   <TooltipTrigger asChild>
                     <DropdownMenuTrigger asChild>
                       <button
                         type="button"
-                        className="w-9 h-9 rounded-full overflow-hidden bg-slate-800 border-2 border-amber-500/30 hover:border-amber-400 transition-colors cursor-pointer flex items-center justify-center"
+                        className="w-9 h-9 rounded-full overflow-hidden bg-zinc-800 border border-white/10 hover:border-zinc-500 transition-colors cursor-pointer flex items-center justify-center"
                         aria-label="User account menu"
                       >
                         {user?.profile ? (
@@ -571,12 +622,12 @@ export default function Sidebar({ isMobile = false }: SidebarProps) {
                             className="w-full h-full object-cover"
                           />
                         ) : (
-                          <ShieldCheck className="w-4 h-4 text-amber-400" />
+                          <ShieldCheck className="w-4 h-4 text-zinc-400" />
                         )}
                       </button>
                     </DropdownMenuTrigger>
                   </TooltipTrigger>
-                  <TooltipContent side="right">
+                  <TooltipContent side="right" className="text-[11px] bg-zinc-900 border-zinc-800 text-zinc-200">
                     {user?.userName || user?.firstName || "Admin Account"}
                   </TooltipContent>
                 </Tooltip>
@@ -584,40 +635,40 @@ export default function Sidebar({ isMobile = false }: SidebarProps) {
                 <DropdownMenuContent
                   side="right"
                   sideOffset={12}
-                  className="w-56 bg-slate-900 border border-slate-700/80 text-slate-100 p-1 rounded-lg shadow-xl"
+                  className="w-56 bg-[#0d0e14] border border-white/[0.08] text-zinc-100 p-1.5 rounded-lg shadow-xl"
                 >
                   <div className="px-2 py-1.5">
                     <p className="text-xs font-semibold text-white truncate">
                       {user?.userName || user?.firstName || "ENG Admin"}
                     </p>
-                    <p className="text-[10px] text-slate-400 truncate">{user?.email || "admin@eng.com"}</p>
-                    <div className="mt-1 inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[9px] font-bold bg-amber-500/15 text-amber-400 border border-amber-500/20 uppercase tracking-wide">
-                      {user?.role?.replace("_", " ") || "Administrator"}
+                    <p className="text-[10px] text-zinc-400 truncate">{user?.email || "admin@eng.com"}</p>
+                    <div className="mt-1.5 inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[9px] font-semibold bg-white/[0.06] text-zinc-300 border border-white/[0.08] uppercase tracking-wider">
+                      {roleDisplay}
                     </div>
                   </div>
-                  <DropdownMenuSeparator className="bg-slate-800 my-1" />
+                  <DropdownMenuSeparator className="bg-white/[0.06] my-1" />
                   <DropdownMenuItem asChild>
                     <Link
                       href="/profile"
-                      className="w-full flex items-center gap-2 px-2 py-1.5 rounded text-xs text-slate-300 hover:bg-slate-800 hover:text-white cursor-pointer"
+                      className="w-full flex items-center gap-2 px-2 py-1.5 rounded-md text-xs text-zinc-300 hover:bg-white/[0.06] hover:text-white cursor-pointer"
                     >
-                      <User className="w-3.5 h-3.5 text-slate-400" />
+                      <User className="w-3.5 h-3.5 text-zinc-400" />
                       <span>My Profile</span>
                     </Link>
                   </DropdownMenuItem>
                   <DropdownMenuItem asChild>
                     <Link
                       href="/settings"
-                      className="w-full flex items-center gap-2 px-2 py-1.5 rounded text-xs text-slate-300 hover:bg-slate-800 hover:text-white cursor-pointer"
+                      className="w-full flex items-center gap-2 px-2 py-1.5 rounded-md text-xs text-zinc-300 hover:bg-white/[0.06] hover:text-white cursor-pointer"
                     >
-                      <Sliders className="w-3.5 h-3.5 text-slate-400" />
+                      <Sliders className="w-3.5 h-3.5 text-zinc-400" />
                       <span>Settings</span>
                     </Link>
                   </DropdownMenuItem>
-                  <DropdownMenuSeparator className="bg-slate-800 my-1" />
+                  <DropdownMenuSeparator className="bg-white/[0.06] my-1" />
                   <DropdownMenuItem
                     onClick={() => setIsLogoutModalOpen(true)}
-                    className="w-full flex items-center gap-2 px-2 py-1.5 rounded text-xs text-rose-400 hover:bg-rose-500/10 hover:text-rose-300 cursor-pointer"
+                    className="w-full flex items-center gap-2 px-2 py-1.5 rounded-md text-xs text-rose-400 hover:bg-rose-500/10 hover:text-rose-300 cursor-pointer"
                   >
                     <LogOut className="w-3.5 h-3.5" />
                     <span>Sign Out</span>

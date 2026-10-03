@@ -2,19 +2,19 @@
 import React from "react";
 import {
   LayoutDashboard,
-  Activity,
-  Gamepad2,
+  Swords,
   Trophy,
-  Award,
-  Gift,
+  Medal,
+  ClipboardCheck,
   Table2,
   Shield,
   Users,
   UserCheck,
-  Users2,
+  UsersRound,
   ArrowLeftRight,
+  ShieldCheck,
   UserCog,
-  ShieldAlert,
+  UserMinus,
   CreditCard,
   Bell,
   Tv,
@@ -25,11 +25,11 @@ import {
   Sparkles,
   ShoppingBag,
   FolderTree,
+  Activity,
   Settings,
   Sliders,
   User,
   FileText,
-  ShieldCheck,
 } from "lucide-react";
 
 /**
@@ -82,56 +82,52 @@ export function hasRoleOrPermission(
   requiredPermission?: string
 ): boolean {
   if (!userRole) return false;
-  const normalized = userRole.toUpperCase();
 
-  // Super admin always has unrestricted system-wide access
-  if (normalized === "SUPER_ADMIN") return true;
+  // SUPER_ADMIN has bypass authority over all menus
+  if (userRole === "SUPER_ADMIN") return true;
 
-  // Check role restrictions
+  // If specific roles are required, ensure user's role is in the whitelist
   if (allowedRoles && allowedRoles.length > 0) {
-    const isAllowed = allowedRoles.some((r) => r.toUpperCase() === normalized);
-    if (!isAllowed) return false;
+    if (!allowedRoles.includes(userRole)) {
+      return false;
+    }
   }
 
-  // Granular permission check for ADMIN
-  if (normalized === "ADMIN") {
-    // Fail-safe: If this admin has NO custom permissions assigned yet, grant access
-    if (!userPermissions || userPermissions.length === 0) return true;
-
-    if (requiredPermission) {
-      return userPermissions.includes(requiredPermission);
+  // If a specific permission is required, verify user has it
+  if (requiredPermission) {
+    if (!Array.isArray(userPermissions) || !userPermissions.includes(requiredPermission)) {
+      return false;
     }
-    return true;
   }
 
   return true;
 }
 
 /**
- * Filters navigation sections and their children based on the user's role and permissions.
- * If a parent section or submenu has no accessible items, it is cleanly omitted.
+ * Filters the sidebar sections based on role and active permissions
  */
 export function getAuthorizedNavigation(
   sections: TSidebarSection[],
   userRole?: string | null,
   userPermissions?: string[] | null
 ): TSidebarSection[] {
-  // If role is missing during initial load, fallback gracefully to ADMIN/SUPER_ADMIN view
-  const activeRole = userRole || "ADMIN";
+  const activeRole = userRole || "";
 
   return sections
     .map((section) => {
-      // Check section-level roles
-      if (section.allowedRoles && !hasRoleOrPermission(activeRole, userPermissions, section.allowedRoles)) {
-        return null;
+      // Check section-level role restrictions if defined
+      if (section.allowedRoles && section.allowedRoles.length > 0) {
+        if (!section.allowedRoles.includes(activeRole) && activeRole !== "SUPER_ADMIN") {
+          return null;
+        }
       }
 
       const authorizedItems = section.items
         .map((item) => {
-          // If item contains children (nested submenu)
+          // If item has children, check access to child items
           if (item.children && item.children.length > 0) {
-            // Check parent permission first
-            if (item.requiredPermission && !hasRoleOrPermission(activeRole, userPermissions, item.allowedRoles, item.requiredPermission)) {
+            // First check parent permission/role
+            if (!hasRoleOrPermission(activeRole, userPermissions, item.allowedRoles, item.requiredPermission)) {
               return null;
             }
 
@@ -139,7 +135,6 @@ export function getAuthorizedNavigation(
               hasRoleOrPermission(activeRole, userPermissions, child.allowedRoles, child.requiredPermission)
             );
 
-            // Hide parent dropdown if no child route is permitted
             if (accessibleChildren.length === 0) return null;
 
             return {
@@ -191,7 +186,7 @@ export const sidebarSections: TSidebarSection[] = [
     items: [
       {
         id: 2,
-        icon: Gamepad2,
+        icon: Swords,
         title: "Match Management",
         label: "/match-management",
         requiredPermission: "MATCH_MANAGEMENT",
@@ -207,7 +202,7 @@ export const sidebarSections: TSidebarSection[] = [
       },
       {
         id: 31,
-        icon: Award,
+        icon: Medal,
         title: "Tournaments",
         label: "/tournaments",
         requiredPermission: "TOURNAMENTS",
@@ -215,7 +210,7 @@ export const sidebarSections: TSidebarSection[] = [
       },
       {
         id: 32,
-        icon: Gift,
+        icon: ClipboardCheck,
         title: "Tournament Claim",
         label: "/tournament-claim",
         requiredPermission: "TOURNAMENT_CLAIM",
@@ -261,7 +256,7 @@ export const sidebarSections: TSidebarSection[] = [
       },
       {
         id: 71,
-        icon: Users2,
+        icon: UsersRound,
         title: "Parent Management",
         label: "/parent-management",
         requiredPermission: "PARENT_MANAGEMENT",
@@ -298,7 +293,7 @@ export const sidebarSections: TSidebarSection[] = [
       },
       {
         id: 111,
-        icon: ShieldAlert,
+        icon: UserMinus,
         title: "Incomplete Accounts",
         label: "/incomplete-accounts",
         requiredPermission: "INCOMPLETE_ACCOUNTS",
