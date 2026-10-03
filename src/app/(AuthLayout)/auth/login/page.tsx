@@ -628,17 +628,21 @@ const Login = () => {
       {/* ========================================================= */}
       {/* 🔐 RIGHT PANEL: Clean Enterprise Authentication Form (45%) */}
       {/* ========================================================= */}
-      <div className="w-full lg:w-[45%] min-h-screen bg-white text-slate-900 flex flex-col justify-between p-6 sm:p-12 lg:p-16">
+      <div className="w-full lg:w-[45%] min-h-screen bg-slate-50 relative overflow-hidden text-slate-900 flex flex-col justify-between p-6 sm:p-12 lg:p-16">
+        {/* Subtle Ambient Light Mesh & Radiance (Matching Forgot Password) */}
+        <div className="absolute inset-0 bg-[linear-gradient(to_right,#e2e8f0_1px,transparent_1px),linear-gradient(to_bottom,#e2e8f0_1px,transparent_1px)] bg-[size:3.5rem_3.5rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_40%,#000_70%,transparent_100%)] opacity-50 pointer-events-none" />
+        <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[520px] h-[300px] bg-gradient-to-b from-emerald-100/50 via-slate-100/60 to-transparent rounded-full blur-3xl pointer-events-none" />
+
         {/* Top Operational Pill */}
-        <div className="flex items-center justify-between">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-medium bg-slate-100 text-slate-700 border border-slate-200">
+        <div className="relative z-10 flex items-center justify-between">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-medium bg-white/90 backdrop-blur-xs text-slate-700 border border-slate-200 shadow-2xs">
             <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
             <span>Console v2.4 &bull; Production</span>
           </div>
         </div>
 
         {/* Center Main Form */}
-        <div className="max-w-[390px] w-full mx-auto my-auto py-8">
+        <div className="relative z-10 max-w-[390px] w-full mx-auto my-auto py-8">
           <div className="mb-6 text-center">
             {/* 🐼 Interactive Panda (Centered directly over Administrator Portal) */}
             <div className="flex justify-center mb-1">
@@ -649,7 +653,7 @@ const Login = () => {
               />
             </div>
 
-            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-md text-[11px] font-semibold uppercase tracking-wider text-slate-700 bg-slate-100 border border-slate-200 mb-2.5">
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-md text-[11px] font-semibold uppercase tracking-wider text-slate-700 bg-white border border-slate-200 shadow-2xs mb-2.5">
               <ShieldCheck className="w-3.5 h-3.5 text-slate-600" />
               <span>Administrator Portal</span>
             </div>
@@ -678,7 +682,7 @@ const Login = () => {
                           type="email"
                           autoComplete="email"
                           placeholder="admin@engsports.com"
-                          className="h-11 text-sm pl-10 pr-3 rounded-lg border-slate-200 focus-visible:ring-slate-900 focus-visible:border-slate-900 transition-colors placeholder:text-slate-400"
+                          className="h-11 text-sm pl-10 pr-3 rounded-lg bg-white border-slate-200 focus-visible:ring-slate-900 focus-visible:border-slate-900 transition-colors placeholder:text-slate-400 shadow-2xs"
                           {...field}
                           onFocus={() => {
                             setIsEmailFocused(true);
@@ -721,7 +725,7 @@ const Login = () => {
                           type={showPassword ? "text" : "password"}
                           autoComplete="current-password"
                           placeholder="Enter your password"
-                          className="h-11 text-sm pl-10 pr-10 rounded-lg border-slate-200 focus-visible:ring-slate-900 focus-visible:border-slate-900 transition-colors placeholder:text-slate-400"
+                          className="h-11 text-sm pl-10 pr-10 rounded-lg bg-white border-slate-200 focus-visible:ring-slate-900 focus-visible:border-slate-900 transition-colors placeholder:text-slate-400 shadow-2xs"
                           {...field}
                           onFocus={() => {
                             setIsPasswordFocused(true);
@@ -783,7 +787,7 @@ const Login = () => {
         </div>
 
         {/* Footer */}
-        <div className="flex flex-col sm:flex-row items-center justify-between text-xs text-slate-400 pt-6 border-t border-slate-100 gap-2">
+        <div className="relative z-10 flex flex-col sm:flex-row items-center justify-between text-xs text-slate-400 pt-6 border-t border-slate-200/80 gap-2">
           <span>&copy; {new Date().getFullYear()} ENG Sports Events. All rights reserved.</span>
           <div className="flex items-center gap-4">
             <span className="text-slate-300">&bull;</span>

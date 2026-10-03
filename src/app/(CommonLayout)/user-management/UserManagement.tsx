@@ -408,17 +408,10 @@ const UserManagement = () => {
         </div>
       </div>
 
-      {/* KPI Overview Strip */}
+      {/* KPI Overview Strip (Static Non-Clickable Display) */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3.5">
         {/* Total Members */}
-        <div
-          onClick={() => handleRoleChange("ALL")}
-          className={`p-4 bg-white border rounded-xl shadow-2xs cursor-pointer transition-all ${
-            activeRole === "ALL"
-              ? "border-slate-900 ring-2 ring-slate-900/5"
-              : "border-slate-200 hover:border-slate-300"
-          }`}
-        >
+        <div className="p-4 bg-white border border-slate-200 rounded-xl shadow-2xs">
           <div className="flex items-center justify-between text-slate-500">
             <span className="text-[11px] font-semibold uppercase tracking-wider text-slate-500">
               Total Members
@@ -439,16 +432,7 @@ const UserManagement = () => {
         </div>
 
         {/* Pending Approvals */}
-        <div
-          onClick={() => handleRoleChange("PENDING_REQUESTS")}
-          className={`p-4 bg-white border rounded-xl shadow-2xs cursor-pointer transition-all ${
-            activeRole === "PENDING_REQUESTS"
-              ? "border-amber-500 ring-2 ring-amber-500/10 bg-amber-50/20"
-              : pendingCount > 0
-                ? "border-amber-300 bg-amber-50/10 hover:border-amber-400"
-                : "border-slate-200 hover:border-slate-300"
-          }`}
-        >
+        <div className="p-4 bg-white border border-slate-200 rounded-xl shadow-2xs">
           <div className="flex items-center justify-between text-slate-500">
             <span className="text-[11px] font-semibold uppercase tracking-wider text-slate-600">
               Pending Approvals
@@ -469,14 +453,7 @@ const UserManagement = () => {
         </div>
 
         {/* Approved Players */}
-        <div
-          onClick={() => handleRoleChange("PLAYER")}
-          className={`p-4 bg-white border rounded-xl shadow-2xs cursor-pointer transition-all ${
-            activeRole === "PLAYER"
-              ? "border-slate-900 ring-2 ring-slate-900/5"
-              : "border-slate-200 hover:border-slate-300"
-          }`}
-        >
+        <div className="p-4 bg-white border border-slate-200 rounded-xl shadow-2xs">
           <div className="flex items-center justify-between text-slate-500">
             <span className="text-[11px] font-semibold uppercase tracking-wider text-slate-500">
               Active Players
@@ -497,14 +474,7 @@ const UserManagement = () => {
         </div>
 
         {/* Staff & Officials */}
-        <div
-          onClick={() => handleRoleChange("MANAGER")}
-          className={`p-4 bg-white border rounded-xl shadow-2xs cursor-pointer transition-all ${
-            activeRole === "MANAGER" || activeRole === "REFEREE"
-              ? "border-slate-900 ring-2 ring-slate-900/5"
-              : "border-slate-200 hover:border-slate-300"
-          }`}
-        >
+        <div className="p-4 bg-white border border-slate-200 rounded-xl shadow-2xs">
           <div className="flex items-center justify-between text-slate-500">
             <span className="text-[11px] font-semibold uppercase tracking-wider text-slate-500">
               Staff & Officials
