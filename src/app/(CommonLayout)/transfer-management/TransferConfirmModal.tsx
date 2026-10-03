@@ -7,7 +7,7 @@ import {
   DialogTitle,
   DialogDescription,
 } from "@/components/ui/dialog";
-import { CheckCircle2, XCircle } from "lucide-react";
+import { Check, X, AlertTriangle } from "lucide-react";
 
 interface TransferConfirmModalProps {
   isOpen: boolean;
@@ -15,6 +15,9 @@ interface TransferConfirmModalProps {
   onConfirm: () => void;
   title: string;
   description: string;
+  playerName?: string;
+  fromTeam?: string;
+  toTeam?: string;
   isLoading?: boolean;
   type: "approve" | "reject";
 }
@@ -25,49 +28,68 @@ const TransferConfirmModal: React.FC<TransferConfirmModalProps> = ({
   onConfirm,
   title,
   description,
+  playerName,
+  fromTeam,
+  toTeam,
   isLoading = false,
   type,
 }) => {
   const isApprove = type === "approve";
 
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
+    <Dialog open={isOpen} onOpenChange={(open) => !isLoading && !open && onClose()}>
       <DialogContent
-        showCloseButton={false}
-        className="max-w-md bg-white dark:bg-slate-900 rounded-lg p-6 border border-slate-200 dark:border-slate-800 shadow-xl"
+        showCloseButton={!isLoading}
+        className="max-w-md bg-white p-6 border border-slate-200 rounded-lg shadow-sm"
       >
-        <div className="flex flex-col items-center text-center space-y-3">
-          {/* Status Icon */}
+        <div className="flex items-start gap-3">
           <div
-            className={`w-10 h-10 rounded-full border flex items-center justify-center ${
+            className={`w-9 h-9 rounded-md border flex items-center justify-center shrink-0 ${
               isApprove
-                ? "bg-emerald-50 dark:bg-emerald-950/40 border-emerald-100 dark:border-emerald-900/40 text-emerald-600 dark:text-emerald-400"
-                : "bg-red-50 dark:bg-red-950/40 border-red-100 dark:border-red-900/40 text-red-600 dark:text-red-400"
+                ? "bg-emerald-50 border-emerald-200 text-emerald-700"
+                : "bg-rose-50 border-rose-200 text-rose-700"
             }`}
           >
             {isApprove ? (
-              <CheckCircle2 className="w-5 h-5" />
+              <Check className="w-4 h-4 stroke-[2.5]" />
             ) : (
-              <XCircle className="w-5 h-5" />
+              <AlertTriangle className="w-4 h-4 stroke-[2.2]" />
             )}
           </div>
 
-          <div className="space-y-1.5 w-full">
-            <DialogTitle className="text-base font-semibold text-slate-900 dark:text-slate-100">
+          <div className="flex-1 min-w-0">
+            <DialogTitle className="text-base font-semibold text-slate-900 tracking-tight">
               {title}
             </DialogTitle>
-            <DialogDescription className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed max-w-sm mx-auto">
+            <DialogDescription className="mt-1 text-xs text-slate-600 leading-relaxed">
               {description}
             </DialogDescription>
+
+            {playerName && (
+              <div className="mt-3 p-3 bg-slate-50 border border-slate-200 rounded-md text-xs space-y-1">
+                <div className="flex justify-between items-center text-slate-700">
+                  <span className="text-slate-500 font-medium">Player</span>
+                  <span className="font-semibold text-slate-900">{playerName}</span>
+                </div>
+                {(fromTeam || toTeam) && (
+                  <div className="flex justify-between items-center text-slate-700 pt-1 border-t border-slate-200/70">
+                    <span className="text-slate-500 font-medium">Movement</span>
+                    <span className="font-medium text-slate-800">
+                      {fromTeam || "Free Agent"} &rarr; {toTeam || "New Club"}
+                    </span>
+                  </div>
+                )}
+              </div>
+            )}
           </div>
         </div>
 
-        <div className="flex items-center gap-2.5 mt-6 pt-3 border-t border-slate-100 dark:border-slate-800">
+        <div className="flex items-center justify-end gap-2 mt-6 pt-4 border-t border-slate-100">
           <button
             type="button"
             onClick={onClose}
             disabled={isLoading}
-            className="flex-1 h-9 rounded-md text-xs font-medium border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 transition-colors cursor-pointer disabled:opacity-50"
+            className="h-8 px-3.5 rounded-md text-xs font-medium border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 transition-colors disabled:opacity-50 cursor-pointer"
           >
             Cancel
           </button>
@@ -75,22 +97,18 @@ const TransferConfirmModal: React.FC<TransferConfirmModalProps> = ({
             type="button"
             onClick={onConfirm}
             disabled={isLoading}
-            className={`flex-1 h-9 rounded-md text-xs font-medium text-white transition-colors cursor-pointer flex items-center justify-center gap-1.5 disabled:opacity-50 ${
+            className={`h-8 px-4 rounded-md text-xs font-medium text-white transition-colors flex items-center gap-1.5 disabled:opacity-50 cursor-pointer ${
               isApprove
                 ? "bg-emerald-600 hover:bg-emerald-700"
-                : "bg-red-600 hover:bg-red-700"
+                : "bg-rose-600 hover:bg-rose-700"
             }`}
           >
             {isLoading ? (
               <div className="w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
             ) : (
               <>
-                {isApprove ? (
-                  <CheckCircle2 className="w-3.5 h-3.5" />
-                ) : (
-                  <XCircle className="w-3.5 h-3.5" />
-                )}
-                <span>{isApprove ? "Approve" : "Reject"}</span>
+                {isApprove ? <Check className="w-3.5 h-3.5" /> : <X className="w-3.5 h-3.5" />}
+                <span>{isApprove ? "Confirm Approval" : "Confirm Rejection"}</span>
               </>
             )}
           </button>

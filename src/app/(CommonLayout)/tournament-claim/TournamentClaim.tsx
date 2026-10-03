@@ -1,21 +1,28 @@
 "use client";
 
+import React, { useEffect, useState, useMemo } from "react";
 import CustomPagination from "@/components/cui/CustomPagination";
-import GeneralStateCard from "@/components/cui/GeneralStateCard";
 import CustomTable from "@/components/table/CustomTable";
-import TableTitle from "@/components/titles/TableTitle";
 import {
   useGetAllTournamentClaimQuery,
+  useGetTournamentClaimOverviewQuery,
   useUpdateTournamentClaimStatusMutation,
 } from "@/features/tournamentClaim/tournamentClaimApi";
 import { useHeaders } from "@/hooks/useHeaders";
 import { getTournamentClaimColumns } from "@/tableColumns/tournamentClaimColumns";
 import { TTournamentClaim } from "@/types/columnTypes";
 import { getErrorMessage } from "@/utils/getErrorMessage";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Check, ChevronsUpDown, Search } from "lucide-react";
+import {
+  Search,
+  RefreshCw,
+  Trophy,
+  Clock,
+  CheckCircle2,
+  XCircle,
+  Filter,
+  X,
+} from "lucide-react";
 import { useSearchParams } from "next/navigation";
-import { useEffect, useState, useMemo } from "react";
 import { toast } from "sonner";
 import TournamentClaimViewModal from "./TournamentClaimViewModal";
 
@@ -24,9 +31,25 @@ export default function TournamentClaim() {
   const searchParams = useSearchParams();
   const page = searchParams.get("page") || "1";
 
-  // API Hooks
-  const { data: claimRes, isLoading } = useGetAllTournamentClaimQuery(page);
-  const [updateTournamentClaimStatus, { isLoading: isUpdating }] =
+  // RTK Query: Claims List
+  const {
+    data: claimRes,
+    isLoading: isClaimsLoading,
+    isFetching: isClaimsFetching,
+    refetch: refetchClaims,
+  } = useGetAllTournamentClaimQuery(page);
+
+  // RTK Query: Backend Computed Analytics / Overview
+  const {
+    data: overviewRes,
+    isLoading: isOverviewLoading,
+    isFetching: isOverviewFetching,
+    refetch: refetchOverview,
+  } = useGetTournamentClaimOverviewQuery(undefined);
+
+  const overview = overviewRes?.data;
+
+  const [updateTournamentClaimStatus] =
     useUpdateTournamentClaimStatusMutation();
 
   // Selection & Modal States
@@ -37,12 +60,11 @@ export default function TournamentClaim() {
   // Search & Filter States
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("ALL");
-  const [statusPopoverOpen, setStatusPopoverOpen] = useState(false);
 
   useEffect(() => {
     setHeaders({
-      title: "Tournament Claim",
-      des: "Review, approve, or reject user rank claim submissions.",
+      title: "Tournament Claims",
+      des: "Review and verify participant rank submissions from tournaments.",
     });
   }, [setHeaders]);
 
@@ -51,24 +73,33 @@ export default function TournamentClaim() {
     [claimRes]
   );
 
-  // Filtered Claims
+  // Backend-driven metrics (accurately aggregated on database)
+  const totalClaimsCount = overview?.totalClaims ?? claimRes?.pagination?.total ?? rawClaims.length;
+  const pendingClaimsCount = overview?.pendingClaims ?? 0;
+  const approvedClaimsCount = overview?.approvedClaims ?? 0;
+  const rejectedClaimsCount = overview?.rejectedClaims ?? 0;
+
+  // Filtered Claims for Current Table View
   const filteredClaims = useMemo(() => {
     return rawClaims.filter((claim) => {
       const userName = claim.user?.userName || "";
       const email = claim.user?.email || "";
       const tournamentTitle = claim.tournament?.title || "";
       const rankName = claim.claimedPositionName || "";
+      const proofNotes = claim.proofNotes || "";
 
+      const query = searchTerm.toLowerCase().trim();
       const matchesSearch =
-        !searchTerm.trim() ||
-        userName.toLowerCase().includes(searchTerm.toLowerCase().trim()) ||
-        email.toLowerCase().includes(searchTerm.toLowerCase().trim()) ||
-        tournamentTitle.toLowerCase().includes(searchTerm.toLowerCase().trim()) ||
-        rankName.toLowerCase().includes(searchTerm.toLowerCase().trim());
+        !query ||
+        userName.toLowerCase().includes(query) ||
+        email.toLowerCase().includes(query) ||
+        tournamentTitle.toLowerCase().includes(query) ||
+        rankName.toLowerCase().includes(query) ||
+        proofNotes.toLowerCase().includes(query);
 
+      const claimStatus = (claim.status || "pending").toLowerCase();
       const matchesStatus =
-        statusFilter === "ALL" ||
-        (claim.status || "pending").toLowerCase() === statusFilter.toLowerCase();
+        statusFilter === "ALL" || claimStatus === statusFilter.toLowerCase();
 
       return matchesSearch && matchesStatus;
     });
@@ -93,113 +124,259 @@ export default function TournamentClaim() {
 
       if (res?.success !== false) {
         toast.success(
-          res?.message || `Tournament claim ${status} successfully`
+          res?.message || `Tournament claim updated to ${status}`
         );
+        refetchOverview();
       }
     } catch (err: any) {
-      toast.error(getErrorMessage(err, `Failed to update claim status to ${status}`));
+      toast.error(
+        getErrorMessage(err, `Failed to update claim status to ${status}`)
+      );
     } finally {
       setUpdatingId(null);
     }
   };
 
-  const totalClaims = claimRes?.pagination?.total || rawClaims.length;
+  const isRefreshing = isClaimsFetching || isOverviewFetching;
 
-  const cardItems = [
-    {
-      title: "Total Claims",
-      value: totalClaims,
-      id: "tc1",
-      description: "User tournament rank claim submissions",
-    },
+  const statusTabs = [
+    { label: "All Claims", value: "ALL", count: totalClaimsCount },
+    { label: "Pending", value: "pending", count: pendingClaimsCount },
+    { label: "Approved", value: "approved", count: approvedClaimsCount },
+    { label: "Rejected", value: "rejected", count: rejectedClaimsCount },
   ];
 
   return (
-    <div className="w-full p-4 sm:p-6 lg:p-8 space-y-6 pb-16">
-      {/* State Banner Card */}
-      <div className="flex items-end">
-        <div className="w-full">
-          <GeneralStateCard items={cardItems} className="grid-cols-4" />
+    <div className="w-full p-4 sm:p-6 lg:p-8 space-y-6 pb-16 max-w-[1600px] mx-auto">
+      {/* Top Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div>
+          <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-slate-900">
+            Tournament Claims
+          </h1>
+          <p className="text-xs sm:text-sm text-slate-500 mt-1">
+            Review, verify, and confirm user tournament rank claim submissions.
+          </p>
+        </div>
+
+        <div className="flex items-center gap-2">
+          <button
+            type="button"
+            onClick={() => {
+              refetchClaims();
+              refetchOverview();
+            }}
+            disabled={isRefreshing}
+            className="inline-flex items-center gap-2 px-3 py-2 text-xs font-medium text-slate-700 bg-white hover:bg-slate-50 border border-slate-200 rounded-lg transition-colors cursor-pointer shadow-2xs disabled:opacity-50"
+            title="Refresh claim records and backend analytics"
+          >
+            <RefreshCw
+              className={`w-3.5 h-3.5 text-slate-500 ${
+                isRefreshing ? "animate-spin" : ""
+              }`}
+            />
+            <span className="hidden sm:inline">Refresh</span>
+          </button>
         </div>
       </div>
 
-      {/* Table Registry Container */}
-      <div className="bg-white rounded-2xl py-4 flex flex-col border border-gray-100 shadow-sm space-y-4">
-        {/* Table Header & Controls */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 px-6 pt-2">
-          <TableTitle payload={{ title: "Tournament Registry" }} />
+      {/* KPI Overview Strip (Backend Computed Analytics) */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3.5">
+        {/* Total Claims */}
+        <div className="p-4 bg-white border border-slate-200 rounded-xl shadow-2xs">
+          <div className="flex items-center justify-between text-slate-500">
+            <span className="text-[11px] font-semibold uppercase tracking-wider text-slate-500">
+              Total Claims
+            </span>
+            <Trophy className="w-4 h-4 text-slate-400" />
+          </div>
+          <div className="mt-2 flex items-baseline gap-2">
+            <span className="text-xl font-bold font-mono text-slate-900">
+              {isOverviewLoading ? "—" : totalClaimsCount.toLocaleString()}
+            </span>
+            <span className="text-xs text-slate-500">submissions</span>
+          </div>
+          <p className="text-[11px] text-slate-400 mt-1">
+            All-time tournament rank submissions
+          </p>
+        </div>
 
-          <div className="flex items-center gap-3 flex-wrap">
-            {/* Search Input */}
-            <div className="relative w-64">
-              <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+        {/* Pending Claims */}
+        <div className="p-4 bg-white border border-slate-200 rounded-xl shadow-2xs">
+          <div className="flex items-center justify-between text-slate-500">
+            <span className="text-[11px] font-semibold uppercase tracking-wider text-slate-500">
+              Pending Review
+            </span>
+            <Clock className="w-4 h-4 text-amber-500" />
+          </div>
+          <div className="mt-2 flex items-baseline gap-2">
+            <span className="text-xl font-bold font-mono text-amber-700">
+              {isOverviewLoading ? "—" : pendingClaimsCount.toLocaleString()}
+            </span>
+            <span className="text-xs text-slate-500">awaiting check</span>
+          </div>
+          <p className="text-[11px] text-slate-400 mt-1">
+            Requires verification by administrator
+          </p>
+        </div>
+
+        {/* Approved Claims */}
+        <div className="p-4 bg-white border border-slate-200 rounded-xl shadow-2xs">
+          <div className="flex items-center justify-between text-slate-500">
+            <span className="text-[11px] font-semibold uppercase tracking-wider text-slate-500">
+              Approved
+            </span>
+            <CheckCircle2 className="w-4 h-4 text-emerald-500" />
+          </div>
+          <div className="mt-2 flex items-baseline gap-2">
+            <span className="text-xl font-bold font-mono text-emerald-700">
+              {isOverviewLoading ? "—" : approvedClaimsCount.toLocaleString()}
+            </span>
+            <span className="text-xs text-slate-500">verified</span>
+          </div>
+          <p className="text-[11px] text-slate-400 mt-1">
+            Ranks confirmed and points credited
+          </p>
+        </div>
+
+        {/* Rejected Claims */}
+        <div className="p-4 bg-white border border-slate-200 rounded-xl shadow-2xs">
+          <div className="flex items-center justify-between text-slate-500">
+            <span className="text-[11px] font-semibold uppercase tracking-wider text-slate-500">
+              Rejected
+            </span>
+            <XCircle className="w-4 h-4 text-rose-500" />
+          </div>
+          <div className="mt-2 flex items-baseline gap-2">
+            <span className="text-xl font-bold font-mono text-rose-700">
+              {isOverviewLoading ? "—" : rejectedClaimsCount.toLocaleString()}
+            </span>
+            <span className="text-xs text-slate-500">declined</span>
+          </div>
+          <p className="text-[11px] text-slate-400 mt-1">
+            Submissions disqualified or invalid
+          </p>
+        </div>
+      </div>
+
+      {/* Main Table Container */}
+      <div className="bg-white border border-slate-200 rounded-xl shadow-2xs overflow-hidden">
+        {/* Filter and Control Bar */}
+        <div className="p-4 border-b border-slate-200 flex flex-col md:flex-row md:items-center justify-between gap-3.5">
+          {/* Status Tabs with Live Backend Counts */}
+          <div className="flex items-center gap-1 overflow-x-auto pb-1 md:pb-0">
+            {statusTabs.map((tab) => {
+              const isActive = statusFilter === tab.value;
+              return (
+                <button
+                  key={tab.value}
+                  type="button"
+                  onClick={() => setStatusFilter(tab.value)}
+                  className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-colors cursor-pointer shrink-0 ${
+                    isActive
+                      ? "bg-slate-900 text-white"
+                      : "text-slate-600 hover:text-slate-900 hover:bg-slate-100"
+                  }`}
+                >
+                  <span>{tab.label}</span>
+                  <span
+                    className={`px-1.5 py-0.2 rounded-full text-[10px] font-mono ${
+                      isActive
+                        ? "bg-slate-800 text-slate-200"
+                        : "bg-slate-100 text-slate-600"
+                    }`}
+                  >
+                    {isOverviewLoading ? "—" : tab.count}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+
+          {/* Search Box */}
+          <div className="flex items-center gap-2">
+            <div className="relative w-full sm:w-72">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
               <input
                 type="text"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                placeholder="Search user, rank or tournament..."
-                className="w-full pl-10 pr-4 py-3.5 bg-gray-50 border border-gray-200 rounded-xl text-xs font-medium text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-black/10 focus:border-black transition-all"
+                placeholder="Search user, rank, tournament..."
+                className="w-full pl-9 pr-8 py-1.5 bg-slate-50 border border-slate-200 rounded-lg text-xs text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-1 focus:ring-slate-900 focus:border-slate-900 focus:bg-white transition-all"
               />
-            </div>
-
-            {/* Status Filter Combobox */}
-            <Popover open={statusPopoverOpen} onOpenChange={setStatusPopoverOpen}>
-              <PopoverTrigger asChild>
+              {searchTerm && (
                 <button
                   type="button"
-                  className="h-12 px-3.5 bg-gray-50 border border-gray-200 rounded-xl text-xs font-semibold text-gray-700 flex items-center justify-between gap-2 hover:bg-gray-100 transition-all cursor-pointer min-w-[125px]"
+                  onClick={() => setSearchTerm("")}
+                  className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 cursor-pointer"
                 >
-                  <span className="capitalize">
-                    {statusFilter === "ALL" ? "All Status" : statusFilter}
-                  </span>
-                  <ChevronsUpDown className="w-3.5 h-3.5 text-gray-400 shrink-0" />
+                  <X className="w-3.5 h-3.5" />
                 </button>
-              </PopoverTrigger>
-              <PopoverContent className="w-36 p-1 bg-white border border-gray-200 shadow-xl rounded-xl z-50">
-                {[
-                  { label: "All Status", value: "ALL" },
-                  { label: "Pending", value: "pending" },
-                  { label: "Approved", value: "approved" },
-                  { label: "Rejected", value: "rejected" },
-                ].map((opt) => (
-                  <button
-                    key={opt.value}
-                    type="button"
-                    onClick={() => {
-                      setStatusFilter(opt.value);
-                      setStatusPopoverOpen(false);
-                    }}
-                    className={`w-full px-3 py-3 text-xs rounded-lg flex items-center justify-between transition-colors cursor-pointer text-left ${statusFilter === opt.value
-                        ? "bg-black text-white font-medium"
-                        : "text-gray-700 hover:bg-gray-100"
-                      }`}
-                  >
-                    <span>{opt.label}</span>
-                    {statusFilter === opt.value && (
-                      <Check className="w-3.5 h-3.5 text-white shrink-0" />
-                    )}
-                  </button>
-                ))}
-              </PopoverContent>
-            </Popover>
+              )}
+            </div>
+
+            {(searchTerm || statusFilter !== "ALL") && (
+              <button
+                type="button"
+                onClick={() => {
+                  setSearchTerm("");
+                  setStatusFilter("ALL");
+                }}
+                className="px-2.5 py-1.5 text-xs text-slate-600 hover:text-slate-900 hover:bg-slate-100 rounded-lg border border-slate-200 transition-colors cursor-pointer shrink-0"
+              >
+                Reset
+              </button>
+            )}
           </div>
         </div>
 
-        {/* Custom Table Component */}
-        <div className="pt-2">
-          <CustomTable<TTournamentClaim>
-            columns={getTournamentClaimColumns(
-              handleView,
-              handleStatusUpdate,
-              updatingId
+        {/* Table View / Custom Empty State */}
+        {filteredClaims.length > 0 || isClaimsLoading ? (
+          <div className="w-full overflow-x-auto">
+            <CustomTable<TTournamentClaim>
+              columns={getTournamentClaimColumns(
+                handleView,
+                handleStatusUpdate,
+                updatingId
+              )}
+              data={filteredClaims}
+              isLoading={isClaimsLoading}
+            />
+          </div>
+        ) : (
+          <div className="py-14 px-4 text-center">
+            <div className="w-10 h-10 rounded-full bg-slate-100 text-slate-400 flex items-center justify-center mx-auto mb-3">
+              <Filter className="w-5 h-5" />
+            </div>
+            <h3 className="text-sm font-semibold text-slate-800">
+              No tournament claims found
+            </h3>
+            <p className="text-xs text-slate-500 mt-1 max-w-sm mx-auto">
+              {searchTerm || statusFilter !== "ALL"
+                ? "No claims match your search criteria. Try adjusting filters or search term."
+                : "No tournament rank claims have been submitted yet."}
+            </p>
+            {(searchTerm || statusFilter !== "ALL") && (
+              <button
+                type="button"
+                onClick={() => {
+                  setSearchTerm("");
+                  setStatusFilter("ALL");
+                }}
+                className="mt-3.5 inline-flex items-center px-3 py-1.5 text-xs font-medium text-slate-700 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 cursor-pointer shadow-2xs"
+              >
+                Clear all filters
+              </button>
             )}
-            data={filteredClaims}
-            isLoading={isLoading}
-          />
-        </div>
+          </div>
+        )}
 
         {/* Pagination Footer */}
-        <div className="pt-6 px-4">
+        <div className="p-4 border-t border-slate-200 flex items-center justify-between flex-wrap gap-3">
+          <span className="text-xs text-slate-500">
+            Showing <strong className="text-slate-700">{filteredClaims.length}</strong> of{" "}
+            <strong className="text-slate-700">{totalClaimsCount}</strong> total claims
+          </span>
           <CustomPagination
             TOTAL_PAGES={claimRes?.pagination?.totalPage || 1}
             qryName="page"
@@ -207,13 +384,13 @@ export default function TournamentClaim() {
         </div>
       </div>
 
-      {/* View Details & Action Modal */}
+      {/* View Details & Review Modal */}
       <TournamentClaimViewModal
         isOpen={isViewModalOpen}
         onClose={() => setIsViewModalOpen(false)}
         claim={selectedClaim}
         onStatusUpdate={handleStatusUpdate}
-        isLoading={isUpdating}
+        isLoading={Boolean(updatingId)}
       />
     </div>
   );

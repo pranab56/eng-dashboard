@@ -1,16 +1,15 @@
 import { baseApi } from "../../utils/apiBaseQuery";
 
-
 export const matchApi = baseApi.injectEndpoints({
+  overrideExisting: true,
   endpoints: (builder) => ({
-
     createMatch: builder.mutation({
       query: (data) => ({
         url: "/match",
         method: "POST",
         body: data,
       }),
-      invalidatesTags: ["match"]
+      invalidatesTags: ["match"],
     }),
 
     updateMatch: builder.mutation({
@@ -19,7 +18,7 @@ export const matchApi = baseApi.injectEndpoints({
         method: "PATCH",
         body: data,
       }),
-      invalidatesTags: ["match"]
+      invalidatesTags: ["match"],
     }),
 
     getAllMatch: builder.query({
@@ -46,21 +45,28 @@ export const matchApi = baseApi.injectEndpoints({
       providesTags: ["match"],
     }),
 
+    getMatchOverview: builder.query({
+      query: () => ({
+        url: "/match/overview",
+        method: "GET",
+      }),
+      providesTags: ["match"],
+    }),
+
     getSingleMatch: builder.query({
       query: (id) => ({
         url: `/match/${id}`,
         method: "GET",
       }),
-      providesTags: ["match"]
+      providesTags: ["match"],
     }),
-
 
     deleteMatch: builder.mutation({
       query: (id) => ({
         url: `/match/${id}`,
         method: "DELETE",
       }),
-      invalidatesTags: ["match"]
+      invalidatesTags: ["match"],
     }),
 
     modifyScore: builder.mutation({
@@ -69,10 +75,10 @@ export const matchApi = baseApi.injectEndpoints({
         method: "PATCH",
         body: data,
       }),
-      invalidatesTags: ["match"]
+      invalidatesTags: ["match"],
     }),
 
-        getMatchScheduleDates: builder.query({
+    getMatchScheduleDates: builder.query({
       query: (params) => {
         let url = "/match/schedule-dates";
         if (typeof params === "object" && params !== null) {
@@ -98,6 +104,7 @@ export const matchApi = baseApi.injectEndpoints({
       },
       providesTags: ["match"],
     }),
+
     getMatchFeedbackSetting: builder.query({
       query: () => ({
         url: "/match/feedback-setting",
@@ -105,6 +112,7 @@ export const matchApi = baseApi.injectEndpoints({
       }),
       providesTags: ["matchSetting"],
     }),
+
     updateMatchFeedbackSetting: builder.mutation({
       query: (data) => ({
         url: "/match/feedback-setting",
@@ -113,7 +121,7 @@ export const matchApi = baseApi.injectEndpoints({
       }),
       invalidatesTags: ["matchSetting"],
     }),
-  
+
     getMatchCleanSheets: builder.query({
       query: (id) => ({
         url: `/match/${id}/clean-sheets`,
@@ -146,8 +154,9 @@ export const matchApi = baseApi.injectEndpoints({
         method: "PATCH",
         body: { status },
       }),
-      invalidatesTags: ["match"]
+      invalidatesTags: ["match"],
     }),
+
     getMatchEvents: builder.query({
       query: (matchId) => ({
         url: `/match-result/match/${matchId}`,
@@ -181,8 +190,6 @@ export const matchApi = baseApi.injectEndpoints({
       }),
       invalidatesTags: ["matchResult", "match", "player"],
     }),
-
-
   }),
 });
 
@@ -191,6 +198,7 @@ export const {
   useCreateMatchMutation,
   useUpdateMatchMutation,
   useGetAllMatchQuery,
+  useGetMatchOverviewQuery,
   useGetSingleMatchQuery,
   useDeleteMatchMutation,
   useModifyScoreMutation,
@@ -205,5 +213,4 @@ export const {
   useCreateMatchEventMutation,
   useUpdateMatchEventMutation,
   useDeleteMatchEventMutation,
-
 } = matchApi;

@@ -1,9 +1,7 @@
 import { baseApi } from "../../utils/apiBaseQuery";
 
-
 export const tournamentClaimApi = baseApi.injectEndpoints({
     endpoints: (builder) => ({
-
         getAllTournamentClaim: builder.query({
             query: (pageNumber) => ({
                 url: `/tournament-claim?page=${pageNumber}`,
@@ -12,7 +10,13 @@ export const tournamentClaimApi = baseApi.injectEndpoints({
             providesTags: ["tournamentClaim"]
         }),
 
-
+        getTournamentClaimOverview: builder.query({
+            query: () => ({
+                url: `/tournament-claim/overview`,
+                method: "GET",
+            }),
+            providesTags: ["tournamentClaim"]
+        }),
 
         updateTournamentClaimStatus: builder.mutation({
             query: ({ id, body }) => ({
@@ -22,12 +26,13 @@ export const tournamentClaimApi = baseApi.injectEndpoints({
             }),
             invalidatesTags: ["tournamentClaim"]
         }),
-
     }),
+    overrideExisting: true,
 });
 
 // Export hooks
 export const {
     useGetAllTournamentClaimQuery,
+    useGetTournamentClaimOverviewQuery,
     useUpdateTournamentClaimStatusMutation,
 } = tournamentClaimApi;

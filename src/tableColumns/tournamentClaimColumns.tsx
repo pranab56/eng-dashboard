@@ -2,11 +2,23 @@ import { ColumnDef } from "@tanstack/react-table";
 import dayjs from "dayjs";
 import Image from "next/image";
 import React, { useState } from "react";
-import { FiEye, FiCheck, FiX } from "react-icons/fi";
 import { TTournamentClaim } from "@/types/columnTypes";
 import { formatImagePath } from "@/utils/formatImagePath";
-import { Trophy, User as UserIcon, FileText, ChevronsUpDown, Check, Loader2 } from "lucide-react";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import {
+  Trophy,
+  User as UserIcon,
+  FileText,
+  ChevronsUpDown,
+  Check,
+  X,
+  Eye,
+  Loader2,
+} from "lucide-react";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 
 function StatusCell({
   claimId,
@@ -22,11 +34,14 @@ function StatusCell({
   const [open, setOpen] = useState(false);
   const status = (currentStatus || "pending").toLowerCase();
 
-  let badgeStyle = "bg-amber-50 text-amber-700 border-amber-200 hover:bg-amber-100";
+  let badgeStyle =
+    "bg-amber-50 text-amber-700 border-amber-200 hover:bg-amber-100/80";
   if (status === "approved") {
-    badgeStyle = "bg-emerald-50 text-emerald-700 border-emerald-200 hover:bg-emerald-100";
+    badgeStyle =
+      "bg-emerald-50 text-emerald-700 border-emerald-200 hover:bg-emerald-100/80";
   } else if (status === "rejected") {
-    badgeStyle = "bg-red-50 text-red-700 border-red-200 hover:bg-red-100";
+    badgeStyle =
+      "bg-rose-50 text-rose-700 border-rose-200 hover:bg-rose-100/80";
   }
 
   return (
@@ -35,24 +50,24 @@ function StatusCell({
         <button
           type="button"
           disabled={isUpdating}
-          className={`px-3 py-1 rounded-full text-[10px] font-medium . tracking-wider border flex items-center gap-1.5 transition-all cursor-pointer disabled:opacity-50 ${badgeStyle}`}
-          title="Click to change status"
+          className={`px-2.5 py-1 rounded-full text-[11px] font-medium tracking-wide border flex items-center gap-1.5 transition-colors cursor-pointer disabled:opacity-50 ${badgeStyle}`}
+          title="Click to update status"
         >
           {isUpdating ? (
             <Loader2 className="w-3 h-3 animate-spin" />
           ) : (
             <>
-              <span>{status}</span>
-              <ChevronsUpDown className="w-3 h-3 shrink-0 opacity-60" />
+              <span className="capitalize">{status}</span>
+              <ChevronsUpDown className="w-3 h-3 opacity-50 shrink-0" />
             </>
           )}
         </button>
       </PopoverTrigger>
-      <PopoverContent className="w-36 p-1 bg-white border border-gray-200 shadow-xl rounded-xl z-50">
+      <PopoverContent className="w-36 p-1 bg-white border border-slate-200 shadow-lg rounded-lg z-50">
         {[
-          { label: "Approved", value: "approved", color: "text-emerald-600 font-medium" },
-          { label: "Rejected", value: "rejected", color: "text-red-600 font-medium" },
-          { label: "Pending", value: "pending", color: "text-amber-600 font-medium" },
+          { label: "Approved", value: "approved", color: "text-emerald-700" },
+          { label: "Pending", value: "pending", color: "text-amber-700" },
+          { label: "Rejected", value: "rejected", color: "text-rose-700" },
         ].map((opt) => (
           <button
             key={opt.value}
@@ -61,10 +76,11 @@ function StatusCell({
               onStatusUpdate(claimId, opt.value as any);
               setOpen(false);
             }}
-            className={`w-full px-3 py-2 text-xs rounded-lg flex items-center justify-between transition-colors cursor-pointer text-left ${status === opt.value
-              ? "bg-black text-white font-medium"
-              : "text-gray-700 hover:bg-gray-100"
-              }`}
+            className={`w-full px-2.5 py-1.5 text-xs rounded-md flex items-center justify-between transition-colors cursor-pointer text-left ${
+              status === opt.value
+                ? "bg-slate-900 text-white font-medium"
+                : "text-slate-700 hover:bg-slate-100"
+            }`}
           >
             <span className={status === opt.value ? "text-white" : opt.color}>
               {opt.label}
@@ -82,175 +98,206 @@ export const getTournamentClaimColumns = (
   onStatusUpdate: (id: string, status: "approved" | "rejected" | "pending") => void,
   updatingId: string | null
 ): ColumnDef<TTournamentClaim>[] => [
-    {
-      accessorKey: "user",
-      header: () => <div className="">User Info</div>,
-      cell: ({ row }) => {
-        const user = row.original.user;
-        const profilePic = user?.profile ? formatImagePath(user.profile) : null;
+  {
+    accessorKey: "user",
+    header: () => <div className="text-xs font-semibold text-slate-600 uppercase tracking-wider">Participant</div>,
+    cell: ({ row }) => {
+      const user = row.original.user;
+      const profilePic = user?.profile ? formatImagePath(user.profile) : null;
+      const initials = (user?.userName || "U")
+        .substring(0, 2)
+        .toUpperCase();
 
-        return (
-          <div className="flex items-center gap-3 py-1">
-            {profilePic ? (
-              <Image
-                src={profilePic}
-                alt={user?.userName || "User"}
-                width={40}
-                height={40}
-                className="w-10 h-10 rounded-full object-cover border border-gray-200 shadow-sm shrink-0"
-              />
-            ) : (
-              <div className="w-10 h-10 rounded-full bg-gray-100 border border-gray-200 flex items-center justify-center text-gray-500 font-medium shrink-0">
-                <UserIcon className="w-5 h-5 text-gray-400" />
-              </div>
-            )}
+      return (
+        <div className="flex items-center gap-3 py-1">
+          {profilePic ? (
+            <Image
+              src={profilePic}
+              alt={user?.userName || "User"}
+              width={36}
+              height={36}
+              className="w-9 h-9 rounded-full object-cover border border-slate-200 shrink-0"
+            />
+          ) : (
+            <div className="w-9 h-9 rounded-full bg-slate-100 border border-slate-200 flex items-center justify-center text-slate-600 font-semibold text-xs shrink-0">
+              {initials}
+            </div>
+          )}
 
-            <div className="flex flex-col min-w-0">
-              <span className="font-medium text-gray-900 text-sm leading-tight truncate">
-                {user?.userName || "N/A"}
+          <div className="flex flex-col min-w-0">
+            <div className="flex items-center gap-1.5">
+              <span className="font-semibold text-slate-900 text-xs sm:text-sm leading-tight truncate">
+                {user?.userName || "Anonymous"}
               </span>
-              <span className="text-xs text-gray-400 font-normal truncate mt-0.5">
-                {user?.email || "N/A"}
-              </span>
-            </div>
-          </div>
-        );
-      },
-    },
-    {
-      accessorKey: "tournament",
-      header: () => <div className="">Tournament</div>,
-      cell: ({ row }) => {
-        const tournament = row.original.tournament;
-        return (
-          <div className="flex items-center gap-2.5 py-1 max-w-[240px]">
-            <div className="w-9 h-9 rounded-xl bg-amber-50 border border-amber-100 flex items-center justify-center text-amber-600 shrink-0">
-              <Trophy className="w-4 h-4" />
-            </div>
-            <div className="flex flex-col min-w-0">
-              <span className="font-medium text-gray-900 text-xs leading-snug truncate">
-                {tournament?.title || "N/A"}
-              </span>
-              {tournament?.description && (
-                <span className="text-[11px] text-gray-400 truncate mt-0.5">
-                  {tournament.description}
+              {user?.role && (
+                <span className="text-[10px] font-mono px-1.5 py-0.2 rounded bg-slate-100 text-slate-600 border border-slate-200">
+                  {user.role}
                 </span>
               )}
             </div>
-          </div>
-        );
-      },
-    },
-    {
-      accessorKey: "claimedPositionName",
-      header: () => <div className="">Claimed Rank</div>,
-      cell: ({ row }) => {
-        const claim = row.original;
-        let badgeIcon = "#" + claim.claimedPosition;
-        if (claim.claimedPosition === 1) badgeIcon = "🥇";
-        else if (claim.claimedPosition === 2) badgeIcon = "🥈";
-        else if (claim.claimedPosition === 3) badgeIcon = "🥉";
-
-        return (
-          <div className="flex items-center gap-1.5 font-medium text-xs">
-            <span className="text-base">{badgeIcon}</span>
-            <span className="bg-amber-50 text-amber-900 border border-amber-200 px-2 py-0.5 rounded-md">
-              {claim.claimedPositionName || `Rank ${claim.claimedPosition}`}
+            <span className="text-[11px] text-slate-500 font-normal truncate mt-0.5">
+              {user?.email || "No email available"}
             </span>
           </div>
-        );
-      },
+        </div>
+      );
     },
-    {
-      accessorKey: "proofNotes",
-      header: () => <div className="">Proof / Notes</div>,
-      cell: ({ row }) => {
-        const notes = row.getValue("proofNotes") as string;
-        return (
-          <div className="flex items-start gap-1.5 max-w-[220px]">
-            <FileText className="w-3.5 h-3.5 text-gray-400 shrink-0 mt-0.5" />
-            <span className="text-xs text-gray-600 line-clamp-2 italic font-normal">
-              {notes ? `"${notes}"` : "No proof notes provided"}
-            </span>
+  },
+  {
+    accessorKey: "tournament",
+    header: () => <div className="text-xs font-semibold text-slate-600 uppercase tracking-wider">Tournament</div>,
+    cell: ({ row }) => {
+      const tournament = row.original.tournament;
+      return (
+        <div className="flex items-center gap-2.5 py-1 max-w-[260px]">
+          <div className="w-8 h-8 rounded-lg bg-slate-50 border border-slate-200 flex items-center justify-center text-slate-600 shrink-0">
+            <Trophy className="w-4 h-4 text-slate-500" />
           </div>
-        );
-      },
+          <div className="flex flex-col min-w-0">
+            <span className="font-medium text-slate-900 text-xs leading-snug truncate">
+              {tournament?.title || "N/A"}
+            </span>
+            {tournament?.startDate && tournament?.endDate ? (
+              <span className="text-[11px] text-slate-400 truncate mt-0.5">
+                {dayjs(tournament.startDate).format("DD MMM")} &ndash;{" "}
+                {dayjs(tournament.endDate).format("DD MMM YYYY")}
+              </span>
+            ) : tournament?.description ? (
+              <span className="text-[11px] text-slate-400 truncate mt-0.5">
+                {tournament.description}
+              </span>
+            ) : null}
+          </div>
+        </div>
+      );
     },
-    {
-      accessorKey: "status",
-      header: () => <div className="">Status</div>,
-      cell: ({ row }) => {
-        const claim = row.original;
-        const claimId = claim._id || claim.id || "";
-        const isUpdatingThis = updatingId === claimId;
+  },
+  {
+    accessorKey: "claimedPositionName",
+    header: () => <div className="text-xs font-semibold text-slate-600 uppercase tracking-wider">Claimed Placement</div>,
+    cell: ({ row }) => {
+      const claim = row.original;
+      const pos = claim.claimedPosition;
 
-        return (
-          <StatusCell
-            claimId={claimId}
-            currentStatus={claim.status}
-            onStatusUpdate={onStatusUpdate}
-            isUpdating={isUpdatingThis}
-          />
-        );
-      },
-    },
-    {
-      accessorKey: "createdAt",
-      header: () => <div className="">Submitted At</div>,
-      cell: ({ row }) => {
-        const dateStr = row.getValue("createdAt") as string;
-        return (
-          <span className="text-xs text-gray-500 font-medium">
-            {dateStr ? dayjs(dateStr).format("DD MMM YYYY, hh:mm A") : "N/A"}
+      // Restrained position badges without emojis
+      let badgeTheme = "bg-slate-100 text-slate-700 border-slate-200";
+      if (pos === 1) {
+        badgeTheme = "bg-amber-50 text-amber-800 border-amber-200 font-bold";
+      } else if (pos === 2) {
+        badgeTheme = "bg-slate-100 text-slate-800 border-slate-300 font-semibold";
+      } else if (pos === 3) {
+        badgeTheme = "bg-orange-50 text-orange-800 border-orange-200 font-semibold";
+      }
+
+      return (
+        <div className="flex items-center gap-2 font-medium text-xs">
+          <span
+            className={`px-2 py-0.5 rounded-md border text-[11px] font-mono ${badgeTheme}`}
+          >
+            #{pos || "—"}
           </span>
-        );
-      },
+          <span className="text-slate-800 font-medium">
+            {claim.claimedPositionName || `Rank ${pos}`}
+          </span>
+        </div>
+      );
     },
-    {
-      id: "actions",
-      header: () => <div className="text-right pr-4">Action</div>,
-      cell: ({ row }) => {
-        const claim = row.original;
-        const claimId = claim._id || claim.id || "";
-        const isUpdatingThis = updatingId === claimId;
+  },
+  {
+    accessorKey: "proofNotes",
+    header: () => <div className="text-xs font-semibold text-slate-600 uppercase tracking-wider">Verification Notes</div>,
+    cell: ({ row }) => {
+      const notes = row.getValue("proofNotes") as string;
+      return (
+        <div className="flex items-start gap-1.5 max-w-[220px]">
+          <FileText className="w-3.5 h-3.5 text-slate-400 shrink-0 mt-0.5" />
+          <span className="text-xs text-slate-600 line-clamp-2 font-normal">
+            {notes ? notes : <span className="text-slate-400 italic">No notes provided</span>}
+          </span>
+        </div>
+      );
+    },
+  },
+  {
+    accessorKey: "status",
+    header: () => <div className="text-xs font-semibold text-slate-600 uppercase tracking-wider">Status</div>,
+    cell: ({ row }) => {
+      const claim = row.original;
+      const claimId = claim._id || claim.id || "";
+      const isUpdatingThis = updatingId === claimId;
 
-        return (
-          <div className="flex items-center justify-end gap-2 pr-2">
-            {/* Quick Approve Button */}
+      return (
+        <StatusCell
+          claimId={claimId}
+          currentStatus={claim.status}
+          onStatusUpdate={onStatusUpdate}
+          isUpdating={isUpdatingThis}
+        />
+      );
+    },
+  },
+  {
+    accessorKey: "createdAt",
+    header: () => <div className="text-xs font-semibold text-slate-600 uppercase tracking-wider">Submitted</div>,
+    cell: ({ row }) => {
+      const dateStr = row.getValue("createdAt") as string;
+      return (
+        <span className="text-xs text-slate-500 font-medium whitespace-nowrap">
+          {dateStr ? dayjs(dateStr).format("DD MMM YYYY, HH:mm") : "—"}
+        </span>
+      );
+    },
+  },
+  {
+    id: "actions",
+    header: () => <div className="text-right pr-2 text-xs font-semibold text-slate-600 uppercase tracking-wider">Actions</div>,
+    cell: ({ row }) => {
+      const claim = row.original;
+      const claimId = claim._id || claim.id || "";
+      const isUpdatingThis = updatingId === claimId;
+      const status = (claim.status || "pending").toLowerCase();
+
+      return (
+        <div className="flex items-center justify-end gap-1.5 pr-1">
+          {/* Quick Approve Button */}
+          {status !== "approved" && (
             <button
               type="button"
               disabled={isUpdatingThis}
               onClick={() => onStatusUpdate(claimId, "approved")}
-              className="px-2.5 py-1 rounded-lg bg-emerald-50 text-emerald-700 border border-emerald-200 hover:bg-emerald-100 text-xs font-medium transition-all flex items-center gap-1 cursor-pointer disabled:opacity-50"
+              className="inline-flex items-center gap-1 h-7 px-2 rounded-md bg-emerald-50 text-emerald-700 border border-emerald-200 hover:bg-emerald-100 text-xs font-medium transition-colors cursor-pointer disabled:opacity-50"
               title="Approve Claim"
             >
-              <FiCheck className="w-3.5 h-3.5" />
-              <span>Approve</span>
+              <Check className="w-3 h-3" />
+              <span className="hidden sm:inline">Approve</span>
             </button>
+          )}
 
-            {/* Quick Reject Button */}
+          {/* Quick Reject Button */}
+          {status !== "rejected" && (
             <button
               type="button"
               disabled={isUpdatingThis}
               onClick={() => onStatusUpdate(claimId, "rejected")}
-              className="px-2.5 py-1 rounded-lg bg-red-50 text-red-700 border border-red-200 hover:bg-red-100 text-xs font-medium transition-all flex items-center gap-1 cursor-pointer disabled:opacity-50"
+              className="inline-flex items-center gap-1 h-7 px-2 rounded-md bg-rose-50 text-rose-700 border border-rose-200 hover:bg-rose-100 text-xs font-medium transition-colors cursor-pointer disabled:opacity-50"
               title="Reject Claim"
             >
-              <FiX className="w-3.5 h-3.5" />
-              <span>Reject</span>
+              <X className="w-3 h-3" />
+              <span className="hidden sm:inline">Reject</span>
             </button>
+          )}
 
-            {/* View Details Button */}
-            <button
-              type="button"
-              onClick={() => onView(claim)}
-              className="p-1.5 rounded-lg text-gray-400 hover:text-blue-600 hover:bg-blue-50 transition-colors cursor-pointer"
-              title="View Claim Details"
-            >
-              <FiEye className="w-4 h-4" />
-            </button>
-          </div>
-        );
-      },
+          {/* View Details Button */}
+          <button
+            type="button"
+            onClick={() => onView(claim)}
+            className="h-7 w-7 rounded-md text-slate-500 hover:text-slate-900 hover:bg-slate-100 transition-colors cursor-pointer flex items-center justify-center border border-transparent hover:border-slate-200"
+            title="View Claim Details"
+          >
+            <Eye className="w-3.5 h-3.5" />
+          </button>
+        </div>
+      );
     },
-  ];
+  },
+];

@@ -2,30 +2,49 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
-import CreateButton from "@/components/buttons/CreateButton";
+import React, { useEffect, useRef, useState, useMemo } from "react";
+import Link from "next/link";
+import Image from "next/image";
+import { useSearchParams, usePathname, useRouter } from "next/navigation";
+import {
+  Trophy,
+  Activity,
+  Clock,
+  CheckCircle2,
+  Calendar,
+  Filter,
+  RefreshCw,
+  Search,
+  X,
+  Plus,
+  ChevronDown,
+  Check,
+  MapPin,
+  Flame,
+} from "lucide-react";
+import { toast } from "sonner";
+
 import CustomPagination from "@/components/cui/CustomPagination";
-import TableHeader from "@/components/cui/TableHeader";
 import CustomTable from "@/components/table/CustomTable";
 import { useGetAllVenueCategoryQuery } from "@/features/categoryManagement/categoryApi";
 import { useGetAllLeagueQuery } from "@/features/leagueManagement/leagueApi";
 import { useGetAllTeamQuery } from "@/features/teamManagement/teamApi";
-import { useDeleteMatchMutation, useGetAllMatchQuery, useUpdateMatchStatusMutation, useGetMatchScheduleDatesQuery } from "@/features/match/matchApi";
+import {
+  useDeleteMatchMutation,
+  useGetAllMatchQuery,
+  useGetMatchOverviewQuery,
+  useGetMatchScheduleDatesQuery,
+} from "@/features/match/matchApi";
 import { useHeaders } from "@/hooks/useHeaders";
 import { getMatchColumns } from "@/tableColumns/matchColumns";
 import { formatImagePath } from "@/utils/formatImagePath";
-import { getErrorMessage } from "@/utils/getErrorMessage";
-import { Check, ChevronDown, Filter, Loader2, RefreshCw, Search, X } from "lucide-react";
-import Image from "next/image";
-import Link from "next/link";
-import { useSearchParams, usePathname, useRouter } from "next/navigation";
-import { useEffect, useRef, useState, useMemo } from "react";
-import { toast } from "sonner";
+
 import DeleteConfirmModal from "./DeleteConfirmModal";
 import MatchViewModal from "./MatchViewModal";
 import ModifyScoreModal from "./ModifyScoreModal";
 import CleanSheetModal from "./CleanSheetModal";
 import RatingRuleModal from "./RatingRuleModal";
-import { Clock } from "lucide-react";
+import UpdateStatusModal from "./UpdateStatusModal";
 
 interface OptionItem {
   label: string;
@@ -35,7 +54,6 @@ interface OptionItem {
 
 const CustomSearchableSelect = ({
   label,
-  badgeText,
   value,
   onChange,
   options,
@@ -43,7 +61,6 @@ const CustomSearchableSelect = ({
   className = "",
 }: {
   label?: string;
-  badgeText?: string;
   value: string;
   onChange: (val: string, option?: OptionItem) => void;
   options: OptionItem[];
@@ -66,19 +83,16 @@ const CustomSearchableSelect = ({
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  // Filter across ALL options by search query
   const filteredOptions = useMemo(() => {
     if (!query.trim()) return options;
     const q = query.toLowerCase().trim();
     return options.filter((opt) => opt.label.toLowerCase().includes(q));
   }, [options, query]);
 
-  // Reset display count when query changes or modal opens
   useEffect(() => {
     setDisplayCount(40);
   }, [query, isOpen]);
 
-  // Handle scroll inside dropdown to load +40 more items on demand (Infinite Scroll Pagination)
   const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
     const { scrollTop, scrollHeight, clientHeight } = e.currentTarget;
     if (scrollHeight - scrollTop - clientHeight < 60) {
@@ -94,38 +108,35 @@ const CustomSearchableSelect = ({
   return (
     <div className={`relative ${className}`} ref={dropdownRef}>
       {label && (
-        <div className="flex items-center gap-2 mb-1">
-          <label className="text-[11px] font-bold text-gray-600">{label}</label>
-          {badgeText && (
-            <span className="text-[9px] bg-blue-600 text-white font-bold px-2 py-0.5 rounded-full">
-              {badgeText}
-            </span>
-          )}
-        </div>
+        <label className="text-[11px] font-semibold text-slate-600 block mb-1">
+          {label}
+        </label>
       )}
 
       {/* Trigger Button */}
       <button
         type="button"
         onClick={() => setIsOpen(!isOpen)}
-        className="w-full flex items-center justify-between px-3 py-2 text-xs border border-gray-300 rounded-lg bg-gray-50 hover:bg-white focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all text-left shadow-xs cursor-pointer"
+        className="w-full h-8 px-2.5 text-xs border border-slate-200 rounded-md bg-white hover:bg-slate-50 focus:outline-hidden focus:ring-1 focus:ring-slate-900 transition-colors flex items-center justify-between text-left cursor-pointer"
       >
         <div className="flex items-center gap-2 truncate">
           {selectedOption?.logo && (
-            <Image
-              src={formatImagePath(selectedOption.logo)}
-              alt="logo"
-              width={18}
-              height={18}
-              className="w-4.5 h-4.5 rounded-full object-cover shrink-0"
-            />
+            <div className="w-4 h-4 rounded-full overflow-hidden shrink-0 border border-slate-200">
+              <Image
+                src={formatImagePath(selectedOption.logo)}
+                alt="logo"
+                width={16}
+                height={16}
+                className="w-full h-full object-cover"
+              />
+            </div>
           )}
-          <span className="truncate font-semibold text-gray-800">
+          <span className="truncate text-xs font-medium text-slate-800">
             {selectedOption ? selectedOption.label : placeholder}
           </span>
         </div>
         <ChevronDown
-          className={`w-3.5 h-3.5 text-gray-500 transition-transform duration-200 shrink-0 ${
+          className={`w-3.5 h-3.5 text-slate-400 transition-transform duration-150 shrink-0 ${
             isOpen ? "rotate-180" : ""
           }`}
         />
@@ -133,40 +144,32 @@ const CustomSearchableSelect = ({
 
       {/* Dropdown Menu */}
       {isOpen && (
-        <div className="absolute z-50 mt-1 w-full min-w-[240px] bg-white border border-gray-200 rounded-xl shadow-xl p-2 space-y-2 animate-in fade-in-50 slide-in-from-top-1 duration-150">
-          {/* Search Bar & Total Items Badge */}
-          <div className="space-y-1">
-            <div className="relative">
-              <Search className="w-3.5 h-3.5 text-gray-400 absolute left-2.5 top-2.5" />
-              <input
-                type="text"
-                value={query}
-                onChange={(e) => setQuery(e.target.value)}
-                placeholder="Search..."
-                className="w-full pl-8 pr-7 py-1.5 text-xs border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gray-50 font-medium text-gray-900"
-                autoFocus
-              />
-              {query && (
-                <button
-                  type="button"
-                  onClick={() => setQuery("")}
-                  className="absolute right-2 top-2 text-gray-400 hover:text-gray-600 cursor-pointer"
-                >
-                  <X className="w-3.5 h-3.5" />
-                </button>
-              )}
-            </div>
-            <div className="flex items-center justify-between px-1 text-[10px] text-gray-400 font-semibold">
-              <span>{filteredOptions.length} available</span>
-              {displayCount < filteredOptions.length && <span>Scroll for more</span>}
-            </div>
+        <div className="absolute z-50 mt-1 w-full min-w-[220px] bg-white border border-slate-200 rounded-lg shadow-lg p-1.5 space-y-1.5 animate-in fade-in-50 duration-100">
+          <div className="relative">
+            <Search className="w-3.5 h-3.5 text-slate-400 absolute left-2 top-1/2 -translate-y-1/2 pointer-events-none" />
+            <input
+              type="text"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              placeholder="Search..."
+              className="w-full h-7 pl-7 pr-6 text-xs border border-slate-200 rounded bg-slate-50 text-slate-900 placeholder:text-slate-400 focus:bg-white focus:outline-hidden focus:ring-1 focus:ring-slate-900"
+              autoFocus
+            />
+            {query && (
+              <button
+                type="button"
+                onClick={() => setQuery("")}
+                className="absolute right-1.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 cursor-pointer"
+              >
+                <X className="w-3 h-3" />
+              </button>
+            )}
           </div>
 
-          {/* Scrollable Infinite Options List */}
           <div
             ref={listRef}
             onScroll={handleScroll}
-            className="max-h-60 overflow-y-auto space-y-0.5 custom-scrollbar pr-1"
+            className="max-h-56 overflow-y-auto space-y-0.5 pr-0.5"
           >
             {displayedOptions.length > 0 ? (
               <>
@@ -181,38 +184,34 @@ const CustomSearchableSelect = ({
                         setIsOpen(false);
                         setQuery("");
                       }}
-                      className={`w-full flex items-center justify-between px-2.5 py-1.5 text-xs rounded-md transition-colors text-left cursor-pointer ${
+                      className={`w-full flex items-center justify-between px-2 py-1.5 text-xs rounded transition-colors text-left cursor-pointer ${
                         isSelected
-                          ? "bg-blue-50 text-blue-700 font-bold"
-                          : "hover:bg-gray-100 text-gray-700"
+                          ? "bg-slate-900 text-white font-medium"
+                          : "hover:bg-slate-100 text-slate-700"
                       }`}
                     >
                       <div className="flex items-center gap-2 truncate">
                         {opt.logo && (
-                          <Image
-                            src={formatImagePath(opt.logo)}
-                            alt="logo"
-                            width={16}
-                            height={16}
-                            className="w-4 h-4 rounded-full object-cover shrink-0"
-                          />
+                          <div className="w-3.5 h-3.5 rounded-full overflow-hidden shrink-0 border border-slate-200">
+                            <Image
+                              src={formatImagePath(opt.logo)}
+                              alt="logo"
+                              width={14}
+                              height={14}
+                              className="w-full h-full object-cover"
+                            />
+                          </div>
                         )}
                         <span className="truncate">{opt.label}</span>
                       </div>
-                      {isSelected && <Check className="w-3.5 h-3.5 text-blue-600 shrink-0" />}
+                      {isSelected && <Check className="w-3.5 h-3.5 shrink-0" />}
                     </button>
                   );
                 })}
-
-                {displayCount < filteredOptions.length && (
-                  <div className="py-1 text-center text-[10px] text-blue-600 font-semibold animate-pulse">
-                    Loading more options ({filteredOptions.length - displayCount} remaining)...
-                  </div>
-                )}
               </>
             ) : (
-              <div className="py-3 text-center text-xs text-gray-400 font-medium">
-                No matching results
+              <div className="py-2.5 text-center text-xs text-slate-400">
+                No matching options
               </div>
             )}
           </div>
@@ -230,7 +229,7 @@ const MatchManagement = () => {
 
   const urlPageParam = searchParams.get("matchPage");
 
-  // Filter States matching client reference UI
+  // Filters State
   const [leagueFilter, setLeagueFilter] = useState<string>("ALL");
   const [dateFilter, setDateFilter] = useState<string>("ALL");
   const [statusFilter, setStatusFilter] = useState<string>("ALL");
@@ -241,11 +240,10 @@ const MatchManagement = () => {
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [debouncedSearchTerm, setDebouncedSearchTerm] = useState<string>("");
 
-  // Store selected option labels so dropdowns retain labels even during loading
   const [filterLabels, setFilterLabels] = useState<Record<string, string>>({});
   const [isFiltersRestored, setIsFiltersRestored] = useState<boolean>(false);
 
-  // 1. Restore saved filters from sessionStorage on mount (survives edit page navigation & refresh)
+  // Restore saved filters from sessionStorage
   useEffect(() => {
     try {
       const saved = sessionStorage.getItem("match_management_filters");
@@ -254,7 +252,8 @@ const MatchManagement = () => {
         if (parsed.leagueFilter !== undefined) setLeagueFilter(parsed.leagueFilter);
         if (parsed.dateFilter !== undefined) setDateFilter(parsed.dateFilter);
         if (parsed.statusFilter !== undefined) setStatusFilter(parsed.statusFilter);
-        if (parsed.matchDateStatusFilter !== undefined) setMatchDateStatusFilter(parsed.matchDateStatusFilter);
+        if (parsed.matchDateStatusFilter !== undefined)
+          setMatchDateStatusFilter(parsed.matchDateStatusFilter);
         if (parsed.venueFilter !== undefined) setVenueFilter(parsed.venueFilter);
         if (parsed.teamFilter !== undefined) setTeamFilter(parsed.teamFilter);
         if (parsed.unplayedOnly !== undefined) setUnplayedOnly(parsed.unplayedOnly);
@@ -267,13 +266,13 @@ const MatchManagement = () => {
         }
       }
     } catch (e) {
-      console.error("Failed to restore match filters from storage:", e);
+      console.error("Failed to restore match filters:", e);
     } finally {
       setIsFiltersRestored(true);
     }
   }, []);
 
-  // 2. Persist filters to sessionStorage on any change (only after initial restoration)
+  // Persist filters to sessionStorage
   useEffect(() => {
     if (!isFiltersRestored) return;
     try {
@@ -346,22 +345,32 @@ const MatchManagement = () => {
   const handleSetTeamFilter = (val: string, opt?: OptionItem) => {
     resetPageInUrl();
     setTeamFilter(val);
-    if (opt) setFilterLabels((prev) => ({ ...prev, team: opt.label, teamLogo: opt.logo || "" }));
+    if (opt)
+      setFilterLabels((prev) => ({
+        ...prev,
+        team: opt.label,
+        teamLogo: opt.logo || "",
+      }));
   };
 
-  // Debounce search term to prevent API hit on every keystroke
+  // Debounced search
   useEffect(() => {
     const handler = setTimeout(() => {
       setDebouncedSearchTerm(searchTerm);
       if (searchTerm) resetPageInUrl();
-    }, 500);
+    }, 400);
 
-    return () => {
-      clearTimeout(handler);
-    };
+    return () => clearTimeout(handler);
   }, [searchTerm]);
 
-  // Data Queries
+  // Queries
+  const {
+    data: overviewRes,
+    isLoading: isOverviewLoading,
+    isFetching: isOverviewFetching,
+    refetch: refetchOverview,
+  } = useGetMatchOverviewQuery(undefined);
+
   const { data: leagueData } = useGetAllLeagueQuery({ limit: 1000 });
   const { data: teamData } = useGetAllTeamQuery({ limit: 1000 });
   const { data: venueCategoryData } = useGetAllVenueCategoryQuery({});
@@ -370,7 +379,6 @@ const MatchManagement = () => {
   const allTeams: any[] = teamData?.data?.result || teamData?.data || [];
   const venueList: any[] = venueCategoryData?.data || [];
 
-  // Options arrays with preserved fallback for restored filters during async query load
   const competitionOptions: OptionItem[] = useMemo(() => {
     const list: OptionItem[] = [
       { label: "Competition : All", value: "ALL" },
@@ -385,7 +393,6 @@ const MatchManagement = () => {
     return list;
   }, [allLeagues, leagueFilter, filterLabels.league]);
 
-  // Query all unique match dates with match counts (dynamically filtered by current league and team)
   const { data: scheduleDatesData } = useGetMatchScheduleDatesQuery({
     ...(leagueFilter !== "ALL" && { league: leagueFilter, leagueId: leagueFilter }),
     ...(teamFilter !== "ALL" && { team: teamFilter, teamId: teamFilter }),
@@ -397,15 +404,13 @@ const MatchManagement = () => {
     scheduleDatesData?.data || [];
 
   const dateOptions: OptionItem[] = useMemo(() => {
-    const list: OptionItem[] = [
-      { label: "Date : All", value: "ALL" },
-    ];
+    const list: OptionItem[] = [{ label: "Date : All", value: "ALL" }];
 
     if (availableScheduleDates.length > 0) {
       availableScheduleDates.forEach((item) => {
         list.push({
-          label: item.label, // e.g. "Fri 05/09/25 [3]"
-          value: item.date,  // e.g. "2025-09-05"
+          label: item.label,
+          value: item.date,
         });
       });
     }
@@ -419,10 +424,11 @@ const MatchManagement = () => {
 
   const statusOptions: OptionItem[] = [
     { label: "Status : All", value: "ALL" },
-    { label: "Upcoming", value: "upcoming" },
-    { label: "Live", value: "live" },
+    { label: "Upcoming / Scheduled", value: "upcoming" },
+    { label: "Live In-Play", value: "live" },
     { label: "Half Time", value: "half_time" },
     { label: "Finished", value: "finished" },
+    { label: "Cancelled", value: "cancelled" },
   ];
 
   const matchDateStatusOptions: OptionItem[] = [
@@ -466,12 +472,10 @@ const MatchManagement = () => {
     return list;
   }, [allTeams, teamFilter, filterLabels.team, filterLabels.teamLogo]);
 
-  // Combine query params: distinguish exact match date ("YYYY-MM-DD") from relative dateStatus ("today", "this_week", etc.)
   const isExactDate = /^\d{4}-\d{2}-\d{2}$/.test(dateFilter);
   const effectiveDateStatus =
     !isExactDate && dateFilter !== "ALL" ? dateFilter : matchDateStatusFilter;
 
-  // Use URL matchPage parameter if available, but reset to 1 if filter is active
   const page = urlPageParam || "1";
 
   const queryParams = {
@@ -486,9 +490,16 @@ const MatchManagement = () => {
     ...(debouncedSearchTerm.trim() && { searchTerm: debouncedSearchTerm.trim() }),
   };
 
-  const { data: matchData, isLoading } = useGetAllMatchQuery(queryParams);
+  const {
+    data: matchData,
+    isLoading: isMatchesLoading,
+    isFetching: isMatchesFetching,
+    refetch: refetchMatches,
+  } = useGetAllMatchQuery(queryParams);
+
   const [deleteMatch, { isLoading: isDeleting }] = useDeleteMatchMutation();
 
+  // Modals state
   const [selectedMatch, setSelectedMatch] = useState<any>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalTab, setModalTab] = useState<"overview" | "events" | "actions">("overview");
@@ -498,24 +509,20 @@ const MatchManagement = () => {
   const [deletingId, setDeletingId] = useState<string | null>(null);
 
   const [isScoreModalOpen, setIsScoreModalOpen] = useState(false);
+  const [scoreModifyingMatch, setScoreModifyingMatch] = useState<any>(null);
+
   const [cleanSheetMatch, setCleanSheetMatch] = useState<any>(null);
   const [isCleanSheetModalOpen, setIsCleanSheetModalOpen] = useState(false);
-
-  const handleManageCleanSheet = (match: any) => {
-    setCleanSheetMatch(match);
-    setIsCleanSheetModalOpen(true);
-  };
-  const [scoreModifyingMatch, setScoreModifyingMatch] = useState<any>(null);
 
   const [isStatusModalOpen, setIsStatusModalOpen] = useState(false);
   const [statusUpdatingMatch, setStatusUpdatingMatch] = useState<any>(null);
 
   useEffect(() => {
     setHeaders({
-      title: "Matches",
-      des: "Manage live broadcasts, schedules, and historical match data.",
+      title: "Match Management",
+      des: "Manage live broadcasts, schedules, pitch formations, and historical match data.",
     });
-  }, []);
+  }, [setHeaders]);
 
   const handleResetFilters = () => {
     setLeagueFilter("ALL");
@@ -534,6 +541,14 @@ const MatchManagement = () => {
     toast.info("Filters reset to default");
   };
 
+  const isRefreshing = isMatchesFetching || isOverviewFetching;
+
+  const handleRefreshAll = () => {
+    refetchOverview();
+    refetchMatches();
+    toast.success("Match data and analytics refreshed");
+  };
+
   const handleView = (match: any, tab: "overview" | "events" | "actions" = "overview") => {
     setSelectedMatch(match);
     setModalTab(tab);
@@ -550,6 +565,11 @@ const MatchManagement = () => {
     setIsStatusModalOpen(true);
   };
 
+  const handleManageCleanSheet = (match: any) => {
+    setCleanSheetMatch(match);
+    setIsCleanSheetModalOpen(true);
+  };
+
   const handleDelete = (id: string) => {
     setDeletingId(id);
     setIsDeleteModalOpen(true);
@@ -563,123 +583,237 @@ const MatchManagement = () => {
         toast.success(res.message || "Match deleted successfully");
         setIsDeleteModalOpen(false);
         setDeletingId(null);
+        refetchOverview();
       }
     } catch (error: any) {
       toast.error(error?.data?.message || "Failed to delete match");
     }
   };
 
-  const tableHeaderPayload = {
-    title: "Matches Registry",
-    des: "Real-time update stream for active league matches.",
-    url: "#",
+  const overview = overviewRes?.data || {
+    totalMatches: 0,
+    upcomingMatches: 0,
+    liveMatches: 0,
+    finishedMatches: 0,
+    cancelledMatches: 0,
   };
 
+  const totalMatchesCount = overview.totalMatches;
+  const liveMatchesCount = overview.liveMatches;
+  const upcomingMatchesCount = overview.upcomingMatches;
+  const finishedMatchesCount = overview.finishedMatches;
+
+  const matchesList = matchData?.data || [];
+  const totalPages = matchData?.pagination?.totalPage || 1;
+
+  const hasActiveFilters =
+    leagueFilter !== "ALL" ||
+    dateFilter !== "ALL" ||
+    statusFilter !== "ALL" ||
+    matchDateStatusFilter !== "ALL" ||
+    venueFilter !== "ALL" ||
+    teamFilter !== "ALL" ||
+    unplayedOnly ||
+    Boolean(debouncedSearchTerm.trim());
+
   return (
-    <div className="w-full p-4 sm:p-6 lg:p-8 space-y-6 pb-16">
-      {/* Top Header & Create Button */}
-      <div className="flex flex-wrap items-center justify-between gap-4 p-4 bg-white rounded-xl border border-gray-100 shadow-sm">
+    <div className="w-full p-4 sm:p-6 lg:p-8 space-y-6 pb-16 max-w-[1600px] mx-auto text-left">
+      {/* Top Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h2 className="text-xl font-bold text-gray-900">Match Management</h2>
-          <p className="text-xs text-gray-500">Filter, search, and manage match schedules and scores.</p>
+          <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-slate-900">
+            Match Management
+          </h1>
+          <p className="text-xs sm:text-sm text-slate-500 mt-1">
+            Configure schedules, manage live match states, track pitch formations, and record final scores.
+          </p>
         </div>
-        <div className="flex items-center gap-3">
+
+        <div className="flex items-center gap-2.5 shrink-0 flex-wrap">
+          {/* Refresh Button */}
+          <button
+            type="button"
+            onClick={handleRefreshAll}
+            disabled={isRefreshing}
+            className="inline-flex items-center gap-2 px-3 py-2 text-xs font-medium text-slate-700 bg-white hover:bg-slate-50 border border-slate-200 rounded-lg transition-colors cursor-pointer shadow-2xs disabled:opacity-50"
+            title="Refresh fixtures and backend analytics"
+          >
+            <RefreshCw
+              className={`w-3.5 h-3.5 text-slate-500 ${isRefreshing ? "animate-spin" : ""}`}
+            />
+            <span className="hidden sm:inline">Refresh</span>
+          </button>
+
+          {/* Rating Window Rule Button */}
           <button
             type="button"
             onClick={() => setIsRatingRuleModalOpen(true)}
-            className="flex items-center gap-2 px-4 py-2.5 bg-amber-500 hover:bg-amber-600 text-white text-xs font-bold rounded-xl transition-all shadow-md shadow-amber-500/20 cursor-pointer"
+            className="inline-flex items-center gap-1.5 px-3 py-2 text-xs font-semibold text-slate-700 bg-white hover:bg-slate-50 border border-slate-200 rounded-lg transition-colors cursor-pointer shadow-2xs"
           >
-            <Clock className="w-4 h-4" />
+            <Clock className="w-3.5 h-3.5 text-slate-500" />
             <span>Rating Window Rule</span>
           </button>
+
+          {/* Add Match Button */}
           <Link href="/match-management/create-match">
-            <CreateButton text="Add Match" />
+            <button
+              type="button"
+              className="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-semibold text-white bg-slate-900 hover:bg-slate-800 rounded-lg transition-colors cursor-pointer shadow-2xs"
+            >
+              <Plus className="w-3.5 h-3.5" />
+              <span>Add Match</span>
+            </button>
           </Link>
         </div>
       </div>
 
-      {/* Filter Control Section matching Client Reference UI */}
-      <div className="bg-white p-5 rounded-xl border border-gray-200 shadow-sm space-y-4">
-        <div className="flex items-center justify-between pb-2 border-b border-gray-100">
-          <div className="flex items-center gap-2 text-gray-700 font-bold text-sm">
-            <Filter className="w-4 h-4 text-blue-600" />
-            <span>Match Filters</span>
+      {/* KPI Overview Strip (Backend Computed Analytics) */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3.5">
+        {/* Total Matches */}
+        <div className="p-4 bg-white border border-slate-200 rounded-xl shadow-2xs">
+          <div className="flex items-center justify-between text-slate-500">
+            <span className="text-[11px] font-semibold uppercase tracking-wider text-slate-500">
+              Total Fixtures
+            </span>
+            <Trophy className="w-4 h-4 text-slate-400" />
           </div>
-          <button
-            type="button"
-            onClick={handleResetFilters}
-            className="flex items-center gap-1 text-xs font-semibold text-gray-500 hover:text-blue-600 transition-colors cursor-pointer"
-          >
-            <RefreshCw className="w-3.5 h-3.5" />
-            Reset Filters
-          </button>
+          <div className="mt-2 flex items-baseline gap-2">
+            <span className="text-xl font-bold font-mono text-slate-900">
+              {isOverviewLoading ? "—" : totalMatchesCount.toLocaleString()}
+            </span>
+            <span className="text-xs text-slate-500">matches</span>
+          </div>
+          <p className="text-[11px] text-slate-400 mt-1">
+            All registered league and cup fixtures
+          </p>
+        </div>
+
+        {/* Live Matches */}
+        <div className="p-4 bg-white border border-slate-200 rounded-xl shadow-2xs">
+          <div className="flex items-center justify-between text-slate-500">
+            <span className="text-[11px] font-semibold uppercase tracking-wider text-slate-500">
+              Live In-Play
+            </span>
+            <Activity className="w-4 h-4 text-rose-500" />
+          </div>
+          <div className="mt-2 flex items-baseline gap-2">
+            <span className="text-xl font-bold font-mono text-rose-700">
+              {isOverviewLoading ? "—" : liveMatchesCount.toLocaleString()}
+            </span>
+            <span className="text-xs text-slate-500">active now</span>
+          </div>
+          <p className="text-[11px] text-slate-400 mt-1">
+            Matches in 1st half, 2nd half, or break
+          </p>
+        </div>
+
+        {/* Upcoming Matches */}
+        <div className="p-4 bg-white border border-slate-200 rounded-xl shadow-2xs">
+          <div className="flex items-center justify-between text-slate-500">
+            <span className="text-[11px] font-semibold uppercase tracking-wider text-slate-500">
+              Scheduled
+            </span>
+            <Calendar className="w-4 h-4 text-blue-500" />
+          </div>
+          <div className="mt-2 flex items-baseline gap-2">
+            <span className="text-xl font-bold font-mono text-blue-700">
+              {isOverviewLoading ? "—" : upcomingMatchesCount.toLocaleString()}
+            </span>
+            <span className="text-xs text-slate-500">upcoming</span>
+          </div>
+          <p className="text-[11px] text-slate-400 mt-1">
+            Fixtures scheduled awaiting kickoff
+          </p>
+        </div>
+
+        {/* Finished Matches */}
+        <div className="p-4 bg-white border border-slate-200 rounded-xl shadow-2xs">
+          <div className="flex items-center justify-between text-slate-500">
+            <span className="text-[11px] font-semibold uppercase tracking-wider text-slate-500">
+              Completed
+            </span>
+            <CheckCircle2 className="w-4 h-4 text-emerald-500" />
+          </div>
+          <div className="mt-2 flex items-baseline gap-2">
+            <span className="text-xl font-bold font-mono text-emerald-700">
+              {isOverviewLoading ? "—" : finishedMatchesCount.toLocaleString()}
+            </span>
+            <span className="text-xs text-slate-500">finalized</span>
+          </div>
+          <p className="text-[11px] text-slate-400 mt-1">
+            Full-time matches with recorded scores
+          </p>
+        </div>
+      </div>
+
+      {/* Filter Control Section */}
+      <div className="bg-white p-4 sm:p-5 rounded-xl border border-slate-200 shadow-2xs space-y-4">
+        {/* Filter Header */}
+        <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+          <div className="flex items-center gap-2 text-slate-800 font-semibold text-xs uppercase tracking-wider">
+            <Filter className="w-3.5 h-3.5 text-slate-500" />
+            <span>Fixture Filters</span>
+          </div>
+          {hasActiveFilters && (
+            <button
+              type="button"
+              onClick={handleResetFilters}
+              className="inline-flex items-center gap-1.5 text-xs font-medium text-slate-500 hover:text-slate-900 transition-colors cursor-pointer"
+            >
+              <RefreshCw className="w-3 h-3" />
+              <span>Reset Filters</span>
+            </button>
+          )}
         </div>
 
         {/* Top Dropdowns Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
-          {/* Competition / League */}
-          <div>
-            <label className="text-[11px] font-bold text-gray-600 block mb-1">Competition</label>
-            <CustomSearchableSelect
-              value={leagueFilter}
-              onChange={handleSetLeagueFilter}
-              options={competitionOptions}
-              placeholder="Competition : All"
-            />
-          </div>
+          <CustomSearchableSelect
+            label="Competition"
+            value={leagueFilter}
+            onChange={handleSetLeagueFilter}
+            options={competitionOptions}
+            placeholder="Competition : All"
+          />
 
-          {/* Date Filter */}
-          <div>
-            <label className="text-[11px] font-bold text-gray-600 block mb-1">Date</label>
-            <CustomSearchableSelect
-              value={dateFilter}
-              onChange={handleSetDateFilter}
-              options={dateOptions}
-              placeholder="Date : All"
-            />
-          </div>
+          <CustomSearchableSelect
+            label="Schedule Date"
+            value={dateFilter}
+            onChange={handleSetDateFilter}
+            options={dateOptions}
+            placeholder="Date : All"
+          />
 
-          {/* Status Filter */}
-          <div>
-            <label className="text-[11px] font-bold text-gray-600 block mb-1">Status</label>
-            <CustomSearchableSelect
-              value={statusFilter}
-              onChange={handleSetStatusFilter}
-              options={statusOptions}
-              placeholder="Status : All"
-            />
-          </div>
+          <CustomSearchableSelect
+            label="Match Status"
+            value={statusFilter}
+            onChange={handleSetStatusFilter}
+            options={statusOptions}
+            placeholder="Status : All"
+          />
 
-          {/* Match Date Status */}
-          <div>
-            <label className="text-[11px] font-bold text-gray-600 block mb-1">Match Date Status</label>
-            <CustomSearchableSelect
-              value={matchDateStatusFilter}
-              onChange={handleSetMatchDateStatusFilter}
-              options={matchDateStatusOptions}
-              placeholder="Match Date Status : All"
-            />
-          </div>
+          <CustomSearchableSelect
+            label="Date Range Status"
+            value={matchDateStatusFilter}
+            onChange={handleSetMatchDateStatusFilter}
+            options={matchDateStatusOptions}
+            placeholder="Match Date Status : All"
+          />
 
-          {/* Venue Filter */}
-          <div>
-            <label className="text-[11px] font-bold text-gray-600 block mb-1">Venue</label>
-            <CustomSearchableSelect
-              value={venueFilter}
-              onChange={handleSetVenueFilter}
-              options={venueOptions}
-              placeholder="Venue : All"
-            />
-          </div>
+          <CustomSearchableSelect
+            label="Venue Location"
+            value={venueFilter}
+            onChange={handleSetVenueFilter}
+            options={venueOptions}
+            placeholder="Venue : All"
+          />
         </div>
 
-        {/* Bottom Filter Row: Team Filter & More Filters Checkboxes */}
-        <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 pt-2 border-t border-gray-100">
-          {/* Team Filter - Custom Searchable & Scrollable Dropdown with Team Logos */}
-          <div className="w-full md:w-1/3">
+        {/* Secondary Filter Row: Team Select, Checkbox, Search */}
+        <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3 pt-3 border-t border-slate-100">
+          {/* Team Dropdown */}
+          <div className="w-full md:w-72">
             <CustomSearchableSelect
-              label="Team Filter"
-              badgeText="Select Team"
               value={teamFilter}
               onChange={handleSetTeamFilter}
               options={teamOptions}
@@ -687,38 +821,35 @@ const MatchManagement = () => {
             />
           </div>
 
-          {/* More Filters Checkboxes */}
-          <div className="flex flex-wrap items-center gap-4 text-xs font-semibold text-gray-700">
-            <span className="text-[11px] font-bold text-gray-500 block w-full md:w-auto">More filters:</span>
-
-            <label className="flex items-center gap-1.5 cursor-pointer">
-              <input
-                type="checkbox"
-                checked={unplayedOnly}
-                onChange={(e) => {
-                  resetPageInUrl();
-                  setUnplayedOnly(e.target.checked);
-                }}
-                className="w-4 h-4 text-blue-600 rounded border-gray-300 focus:ring-blue-500 cursor-pointer"
-              />
-              <span>Show unplayed matches only</span>
-            </label>
-          </div>
+          {/* Unplayed Only Checkbox */}
+          <label className="flex items-center gap-2 text-xs font-medium text-slate-700 cursor-pointer select-none">
+            <input
+              type="checkbox"
+              checked={unplayedOnly}
+              onChange={(e) => {
+                resetPageInUrl();
+                setUnplayedOnly(e.target.checked);
+              }}
+              className="w-3.5 h-3.5 rounded border-slate-300 text-slate-900 focus:ring-slate-900 cursor-pointer"
+            />
+            <span>Show unplayed fixtures only</span>
+          </label>
 
           {/* Search Term Input */}
-          <div className="relative w-full md:w-1/4">
-            <Search className="w-4 h-4 text-gray-400 absolute left-3 top-2.5" />
+          <div className="relative w-full md:w-64">
+            <Search className="w-3.5 h-3.5 text-slate-400 absolute left-2.5 top-1/2 -translate-y-1/2 pointer-events-none" />
             <input
               type="text"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              placeholder="Search match notes, venue..."
-              className="w-full pl-9 pr-8 py-2 text-xs border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              placeholder="Search notes, venue, teams..."
+              className="w-full h-8 pl-8 pr-7 text-xs bg-slate-50 border border-slate-200 rounded-md text-slate-900 placeholder:text-slate-400 focus:bg-white focus:outline-hidden focus:ring-1 focus:ring-slate-900 transition-colors"
             />
             {searchTerm && (
               <button
+                type="button"
                 onClick={() => setSearchTerm("")}
-                className="absolute right-2.5 top-2.5 text-gray-400 hover:text-gray-600"
+                className="absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 cursor-pointer"
               >
                 <X className="w-3.5 h-3.5" />
               </button>
@@ -727,24 +858,42 @@ const MatchManagement = () => {
         </div>
       </div>
 
-      {/* Main Table */}
-      <div className="bg-white rounded-md py-4 flex flex-col shadow-sm border border-gray-100">
-        <div className="flex-1">
-          <TableHeader payload={tableHeaderPayload} />
-          <div className="pt-4">
-            <CustomTable<any>
-              columns={getMatchColumns(handleView, handleDelete, handleModifyScore, handleUpdateStatus)}
-              data={matchData?.data || []}
-              isLoading={isLoading}
-            />
+      {/* Main Table Container */}
+      <div className="bg-white border border-slate-200 rounded-xl shadow-2xs overflow-hidden">
+        {/* Table Content */}
+        <div className="p-4">
+          <div className="text-xs text-slate-500 mb-3 flex items-center justify-between">
+            <span>
+              Showing <span className="font-semibold text-slate-800">{matchesList.length}</span>{" "}
+              fixtures (Page {page} of {totalPages})
+            </span>
+            {hasActiveFilters && (
+              <span className="text-slate-600">
+                Filtered view active
+              </span>
+            )}
           </div>
-        </div>
 
-        <div className="pt-8 px-4">
-          <CustomPagination TOTAL_PAGES={matchData?.pagination?.totalPage || 1} qryName="matchPage" />
+          <CustomTable<any>
+            columns={getMatchColumns(
+              handleView,
+              handleDelete,
+              handleModifyScore,
+              handleUpdateStatus,
+              handleManageCleanSheet
+            )}
+            data={matchesList}
+            isLoading={isMatchesLoading}
+          />
+
+          {/* Pagination */}
+          <div className="pt-4 border-t border-slate-100 mt-4">
+            <CustomPagination TOTAL_PAGES={totalPages} qryName="matchPage" />
+          </div>
         </div>
       </div>
 
+      {/* Modals */}
       <MatchViewModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
@@ -755,7 +904,11 @@ const MatchManagement = () => {
         initialTab={modalTab}
       />
 
-      <RatingRuleModal isOpen={isRatingRuleModalOpen} onClose={() => setIsRatingRuleModalOpen(false)} />
+      <RatingRuleModal
+        isOpen={isRatingRuleModalOpen}
+        onClose={() => setIsRatingRuleModalOpen(false)}
+      />
+
       <CleanSheetModal
         isOpen={isCleanSheetModalOpen}
         onClose={() => {
@@ -764,6 +917,7 @@ const MatchManagement = () => {
         }}
         match={cleanSheetMatch}
       />
+
       <ModifyScoreModal
         isOpen={isScoreModalOpen}
         onClose={() => {
@@ -788,323 +942,6 @@ const MatchManagement = () => {
         onConfirm={handleConfirmDelete}
         isLoading={isDeleting}
       />
-    </div>
-  );
-};
-
-import dayjs from "dayjs";
-import utc from "dayjs/plugin/utc";
-import timezone from "dayjs/plugin/timezone";
-
-dayjs.extend(utc);
-dayjs.extend(timezone);
-
-const formatForInput = (d: any) => {
-  if (!d) return "";
-  return dayjs(d).tz("Europe/London").format("YYYY-MM-DDTHH:mm");
-};
-
-const parseFromInput = (str: string) => {
-  if (!str) return null;
-  return dayjs.tz(str, "Europe/London").utc().toISOString();
-};
-
-const UpdateStatusModal = ({
-  isOpen,
-  onClose,
-  match,
-}: {
-  isOpen: boolean;
-  onClose: () => void;
-  match: any;
-}) => {
-  const [selectedStatus, setSelectedStatus] = useState<string>("scheduled");
-  const [selectedPeriod, setSelectedPeriod] = useState<string>("first_half");
-
-  const [scheduledAt, setScheduledAt] = useState<string>("");
-  const [startedAt, setStartedAt] = useState<string>("");
-  const [firstHalfStartedAt, setFirstHalfStartedAt] = useState<string>("");
-  const [halfTimeAt, setHalfTimeAt] = useState<string>("");
-  const [secondHalfStartedAt, setSecondHalfStartedAt] = useState<string>("");
-  const [finishedAt, setFinishedAt] = useState<string>("");
-
-  const [showAdvancedTimestamps, setShowAdvancedTimestamps] = useState<boolean>(false);
-  const [updateMatchStatus, { isLoading }] = useUpdateMatchStatusMutation();
-
-  useEffect(() => {
-    if (match) {
-      const currentStatus = match.status === "upcoming" ? "scheduled" : (match.status || "scheduled");
-      setSelectedStatus(currentStatus);
-      setSelectedPeriod(
-        match.period ||
-          (currentStatus === "half_time"
-            ? "first_half"
-            : currentStatus === "finished"
-            ? "second_half"
-            : "first_half")
-      );
-
-      setScheduledAt(formatForInput(match.scheduledAt || match.matchDate));
-      setStartedAt(formatForInput(match.startedAt));
-      setFirstHalfStartedAt(formatForInput(match.firstHalfStartedAt));
-      setHalfTimeAt(formatForInput(match.halfTimeAt));
-      setSecondHalfStartedAt(formatForInput(match.secondHalfStartedAt));
-      setFinishedAt(formatForInput(match.finishedAt));
-    }
-  }, [match]);
-
-  if (!isOpen || !match) return null;
-
-  const handleSaveStatus = async () => {
-    try {
-      const payload: any = {
-        id: match._id || match.id,
-        status: selectedStatus,
-        period: selectedPeriod || null,
-      };
-
-      if (showAdvancedTimestamps) {
-        payload.scheduledAt = parseFromInput(scheduledAt);
-        payload.startedAt = parseFromInput(startedAt);
-        payload.firstHalfStartedAt = parseFromInput(firstHalfStartedAt);
-        payload.halfTimeAt = parseFromInput(halfTimeAt);
-        payload.secondHalfStartedAt = parseFromInput(secondHalfStartedAt);
-        payload.finishedAt = parseFromInput(finishedAt);
-      }
-
-      const res = await updateMatchStatus(payload).unwrap();
-      if (res.success) {
-        toast.success(res.message || "Match status & timing updated successfully");
-        onClose();
-      }
-    } catch (err: any) {
-      toast.error(getErrorMessage(err, "Failed to update match status & timing"));
-    }
-  };
-
-  const presetOptions = [
-    {
-      id: "upcoming",
-      status: "upcoming",
-      period: null,
-      label: "Upcoming",
-      subLabel: "Match planned for future date",
-      badgeColor: "bg-blue-100 text-blue-700",
-    },
-    {
-      id: "live_1st_half",
-      status: "live",
-      period: "first_half",
-      label: "Live - 1st Half",
-      subLabel: "Match is live in First Half",
-      badgeColor: "bg-red-100 text-red-700",
-    },
-    {
-      id: "half_time",
-      status: "half_time",
-      period: "first_half",
-      label: "Half Time",
-      subLabel: "15 minute interval break",
-      badgeColor: "bg-amber-100 text-amber-700",
-    },
-    {
-      id: "live_2nd_half",
-      status: "live",
-      period: "second_half",
-      label: "Live - 2nd Half",
-      subLabel: "Match is live in Second Half",
-      badgeColor: "bg-purple-100 text-purple-700",
-    },
-    {
-      id: "finished",
-      status: "finished",
-      period: "second_half",
-      label: "Finished",
-      subLabel: "Match fully completed",
-      badgeColor: "bg-green-100 text-green-700",
-    },
-    {
-      id: "cancelled",
-      status: "cancelled",
-      period: null,
-      label: "Cancelled",
-      subLabel: "Match called off",
-      badgeColor: "bg-gray-100 text-gray-700",
-    },
-  ];
-
-  const currentPresetId =
-    selectedStatus === "upcoming" || selectedStatus === "scheduled"
-      ? "upcoming"
-      : selectedStatus === "half_time"
-      ? "half_time"
-      : selectedStatus === "finished"
-      ? "finished"
-      : selectedStatus === "cancelled"
-      ? "cancelled"
-      : selectedPeriod === "second_half"
-      ? "live_2nd_half"
-      : "live_1st_half";
-
-  return (
-    <div className="fixed inset-0 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 z-50 animate-in fade-in duration-200">
-      <div className="bg-white rounded-2xl max-w-lg w-full p-6 space-y-5 shadow-2xl border border-gray-100 max-h-[90vh] overflow-y-auto custom-scrollbar">
-        <div className="flex items-center justify-between pb-3 border-b border-gray-100">
-          <div>
-            <h3 className="text-lg font-bold text-gray-900">Update Match Status & Stage</h3>
-            <p className="text-xs text-gray-500 font-medium mt-0.5">
-              {match?.homeTeam?.teamName} vs {match?.awayTeam?.teamName}
-            </p>
-          </div>
-          <button
-            onClick={onClose}
-            className="text-gray-400 hover:text-gray-600 transition-colors p-1 rounded-lg hover:bg-gray-100 cursor-pointer"
-          >
-            <X className="w-5 h-5" />
-          </button>
-        </div>
-
-        <div className="space-y-4">
-          <div>
-            <label className="block text-xs font-bold text-gray-700 mb-2">
-              Select Match State
-            </label>
-            <div className="space-y-2">
-              {presetOptions.map((opt) => {
-                const isSelected = currentPresetId === opt.id;
-                return (
-                  <label
-                    key={opt.id}
-                    onClick={() => {
-                      setSelectedStatus(opt.status);
-                      setSelectedPeriod(opt.period as any);
-                    }}
-                    className={`flex items-center justify-between p-3 rounded-xl border transition-all cursor-pointer ${
-                      isSelected
-                        ? "border-blue-500 bg-blue-50/40 ring-2 ring-blue-500/20 shadow-xs"
-                        : "border-gray-200 hover:border-gray-300 hover:bg-gray-50"
-                    }`}
-                  >
-                    <div className="flex items-center gap-3">
-                      <input
-                        type="radio"
-                        name="matchStatePreset"
-                        checked={isSelected}
-                        onChange={() => {
-                          setSelectedStatus(opt.status);
-                          setSelectedPeriod(opt.period as any);
-                        }}
-                        className="w-4 h-4 text-blue-600 focus:ring-blue-500 cursor-pointer"
-                      />
-                      <div>
-                        <span className="text-xs font-bold text-gray-800 block">{opt.label}</span>
-                        <span className="text-[10px] text-gray-400 font-medium">{opt.subLabel}</span>
-                      </div>
-                    </div>
-                    <span className={`text-[10px] font-bold px-2 py-0.5 rounded capitalize ${opt.badgeColor}`}>
-                      {opt.label}
-                    </span>
-                  </label>
-                );
-              })}
-            </div>
-          </div>
-
-          {/* Toggle Advanced Timestamp Correction */}
-          <div className="pt-2">
-            <button
-              type="button"
-              onClick={() => setShowAdvancedTimestamps(!showAdvancedTimestamps)}
-              className="text-xs font-bold text-blue-600 hover:text-blue-700 underline flex items-center gap-1.5 cursor-pointer"
-            >
-              <span>{showAdvancedTimestamps ? "Hide" : "Edit"} Advanced Match Timestamps (UK Time)</span>
-            </button>
-          </div>
-
-          {showAdvancedTimestamps && (
-            <div className="bg-slate-50 border border-slate-200 p-4 rounded-xl space-y-3 animate-in fade-in duration-200">
-              <span className="text-[11px] font-extrabold text-slate-700 block">
-                Manual Timestamp Overwrite (Europe/London UK Time)
-              </span>
-              <div className="grid grid-cols-2 gap-3 text-xs">
-                <div>
-                  <label className="block font-semibold text-gray-600 text-[10px] mb-1">Scheduled At</label>
-                  <input
-                    type="datetime-local"
-                    value={scheduledAt}
-                    onChange={(e) => setScheduledAt(e.target.value)}
-                    className="w-full px-2.5 py-1.5 border border-gray-300 rounded-lg text-xs bg-white"
-                  />
-                </div>
-                <div>
-                  <label className="block font-semibold text-gray-600 text-[10px] mb-1">Started At</label>
-                  <input
-                    type="datetime-local"
-                    value={startedAt}
-                    onChange={(e) => setStartedAt(e.target.value)}
-                    className="w-full px-2.5 py-1.5 border border-gray-300 rounded-lg text-xs bg-white"
-                  />
-                </div>
-                <div>
-                  <label className="block font-semibold text-gray-600 text-[10px] mb-1">1st Half Started</label>
-                  <input
-                    type="datetime-local"
-                    value={firstHalfStartedAt}
-                    onChange={(e) => setFirstHalfStartedAt(e.target.value)}
-                    className="w-full px-2.5 py-1.5 border border-gray-300 rounded-lg text-xs bg-white"
-                  />
-                </div>
-                <div>
-                  <label className="block font-semibold text-gray-600 text-[10px] mb-1">Half Time At</label>
-                  <input
-                    type="datetime-local"
-                    value={halfTimeAt}
-                    onChange={(e) => setHalfTimeAt(e.target.value)}
-                    className="w-full px-2.5 py-1.5 border border-gray-300 rounded-lg text-xs bg-white"
-                  />
-                </div>
-                <div>
-                  <label className="block font-semibold text-gray-600 text-[10px] mb-1">2nd Half Started</label>
-                  <input
-                    type="datetime-local"
-                    value={secondHalfStartedAt}
-                    onChange={(e) => setSecondHalfStartedAt(e.target.value)}
-                    className="w-full px-2.5 py-1.5 border border-gray-300 rounded-lg text-xs bg-white"
-                  />
-                </div>
-                <div>
-                  <label className="block font-semibold text-gray-600 text-[10px] mb-1">Finished At</label>
-                  <input
-                    type="datetime-local"
-                    value={finishedAt}
-                    onChange={(e) => setFinishedAt(e.target.value)}
-                    className="w-full px-2.5 py-1.5 border border-gray-300 rounded-lg text-xs bg-white"
-                  />
-                </div>
-              </div>
-            </div>
-          )}
-        </div>
-
-        <div className="flex items-center justify-end gap-3 pt-3 border-t border-gray-100">
-          <button
-            type="button"
-            onClick={onClose}
-            className="px-4 py-2 text-xs font-bold text-gray-600 bg-gray-100 hover:bg-gray-200 rounded-xl transition-colors cursor-pointer"
-          >
-            Cancel
-          </button>
-          <button
-            type="button"
-            onClick={handleSaveStatus}
-            disabled={isLoading}
-            className="px-5 py-2 text-xs font-bold text-white bg-blue-600 hover:bg-blue-700 disabled:opacity-50 rounded-xl transition-all cursor-pointer shadow-md shadow-blue-500/20 flex items-center gap-2"
-          >
-            {isLoading && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
-            Save Status & Timings
-          </button>
-        </div>
-      </div>
     </div>
   );
 };
