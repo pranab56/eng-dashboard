@@ -1,8 +1,8 @@
 import * as React from "react"
 import {
   MoreHorizontalIcon,
-  ArrowRight,
-  ArrowLeft
+  ChevronLeft,
+  ChevronRight,
 } from "lucide-react"
 
 import { cn } from "@/lib/utils"
@@ -14,7 +14,7 @@ function Pagination({ className, ...props }: React.ComponentProps<"nav">) {
       role="navigation"
       aria-label="pagination"
       data-slot="pagination"
-      className={cn("", className)}
+      className={cn("mx-auto flex w-full justify-center", className)}
       {...props}
     />
   )
@@ -27,24 +27,26 @@ function PaginationContent({
   return (
     <ul
       data-slot="pagination-content"
-      className={cn("flex flex-row items-center gap-3", className)}
+      className={cn("flex flex-row items-center gap-1 sm:gap-1.5", className)}
       {...props}
     />
   )
 }
 
 function PaginationItem({ ...props }: React.ComponentProps<"li">) {
-  return <li data-slot="pagination-item" {...props} />
+  return <li data-slot="pagination-item" className="list-none" {...props} />
 }
 
 type PaginationLinkProps = {
   isActive?: boolean
-} & Pick<React.ComponentProps<typeof Button>, "size"> &
+} & Pick<React.ComponentProps<typeof Button>, "size" | "variant"> &
   React.ComponentProps<"a">
 
 function PaginationLink({
   className,
   isActive,
+  size = "paginationIcon",
+  variant,
   ...props
 }: PaginationLinkProps) {
   return (
@@ -54,8 +56,8 @@ function PaginationLink({
       data-active={isActive}
       className={cn(
         buttonVariants({
-          variant: isActive ? "paginationButtonActive" : "paginationButton",
-          size: "paginationIcon",
+          variant: variant || (isActive ? "paginationButtonActive" : "paginationButton"),
+          size,
         }),
         className
       )}
@@ -75,16 +77,13 @@ function PaginationPrevious({
       aria-current={isActive ? "page" : undefined}
       data-slot="pagination-link"
       data-active={isActive}
-      className={cn(
-        buttonVariants({
-          variant: isActive ? "paginationGhostButtonDisable" : "paginationGhostButton",
-          size: "prevNextIcon"
-        }),
-        className
-      )}
+      variant={isActive ? "paginationGhostButtonDisable" : "paginationGhostButton"}
+      size="prevNextIcon"
+      className={cn("select-none", className)}
       {...props}
     >
-      <ArrowLeft strokeWidth={3} /> Previous
+      <ChevronLeft className="size-3.5 shrink-0" />
+      <span className="hidden sm:inline">Previous</span>
     </PaginationLink>
   )
 }
@@ -100,16 +99,13 @@ function PaginationNext({
       aria-current={isActive ? "page" : undefined}
       data-slot="pagination-link"
       data-active={isActive}
-      className={cn(
-        buttonVariants({
-          variant: isActive ? "paginationGhostButtonDisable" : "paginationGhostButton",
-          size: "prevNextIcon"
-        }),
-        className
-      )}
+      variant={isActive ? "paginationGhostButtonDisable" : "paginationGhostButton"}
+      size="prevNextIcon"
+      className={cn("select-none", className)}
       {...props}
     >
-      Next <ArrowRight strokeWidth={3} />
+      <span className="hidden sm:inline">Next</span>
+      <ChevronRight className="size-3.5 shrink-0" />
     </PaginationLink>
   )
 }
@@ -122,10 +118,10 @@ function PaginationEllipsis({
     <span
       aria-hidden
       data-slot="pagination-ellipsis"
-      className={cn("flex size-12 items-center justify-center", className)}
+      className={cn("flex h-8 w-7 items-center justify-center text-slate-400 select-none", className)}
       {...props}
     >
-      <MoreHorizontalIcon className="size-4" />
+      <MoreHorizontalIcon className="size-3.5" />
       <span className="sr-only">More pages</span>
     </span>
   )
