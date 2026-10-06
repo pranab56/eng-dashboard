@@ -155,7 +155,7 @@ const CustomTimePicker: React.FC<CustomTimePickerProps> = ({
             </span>
           )}
           <span className="text-[11px] font-medium text-slate-400 bg-slate-100 px-1.5 py-0.5 rounded border border-slate-200">
-            Time
+            Pick
           </span>
         </div>
       </button>
