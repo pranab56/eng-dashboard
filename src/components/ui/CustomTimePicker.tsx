@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useRef, useEffect } from "react";
-import { Clock, Check } from "lucide-react";
+import { Clock, Check, X } from "lucide-react";
 
 interface CustomTimePickerProps {
   value: string; // HH:mm format (24-hour) e.g. "15:00"
@@ -15,7 +15,7 @@ interface CustomTimePickerProps {
 const CustomTimePicker: React.FC<CustomTimePickerProps> = ({
   value,
   onChange,
-  label = "Select Time",
+  label,
   error,
   align = "left",
   placeholder,
@@ -87,6 +87,13 @@ const CustomTimePicker: React.FC<CustomTimePickerProps> = ({
     setIsOpen(false);
   };
 
+  const handleClear = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    onChange("");
+    setIsOpen(false);
+  };
+
   const hoursList = Array.from({ length: 24 }, (_, i) =>
     i < 10 ? `0${i}` : `${i}`
   );
@@ -99,48 +106,58 @@ const CustomTimePicker: React.FC<CustomTimePickerProps> = ({
     "15:00", "17:00", "18:30", "20:00",
   ];
 
-  const displayTime = value ? value : (placeholder || (label ? `Select ${label}` : "Select Time (24h)"));
+  const displayTime = value || placeholder || (label ? `Select ${label}` : "Select Time");
 
   return (
-    <div className="space-y-1.5 relative" ref={containerRef}>
+    <div
+      className={`space-y-1.5 relative ${isOpen ? "z-50" : "z-10"}`}
+      ref={containerRef}
+    >
       {label && (
         <label className="block text-xs font-semibold text-slate-700">
           {label}
         </label>
       )}
 
-      {/* Input Trigger Button */}
+      {/* Input Trigger Button (Matches CustomDatePicker exactly: h-10, rounded-md, border-slate-200) */}
       <button
         type="button"
-        onClick={() => setIsOpen(!isOpen)}
-        className={`w-full h-14 flex items-center justify-between px-3.5 py-2 bg-[#f8fafc] border rounded-xl text-xs font-semibold text-slate-800 hover:bg-white focus:outline-none focus:ring-2 transition-all duration-200 cursor-pointer shadow-2xs ${
+        onClick={() => setIsOpen((prev) => !prev)}
+        className={`w-full h-10 flex items-center justify-between px-3 py-2 bg-white border rounded-md text-xs sm:text-sm font-normal text-slate-800 hover:bg-slate-50/80 focus:outline-none focus:ring-2 transition-all cursor-pointer shadow-2xs select-none ${
           error
-            ? "border-red-400 focus:ring-red-100 bg-red-50/30"
+            ? "border-rose-400 focus:ring-rose-500/10 bg-rose-50/20"
             : isOpen
-            ? "border-amber-500 ring-2 ring-amber-500/10 bg-white shadow-sm"
-            : "border-slate-200 hover:border-amber-300 hover:shadow-xs"
+            ? "border-slate-500 ring-2 ring-slate-900/5 bg-white"
+            : "border-slate-200 hover:border-slate-300"
         }`}
       >
         <div className="flex items-center gap-2.5 truncate">
-          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-amber-500 to-orange-600 text-white flex items-center justify-center shrink-0 shadow-xs">
-            <Clock className="w-4 h-4" />
-          </div>
-          <div className="text-left truncate">
-            <span className="block text-[9px] font-bold text-slate-400 uppercase tracking-wider">
-              Time (24h)
-            </span>
-            <span
-              className={`block text-xs font-bold truncate font-mono ${
-                value ? "text-slate-900" : "text-slate-400 font-medium"
-              }`}
-            >
-              {displayTime}
-            </span>
-          </div>
+          <Clock className="w-4 h-4 text-slate-500 shrink-0" />
+          <span
+            className={`truncate ${
+              value
+                ? "text-slate-900 font-medium font-mono"
+                : "text-slate-400 font-normal"
+            }`}
+          >
+            {displayTime}
+          </span>
         </div>
-        <span className="text-[10px] font-bold bg-amber-50 text-amber-800 px-2 py-0.5 rounded-md border border-amber-200/80">
-          24h
-        </span>
+
+        <div className="flex items-center gap-1.5 shrink-0">
+          {value && (
+            <span
+              onClick={handleClear}
+              className="p-0.5 rounded text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-colors cursor-pointer"
+              title="Clear time"
+            >
+              <X className="w-3.5 h-3.5" />
+            </span>
+          )}
+          <span className="text-[11px] font-medium text-slate-400 bg-slate-100 px-1.5 py-0.5 rounded border border-slate-200">
+            Time
+          </span>
+        </div>
       </button>
 
       {error && <p className="text-xs text-red-500 mt-1">{error}</p>}
@@ -150,7 +167,7 @@ const CustomTimePicker: React.FC<CustomTimePickerProps> = ({
         <div
           className={`absolute ${
             align === "right" ? "right-0" : "left-0"
-          } top-full mt-2 w-80 sm:w-84 bg-white rounded-2xl shadow-2xl border border-slate-200 p-4 z-50 animate-in fade-in zoom-in-95 duration-150`}
+          } top-full mt-1.5 w-72 sm:w-80 bg-white rounded-lg shadow-xl border border-slate-200 p-3.5 z-50 animate-in fade-in zoom-in-95 duration-100`}
         >
           {/* Digital Time Header with Direct Editable Inputs */}
           <div className="flex items-center justify-between pb-3 border-b border-slate-100 mb-3 bg-gradient-to-r from-amber-50 to-orange-50/80 p-3 rounded-xl border border-amber-200/60">
@@ -299,7 +316,7 @@ const CustomTimePicker: React.FC<CustomTimePickerProps> = ({
             <button
               type="button"
               onClick={() => setIsOpen(false)}
-              className="w-full text-xs font-bold py-2 bg-amber-500 hover:bg-amber-600 text-white rounded-xl transition-all cursor-pointer flex items-center justify-center gap-1.5 shadow-xs shadow-amber-500/20"
+              className="w-full text-xs font-semibold py-2 bg-slate-900 hover:bg-slate-800 text-white rounded-md transition-all cursor-pointer flex items-center justify-center gap-1.5 shadow-xs"
             >
               <Check className="w-4 h-4" />
               Set Time ({selectedHour}:{selectedMin})
