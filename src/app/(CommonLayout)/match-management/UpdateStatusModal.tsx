@@ -8,7 +8,7 @@ import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { useUpdateMatchStatusMutation } from "@/features/match/matchApi";
 import { getErrorMessage } from "@/utils/getErrorMessage";
 import { toast } from "sonner";
-import { Clock, X, Check, ChevronDown, ChevronUp } from "lucide-react";
+import { X, Check, ChevronDown, ChevronUp } from "lucide-react";
 
 dayjs.extend(utc);
 dayjs.extend(timezone);

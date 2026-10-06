@@ -6,7 +6,7 @@ import Image from "next/image";
 import { ColumnDef } from "@tanstack/react-table";
 import { TUserManagement } from "@/types/columnTypes";
 import { formatImagePath } from "@/utils/formatImagePath";
-import { Eye, Trash2, Users, User, CheckCircle2 } from "lucide-react";
+import { Eye, Trash2, User, CheckCircle2 } from "lucide-react";
 import dayjs from "dayjs";
 
 export const getParentColumns = (

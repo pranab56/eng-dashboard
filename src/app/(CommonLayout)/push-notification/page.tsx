@@ -11,7 +11,6 @@ import {
   useSendScheduledNowPushNotificationMutation,
 } from "@/features/pushNotification/pushNotificationApi";
 import GeneralStateCard, { GeneralStateCardProps } from "@/components/cui/GeneralStateCard";
-import CreateButton from "@/components/buttons/CreateButton";
 import CustomPagination from "@/components/cui/CustomPagination";
 import CreatePushNotificationModal from "@/components/modals/CreatePushNotificationModal";
 import MatchRemindersSection from "@/components/pushNotification/MatchRemindersSection";
@@ -22,7 +21,6 @@ import utc from "dayjs/plugin/utc";
 import timezone from "dayjs/plugin/timezone";
 import {
   Bell,
-  Megaphone,
   Trash2,
   User,
   Users,
@@ -33,8 +31,6 @@ import {
   Send,
   XCircle,
   CheckCircle2,
-  Calendar,
-  AlertCircle,
   ChevronDown,
   Globe,
 } from "lucide-react";

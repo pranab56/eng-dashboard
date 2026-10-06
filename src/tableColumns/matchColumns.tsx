@@ -17,7 +17,6 @@ import {
   Clock,
   Goal,
   MapPin,
-  ShieldAlert,
 } from "lucide-react";
 import {
   DropdownMenu,

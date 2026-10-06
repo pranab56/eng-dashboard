@@ -7,7 +7,6 @@ import Image from "next/image";
 import { useHeaders } from "@/hooks/useHeaders";
 import { useSidebar } from "@/context/SidebarContext";
 import { useGetProfileQuery } from "@/features/profile/profileApi";
-import { useNotificationUnReadCountQuery } from "@/features/notification/notificationApi";
 import { formatImagePath } from "@/utils/formatImagePath";
 import { removeAuthCookie } from "../../app/actions/auth";
 import { logout } from "@/features/auth/authSlice";
@@ -17,7 +16,6 @@ import LogoutConfirmModal from "../modals/LogoutConfirmModal";
 import NotificationDropdown from "./NotificationDropdown";
 
 import {
-  Bell,
   Menu,
   PanelLeft,
   ChevronRight,
@@ -44,13 +42,11 @@ const Header = () => {
   const { headers } = useHeaders();
   const { toggleMobile, toggleCollapse, isCollapsed } = useSidebar();
   const { data: profileData } = useGetProfileQuery({});
-  const { data: unreadData } = useNotificationUnReadCountQuery(undefined);
 
   const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
 
   const user = profileData?.data;
-  const unreadCount = unreadData?.data?.unreadCount || 0;
 
   const handleLogout = async () => {
     setIsLoggingOut(true);

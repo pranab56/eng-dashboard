@@ -26,7 +26,6 @@ import {
   Loader2,
   Receipt,
   PlusCircle,
-  ArrowRight,
   ChevronLeft,
   ChevronRight,
   Filter,

@@ -2,7 +2,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
-import React, { useEffect, useState, useMemo } from "react";
+import React, { useEffect, useState } from "react";
 import { useSearchParams, useRouter, usePathname } from "next/navigation";
 import {
   Users,
@@ -12,10 +12,6 @@ import {
   Search,
   X,
   RefreshCw,
-  UserCheck,
-  UserX,
-  AlertCircle,
-  Filter,
 } from "lucide-react";
 import { toast } from "sonner";
 

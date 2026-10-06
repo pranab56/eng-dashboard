@@ -6,7 +6,6 @@ import { TTournamentClaim } from "@/types/columnTypes";
 import { formatImagePath } from "@/utils/formatImagePath";
 import {
   Trophy,
-  User as UserIcon,
   FileText,
   ChevronsUpDown,
   Check,

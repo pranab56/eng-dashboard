@@ -21,8 +21,6 @@ import {
   Star,
   Film,
   Hash,
-  CheckCircle2,
-  AlertCircle,
 } from "lucide-react";
 import { TEngtv } from "@/types/columnTypes";
 

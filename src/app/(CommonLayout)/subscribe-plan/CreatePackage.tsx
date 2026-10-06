@@ -11,7 +11,7 @@ import InputField from '@/components/form/InputField'
 import SelectField from '@/components/form/SelectField'
 import TextareaField from '@/components/form/TextareaField'
 import SubmitButton from '@/components/buttons/SubmitButton'
-import { Plus, Trash2, Check, X, Info, Sparkles, Shield, Coins } from 'lucide-react'
+import { Plus, Trash2, Check, X, Sparkles, Shield, Coins } from 'lucide-react'
 
 const featureItemSchema = z.object({
   title: z.string().min(1, "Feature title is required"),

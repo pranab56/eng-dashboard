@@ -11,10 +11,8 @@ import {
   Package, 
   RefreshCw, 
   Users, 
-  Coins, 
-  Archive,
+  Coins,
   Layers,
-  Sparkles
 } from 'lucide-react'
 import CreatePackage from './CreatePackage'
 import PackageCard from './PackageCard'

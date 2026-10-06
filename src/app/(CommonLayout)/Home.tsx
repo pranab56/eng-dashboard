@@ -98,7 +98,7 @@ export default function Home() {
     });
   }, [setHeaders]);
 
-  const stats = overviewData?.data || {};
+  const stats = useMemo(() => overviewData?.data || {}, [overviewData?.data]);
 
   // Exact 10 metrics preserving 100% backend fields & bindings
   const cards = useMemo(

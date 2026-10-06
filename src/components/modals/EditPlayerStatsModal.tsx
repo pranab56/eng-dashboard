@@ -4,23 +4,13 @@ import React, { useEffect, useState } from "react";
 import {
   Dialog,
   DialogContent,
-  DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
 import { useEditPlayerStatsMutation } from "@/features/player/playerApi";
 import { toast } from "sonner";
 import {
-  Activity,
-  Award,
-  Calendar,
-  Check,
-  FileText,
   Loader2,
-  Shield,
-  Trophy,
   X,
-  AlertCircle,
 } from "lucide-react";
 
 interface EditPlayerStatsModalProps {

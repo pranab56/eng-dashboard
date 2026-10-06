@@ -4,17 +4,14 @@ import React, { useState } from "react";
 import {
   Dialog,
   DialogContent,
-  DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
 import { useAdjustPlayerCoinsMutation } from "@/features/player/playerApi";
 import { toast } from "sonner";
 import {
   Coins,
   Plus,
   Minus,
-  FileText,
   Loader2,
   X,
   ArrowRight,

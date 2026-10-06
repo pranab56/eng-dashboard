@@ -15,13 +15,11 @@ import {
   Trophy,
   Calendar,
   FileText,
-  User as UserIcon,
   X,
   Check,
   Clock,
   CheckCircle2,
   XCircle,
-  AlertCircle,
 } from "lucide-react";
 
 dayjs.extend(relativeTime);

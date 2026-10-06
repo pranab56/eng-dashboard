@@ -7,7 +7,6 @@ import * as z from "zod";
 import {
   Dialog,
   DialogContent,
-  DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
 import InputField from "@/components/form/InputField";
@@ -26,12 +25,9 @@ import {
   User,
   Activity,
   Coins,
-  Shield,
   FileText,
   Loader2,
   X,
-  TrendingUp,
-  TrendingDown,
 } from "lucide-react";
 
 const playerEditSchema = z.object({
@@ -62,7 +58,7 @@ const PlayerEditModal = ({ player, isOpen, onClose }: PlayerEditModalProps) => {
   const { data: statsData, refetch: refetchStats } = useGetPlayerStatsQuery(playerId, {
     skip: !playerId || !isOpen,
   });
-  const currentStats = statsData?.data || {};
+  const currentStats = statsData?.data;
 
   // Form for basic info
   const {

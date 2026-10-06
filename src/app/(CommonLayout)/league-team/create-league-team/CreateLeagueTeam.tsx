@@ -41,7 +41,7 @@ export default function CreateLeagueTeam() {
     value: l._id,
   }));
 
-  const teamsList: any[] = teamData?.data || [];
+  const teamsList: any[] = useMemo(() => teamData?.data || [], [teamData?.data]);
 
   const {
     handleSubmit,

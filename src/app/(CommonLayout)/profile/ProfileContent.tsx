@@ -17,7 +17,6 @@ import {
   Mail,
   Lock,
   ShieldCheck,
-  Calendar,
   BadgeCheck,
   Save,
   KeyRound,

@@ -17,8 +17,6 @@ import {
   Info,
   Loader2,
   Trophy,
-  AlertCircle,
-  Shield,
   Save,
 } from "lucide-react";
 import { toast } from "sonner";
@@ -81,7 +79,7 @@ const CreateLeague = () => {
     control,
     reset,
     watch,
-    formState: { errors, isDirty },
+    formState: { errors },
   } = useForm<LeagueFormValues>({
     resolver: zodResolver(leagueSchema),
     defaultValues: {
@@ -93,6 +91,8 @@ const CreateLeague = () => {
   });
 
   const formValues = watch();
+  const startDate = formValues.startDate;
+  const endDate = formValues.endDate;
 
   useEffect(() => {
     setHeaders({
@@ -117,7 +117,6 @@ const CreateLeague = () => {
 
   // Projected Duration & Status calculation
   const timelineAnalysis = useMemo(() => {
-    const { startDate, endDate } = formValues;
     if (!startDate || !endDate) return null;
 
     const start = dayjs(startDate);
@@ -165,7 +164,7 @@ const CreateLeague = () => {
       formattedStart: start.format("DD MMM, YYYY"),
       formattedEnd: end.format("DD MMM, YYYY"),
     };
-  }, [formValues.startDate, formValues.endDate]);
+  }, [startDate, endDate]);
 
   const handleCopyId = () => {
     if (!leagueId) return;

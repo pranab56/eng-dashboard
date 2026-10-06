@@ -27,16 +27,7 @@ import { useGetSingleTeamQuery } from "@/features/teamManagement/teamApi";
 import { toast } from "sonner";
 import {
   X,
-  MapPin,
-  Calendar,
-  User,
-  Mail,
-  Phone,
-  Clock,
-  UserX,
   Loader2,
-  Grid,
-  TrendingUp,
   ShieldCheck,
   ChevronDown,
   Search,

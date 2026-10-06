@@ -8,20 +8,12 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import dayjs from "dayjs";
 import { toast } from "sonner";
-import {
-  FiVideo,
-  FiRotateCcw,
-} from "react-icons/fi";
+import { FiRotateCcw } from "react-icons/fi";
 import { FaYoutube } from "react-icons/fa";
 import { HiOutlineTrash } from "react-icons/hi";
 import {
   ArrowLeft,
-  Tv,
-  Calendar,
-  Clock,
   Check,
-  Star,
-  Film,
   Upload,
 } from "lucide-react";
 
@@ -87,7 +79,6 @@ const CreateVideos = () => {
     handleSubmit,
     setValue,
     control,
-    reset,
     formState: { errors },
   } = useForm<VideoFormValues>({
     resolver: zodResolver(videoSchema),

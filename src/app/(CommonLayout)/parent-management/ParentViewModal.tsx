@@ -20,10 +20,7 @@ import {
   Users,
   Check,
   Copy,
-  Building2,
   Coins,
-  MapPin,
-  Calendar,
 } from "lucide-react";
 import dayjs from "dayjs";
 import { toast } from "sonner";

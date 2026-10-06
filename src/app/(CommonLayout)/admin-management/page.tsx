@@ -691,7 +691,7 @@ export default function AdminManagementPage() {
   const [updateAdmin, { isLoading: isUpdating }] = useUpdateAdminMutation();
   const [deleteAdmin, { isLoading: isDeleting }] = useDeleteAdminMutation();
 
-  const admins: any[] = adminData?.data || [];
+  const admins: any[] = useMemo(() => adminData?.data || [], [adminData?.data]);
 
   // Filter admins by search and tab
   const filteredAdmins = useMemo(() => {

@@ -3,12 +3,10 @@
 import React, { useState, useEffect, useMemo } from "react";
 import {
   RefreshCw,
-  Server,
   Database,
   Cpu,
   HardDrive,
   Clock,
-  ShieldCheck,
   AlertCircle,
   Layers,
   RotateCcw,
@@ -22,7 +20,6 @@ import {
   Sparkles,
   ShieldAlert,
   Info,
-  CheckCircle2,
 } from "lucide-react";
 import {
   AreaChart,
@@ -49,7 +46,6 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 
 interface ChartHistoryItem {

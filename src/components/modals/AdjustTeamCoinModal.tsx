@@ -4,10 +4,8 @@ import React, { useState } from "react";
 import {
   Dialog,
   DialogContent,
-  DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
 import { useAdjustTeamCoinsMutation } from "@/features/teamManagement/teamApi";
 import { toast } from "sonner";
 import {
@@ -18,7 +16,6 @@ import {
   Loader2,
   X,
   ArrowRight,
-  Shield,
 } from "lucide-react";
 
 interface AdjustTeamCoinModalProps {

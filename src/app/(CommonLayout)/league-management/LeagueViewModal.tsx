@@ -5,21 +5,15 @@ import React, { useState } from "react";
 import {
   Dialog,
   DialogContent,
-  DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
 import dayjs from "dayjs";
 import {
-  Calendar,
   Clock,
   X,
   Trophy,
   Copy,
   Check,
-  CheckCircle2,
-  CalendarDays,
-  Shield,
-  ExternalLink,
 } from "lucide-react";
 import { FiEdit } from "react-icons/fi";
 import Link from "next/link";

@@ -19,8 +19,6 @@ import {
   Plus,
   ChevronDown,
   Check,
-  ArrowUpDown,
-  Layers,
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -576,7 +574,7 @@ const MatchManagement = () => {
     setFilterLabels({});
     try {
       sessionStorage.removeItem("match_management_filters");
-    } catch (e) {}
+    } catch {}
     toast.info("Filters reset to default");
   };
 

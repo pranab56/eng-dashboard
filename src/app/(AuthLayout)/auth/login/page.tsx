@@ -17,7 +17,6 @@ import {
   ShieldCheck,
   Trophy,
   Activity,
-  CalendarCheck2,
   CheckCircle2,
   ArrowRight,
 } from "lucide-react";
@@ -314,7 +313,7 @@ const Login = () => {
   const rafRef = React.useRef<number | null>(null);
 
   useEffect(() => {
-    let startTime = performance.now();
+    const startTime = performance.now();
 
     const animate = (now: number) => {
       const elapsed = (now - startTime) * 0.001;
@@ -704,7 +703,7 @@ const Login = () => {
                             setIsEmailFocused(true);
                             setIsPasswordFocused(false);
                           }}
-                          onBlur={(e) => {
+                          onBlur={() => {
                             field.onBlur();
                             setIsEmailFocused(false);
                           }}
@@ -747,7 +746,7 @@ const Login = () => {
                             setIsPasswordFocused(true);
                             setIsEmailFocused(false);
                           }}
-                          onBlur={(e) => {
+                          onBlur={() => {
                             field.onBlur();
                             setIsPasswordFocused(false);
                           }}

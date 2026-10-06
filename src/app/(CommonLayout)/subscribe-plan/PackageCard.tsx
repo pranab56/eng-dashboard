@@ -13,7 +13,6 @@ import {
   ShieldCheck, 
   UserCheck, 
   Power,
-  Layers
 } from 'lucide-react'
 import toast from 'react-hot-toast'
 import CreatePackage from './CreatePackage'

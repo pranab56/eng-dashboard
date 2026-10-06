@@ -7,7 +7,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { toast } from "sonner";
-import { ArrowLeft, Shield, MapPin, Users } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 
 import InputField from "@/components/form/InputField";
 import SelectField from "@/components/form/SelectField";

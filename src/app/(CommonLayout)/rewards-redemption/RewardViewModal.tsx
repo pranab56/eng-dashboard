@@ -13,7 +13,7 @@ import relativeTime from "dayjs/plugin/relativeTime";
 import Image from "next/image";
 import Link from "next/link";
 import { formatImagePath } from "@/utils/formatImagePath";
-import { X, Coffee, Package, Users, Pencil, QrCode } from "lucide-react";
+import { X, Coffee, Package, Pencil, QrCode } from "lucide-react";
 
 dayjs.extend(relativeTime);
 

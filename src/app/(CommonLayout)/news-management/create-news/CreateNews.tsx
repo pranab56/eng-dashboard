@@ -11,13 +11,11 @@ import dayjs from "dayjs";
 import dynamic from "next/dynamic";
 import {
   ArrowLeft,
-  Calendar,
   Clock,
   Globe,
   Loader2,
   Newspaper,
   Save,
-  Tag,
   BookOpen,
   Info,
 } from "lucide-react";

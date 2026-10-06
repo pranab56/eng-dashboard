@@ -24,7 +24,6 @@ import {
   useDeletePlayerMutation,
   useGetAllPlayerQuery,
   useGetPlayerOverviewQuery,
-  useUpdateEngCoinBudgetMutation,
 } from "@/features/player/playerApi";
 import { useGetAllAgeGroupQuery } from "@/features/categoryManagement/categoryApi";
 import { useGetAllTeamQuery } from "@/features/teamManagement/teamApi";
@@ -132,7 +131,6 @@ const PlayerManagement = () => {
     return Array.from(posSet);
   }, [allPlayersList]);
 
-  const [updateEngCoinBudget] = useUpdateEngCoinBudgetMutation();
   const [deletePlayer, { isLoading: isDeletingPlayer }] = useDeletePlayerMutation();
 
   const [statsTargetPlayer, setStatsTargetPlayer] = useState<TPlayer | null>(null);

@@ -13,13 +13,9 @@ import {
   X,
   Upload,
   Loader2,
-  Image as ImageIcon,
   Check,
   ChevronsUpDown,
   Search,
-  Folder,
-  Layers,
-  Sparkles,
 } from "lucide-react";
 import React, { useEffect, useState } from "react";
 

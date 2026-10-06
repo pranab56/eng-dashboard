@@ -82,7 +82,7 @@ const ParentManagement = () => {
     }
   };
 
-  const rawParents = userData?.data || [];
+  const rawParents = useMemo(() => userData?.data || [], [userData?.data]);
   const pagination = userData?.pagination || { totalPage: 1, total: rawParents.length };
 
   // Overview metric cards powered directly by backend DB aggregation

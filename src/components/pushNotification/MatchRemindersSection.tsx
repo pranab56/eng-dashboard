@@ -18,8 +18,6 @@ import {
   MapPin,
   Settings2,
   Check,
-  ChevronLeft,
-  ChevronRight,
 } from "lucide-react";
 import toast from "react-hot-toast";
 import {
@@ -35,19 +33,6 @@ dayjs.extend(relativeTime);
 dayjs.extend(utc);
 dayjs.extend(timezone);
 
-
-function getPaginationPages(current: number, total: number): (number | string)[] {
-  if (total <= 7) {
-    return Array.from({ length: total }, (_, i) => i + 1);
-  }
-  if (current <= 4) {
-    return [1, 2, 3, 4, 5, '...', total];
-  }
-  if (current >= total - 3) {
-    return [1, '...', total - 4, total - 3, total - 2, total - 1, total];
-  }
-  return [1, '...', current - 1, current, current + 1, '...', total];
-}
 
 export default function MatchRemindersSection() {
   // Settings Query & Mutation
