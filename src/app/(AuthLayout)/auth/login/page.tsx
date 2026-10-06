@@ -430,14 +430,14 @@ const Login = () => {
   }
 
   return (
-    <div className="min-h-screen w-full flex flex-col lg:flex-row overflow-x-hidden bg-slate-950">
+    <div className="min-h-[100dvh] w-full flex flex-col lg:flex-row bg-slate-50 lg:bg-slate-950">
       {/* ========================================================= */}
       {/* 🏟️ LEFT PANEL: 3D Sports Stadium & Environment (~55%)    */}
       {/* ========================================================= */}
       <div
         onMouseMove={handleMouseMove}
         onMouseLeave={handleMouseLeave}
-        className="w-full lg:w-[55%] min-h-[460px] lg:min-h-screen relative overflow-hidden bg-gradient-to-b from-slate-950 via-slate-900 to-[#030712] flex flex-col justify-between p-6 sm:p-10 lg:p-14 text-white border-b lg:border-b-0 lg:border-r border-slate-800/80"
+        className="hidden lg:flex lg:w-[55%] min-h-screen sticky top-0 relative overflow-hidden bg-gradient-to-b from-slate-950 via-slate-900 to-[#030712] flex-col justify-between p-10 lg:p-14 text-white border-r border-slate-800/80"
       >
         {/* Soft Volumetric Stadium Floodlights (Dynamic Pulsing Aura) */}
         <div
@@ -628,21 +628,37 @@ const Login = () => {
       {/* ========================================================= */}
       {/* 🔐 RIGHT PANEL: Clean Enterprise Authentication Form (45%) */}
       {/* ========================================================= */}
-      <div className="w-full lg:w-[45%] min-h-screen bg-slate-50 relative overflow-hidden text-slate-900 flex flex-col justify-between p-6 sm:p-12 lg:p-16">
+      <div className="w-full lg:w-[45%] min-h-[100dvh] bg-slate-50 relative overflow-y-auto text-slate-900 flex flex-col justify-between p-4 sm:p-8 lg:p-12 xl:p-16">
         {/* Subtle Ambient Light Mesh & Radiance (Matching Forgot Password) */}
         <div className="absolute inset-0 bg-[linear-gradient(to_right,#e2e8f0_1px,transparent_1px),linear-gradient(to_bottom,#e2e8f0_1px,transparent_1px)] bg-[size:3.5rem_3.5rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_40%,#000_70%,transparent_100%)] opacity-50 pointer-events-none" />
         <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[520px] h-[300px] bg-gradient-to-b from-emerald-100/50 via-slate-100/60 to-transparent rounded-full blur-3xl pointer-events-none" />
 
-        {/* Top Operational Pill */}
-        <div className="relative z-10 flex items-center justify-between">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-medium bg-white/90 backdrop-blur-xs text-slate-700 border border-slate-200 shadow-2xs">
+        {/* Top Header Bar */}
+        <div className="relative z-10 flex items-center justify-between mb-3 sm:mb-4">
+          {/* Mobile Brand Logo */}
+          <div className="lg:hidden flex items-center gap-2">
+            {logo ? (
+              <Image
+                src={logo}
+                width={120}
+                height={32}
+                alt="ENG Sports"
+                className="h-7 w-auto object-contain"
+                priority
+              />
+            ) : (
+              <span className="font-extrabold tracking-wider text-sm text-slate-900">ENG SPORTS</span>
+            )}
+          </div>
+
+          <div className="inline-flex items-center gap-2 px-2.5 py-1 rounded-full text-[11px] font-medium bg-white/90 backdrop-blur-xs text-slate-700 border border-slate-200 shadow-2xs ml-auto">
             <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
             <span>Console v2.4 &bull; Production</span>
           </div>
         </div>
 
         {/* Center Main Form */}
-        <div className="relative z-10 max-w-[390px] w-full mx-auto my-auto py-8">
+        <div className="relative z-10 max-w-[390px] w-full mx-auto my-auto py-4 sm:py-8">
           <div className="mb-6 text-center">
             {/* 🐼 Interactive Panda (Centered directly over Administrator Portal) */}
             <div className="flex justify-center mb-1">

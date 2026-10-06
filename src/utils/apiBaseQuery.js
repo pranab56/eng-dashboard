@@ -184,6 +184,7 @@ export const baseApi = createApi({
     "coin",
     "statsAudit",
     "serverHealth",
+    "QueueAndCache",
     "serverLogs",
   ],
 });

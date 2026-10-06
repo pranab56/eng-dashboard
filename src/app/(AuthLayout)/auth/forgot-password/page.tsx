@@ -59,7 +59,7 @@ const ForgotPassword = () => {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 relative flex flex-col justify-center items-center py-12 px-4 sm:px-6 antialiased overflow-hidden">
+    <div className="min-h-[100dvh] bg-slate-50 relative flex flex-col justify-center items-center py-6 sm:py-12 px-4 sm:px-6 antialiased overflow-y-auto">
       {/* Subtle Ambient Light Mesh & Radiance (No Black) */}
       <div className="absolute inset-0 bg-[linear-gradient(to_right,#e2e8f0_1px,transparent_1px),linear-gradient(to_bottom,#e2e8f0_1px,transparent_1px)] bg-[size:3.5rem_3.5rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_40%,#000_70%,transparent_100%)] opacity-50 pointer-events-none" />
       <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[520px] h-[300px] bg-gradient-to-b from-emerald-100/50 via-slate-100/60 to-transparent rounded-full blur-3xl pointer-events-none" />
@@ -81,7 +81,7 @@ const ForgotPassword = () => {
       </div>
 
       {/* Clean White Elevated Card */}
-      <div className="relative z-10 w-full max-w-[420px] bg-white rounded-2xl border border-slate-200/90 shadow-xl shadow-slate-200/50 p-6 sm:p-8">
+      <div className="relative z-10 w-full max-w-[420px] bg-white rounded-2xl border border-slate-200/90 shadow-xl shadow-slate-200/50 p-5 sm:p-8 my-auto">
         {/* Header */}
         <div className="text-center mb-6">
           <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[11px] font-semibold uppercase tracking-wider text-slate-700 bg-slate-100 border border-slate-200 mb-2.5">
