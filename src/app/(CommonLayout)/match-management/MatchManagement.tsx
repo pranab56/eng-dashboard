@@ -43,6 +43,7 @@ import ModifyScoreModal from "./ModifyScoreModal";
 import CleanSheetModal from "./CleanSheetModal";
 import RatingRuleModal from "./RatingRuleModal";
 import UpdateStatusModal from "./UpdateStatusModal";
+import { AdjustMatchConductModal } from "./AdjustMatchConductModal";
 
 interface OptionItem {
   label: string;
@@ -552,6 +553,9 @@ const MatchManagement = () => {
   const [isStatusModalOpen, setIsStatusModalOpen] = useState(false);
   const [statusUpdatingMatch, setStatusUpdatingMatch] = useState<any>(null);
 
+  const [isConductModalOpen, setIsConductModalOpen] = useState(false);
+  const [conductTargetMatch, setConductTargetMatch] = useState<any>(null);
+
   useEffect(() => {
     setHeaders({
       title: "Match Management",
@@ -605,6 +609,11 @@ const MatchManagement = () => {
   const handleManageCleanSheet = (match: any) => {
     setCleanSheetMatch(match);
     setIsCleanSheetModalOpen(true);
+  };
+
+  const handleAdjustConduct = (match: any) => {
+    setConductTargetMatch(match);
+    setIsConductModalOpen(true);
   };
 
   const handleDelete = (id: string) => {
@@ -945,7 +954,8 @@ const MatchManagement = () => {
               handleDelete,
               handleModifyScore,
               handleUpdateStatus,
-              handleManageCleanSheet
+              handleManageCleanSheet,
+              handleAdjustConduct
             )}
             data={matchesList}
             isLoading={isMatchesLoading}
@@ -966,6 +976,7 @@ const MatchManagement = () => {
         onManageCleanSheet={handleManageCleanSheet}
         onModifyScore={handleModifyScore}
         onUpdateStatus={handleUpdateStatus}
+        onAdjustConduct={handleAdjustConduct}
         initialTab={modalTab}
       />
 
@@ -999,6 +1010,16 @@ const MatchManagement = () => {
           setStatusUpdatingMatch(null);
         }}
         match={statusUpdatingMatch}
+      />
+
+      <AdjustMatchConductModal
+        isOpen={isConductModalOpen}
+        onClose={() => {
+          setIsConductModalOpen(false);
+          setConductTargetMatch(null);
+        }}
+        match={conductTargetMatch}
+        onSuccess={handleRefreshAll}
       />
 
       <DeleteConfirmModal

@@ -183,6 +183,23 @@ export const matchApi = baseApi.injectEndpoints({
       invalidatesTags: ["matchResult", "match", "player"],
     }),
 
+    getMatchEvaluation: builder.query({
+      query: (matchId) => ({
+        url: `/referee/match/${matchId}`,
+        method: "GET",
+      }),
+      providesTags: ["evaluation", "match"],
+    }),
+
+    saveMatchEvaluation: builder.mutation({
+      query: (data) => ({
+        url: "/referee",
+        method: "POST",
+        body: data,
+      }),
+      invalidatesTags: ["evaluation", "match", "team"],
+    }),
+
     deleteMatchEvent: builder.mutation({
       query: (id) => ({
         url: `/match-result/${id}`,
@@ -213,4 +230,6 @@ export const {
   useCreateMatchEventMutation,
   useUpdateMatchEventMutation,
   useDeleteMatchEventMutation,
+  useGetMatchEvaluationQuery,
+  useSaveMatchEvaluationMutation,
 } = matchApi;

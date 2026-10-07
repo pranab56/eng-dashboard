@@ -15,6 +15,7 @@ import {
   X,
   Users,
   Shield,
+  ShieldCheck,
   Trophy,
   Coins,
   UserCheck,
@@ -320,7 +321,7 @@ const TeamViewModal: React.FC<TeamViewModalProps> = ({
 
           {/* Modal Body */}
           <div className="p-5 space-y-4 overflow-y-auto flex-1 text-slate-800 dark:text-slate-200">
-            {/* Top 3 Metric Cards */}
+            {/* Top 4 Metric Cards */}
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
               <div className="bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-800 rounded-md p-3">
                 <div className="flex items-center justify-between text-xs text-slate-500 dark:text-slate-400">
@@ -362,11 +363,74 @@ const TeamViewModal: React.FC<TeamViewModalProps> = ({
                   £{marketValue.toLocaleString()}
                 </p>
               </div>
+
+              
             </div>
 
             {/* TAB 1: OVERVIEW & SQUAD */}
             {activeTab === "overview" && (
               <div className="space-y-4">
+                {/* Team Form & Upcoming Match Banner */}
+                {(currentTeam.form || currentTeam.upcomingFixture) && (
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
+                    {/* Team Form */}
+                    <div className="bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-800 rounded-md p-3 flex items-center justify-between">
+                      <div>
+                        <span className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider block mb-1">
+                          Recent Form (Last 5)
+                        </span>
+                        {Array.isArray(currentTeam.form) && currentTeam.form.length > 0 ? (
+                          <div className="flex items-center gap-1.5 mt-1">
+                            {currentTeam.form.map((res: string, idx: number) => {
+                              const badgeBg =
+                                res === "W"
+                                  ? "bg-emerald-500 text-white"
+                                  : res === "D"
+                                  ? "bg-amber-500 text-white"
+                                  : "bg-rose-500 text-white";
+                              return (
+                                <span
+                                  key={idx}
+                                  className={`w-6 h-6 rounded-md flex items-center justify-center font-bold text-xs shadow-xs ${badgeBg}`}
+                                >
+                                  {res}
+                                </span>
+                              );
+                            })}
+                            <span className="text-xs text-slate-500 ml-1.5 font-mono">
+                              ({currentTeam.formString || currentTeam.form.join(" - ")})
+                            </span>
+                          </div>
+                        ) : (
+                          <span className="text-xs text-slate-400 italic">No finished matches yet</span>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Upcoming Fixture */}
+                    <div className="bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-800 rounded-md p-3 flex flex-col justify-center">
+                      <span className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider block mb-1">
+                        Upcoming Fixture
+                      </span>
+                      {currentTeam.upcomingFixture ? (
+                        <div className="text-xs">
+                          <span className="font-semibold text-slate-800 dark:text-slate-200">
+                            {currentTeam.upcomingFixture.homeTeam?.teamName || "Home"} vs{" "}
+                            {currentTeam.upcomingFixture.awayTeam?.teamName || "Away"}
+                          </span>
+                          <span className="text-[11px] text-slate-400 block mt-0.5">
+                            {currentTeam.upcomingFixture.matchDate
+                              ? dayjs(currentTeam.upcomingFixture.matchDate).format("MMM DD, YYYY • h:mm A")
+                              : "Date TBD"}
+                          </span>
+                        </div>
+                      ) : (
+                        <span className="text-xs text-slate-400 italic">No upcoming fixture scheduled</span>
+                      )}
+                    </div>
+                  </div>
+                )}
+
                 {/* League & Manager Section */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
                   <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-md p-3 space-y-1">

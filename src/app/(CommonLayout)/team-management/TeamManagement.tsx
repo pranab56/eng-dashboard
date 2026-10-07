@@ -89,6 +89,7 @@ const TeamManagement = () => {
   const [coinTargetTeam, setCoinTargetTeam] = useState<any | null>(null);
   const [isCoinModalOpen, setIsCoinModalOpen] = useState(false);
 
+
   useEffect(() => {
     setHeaders({
       title: "Team Management",
@@ -110,6 +111,7 @@ const TeamManagement = () => {
     setCoinTargetTeam(team);
     setIsCoinModalOpen(true);
   };
+
 
   const handleConfirmUpdateCoin = async (coinValue: number) => {
     if (!coinTargetTeam?._id) {
@@ -416,7 +418,8 @@ const TeamManagement = () => {
         initialValue={coinTargetTeam?.coin ?? 0}
         isLoading={isUpdatingCoin}
       />
-    </div>
+
+          </div>
   );
 };
 

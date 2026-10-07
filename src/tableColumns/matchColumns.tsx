@@ -9,6 +9,7 @@ import Link from "next/link";
 import { formatImagePath } from "../utils/formatImagePath";
 import {
   Shield,
+  ShieldCheck,
   Eye,
   Activity,
   MoreVertical,
@@ -52,7 +53,8 @@ export const getMatchColumns = (
   onDelete: (id: string) => void,
   onModifyScore: (match: any) => void,
   onUpdateStatus?: (match: any) => void,
-  onManageCleanSheet?: (match: any) => void
+  onManageCleanSheet?: (match: any) => void,
+  onAdjustConduct?: (match: any) => void
 ): ColumnDef<any>[] => [
   {
     accessorKey: "homeTeam",
@@ -291,6 +293,16 @@ export const getMatchColumns = (
                 <Goal className="w-3.5 h-3.5 text-emerald-600" />
                 <span>Modify Score & Goals</span>
               </DropdownMenuItem>
+
+              {onAdjustConduct && (
+                <DropdownMenuItem
+                  onClick={() => onAdjustConduct(match)}
+                  className="flex items-center gap-2 px-2.5 py-1.5 rounded-md text-slate-700 hover:text-slate-900 hover:bg-slate-100 font-medium cursor-pointer"
+                >
+                  <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
+                  <span>Adjust Team Conduct Ratings</span>
+                </DropdownMenuItem>
+              )}
 
               {onManageCleanSheet && (
                 <DropdownMenuItem

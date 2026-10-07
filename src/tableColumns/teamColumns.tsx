@@ -3,7 +3,7 @@ import { ColumnDef } from "@tanstack/react-table";
 import Image from "next/image";
 import Link from "next/link";
 import { FiEdit, FiEdit2, FiEye, FiTrash2 } from "react-icons/fi";
-import { Coins, Shield } from "lucide-react";
+import { Coins, Shield, ShieldCheck } from "lucide-react";
 
 export const getTeamColumns = (
   onView: (team: any) => void,

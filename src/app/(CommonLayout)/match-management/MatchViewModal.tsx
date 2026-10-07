@@ -43,6 +43,7 @@ interface MatchViewModalProps {
   onManageCleanSheet?: (match: any) => void;
   onModifyScore?: (match: any) => void;
   onUpdateStatus?: (match: any) => void;
+  onAdjustConduct?: (match: any) => void;
   initialTab?: "overview" | "events" | "actions";
 }
 
@@ -301,6 +302,7 @@ const MatchViewModal = ({
   onManageCleanSheet,
   onModifyScore,
   onUpdateStatus,
+  onAdjustConduct,
   initialTab = "overview",
 }: MatchViewModalProps) => {
   const [activeTab, setActiveTab] = useState<"overview" | "events" | "actions">(initialTab);
@@ -1125,6 +1127,25 @@ const MatchViewModal = ({
                     Modify schedule, pitch formation, venue, duration, or referee.
                   </p>
                 </Link>
+
+                {onAdjustConduct && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      onClose();
+                      onAdjustConduct(match);
+                    }}
+                    className="p-4 rounded-lg border border-slate-200 hover:border-slate-300 hover:bg-slate-50 transition-all text-left cursor-pointer"
+                  >
+                    <h5 className="text-xs font-semibold text-slate-900 flex items-center gap-1.5">
+                      <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
+                      Adjust Team Conduct Ratings
+                    </h5>
+                    <p className="text-xs text-slate-500 mt-1">
+                      Override referee fair-play conduct scores and club economy rewards.
+                    </p>
+                  </button>
+                )}
 
                 {onModifyScore && (
                   <button
