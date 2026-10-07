@@ -8,6 +8,14 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
   useGetMatchEvaluationQuery,
   useSaveMatchEvaluationMutation,
 } from "@/features/match/matchApi";
@@ -115,7 +123,7 @@ export const AdjustMatchConductModal: React.FC<AdjustMatchConductModalProps> = (
         awayTeam: awayTeamId,
         homeTeamRating: homeRating,
         awayTeamRating: awayRating,
-        manOfTheMatch: motm && motm.trim() !== "" ? motm : undefined,
+        manOfTheMatch: motm && motm.trim() !== "" && motm !== "none" ? motm : undefined,
         notes: notes.trim() !== "" ? notes.trim() : undefined,
         isAdminOverride: true,
       }).unwrap();
@@ -320,31 +328,38 @@ export const AdjustMatchConductModal: React.FC<AdjustMatchConductModalProps> = (
 
           <div className="border-t border-slate-100 dark:border-slate-800" />
 
-          {/* Section 3: Man of the Match */}
+          {/* Section 3: Player of the Match (Custom Select) */}
           <div className="space-y-1.5">
             <label className="block text-xs font-medium text-slate-700 dark:text-slate-300">
               Player of the Match
             </label>
-            <select
-              value={motm}
-              onChange={(e) => setMotm(e.target.value)}
-              className="w-full h-8 px-2.5 rounded-md border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-xs text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-1 focus:ring-slate-400 dark:focus:ring-slate-600"
+            <Select
+              value={motm || "none"}
+              onValueChange={(val) => setMotm(val === "none" ? "" : val)}
             >
-              <option value="">Not selected</option>
-              {allMatchPlayers.map((player: any) => {
-                const pName =
-                  `${player.firstName || ""} ${player.lastName || ""}`.trim() ||
-                  player.userName ||
-                  player.name ||
-                  "Player";
-                const pId = player._id || player.id;
-                return (
-                  <option key={pId} value={pId}>
-                    {pName} ({player.teamName}) {player.jerseyNumber ? `#${player.jerseyNumber}` : ""}
-                  </option>
-                );
-              })}
-            </select>
+              <SelectTrigger className="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-md h-8 text-xs text-slate-800 dark:text-slate-200">
+                <SelectValue placeholder="Select player..." />
+              </SelectTrigger>
+              <SelectContent className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 max-h-56 z-[70]">
+                <SelectGroup>
+                  <SelectItem value="none">Not selected</SelectItem>
+                  {allMatchPlayers.map((player: any) => {
+                    const pName =
+                      `${player.firstName || ""} ${player.lastName || ""}`.trim() ||
+                      player.userName ||
+                      player.name ||
+                      "Player";
+                    const pId = String(player._id || player.id || "");
+                    if (!pId) return null;
+                    return (
+                      <SelectItem key={pId} value={pId}>
+                        {pName} ({player.teamName}) {player.jerseyNumber ? `#${player.jerseyNumber}` : ""}
+                      </SelectItem>
+                    );
+                  })}
+                </SelectGroup>
+              </SelectContent>
+            </Select>
           </div>
 
           {/* Section 4: Disciplinary Notes */}
