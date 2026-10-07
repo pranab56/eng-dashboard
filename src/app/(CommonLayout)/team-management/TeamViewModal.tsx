@@ -15,7 +15,6 @@ import {
   X,
   Users,
   Shield,
-  ShieldCheck,
   Trophy,
   Coins,
   UserCheck,
