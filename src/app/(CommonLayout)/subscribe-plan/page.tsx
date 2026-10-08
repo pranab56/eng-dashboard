@@ -10,9 +10,9 @@ import {
   Loader2, 
   Package, 
   RefreshCw, 
-  Users, 
   Coins,
   Layers,
+  X,
 } from 'lucide-react'
 import CreatePackage from './CreatePackage'
 import PackageCard from './PackageCard'
@@ -34,7 +34,6 @@ const SubscribePlan = () => {
     status: status
   });
 
-  // Backend Overview Statistics (calculated directly on MongoDB backend)
   const {
     data: overviewRes,
     isLoading: isOverviewLoading,
@@ -49,7 +48,6 @@ const SubscribePlan = () => {
     return Array.isArray(packageData?.data) ? packageData.data : []
   }, [packageData])
 
-  // Filter by search term
   const filteredPackages = useMemo(() => {
     if (!searchTerm.trim()) return rawPackages
     const q = searchTerm.toLowerCase().trim()
@@ -67,7 +65,6 @@ const SubscribePlan = () => {
     })
   }, [rawPackages, searchTerm])
 
-  // Backend-driven KPI Statistics (computed on MongoDB backend)
   const stats = useMemo(() => {
     return {
       totalCount: overview?.totalPackages ?? rawPackages.length,
@@ -76,43 +73,45 @@ const SubscribePlan = () => {
     };
   }, [overview, rawPackages.length]);
 
+  const activeAudienceLabel = userTypes.find(t => t.value === activeTab)?.label || activeTab;
+
   return (
     <div className="w-full p-4 sm:p-6 lg:p-8 space-y-6 pb-16">
       {/* Top Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-4 border-b border-slate-200">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-slate-900">
+          <h1 className="text-xl sm:text-2xl font-semibold tracking-tight text-slate-900">
             Subscription Plans
           </h1>
-          <p className="text-sm text-slate-500 mt-0.5">
-            Configure player membership tiers, pricing cycles, coin allowances, and benefits.
+          <p className="text-xs sm:text-sm text-slate-500 mt-1">
+            Configure player membership tiers, pricing cycles, coin allowances, and platform benefits.
           </p>
         </div>
 
-        <div className="flex items-center gap-2.5">
+        <div className="flex items-center gap-2">
           <button
             type="button"
             onClick={() => { refetch(); refetchOverview(); }}
             disabled={isFetching || isOverviewFetching}
-            className="inline-flex items-center gap-1.5 px-3 py-2 text-xs font-medium text-slate-700 bg-white hover:bg-slate-50 border border-slate-200 rounded-lg transition-colors cursor-pointer shadow-2xs disabled:opacity-50"
-            title="Refresh package list"
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-slate-700 bg-white hover:bg-slate-50 border border-slate-300 rounded-md transition-colors cursor-pointer disabled:opacity-50"
+            title="Refresh list"
           >
             <RefreshCw className={`w-3.5 h-3.5 text-slate-500 ${isFetching || isOverviewFetching ? 'animate-spin' : ''}`} />
             <span className="hidden sm:inline">Refresh</span>
           </button>
 
           <CustomModal
-            title="Create New Membership Plan"
+            title="Create Subscription Plan"
             isOpen={isModalOpen}
             setIsOpen={setIsModalOpen}
             className="sm:max-w-3xl"
             trigger={
               <button
                 type="button"
-                className="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-semibold text-white bg-slate-900 hover:bg-slate-800 rounded-lg transition-colors cursor-pointer shadow-2xs"
+                className="inline-flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-medium text-white bg-slate-900 hover:bg-slate-800 rounded-md transition-colors cursor-pointer"
               >
                 <Plus className="w-3.5 h-3.5" />
-                <span>New Package</span>
+                <span>New Plan</span>
               </button>
             }
           >
@@ -121,76 +120,74 @@ const SubscribePlan = () => {
         </div>
       </div>
 
-      {/* KPI Overview Strip */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3.5">
-        <div className="p-4 bg-white border border-slate-200 rounded-xl shadow-2xs">
-          <div className="flex items-center justify-between text-slate-500">
-            <span className="text-xs font-medium uppercase tracking-wider">Active Category</span>
-            <Users className="w-4 h-4 text-slate-400" />
-          </div>
-          <div className="mt-2 flex items-baseline gap-2">
-            <span className="text-xl font-bold text-slate-900">
-              {userTypes.find(t => t.value === activeTab)?.label || activeTab}
+      {/* Unified Enterprise KPI Metric Strip */}
+      <div className="bg-white border border-slate-200 rounded-lg overflow-hidden grid grid-cols-2 md:grid-cols-4 divide-y md:divide-y-0 md:divide-x divide-slate-200">
+        <div className="p-3.5 sm:p-4">
+          <span className="text-[11px] font-medium text-slate-500 uppercase tracking-wider block">
+            Target Audience
+          </span>
+          <div className="mt-1 flex items-baseline gap-2">
+            <span className="text-sm sm:text-base font-semibold text-slate-900 truncate">
+              {activeAudienceLabel}
             </span>
           </div>
-          <div className="text-[11px] text-slate-500 mt-1">
-            Status: <span className="font-semibold text-slate-700">{status}</span>
-          </div>
+          <span className="text-[11px] text-slate-400 mt-0.5 block">
+            Filter: {status}
+          </span>
         </div>
 
-        <div className="p-4 bg-white border border-slate-200 rounded-xl shadow-2xs">
-          <div className="flex items-center justify-between text-slate-500">
-            <span className="text-xs font-medium uppercase tracking-wider">Loaded Plans</span>
-            <Package className="w-4 h-4 text-slate-400" />
-          </div>
-          <div className="mt-2 flex items-baseline gap-2">
-            <span className="text-xl font-bold font-mono text-slate-900">
+        <div className="p-3.5 sm:p-4">
+          <span className="text-[11px] font-medium text-slate-500 uppercase tracking-wider block">
+            Total Plans
+          </span>
+          <div className="mt-1 flex items-baseline gap-1.5">
+            <span className="text-base sm:text-lg font-bold font-mono text-slate-900">
               {isOverviewLoading ? "—" : stats.totalCount}
             </span>
-            <span className="text-xs text-slate-500">packages</span>
+            <span className="text-xs text-slate-500">tiers</span>
           </div>
-          <div className="text-[11px] text-slate-500 mt-1">
-            Showing filtered category results
-          </div>
+          <span className="text-[11px] text-slate-400 mt-0.5 block">
+            Configured for this group
+          </span>
         </div>
 
-        <div className="p-4 bg-white border border-slate-200 rounded-xl shadow-2xs">
-          <div className="flex items-center justify-between text-slate-500">
-            <span className="text-xs font-medium uppercase tracking-wider">Max Coin Allocation</span>
-            <Coins className="w-4 h-4 text-amber-500" />
+        <div className="p-3.5 sm:p-4">
+          <div className="flex items-center gap-1.5 text-[11px] font-medium text-slate-500 uppercase tracking-wider">
+            <Coins className="w-3 h-3 text-amber-500" />
+            <span>Max Coin Allowance</span>
           </div>
-          <div className="mt-2 flex items-baseline gap-2">
-            <span className="text-xl font-bold font-mono text-amber-950">
+          <div className="mt-1 flex items-baseline gap-1.5">
+            <span className="text-base sm:text-lg font-bold font-mono text-slate-900">
               {isOverviewLoading ? "—" : stats.maxCoins.toLocaleString()}
             </span>
-            <span className="text-xs text-amber-700 font-medium">coins</span>
+            <span className="text-xs text-slate-500">coins</span>
           </div>
-          <div className="text-[11px] text-slate-500 mt-1">
-            Granted upon subscription
-          </div>
+          <span className="text-[11px] text-slate-400 mt-0.5 block">
+            Initial subscriber grant
+          </span>
         </div>
 
-        <div className="p-4 bg-white border border-slate-200 rounded-xl shadow-2xs">
-          <div className="flex items-center justify-between text-slate-500">
-            <span className="text-xs font-medium uppercase tracking-wider">Average Price</span>
-            <Layers className="w-4 h-4 text-slate-400" />
+        <div className="p-3.5 sm:p-4">
+          <div className="flex items-center gap-1.5 text-[11px] font-medium text-slate-500 uppercase tracking-wider">
+            <Layers className="w-3 h-3 text-slate-400" />
+            <span>Average Pricing</span>
           </div>
-          <div className="mt-2 flex items-baseline gap-2">
-            <span className="text-xl font-bold font-mono text-slate-900">
+          <div className="mt-1 flex items-baseline gap-1.5">
+            <span className="text-base sm:text-lg font-bold font-mono text-slate-900">
               {isOverviewLoading ? "—" : `£${stats.avgPrice}`}
             </span>
             <span className="text-xs text-slate-500">/ subscription</span>
           </div>
-          <div className="text-[11px] text-slate-500 mt-1">
-            Calculated across category plans
-          </div>
+          <span className="text-[11px] text-slate-400 mt-0.5 block">
+            Across active tiers
+          </span>
         </div>
       </div>
 
-      {/* Control Strip: Audience Tabs, Status Switch, Search */}
-      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3 bg-white p-3 border border-slate-200 rounded-xl shadow-2xs">
+      {/* Control Strip: Tabs, Status Switch, Search */}
+      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3 pt-1">
         {/* Left: Audience Segmented Tabs */}
-        <div className="flex items-center gap-1.5 overflow-x-auto pb-1 md:pb-0">
+        <div className="inline-flex p-1 bg-slate-100 rounded-md border border-slate-200/80 gap-1 overflow-x-auto">
           {userTypes.map((type) => {
             const isSelected = activeTab === type.value
             return (
@@ -198,10 +195,10 @@ const SubscribePlan = () => {
                 key={type.value}
                 type="button"
                 onClick={() => setActiveTab(type.value)}
-                className={`px-3.5 py-1.5 text-xs font-semibold rounded-lg transition-colors cursor-pointer whitespace-nowrap ${
+                className={`px-3 py-1.5 text-xs font-medium rounded transition-colors cursor-pointer whitespace-nowrap ${
                   isSelected
-                    ? 'bg-slate-900 text-white shadow-2xs'
-                    : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
+                    ? 'bg-white text-slate-900 font-semibold shadow-xs border border-slate-200/60'
+                    : 'text-slate-600 hover:text-slate-900 hover:bg-slate-200/50'
                 }`}
               >
                 {type.label}
@@ -213,14 +210,14 @@ const SubscribePlan = () => {
         {/* Right: Status Switch & Search */}
         <div className="flex items-center gap-2.5 flex-wrap sm:flex-nowrap">
           {/* Status Segmented Control */}
-          <div className="inline-flex items-center p-0.5 bg-slate-100 border border-slate-200 rounded-lg">
+          <div className="inline-flex p-0.5 bg-slate-100 border border-slate-200 rounded-md">
             <button
               type="button"
               onClick={() => setStatus('Active')}
-              className={`px-3 py-1 text-xs font-medium rounded-md transition-colors cursor-pointer ${
+              className={`px-3 py-1 text-xs font-medium rounded transition-colors cursor-pointer ${
                 status === 'Active'
-                  ? 'bg-white text-emerald-700 font-semibold shadow-2xs'
-                  : 'text-slate-500 hover:text-slate-900'
+                  ? 'bg-white text-emerald-700 font-semibold shadow-xs'
+                  : 'text-slate-600 hover:text-slate-900'
               }`}
             >
               Active
@@ -228,10 +225,10 @@ const SubscribePlan = () => {
             <button
               type="button"
               onClick={() => setStatus('Delete')}
-              className={`px-3 py-1 text-xs font-medium rounded-md transition-colors cursor-pointer ${
+              className={`px-3 py-1 text-xs font-medium rounded transition-colors cursor-pointer ${
                 status === 'Delete'
-                  ? 'bg-white text-rose-700 font-semibold shadow-2xs'
-                  : 'text-slate-500 hover:text-slate-900'
+                  ? 'bg-white text-rose-700 font-semibold shadow-xs'
+                  : 'text-slate-600 hover:text-slate-900'
               }`}
             >
               Archived
@@ -239,46 +236,55 @@ const SubscribePlan = () => {
           </div>
 
           {/* Quick Search */}
-          <div className="relative min-w-[180px] sm:min-w-[220px]">
-            <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+          <div className="relative min-w-[200px] sm:min-w-[240px]">
+            <Search className="w-3.5 h-3.5 absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400" />
             <input
               type="text"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              placeholder="Search plans, benefits..."
-              className="w-full pl-9 pr-3 py-1.5 text-xs text-slate-900 placeholder:text-slate-400 bg-white border border-slate-200 rounded-lg focus:outline-none focus:border-slate-400 focus:ring-1 focus:ring-slate-400 transition-colors"
+              placeholder="Filter by title or benefit..."
+              className="w-full pl-8 pr-7 py-1.5 text-xs text-slate-900 placeholder:text-slate-400 bg-white border border-slate-300 rounded-md focus:outline-none focus:border-slate-900 focus:ring-1 focus:ring-slate-900 transition-colors"
             />
+            {searchTerm && (
+              <button
+                type="button"
+                onClick={() => setSearchTerm('')}
+                className="absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 cursor-pointer"
+              >
+                <X className="w-3.5 h-3.5" />
+              </button>
+            )}
           </div>
         </div>
       </div>
 
       {/* Package Content Cards Grid */}
-      <div className="min-h-[350px]">
+      <div className="min-h-[300px]">
         {isLoading ? (
-          <div className="flex flex-col items-center justify-center py-24 bg-white border border-slate-200 rounded-xl">
-            <Loader2 className="w-7 h-7 animate-spin text-slate-400" />
-            <p className="text-xs font-medium text-slate-500 mt-2.5">
-              Loading membership packages...
+          <div className="flex flex-col items-center justify-center py-24 bg-white border border-slate-200 rounded-lg">
+            <Loader2 className="w-6 h-6 animate-spin text-slate-400" />
+            <p className="text-xs font-medium text-slate-500 mt-2">
+              Loading plans...
             </p>
           </div>
         ) : filteredPackages.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 2xl:grid-cols-4 gap-4 lg:gap-5">
             {filteredPackages.map((pkg: any) => (
               <PackageCard key={pkg._id} packageData={pkg} />
             ))}
           </div>
         ) : (
-          <div className="flex flex-col items-center justify-center py-20 bg-white border border-slate-200 rounded-xl text-center px-4">
-            <div className="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center text-slate-400 mb-3">
-              <Package className="w-5 h-5" />
+          <div className="flex flex-col items-center justify-center py-16 bg-white border border-slate-200 rounded-lg text-center px-4">
+            <div className="w-9 h-9 rounded-md bg-slate-100 flex items-center justify-center text-slate-400 mb-2.5">
+              <Package className="w-4 h-4" />
             </div>
-            <h3 className="text-sm font-bold text-slate-900">
-              No {status === 'Active' ? 'Active' : 'Archived'} {activeTab} Packages Found
+            <h3 className="text-sm font-semibold text-slate-900">
+              No {status === 'Active' ? 'Active' : 'Archived'} Plans Found
             </h3>
             <p className="text-xs text-slate-500 mt-1 max-w-sm">
               {searchTerm 
-                ? `No plans matched "${searchTerm}". Try resetting your search filter.`
-                : `There are currently no ${status.toLowerCase()} packages configured for this category.`
+                ? `No subscription plans matched "${searchTerm}".`
+                : `There are no ${status.toLowerCase()} packages configured for ${activeAudienceLabel.toLowerCase()}.`
               }
             </p>
 
@@ -287,7 +293,7 @@ const SubscribePlan = () => {
                 <button
                   type="button"
                   onClick={() => setSearchTerm('')}
-                  className="px-3 py-1.5 text-xs font-medium text-slate-700 bg-slate-100 hover:bg-slate-200 rounded-lg transition-colors cursor-pointer"
+                  className="px-3 py-1.5 text-xs font-medium text-slate-700 bg-slate-100 hover:bg-slate-200 rounded-md transition-colors cursor-pointer"
                 >
                   Clear Search
                 </button>
@@ -295,10 +301,10 @@ const SubscribePlan = () => {
               <button
                 type="button"
                 onClick={() => setIsModalOpen(true)}
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-white bg-slate-900 hover:bg-slate-800 rounded-lg transition-colors cursor-pointer shadow-2xs"
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-white bg-slate-900 hover:bg-slate-800 rounded-md transition-colors cursor-pointer"
               >
                 <Plus className="w-3.5 h-3.5" />
-                Create Plan
+                <span>Create Plan</span>
               </button>
             </div>
           </div>

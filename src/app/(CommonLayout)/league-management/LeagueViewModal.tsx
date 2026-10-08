@@ -88,12 +88,41 @@ const LeagueViewModal = ({ league, isOpen, onClose }: LeagueViewModalProps) => {
 
   const { label, dotColor, badgeStyle } = getStatusBadge(league.status);
 
-  const handleCopyId = () => {
+  const handleCopyId = async () => {
     if (!league._id) return;
-    navigator.clipboard.writeText(league._id);
-    setIsCopied(true);
-    toast.success("League ID copied to clipboard");
-    setTimeout(() => setIsCopied(false), 2000);
+    let success = false;
+    try {
+      if (navigator?.clipboard?.writeText) {
+        await navigator.clipboard.writeText(league._id);
+        success = true;
+      } else {
+        throw new Error("Clipboard API unavailable");
+      }
+    } catch {
+      try {
+        const textarea = document.createElement("textarea");
+        textarea.value = league._id;
+        textarea.style.position = "fixed";
+        textarea.style.left = "-9999px";
+        textarea.style.top = "-9999px";
+        textarea.setAttribute("readonly", "");
+        document.body.appendChild(textarea);
+        textarea.select();
+        textarea.setSelectionRange(0, textarea.value.length);
+        success = document.execCommand("copy");
+        document.body.removeChild(textarea);
+      } catch (err) {
+        success = false;
+      }
+    }
+
+    if (success) {
+      setIsCopied(true);
+      toast.success("League ID copied to clipboard");
+      setTimeout(() => setIsCopied(false), 2000);
+    } else {
+      toast.error("Failed to copy League ID");
+    }
   };
 
   return (
@@ -218,6 +247,12 @@ const LeagueViewModal = ({ league, isOpen, onClose }: LeagueViewModalProps) => {
               </div>
             </div>
 
+                        <div className="flex items-center justify-between">
+              <span className="text-slate-500">Age Group</span>
+              <span className="font-semibold text-slate-800 text-xs px-2.5 py-0.5 rounded-full bg-violet-50 text-violet-700 border border-violet-200">
+                {league.ageGroup || "All Ages"}
+              </span>
+            </div>
             <div className="flex items-center justify-between">
               <span className="text-slate-500">Created At</span>
               <span className="font-mono text-slate-700">

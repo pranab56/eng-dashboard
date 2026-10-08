@@ -23,11 +23,14 @@ import {
   useDeleteLeagueMutation,
   useGetAllLeagueQuery,
   useGetLeagueAnalyticsQuery,
+  useGetLeagueAgeGroupsQuery,
 } from "@/features/leagueManagement/leagueApi";
 import { useHeaders } from "@/hooks/useHeaders";
 import { getLeagueColumns } from "@/tableColumns/leagueColumns";
 import DeleteConfirmModal from "../match-management/DeleteConfirmModal";
 import LeagueViewModal from "./LeagueViewModal";
+import { useGetAllAgeGroupQuery } from "@/features/categoryManagement/categoryApi";
+import { AgeGroupSelectDropdown } from "@/components/dropdowns/AgeGroupSelectDropdown";
 
 type StatusTab = "all" | "running" | "upcoming" | "finished";
 
@@ -40,9 +43,14 @@ const LeagueManagement = () => {
 
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState<StatusTab>("all");
+  const [selectedAgeGroup, setSelectedAgeGroup] = useState<string>("ALL");
+  const { data: ageGroupRes } = useGetAllAgeGroupQuery({});
+  const { data: leagueAgeGroupsRes } = useGetLeagueAgeGroupsQuery(undefined);
 
   // 1. Fetch backend-calculated analytics (accurate across all pages)
-  const { data: analyticsData } = useGetLeagueAnalyticsQuery(undefined);
+  const { data: analyticsData } = useGetLeagueAnalyticsQuery(
+    selectedAgeGroup !== "ALL" ? { ageGroup: selectedAgeGroup } : undefined
+  );
   const backendStats = analyticsData?.data || {
     total: 0,
     running: 0,
@@ -55,6 +63,7 @@ const LeagueManagement = () => {
     page: page,
     searchValue: searchTerm,
     status: statusFilter === "all" ? "" : statusFilter,
+    ageGroup: selectedAgeGroup !== "ALL" ? selectedAgeGroup : "",
   });
 
   const [deleteLeague, { isLoading: isDeleting }] = useDeleteLeagueMutation();
@@ -71,6 +80,15 @@ const LeagueManagement = () => {
       des: "Manage league seasons, tournament timelines, and competition records.",
     });
   }, []);
+
+  const handleAgeGroupChange = (group: string) => {
+    setSelectedAgeGroup(group);
+    if (page !== "1") {
+      const params = new URLSearchParams(searchParams.toString());
+      params.set("leaguePage", "1");
+      router.push(`${pathname}?${params.toString()}`);
+    }
+  };
 
   const handleTabChange = (tab: StatusTab) => {
     setStatusFilter(tab);
@@ -126,6 +144,70 @@ const LeagueManagement = () => {
   }, [leagueData]);
 
   // True system stats calculated on the backend
+        // Fetch all unique age groups across categories and leagues (deduplicated strictly)
+  const dynamicAgeGroups = useMemo(() => {
+    const seen = new Set<string>();
+    const uniqueList: string[] = [];
+
+    const addUnique = (val: any) => {
+      if (!val || typeof val !== "string") return;
+      const trimmed = val.trim();
+      if (!trimmed || trimmed.toUpperCase() === "ALL" || trimmed.toLowerCase() === "null") return;
+      const lower = trimmed.toLowerCase();
+      if (!seen.has(lower)) {
+        seen.add(lower);
+        uniqueList.push(trimmed);
+      }
+    };
+
+    // 1. From database categories - extract subcategory age groups
+    const apiCats = ageGroupRes?.data?.result || ageGroupRes?.data || [];
+    if (Array.isArray(apiCats)) {
+      apiCats.forEach((cat: any) => {
+        if (Array.isArray(cat?.subCategories) && cat.subCategories.length > 0) {
+          cat.subCategories.forEach((sub: any) => addUnique(sub?.name));
+        } else {
+          // If no subcategories, only add if it is actually an age group (not a tournament/league name)
+          const name = cat?.name;
+          if (
+            name &&
+            (/^(u|under\s*)\d+/i.test(name) ||
+             /^(senior|junior|open|adult|veteran)/i.test(name) ||
+             /\d+\s*(year|yr)/i.test(name))
+          ) {
+            addUnique(name);
+          }
+        }
+      });
+    }
+
+    // 2. From all leagues in DB
+    const leagueAges = leagueAgeGroupsRes?.data || [];
+    if (Array.isArray(leagueAges)) {
+      leagueAges.forEach((ag: any) => addUnique(ag));
+    }
+
+    // 3. From current page leagues (fallback)
+    rawLeagues.forEach((l: any) => {
+      addUnique(l?.ageGroup);
+    });
+
+    // Fallback if none exist yet
+    if (uniqueList.length === 0) {
+      ["u7", "u8", "u9", "u10", "u11", "u12", "u13", "u14", "Senior"].forEach(addUnique);
+    }
+
+    // Natural numerical sort
+    return uniqueList.sort((a, b) => {
+      const numA = parseInt(a.replace(/\D/g, ""), 10);
+      const numB = parseInt(b.replace(/\D/g, ""), 10);
+      if (!isNaN(numA) && !isNaN(numB)) return numA - numB;
+      if (!isNaN(numA)) return -1;
+      if (!isNaN(numB)) return 1;
+      return a.localeCompare(b);
+    });
+  }, [ageGroupRes, leagueAgeGroupsRes, rawLeagues]);
+
   const stats = {
     total: backendStats?.total ?? 0,
     running: backendStats?.running ?? 0,
@@ -134,10 +216,11 @@ const LeagueManagement = () => {
   };
 
   const hasActiveFilters =
-    statusFilter !== "all" || searchTerm.trim().length > 0;
+    statusFilter !== "all" || selectedAgeGroup !== "ALL" || searchTerm.trim().length > 0;
 
   const handleResetFilters = () => {
     setStatusFilter("all");
+    setSelectedAgeGroup("ALL");
     setSearchTerm("");
     if (page !== "1") {
       const params = new URLSearchParams(searchParams.toString());
@@ -330,8 +413,14 @@ const LeagueManagement = () => {
             </button>
           </div>
 
-          {/* Search + Add League Action */}
-          <div className="flex items-center gap-2.5 w-full lg:w-auto">
+          {/* Search, Age Group & Add League Action */}
+          <div className="flex flex-wrap items-center gap-2.5 w-full lg:w-auto">
+            <AgeGroupSelectDropdown
+              groups={dynamicAgeGroups}
+              selectedGroup={selectedAgeGroup}
+              onChange={handleAgeGroupChange}
+              placeholder="All Age Groups"
+            />
             <div className="relative flex-1 sm:w-64 md:w-72">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 size-3.5 pointer-events-none" />
               <input
@@ -368,6 +457,11 @@ const LeagueManagement = () => {
           <div className="px-5 py-2 bg-slate-50/60 border-b border-slate-200/60 flex items-center justify-between text-xs text-slate-600">
             <div className="flex items-center gap-2">
               <span className="font-medium text-slate-700">Active filter:</span>
+              {selectedAgeGroup !== "ALL" && (
+                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-white border border-slate-200 text-slate-700 font-medium">
+                  Age: {selectedAgeGroup}
+                </span>
+              )}
               {statusFilter !== "all" && (
                 <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-white border border-slate-200 text-slate-700 font-medium capitalize">
                   Status: {statusFilter}

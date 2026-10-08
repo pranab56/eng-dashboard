@@ -26,11 +26,13 @@ export const leagueApi = baseApi.injectEndpoints({
         let limit = 10;
         let searchValue = "";
         let status = "";
+        let ageGroup = "";
         if (typeof params === "object" && params !== null) {
           page = params.page || params.pageNumber || 1;
           limit = params.limit || 10;
           searchValue = params.searchValue || params.searchTerm || "";
           status = params.status || "";
+          ageGroup = params.ageGroup || "";
         } else if (params) {
           page = params;
         }
@@ -42,6 +44,9 @@ export const leagueApi = baseApi.injectEndpoints({
         if (status && status !== "all") {
           url += `&status=${encodeURIComponent(status)}`;
         }
+        if (ageGroup && ageGroup !== "all" && ageGroup !== "ALL") {
+          url += `&ageGroup=${encodeURIComponent(ageGroup)}`;
+        }
         return {
           url,
           method: "GET",
@@ -51,8 +56,27 @@ export const leagueApi = baseApi.injectEndpoints({
     }),
 
     getLeagueAnalytics: builder.query({
+      query: (params) => {
+        let url = "/league/analytics";
+        let ageGroup = "";
+        if (typeof params === "object" && params !== null) {
+          ageGroup = params.ageGroup || "";
+        } else if (typeof params === "string") {
+          ageGroup = params;
+        }
+        if (ageGroup && ageGroup !== "all" && ageGroup !== "ALL") {
+          url += `?ageGroup=${encodeURIComponent(ageGroup)}`;
+        }
+        return {
+          url,
+          method: "GET",
+        };
+      },
+      providesTags: ["league"],
+    }),
+    getLeagueAgeGroups: builder.query({
       query: () => ({
-        url: "/league/analytics",
+        url: "/league/age-groups",
         method: "GET",
       }),
       providesTags: ["league"],
@@ -82,6 +106,7 @@ export const {
   useUpdateLeagueMutation,
   useGetAllLeagueQuery,
   useGetLeagueAnalyticsQuery,
+  useGetLeagueAgeGroupsQuery,
   useGetSingleLeagueQuery,
   useDeleteLeagueMutation,
 } = leagueApi;

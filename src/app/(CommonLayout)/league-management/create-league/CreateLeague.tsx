@@ -23,11 +23,20 @@ import { toast } from "sonner";
 
 import CustomDatePicker from "@/components/ui/CustomDatePicker";
 import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
   useCreateLeagueMutation,
   useGetSingleLeagueQuery,
   useUpdateLeagueMutation,
+  useGetLeagueAgeGroupsQuery,
 } from "@/features/leagueManagement/leagueApi";
 import { useHeaders } from "@/hooks/useHeaders";
+import { useGetAllAgeGroupQuery } from "@/features/categoryManagement/categoryApi";
 
 const leagueSchema = z
   .object({
@@ -39,6 +48,7 @@ const leagueSchema = z
       .string()
       .trim()
       .min(2, "Season is required (e.g. 2025/2026 or 2026)"),
+    ageGroup: z.string().trim().min(1, "Age Group is required (e.g. u7, u8, u10)"),
     startDate: z.string().min(1, "Start Date is required"),
     endDate: z.string().min(1, "End Date is required"),
   })
@@ -58,6 +68,7 @@ const leagueSchema = z
 
 type LeagueFormValues = z.infer<typeof leagueSchema>;
 
+
 const CreateLeague = () => {
   const { setHeaders } = useHeaders();
   const router = useRouter();
@@ -65,19 +76,23 @@ const CreateLeague = () => {
   const leagueId = searchParams.get("id");
   const isEditMode = Boolean(leagueId);
 
-  const [copiedId, setCopiedId] = useState(false);
+  const [copiedName, setCopiedName] = useState(false);
+  const [isCustomAge, setIsCustomAge] = useState(false);
 
   const [createLeague, { isLoading: isCreating }] = useCreateLeagueMutation();
   const [updateLeague, { isLoading: isUpdating }] = useUpdateLeagueMutation();
   const { data: leagueData, isFetching } = useGetSingleLeagueQuery(leagueId, {
     skip: !isEditMode,
   });
+  const { data: ageGroupRes } = useGetAllAgeGroupQuery({});
+  const { data: leagueAgeGroupsRes } = useGetLeagueAgeGroupsQuery(undefined);
 
   const {
     register,
     handleSubmit,
     control,
     reset,
+    setValue,
     watch,
     formState: { errors },
   } = useForm<LeagueFormValues>({
@@ -85,6 +100,7 @@ const CreateLeague = () => {
     defaultValues: {
       leagueName: "",
       season: "",
+      ageGroup: "",
       startDate: "",
       endDate: "",
     },
@@ -103,17 +119,85 @@ const CreateLeague = () => {
     });
   }, [setHeaders, isEditMode]);
 
+  // Fetch all unique age groups across categories and leagues (deduplicated strictly)
+  const uniqueAgeGroups = useMemo(() => {
+    const seen = new Set<string>();
+    const uniqueList: string[] = [];
+
+    const addUnique = (val: any) => {
+      if (!val || typeof val !== "string") return;
+      const trimmed = val.trim();
+      if (!trimmed || trimmed.toUpperCase() === "ALL" || trimmed.toLowerCase() === "null") return;
+      const lower = trimmed.toLowerCase();
+      if (!seen.has(lower)) {
+        seen.add(lower);
+        uniqueList.push(trimmed);
+      }
+    };
+
+    // 1. From database categories - extract subcategory age groups
+    const apiCats = ageGroupRes?.data?.result || ageGroupRes?.data || [];
+    if (Array.isArray(apiCats)) {
+      apiCats.forEach((cat: any) => {
+        if (Array.isArray(cat?.subCategories) && cat.subCategories.length > 0) {
+          cat.subCategories.forEach((sub: any) => addUnique(sub?.name));
+        } else {
+          const name = cat?.name;
+          if (
+            name &&
+            (/^(u|under\s*)\d+/i.test(name) ||
+             /^(senior|junior|open|adult|veteran)/i.test(name) ||
+             /\d+\s*(year|yr)/i.test(name))
+          ) {
+            addUnique(name);
+          }
+        }
+      });
+    }
+
+    // 2. From existing leagues in DB
+    const leagueAges = leagueAgeGroupsRes?.data || [];
+    if (Array.isArray(leagueAges)) {
+      leagueAges.forEach((ag: any) => addUnique(ag));
+    }
+
+    // 3. Always ensure the currently loaded league's ageGroup is included!
+    if (leagueData?.data?.ageGroup) {
+      addUnique(leagueData.data.ageGroup);
+    }
+
+    // Fallback if none exist yet
+    if (uniqueList.length === 0) {
+      ["u7", "u8", "u9", "u10", "u11", "u12", "u13", "u14", "Senior"].forEach(addUnique);
+    }
+
+    // Natural numerical sort
+    return uniqueList.sort((a, b) => {
+      const numA = parseInt(a.replace(/\D/g, ""), 10);
+      const numB = parseInt(b.replace(/\D/g, ""), 10);
+      if (!isNaN(numA) && !isNaN(numB)) return numA - numB;
+      if (!isNaN(numA)) return -1;
+      if (!isNaN(numB)) return 1;
+      return a.localeCompare(b);
+    });
+  }, [ageGroupRes, leagueAgeGroupsRes, leagueData]);
+
   useEffect(() => {
     if (leagueData?.data) {
       const league = leagueData.data;
+      const targetAge = league.ageGroup || "";
       reset({
         leagueName: league.leagueName || "",
         season: league.season || "",
+        ageGroup: targetAge,
         startDate: league.startDate ? league.startDate.split("T")[0] : "",
         endDate: league.endDate ? league.endDate.split("T")[0] : "",
       });
+      if (targetAge) {
+        setValue("ageGroup", targetAge, { shouldValidate: true });
+      }
     }
-  }, [leagueData, reset]);
+  }, [leagueData, reset, setValue]);
 
   // Projected Duration & Status calculation
   const timelineAnalysis = useMemo(() => {
@@ -166,15 +250,47 @@ const CreateLeague = () => {
     };
   }, [startDate, endDate]);
 
-  const handleCopyId = () => {
-    if (!leagueId) return;
-    navigator.clipboard.writeText(leagueId);
-    setCopiedId(true);
-    toast.success("League ID copied to clipboard");
-    setTimeout(() => setCopiedId(false), 2000);
+  const handleCopyName = async () => {
+    const textToCopy = formValues.leagueName || leagueData?.data?.leagueName || "";
+    if (!textToCopy) return;
+
+    let success = false;
+    try {
+      if (navigator?.clipboard?.writeText) {
+        await navigator.clipboard.writeText(textToCopy);
+        success = true;
+      } else {
+        throw new Error("Clipboard API unavailable");
+      }
+    } catch {
+      try {
+        const textarea = document.createElement("textarea");
+        textarea.value = textToCopy;
+        textarea.style.position = "fixed";
+        textarea.style.left = "-9999px";
+        textarea.style.top = "-9999px";
+        textarea.setAttribute("readonly", "");
+        document.body.appendChild(textarea);
+        textarea.select();
+        textarea.setSelectionRange(0, textarea.value.length);
+        success = document.execCommand("copy");
+        document.body.removeChild(textarea);
+      } catch (err) {
+        success = false;
+      }
+    }
+
+    if (success) {
+      setCopiedName(true);
+      toast.success("League name copied to clipboard");
+      setTimeout(() => setCopiedName(false), 2000);
+    } else {
+      toast.error("Failed to copy league name");
+    }
   };
 
   const onSubmit = async (data: LeagueFormValues) => {
+    
     try {
       if (isEditMode) {
         const res = await updateLeague({ id: leagueId, data }).unwrap();
@@ -368,34 +484,145 @@ const CreateLeague = () => {
                 </div>
 
                 {/* Season Field */}
-                <div className="space-y-1.5">
-                  <div className="flex items-center justify-between">
-                    <label
-                      htmlFor="season"
-                      className="block text-xs font-semibold text-slate-700"
-                    >
-                      Season Identifier <span className="text-rose-500">*</span>
-                    </label>
-                    <span className="text-[11px] text-slate-400">
-                      e.g. 2025/2026 or 2026
-                    </span>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  {/* Season Field */}
+                  <div className="space-y-1.5">
+                    <div className="flex items-center justify-between">
+                      <label
+                        htmlFor="season"
+                        className="block text-xs font-semibold text-slate-700"
+                      >
+                        Season Identifier <span className="text-rose-500">*</span>
+                      </label>
+                      <span className="text-[11px] text-slate-400">
+                        e.g. 2025/2026 or 2026
+                      </span>
+                    </div>
+                    <input
+                      id="season"
+                      type="text"
+                      {...register("season")}
+                      placeholder="e.g. 2025-2026"
+                      className={`w-full h-10 px-3.5 text-xs sm:text-sm bg-white border rounded-md text-slate-900 placeholder:text-slate-400 outline-none transition-all ${
+                        errors.season
+                          ? "border-rose-400 focus:ring-2 focus:ring-rose-500/10"
+                          : "border-slate-200 focus:border-slate-500 focus:ring-2 focus:ring-slate-900/5 hover:border-slate-300"
+                      }`}
+                    />
+                    {errors.season && (
+                      <p className="text-xs text-rose-500 font-medium mt-1">
+                        {errors.season.message}
+                      </p>
+                    )}
                   </div>
-                  <input
-                    id="season"
-                    type="text"
-                    {...register("season")}
-                    placeholder="e.g. 2025-2026"
-                    className={`w-full h-10 px-3.5 text-xs sm:text-sm bg-white border rounded-md text-slate-900 placeholder:text-slate-400 outline-none transition-all ${
-                      errors.season
-                        ? "border-rose-400 focus:ring-2 focus:ring-rose-500/10"
-                        : "border-slate-200 focus:border-slate-500 focus:ring-2 focus:ring-slate-900/5 hover:border-slate-300"
-                    }`}
-                  />
-                  {errors.season && (
-                    <p className="text-xs text-rose-500 font-medium mt-1">
-                      {errors.season.message}
-                    </p>
-                  )}
+
+                  {/* Age Group Field */}
+                  <div className="space-y-1.5">
+                    <div className="flex items-center justify-between">
+                      <label htmlFor="ageGroup" className="block text-xs font-semibold text-slate-700">Age Group <span className="text-rose-500">*</span></label>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setIsCustomAge(!isCustomAge);
+                          if (isCustomAge) setValue("ageGroup", "");
+                        }}
+                        className="text-[11px] font-semibold text-blue-600 hover:text-blue-700 transition-colors cursor-pointer"
+                      >
+                        {isCustomAge ? "Select from list" : "+ Custom Age Group"}
+                      </button>
+                    </div>
+
+                    {isCustomAge ? (
+                      <div className="flex items-center gap-2">
+                        <input
+                          id="ageGroup"
+                          type="text"
+                          {...register("ageGroup")}
+                          placeholder="e.g. u13 or under 15"
+                          className={`w-full h-10 px-3.5 text-xs sm:text-sm bg-white border rounded-md text-slate-900 placeholder:text-slate-400 outline-none transition-all ${
+                            errors.ageGroup
+                              ? "border-rose-400 focus:ring-2 focus:ring-rose-500/10"
+                              : "border-slate-200 focus:border-slate-500 focus:ring-2 focus:ring-slate-900/5 hover:border-slate-300"
+                          }`}
+                          autoFocus
+                        />
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setIsCustomAge(false);
+                            setValue("ageGroup", "");
+                          }}
+                          className="h-10 px-3 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-md text-xs font-medium whitespace-nowrap transition-colors cursor-pointer"
+                        >
+                          Cancel
+                        </button>
+                      </div>
+                    ) : (
+                      <Controller
+                        name="ageGroup"
+                        control={control}
+                        render={({ field }) => {
+                          const currentVal = field.value || "";
+                          const matching = uniqueAgeGroups.find(
+                            (a) => a.toLowerCase() === currentVal.toLowerCase()
+                          );
+                          const selectValue = matching || currentVal || undefined;
+
+                          return (
+                            <Select
+                              key={`ageGroup-select-${selectValue || "empty"}-${uniqueAgeGroups.length}`}
+                              value={selectValue}
+                              onValueChange={(val) => {
+                                if (val === "__CUSTOM__") {
+                                  setIsCustomAge(true);
+                                } else {
+                                  field.onChange(val);
+                                }
+                              }}
+                            >
+                              <SelectTrigger
+                                className={`w-full h-10 px-3.5 text-xs sm:text-sm bg-white border rounded-md text-slate-900 outline-none transition-all ${
+                                  errors.ageGroup
+                                    ? "border-rose-400 focus:ring-2 focus:ring-rose-500/10"
+                                    : "border-slate-200 focus:border-slate-500 focus:ring-2 focus:ring-slate-900/5 hover:border-slate-300"
+                                }`}
+                              >
+                                <SelectValue placeholder="Select Age Group" />
+                              </SelectTrigger>
+                              <SelectContent className="max-h-64 bg-white border border-slate-200 rounded-lg shadow-xl z-50">
+                                {uniqueAgeGroups.map((age) => (
+                                  <SelectItem
+                                    key={age}
+                                    value={age}
+                                    className="text-xs font-medium text-slate-800 hover:bg-slate-50 cursor-pointer"
+                                  >
+                                    {age}
+                                  </SelectItem>
+                                ))}
+                                <SelectItem
+                                  value="__CUSTOM__"
+                                  className="text-xs font-semibold text-blue-600 border-t border-slate-100 mt-1 cursor-pointer"
+                                >
+                                  + Type Custom Age Group...
+                                </SelectItem>
+                              </SelectContent>
+                            </Select>
+                          );
+                        }}
+                      />
+                    )}
+                    {errors.ageGroup ? (
+                      <p className="text-xs text-rose-500 font-medium mt-1">
+                        {errors.ageGroup.message}
+                      </p>
+                    ) : (
+                      <p className="text-[11px] text-slate-400 mt-0.5">
+                        {isCustomAge
+                          ? "Enter exact age group name to save."
+                          : "Select age group (e.g. u7, u8, u10)."}
+                      </p>
+                    )}
+                  </div>
                 </div>
               </div>
             </div>
@@ -513,12 +740,7 @@ const CreateLeague = () => {
 
                 <div className="grid grid-cols-2 gap-2">
                   <div>
-                    <span className="block text-[11px] font-medium text-slate-400">
-                      Season
-                    </span>
-                    <span className="font-semibold text-slate-900 mt-0.5 block">
-                      {formValues.season || "—"}
-                    </span>
+                    <span className="block text-[11px] font-medium text-slate-400">Season</span><span className="font-semibold text-slate-900 mt-0.5 block">{formValues.season || "—"}</span></div><div><span className="block text-[11px] font-medium text-slate-400">Age Group</span><span className="font-semibold text-slate-900 mt-0.5 block truncate">{formValues.ageGroup ? <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-semibold bg-violet-50 text-violet-700 border border-violet-200">{formValues.ageGroup}</span> : "All Ages"}</span>
                   </div>
                   <div>
                     <span className="block text-[11px] font-medium text-slate-400">
@@ -551,22 +773,25 @@ const CreateLeague = () => {
                   </div>
                 </div>
 
-                {isEditMode && leagueId && (
+                {isEditMode && (
                   <div className="pt-3 border-t border-slate-100">
-                    <span className="block text-[11px] font-medium text-slate-400 mb-1">
-                      System League ID
+                    <span className="block text-[11px] font-medium text-slate-500 mb-1">
+                      League Name
                     </span>
-                    <div className="flex items-center justify-between p-2 bg-slate-50 rounded border border-slate-200/80">
-                      <span className="font-mono text-[11px] text-slate-700 truncate mr-2">
-                        {leagueId}
+                    <div className="flex items-center justify-between p-2 bg-slate-50 rounded-md border border-slate-200/80">
+                      <span
+                        className="font-medium text-[12px] text-slate-800 truncate mr-2"
+                        title={formValues.leagueName || leagueData?.data?.leagueName || ""}
+                      >
+                        {formValues.leagueName || leagueData?.data?.leagueName || "—"}
                       </span>
                       <button
                         type="button"
-                        onClick={handleCopyId}
-                        className="text-slate-400 hover:text-slate-700 p-1 transition-colors cursor-pointer"
-                        title="Copy League ID"
+                        onClick={handleCopyName}
+                        className="text-slate-400 hover:text-slate-700 p-1.5 hover:bg-slate-200/60 rounded transition-colors cursor-pointer shrink-0"
+                        title="Copy League Name"
                       >
-                        {copiedId ? (
+                        {copiedName ? (
                           <Check className="w-3.5 h-3.5 text-emerald-600" />
                         ) : (
                           <Copy className="w-3.5 h-3.5" />

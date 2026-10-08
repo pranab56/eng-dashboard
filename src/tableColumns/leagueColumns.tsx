@@ -51,6 +51,21 @@ export const getLeagueColumns = (
       );
     },
   },
+    {
+    accessorKey: "ageGroup",
+    header: () => <span className="font-semibold text-xs text-slate-600 uppercase tracking-wider">Age Group</span>,
+    cell: ({ row }) => {
+      const age = row.original.ageGroup;
+      if (!age) {
+        return <span className="text-xs text-slate-400 font-medium">All Ages</span>;
+      }
+      return (
+        <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-violet-50 text-violet-700 border border-violet-200/80 whitespace-nowrap">
+          {age}
+        </span>
+      );
+    },
+  },
   {
     accessorKey: "startDate",
     header: () => <span className="font-semibold text-xs text-slate-600 uppercase tracking-wider">Start Date</span>,

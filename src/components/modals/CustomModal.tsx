@@ -9,6 +9,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog"
+import { cn } from "@/lib/utils"
 
 interface CustomModalProps {
   trigger?: React.ReactNode;
@@ -30,15 +31,19 @@ export function CustomModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
-      <DialogTrigger asChild>
-        {trigger}
-      </DialogTrigger>
-      <DialogContent className={className} >
-        <DialogHeader>
-          <DialogTitle>{title}</DialogTitle>
+      {trigger && (
+        <DialogTrigger asChild>
+          {trigger}
+        </DialogTrigger>
+      )}
+      <DialogContent className={cn("max-h-[90vh] flex flex-col p-6 overflow-hidden", className)}>
+        <DialogHeader className="shrink-0 pb-2">
+          <DialogTitle className="text-base font-bold text-slate-900">{title}</DialogTitle>
         </DialogHeader>
 
-        <div className="pt-2 pb-0">{children}</div>
+        <div className="pt-2 pb-0 overflow-y-auto flex-1 overscroll-contain pr-1">
+          {children}
+        </div>
 
         <DialogFooter className="hidden">
           <DialogClose id="close_custom_modal" asChild>
