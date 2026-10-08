@@ -469,6 +469,16 @@ export default function PushNotificationPage() {
                                 <span>{isScheduled ? "Scheduled" : isCancelled ? "Cancelled" : "Delivered"}</span>
                               </span>
 
+                              {/* Category Badge */}
+                              {item.category && (
+                                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-purple-50 text-purple-700 border border-purple-200 text-[10px] font-semibold">
+                                  {item.category === "MATCH_UPDATE" && "🎯 Match Updates"}
+                                  {item.category === "TRANSFERS_GOSSIP" && "⇄ Transfers Gossip"}
+                                  {item.category === "PLAYER_OF_THE_WEEK" && "🏆 Player of the Week"}
+                                  {(!item.category || item.category === "GENERAL_NEWS") && "📰 General News"}
+                                </span>
+                              )}
+
                               {/* Target Audience Badge */}
                               <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-slate-100 text-slate-700 border border-slate-200 text-[10px] font-medium">
                                 {targetUser ? <User className="w-3 h-3 text-slate-500" /> : <Users className="w-3 h-3 text-slate-500" />}
