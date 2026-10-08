@@ -182,6 +182,7 @@ export type TNotification = {
   title: string;
   message: string;
   type?: string;
+  category?: string;
   isRead?: boolean;
   read?: boolean;
   createdAt: string;
