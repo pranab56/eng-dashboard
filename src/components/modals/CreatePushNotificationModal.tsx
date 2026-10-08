@@ -99,6 +99,7 @@ export default function CreatePushNotificationModal({
 
   // Target audience: "ALL" | "PLAYER" | "MANAGER" | "REFEREE" | "SINGLE"
   const [audienceType, setAudienceType] = useState<"ALL" | "PLAYER" | "MANAGER" | "REFEREE" | "SINGLE">("ALL");
+  const [category, setCategory] = useState<"GENERAL_NEWS" | "TRANSFERS_GOSSIP" | "PLAYER_OF_THE_WEEK" | "MATCH_UPDATE">("GENERAL_NEWS");
 
   const [title, setTitle] = useState("");
   const [message, setMessage] = useState("");
@@ -357,6 +358,38 @@ export default function CreatePushNotificationModal({
                   </div>
                 </div>
               )}
+
+              {/* Notification Category Selector */}
+              <div className="space-y-1.5">
+                <label className="text-xs font-semibold text-slate-800 block">
+                  Notification Category
+                </label>
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-1.5 p-1 bg-slate-100 rounded-xl border border-slate-200">
+                  {[
+                    { id: "GENERAL_NEWS", label: "General News", icon: "📰" },
+                    { id: "TRANSFERS_GOSSIP", label: "Transfers", icon: "⇄" },
+                    { id: "PLAYER_OF_THE_WEEK", label: "Player Awards", icon: "🏆" },
+                    { id: "MATCH_UPDATE", label: "Match Updates", icon: "🎯" },
+                  ].map((cat) => {
+                    const isSelected = category === cat.id;
+                    return (
+                      <button
+                        key={cat.id}
+                        type="button"
+                        onClick={() => setCategory(cat.id as any)}
+                        className={`flex items-center justify-center gap-1.5 px-2 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
+                          isSelected
+                            ? "bg-white text-slate-900 shadow-xs border border-slate-200 font-bold"
+                            : "text-slate-600 hover:text-slate-900 hover:bg-slate-200/50"
+                        }`}
+                      >
+                        <span>{cat.icon}</span>
+                        <span className="truncate">{cat.label}</span>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
 
               {/* Target Audience Segmented Selector */}
               <div className="space-y-1.5">
@@ -720,6 +753,15 @@ export default function CreatePushNotificationModal({
 
               {/* Delivery Parameters Summary */}
               <div className="bg-slate-50 border border-slate-200 rounded-xl p-3 text-[11px] text-slate-600 space-y-1.5">
+                <div className="flex justify-between items-center">
+                  <span className="text-slate-500">Category:</span>
+                  <span className="font-semibold text-slate-800 bg-white px-2 py-0.5 rounded border border-slate-200">
+                    {category === "GENERAL_NEWS" && "📰 General News"}
+                    {category === "TRANSFERS_GOSSIP" && "⇄ Transfers Gossip"}
+                    {category === "PLAYER_OF_THE_WEEK" && "🏆 Player of the Week"}
+                    {category === "MATCH_UPDATE" && "🎯 Match Updates"}
+                  </span>
+                </div>
                 <div className="flex justify-between items-center">
                   <span className="text-slate-500">Target Segment:</span>
                   <span className="font-semibold text-slate-800 bg-white px-2 py-0.5 rounded border border-slate-200">
