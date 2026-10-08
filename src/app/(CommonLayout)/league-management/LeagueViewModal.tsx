@@ -111,7 +111,7 @@ const LeagueViewModal = ({ league, isOpen, onClose }: LeagueViewModalProps) => {
         textarea.setSelectionRange(0, textarea.value.length);
         success = document.execCommand("copy");
         document.body.removeChild(textarea);
-      } catch (err) {
+      } catch {
         success = false;
       }
     }
