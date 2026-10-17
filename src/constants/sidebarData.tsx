@@ -7,6 +7,7 @@ import {
   Medal,
   ClipboardCheck,
   Table2,
+  Vote,
   Shield,
   Users,
   UserCheck,
@@ -22,6 +23,7 @@ import {
   Calendar,
   Image as ImageIcon,
   Share2,
+  Handshake,
   Sparkles,
   ShoppingBag,
   FolderTree,
@@ -227,6 +229,20 @@ export const sidebarSections: TSidebarSection[] = [
     ],
   },
   {
+    id: "statistics",
+    title: "Statistics & Voting",
+    items: [
+      {
+        id: 33,
+        icon: Vote,
+        title: "Player Voting",
+        label: "/player-voting",
+        requiredPermission: "PLAYER_VOTING",
+        allowedRoles: ["SUPER_ADMIN", "ADMIN", "MANAGER"],
+      },
+    ],
+  },
+  {
     id: "teams",
     title: "Clubs & Players",
     items: [
@@ -359,6 +375,14 @@ export const sidebarSections: TSidebarSection[] = [
         title: "Social Media",
         label: "/social-media",
         requiredPermission: "SOCIAL_MEDIA",
+        allowedRoles: ["SUPER_ADMIN", "ADMIN"],
+      },
+      {
+        id: 19,
+        icon: Handshake,
+        title: "Sponsors & Partners",
+        label: "/sponsorship",
+        requiredPermission: "SPONSORSHIP",
         allowedRoles: ["SUPER_ADMIN", "ADMIN"],
       },
     ],

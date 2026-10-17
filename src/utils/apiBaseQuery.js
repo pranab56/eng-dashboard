@@ -186,5 +186,7 @@ export const baseApi = createApi({
     "serverHealth",
     "QueueAndCache",
     "serverLogs",
+    "sponsorship",
+    "playerVoting",
   ],
 });

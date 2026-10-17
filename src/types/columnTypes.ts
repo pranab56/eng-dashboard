@@ -310,3 +310,93 @@ export type TTournamentClaim = {
   createdAt: string;
   updatedAt: string;
 };
+export type TSponsorship = {
+  _id: string;
+  id?: string;
+  name: string;
+  title?: string;
+  type: 'sponsor' | 'partner' | 'brand_collaboration';
+  tier:
+    | 'title'
+    | 'platinum'
+    | 'gold'
+    | 'silver'
+    | 'bronze'
+    | 'official'
+    | 'community'
+    | 'media'
+    | 'other';
+  logo: string;
+  banner?: string;
+  websiteUrl?: string;
+  description?: string;
+  placements?: string[];
+  startDate?: string;
+  endDate?: string;
+  order?: number;
+  status: 'active' | 'inactive';
+  clickCount?: number;
+  impressionCount?: number;
+  contactEmail?: string;
+  contactPhone?: string;
+  createdBy?: any;
+  createdAt?: string;
+  updatedAt?: string;
+};
+
+export type TPlayerNominee = {
+  _id?: string;
+  player: {
+    _id: string;
+    firstName?: string;
+    lastName?: string;
+    userName?: string;
+    profile?: string;
+    position?: string;
+  };
+  team?: {
+    _id: string;
+    teamName?: string;
+    logo?: string;
+  };
+  statsHighlight?: string;
+  votesCount: number;
+  votePercentage?: number;
+  isLeading?: boolean;
+};
+
+export type TPlayerVoting = {
+  _id: string;
+  id?: string;
+  title: string;
+  votingType: 'WEEK' | 'MONTH';
+  league: {
+    _id: string;
+    leagueName?: string;
+    season?: string;
+    ageGroup?: string;
+  };
+  ageGroup: string;
+  season?: string;
+  weekNumber?: number;
+  month?: string;
+  startDate: string;
+  endDate: string;
+  status: 'upcoming' | 'active' | 'completed' | 'cancelled';
+  nominees: TPlayerNominee[];
+  totalVotes: number;
+  winner?: {
+    _id: string;
+    firstName?: string;
+    lastName?: string;
+    userName?: string;
+    profile?: string;
+  };
+  winnerVotes?: number;
+  banner?: string;
+  description?: string;
+  isFeatured?: boolean;
+  createdBy?: any;
+  createdAt?: string;
+  updatedAt?: string;
+};

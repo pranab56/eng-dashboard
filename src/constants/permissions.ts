@@ -43,6 +43,13 @@ export const AVAILABLE_PERMISSIONS: IPermissionOption[] = [
     description: "Process tournament reward and trophy claims",
   },
   {
+    key: "PLAYER_VOTING",
+    label: "Player Voting",
+    route: "/player-voting",
+    category: "Statistics & Voting",
+    description: "Manage Player of the Week and Player of the Month voting polls",
+  },
+  {
     key: "TABLE_MANAGEMENT",
     label: "Table Management",
     route: "/table-management",
@@ -146,6 +153,13 @@ export const AVAILABLE_PERMISSIONS: IPermissionOption[] = [
     route: "/social-media",
     category: "Media & Content",
     description: "Manage social channel feeds and official links",
+  },
+  {
+    key: "SPONSORSHIP",
+    label: "Sponsors & Partners",
+    route: "/sponsorship",
+    category: "Media & Content",
+    description: "Manage official club sponsors, partners, and brand collaborations",
   },
   {
     key: "REWARDS_REDEMPTION",
