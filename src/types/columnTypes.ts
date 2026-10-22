@@ -400,3 +400,59 @@ export type TPlayerVoting = {
   createdAt?: string;
   updatedAt?: string;
 };
+
+export type TRefereeNominee = {
+  _id?: string;
+  referee: {
+    _id: string;
+    firstName?: string;
+    lastName?: string;
+    userName?: string;
+    profile?: string;
+    email?: string;
+    phone?: string;
+  };
+  matchesOfficiatedCount?: number;
+  fairPlayRating?: number;
+  statsHighlight?: string;
+  votesCount: number;
+  votePercentage?: number;
+  isLeading?: boolean;
+};
+
+export type TRefereeVoting = {
+  _id: string;
+  id?: string;
+  title: string;
+  votingType: 'WEEK' | 'MONTH';
+  league?: {
+    _id: string;
+    leagueName?: string;
+    season?: string;
+    ageGroup?: string;
+  };
+  season?: string;
+  weekNumber?: number;
+  month?: string;
+  startDate: string;
+  endDate: string;
+  status: 'upcoming' | 'active' | 'completed' | 'cancelled';
+  nominees: TRefereeNominee[];
+  totalVotes: number;
+  winner?: {
+    _id: string;
+    firstName?: string;
+    lastName?: string;
+    userName?: string;
+    profile?: string;
+    email?: string;
+    phone?: string;
+  };
+  winnerVotes?: number;
+  banner?: string;
+  description?: string;
+  isFeatured?: boolean;
+  createdBy?: any;
+  createdAt?: string;
+  updatedAt?: string;
+};

@@ -34,13 +34,14 @@ import {
   useGetAllPlayerVotingQuery,
   useUpdatePlayerVotingMutation,
 } from "@/features/playerVoting/playerVotingApi";
-import { useGetAllLeagueQuery } from "@/features/leagueManagement/leagueApi";
+import { useGetAllLeagueQuery, useGetLeagueAgeGroupsQuery } from "@/features/leagueManagement/leagueApi";
+import { useGetAllAgeGroupQuery } from "@/features/categoryManagement/categoryApi";
+import { LeagueSelectDropdown } from "@/components/dropdowns/LeagueSelectDropdown";
+import { AgeGroupSelectDropdown } from "@/components/dropdowns/AgeGroupSelectDropdown";
 import { useHeaders } from "@/hooks/useHeaders";
 import { getPlayerVotingColumns } from "@/tableColumns/playerVotingColumns";
 import { TPlayerVoting } from "@/types/columnTypes";
 import { getErrorMessage } from "@/utils/getErrorMessage";
-
-const AGE_GROUPS = ["U12", "U14", "U16", "U18", "U21", "SENIOR", "OPEN"];
 
 export default function PlayerVotingManagement() {
   const { setHeaders } = useHeaders();
@@ -73,6 +74,56 @@ export default function PlayerVotingManagement() {
     if (Array.isArray(leaguesData?.data?.result)) return leaguesData.data.result;
     return [];
   }, [leaguesData]);
+
+  // Dynamic Age Groups from DB (Categories + Leagues)
+  const { data: ageGroupRes } = useGetAllAgeGroupQuery({});
+  const { data: leagueAgeGroupsRes } = useGetLeagueAgeGroupsQuery(undefined);
+
+  const dynamicAgeGroups = useMemo(() => {
+    const seen = new Set<string>();
+    const uniqueList: string[] = [];
+
+    const addUnique = (val: any) => {
+      if (!val || typeof val !== "string") return;
+      const trimmed = val.trim();
+      if (!trimmed || trimmed.toUpperCase() === "ALL" || trimmed.toLowerCase() === "null") return;
+      const lower = trimmed.toLowerCase();
+      if (!seen.has(lower)) {
+        seen.add(lower);
+        uniqueList.push(trimmed);
+      }
+    };
+
+    const apiCats = ageGroupRes?.data?.result || ageGroupRes?.data || [];
+    if (Array.isArray(apiCats)) {
+      apiCats.forEach((cat: any) => {
+        if (Array.isArray(cat?.subCategories) && cat.subCategories.length > 0) {
+          cat.subCategories.forEach((sub: any) => addUnique(sub?.name));
+        } else {
+          const name = cat?.name;
+          if (name) addUnique(name);
+        }
+      });
+    }
+
+    const leagueAges = leagueAgeGroupsRes?.data || [];
+    if (Array.isArray(leagueAges)) {
+      leagueAges.forEach((ag: any) => addUnique(ag));
+    }
+
+    if (Array.isArray(leagues)) {
+      leagues.forEach((l: any) => {
+        if (l?.ageGroup) addUnique(l.ageGroup);
+      });
+    }
+
+    return uniqueList.sort((a, b) => {
+      const numA = parseInt(a.replace(/\D/g, ""), 10);
+      const numB = parseInt(b.replace(/\D/g, ""), 10);
+      if (!isNaN(numA) && !isNaN(numB)) return numA - numB;
+      return a.localeCompare(b);
+    });
+  }, [ageGroupRes, leagueAgeGroupsRes, leagues]);
 
   // Query Voting Polls
   const queryParams: Record<string, any> = {
@@ -410,38 +461,24 @@ export default function PlayerVotingManagement() {
 
             {/* Dropdown Filters */}
             <div className="flex flex-wrap items-center gap-2">
-              {/* Competition League */}
-              <div className="w-44">
-                <Select value={selectedLeague} onValueChange={setSelectedLeague}>
-                  <SelectTrigger className="w-full h-8 text-xs bg-slate-50/60 border-slate-200 rounded-md">
-                    <SelectValue placeholder="All Leagues" />
-                  </SelectTrigger>
-                  <SelectContent className="bg-white border-slate-200">
-                    <SelectItem value="all" className="text-xs">All Leagues</SelectItem>
-                    {leagues.filter((l) => Boolean(l?._id)).map((l) => (
-                      <SelectItem key={String(l._id)} value={String(l._id)} className="text-xs">
-                        {l.leagueName}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+              {/* Custom Competition League Dropdown */}
+              <div className="w-48">
+                <LeagueSelectDropdown
+                  leagues={leagues}
+                  selectedLeagueId={selectedLeague === "all" ? "" : selectedLeague}
+                  onChange={(val) => setSelectedLeague(val || "all")}
+                  placeholder="All Leagues"
+                />
               </div>
 
-              {/* Age Group */}
-              <div className="w-32">
-                <Select value={selectedAgeGroup} onValueChange={setSelectedAgeGroup}>
-                  <SelectTrigger className="w-full h-8 text-xs bg-slate-50/60 border-slate-200 rounded-md">
-                    <SelectValue placeholder="Age Group" />
-                  </SelectTrigger>
-                  <SelectContent className="bg-white border-slate-200">
-                    <SelectItem value="all" className="text-xs">All Age Groups</SelectItem>
-                    {AGE_GROUPS.map((ag) => (
-                      <SelectItem key={ag} value={ag} className="text-xs">
-                        {ag}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+              {/* Custom Age Group Dropdown */}
+              <div className="w-36">
+                <AgeGroupSelectDropdown
+                  groups={dynamicAgeGroups}
+                  selectedGroup={selectedAgeGroup}
+                  onChange={setSelectedAgeGroup}
+                  placeholder="All Age Groups"
+                />
               </div>
 
               {/* Status */}

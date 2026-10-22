@@ -11,7 +11,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useGetAllLeagueQuery } from "@/features/leagueManagement/leagueApi";
+import CustomDatePicker from "@/components/ui/CustomDatePicker";
+import { NomineePlayerSelectDropdown } from "@/components/dropdowns/NomineePlayerSelectDropdown";
+import { useGetAllLeagueQuery, useGetLeagueAgeGroupsQuery } from "@/features/leagueManagement/leagueApi";
+import { useGetAllAgeGroupQuery } from "@/features/categoryManagement/categoryApi";
 import { useGetAllPlayerQuery } from "@/features/player/playerApi";
 import { TPlayerVoting } from "@/types/columnTypes";
 import { formatImagePath } from "@/utils/formatImagePath";
@@ -25,8 +28,6 @@ interface PlayerVotingModalProps {
   isLoading: boolean;
 }
 
-const AGE_GROUPS = ["U12", "U14", "U16", "U18", "U21", "SENIOR", "OPEN"];
-
 export default function PlayerVotingModal({
   isOpen,
   onClose,
@@ -37,7 +38,7 @@ export default function PlayerVotingModal({
   const [title, setTitle] = useState("");
   const [votingType, setVotingType] = useState<"WEEK" | "MONTH">("WEEK");
   const [league, setLeague] = useState<string>("");
-  const [ageGroup, setAgeGroup] = useState<string>("U16");
+  const [ageGroup, setAgeGroup] = useState<string>("");
   const [weekNumber, setWeekNumber] = useState<number>(1);
   const [month, setMonth] = useState("");
   const [startDate, setStartDate] = useState("");
@@ -55,6 +56,7 @@ export default function PlayerVotingModal({
   const [bannerFile, setBannerFile] = useState<File | null>(null);
   const [bannerPreview, setBannerPreview] = useState<string | null>(null);
   const [errorMsg, setErrorMsg] = useState("");
+  const [showAllAgeGroups, setShowAllAgeGroups] = useState(false);
 
   // Safely fetch leagues
   const { data: leaguesData } = useGetAllLeagueQuery({ limit: 100 });
@@ -64,8 +66,66 @@ export default function PlayerVotingModal({
     return [];
   }, [leaguesData]);
 
-  // Safely fetch players (backend returns { data: { players: [...] } } or { data: [...] })
-  const { data: playersData } = useGetAllPlayerQuery({ limit: 500 });
+  // Dynamic Age Groups from DB (Categories + Leagues)
+  const { data: ageGroupRes } = useGetAllAgeGroupQuery({});
+  const { data: leagueAgeGroupsRes } = useGetLeagueAgeGroupsQuery(undefined);
+
+  const dynamicAgeGroups = useMemo(() => {
+    const seen = new Set<string>();
+    const uniqueList: string[] = [];
+
+    const addUnique = (val: any) => {
+      if (!val || typeof val !== "string") return;
+      const trimmed = val.trim();
+      if (!trimmed || trimmed.toUpperCase() === "ALL" || trimmed.toLowerCase() === "null") return;
+      const lower = trimmed.toLowerCase();
+      if (!seen.has(lower)) {
+        seen.add(lower);
+        uniqueList.push(trimmed);
+      }
+    };
+
+    const apiCats = ageGroupRes?.data?.result || ageGroupRes?.data || [];
+    if (Array.isArray(apiCats)) {
+      apiCats.forEach((cat: any) => {
+        if (Array.isArray(cat?.subCategories) && cat.subCategories.length > 0) {
+          cat.subCategories.forEach((sub: any) => addUnique(sub?.name));
+        } else {
+          const name = cat?.name;
+          if (name) addUnique(name);
+        }
+      });
+    }
+
+    const leagueAges = leagueAgeGroupsRes?.data || [];
+    if (Array.isArray(leagueAges)) {
+      leagueAges.forEach((ag: any) => addUnique(ag));
+    }
+
+    if (Array.isArray(leagues)) {
+      leagues.forEach((l: any) => {
+        if (l?.ageGroup) addUnique(l.ageGroup);
+      });
+    }
+
+    return uniqueList.sort((a, b) => {
+      const numA = parseInt(a.replace(/\D/g, ""), 10);
+      const numB = parseInt(b.replace(/\D/g, ""), 10);
+      if (!isNaN(numA) && !isNaN(numB)) return numA - numB;
+      return a.localeCompare(b);
+    });
+  }, [ageGroupRes, leagueAgeGroupsRes, leagues]);
+
+  // Safely fetch players filtered by selected ageGroup (or all if toggled)
+  const playerQueryParams = useMemo(() => {
+    const params: Record<string, any> = { limit: 500 };
+    if (ageGroup && !showAllAgeGroups) {
+      params.ageGroup = ageGroup;
+    }
+    return params;
+  }, [ageGroup, showAllAgeGroups]);
+
+  const { data: playersData, isFetching: isFetchingPlayers } = useGetAllPlayerQuery(playerQueryParams);
   const players: any[] = useMemo(() => {
     if (Array.isArray(playersData?.data?.players)) return playersData.data.players;
     if (Array.isArray(playersData?.data?.result)) return playersData.data.result;
@@ -110,7 +170,7 @@ export default function PlayerVotingModal({
       setTitle("");
       setVotingType("WEEK");
       setLeague(leagues[0]?._id ? String(leagues[0]._id) : "");
-      setAgeGroup("U16");
+      setAgeGroup(leagues[0]?.ageGroup || dynamicAgeGroups[0] || "");
       setWeekNumber(1);
       setMonth("");
       const today = new Date().toISOString().split("T")[0];
@@ -131,12 +191,26 @@ export default function PlayerVotingModal({
     setErrorMsg("");
   }, [editingItem, isOpen]);
 
-  // Fallback auto-assign league when leagues finish loading
+  // Fallback auto-assign league & ageGroup when leagues finish loading
   useEffect(() => {
-    if (!editingItem && !league && leagues.length > 0 && leagues[0]?._id) {
-      setLeague(String(leagues[0]._id));
+    if (!editingItem && leagues.length > 0) {
+      if (!league && leagues[0]?._id) {
+        setLeague(String(leagues[0]._id));
+      }
+      if (!ageGroup) {
+        setAgeGroup(leagues[0]?.ageGroup || dynamicAgeGroups[0] || "");
+      }
     }
-  }, [leagues, editingItem, league]);
+  }, [leagues, dynamicAgeGroups, editingItem, league, ageGroup]);
+
+  // When admin switches league, auto-sync ageGroup from selected league
+  const handleLeagueSelect = (selectedId: string) => {
+    setLeague(selectedId);
+    const matched = leagues.find((l) => String(l._id) === String(selectedId));
+    if (matched?.ageGroup) {
+      setAgeGroup(matched.ageGroup);
+    }
+  };
 
   if (!isOpen) return null;
 
@@ -230,7 +304,7 @@ export default function PlayerVotingModal({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-[2px] p-4 overflow-y-auto">
-      <div className="bg-white rounded-lg border border-slate-200 shadow-xl w-full max-w-2xl my-8 overflow-hidden animate-in fade-in duration-150">
+      <div className="bg-white rounded-lg border border-slate-200 shadow-xl w-full max-w-4xl my-8 overflow-hidden animate-in fade-in duration-150">
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-slate-200 bg-slate-50/70">
           <div>
@@ -286,7 +360,7 @@ export default function PlayerVotingModal({
                 <SelectTrigger className="w-full h-8 px-2.5 rounded-md border border-slate-200 text-xs text-slate-900 bg-white">
                   <SelectValue placeholder="Select type" />
                 </SelectTrigger>
-                <SelectContent className="bg-white border-slate-200">
+                <SelectContent>
                   <SelectItem value="WEEK">Player of the Week (POTW)</SelectItem>
                   <SelectItem value="MONTH">Player of the Month (POTM)</SelectItem>
                 </SelectContent>
@@ -328,7 +402,7 @@ export default function PlayerVotingModal({
               </label>
               <Select
                 value={league || undefined}
-                onValueChange={(val: any) => setLeague(val)}
+                onValueChange={handleLeagueSelect}
               >
                 <SelectTrigger className="w-full h-8 px-2.5 rounded-md border border-slate-200 text-xs text-slate-900 bg-white">
                   <SelectValue placeholder="Select League" />
@@ -357,7 +431,7 @@ export default function PlayerVotingModal({
                   <SelectValue placeholder="Select Age Group" />
                 </SelectTrigger>
                 <SelectContent className="bg-white border-slate-200">
-                  {AGE_GROUPS.map((ag) => (
+                  {dynamicAgeGroups.map((ag) => (
                     <SelectItem key={ag} value={ag}>
                       {ag}
                     </SelectItem>
@@ -366,29 +440,22 @@ export default function PlayerVotingModal({
               </Select>
             </div>
 
+            {/* Custom Date Pickers */}
             <div>
-              <label className="block text-xs font-medium text-slate-700 mb-1">
-                Voting Opens
-              </label>
-              <input
-                type="date"
+              <CustomDatePicker
+                label="Voting Opens"
                 value={startDate}
-                onChange={(e) => setStartDate(e.target.value)}
-                className="w-full h-8 px-2.5 rounded-md border border-slate-200 text-xs text-slate-900 focus:outline-none focus:border-slate-400 bg-white font-mono"
-                required
+                onChange={(val) => setStartDate(val)}
+                placeholder="Select start date"
               />
             </div>
 
             <div>
-              <label className="block text-xs font-medium text-slate-700 mb-1">
-                Voting Closes
-              </label>
-              <input
-                type="date"
+              <CustomDatePicker
+                label="Voting Closes"
                 value={endDate}
-                onChange={(e) => setEndDate(e.target.value)}
-                className="w-full h-8 px-2.5 rounded-md border border-slate-200 text-xs text-slate-900 focus:outline-none focus:border-slate-400 bg-white font-mono"
-                required
+                onChange={(val) => setEndDate(val)}
+                placeholder="Select close date"
               />
             </div>
 
@@ -434,37 +501,20 @@ export default function PlayerVotingModal({
               {nominees.map((nom, idx) => (
                 <div
                   key={idx}
-                  className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 p-2 rounded-md border border-slate-200 bg-white"
+                  className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 p-2.5 rounded-md border border-slate-200 bg-white"
                 >
                   <span className="w-5 text-center text-xs font-mono text-slate-400 font-medium">
                     #{idx + 1}
                   </span>
 
-                  {/* Player Select */}
+                  {/* Custom Player Select Dropdown */}
                   <div className="flex-1 min-w-[200px]">
-                    <select
-                      value={nom.player}
-                      onChange={(e) =>
-                        handleNomineeChange(idx, "player", e.target.value)
-                      }
-                      className="w-full h-8 px-2.5 rounded-md border border-slate-200 text-xs text-slate-800 bg-white focus:outline-none focus:border-slate-400"
-                    >
-                      <option value="">Select Nominee Player...</option>
-                      {players.map((p) => {
-                        const pId = p?._id || p?.id;
-                        if (!pId) return null;
-                        const firstName = p?.firstName || "";
-                        const lastName = p?.lastName || "";
-                        const pName = `${firstName} ${lastName}`.trim() || p?.userName || "Player";
-                        const pos = p?.position ? ` (${p.position})` : "";
-                        const team = p?.selectTeam?.teamName ? ` - ${p.selectTeam.teamName}` : "";
-                        return (
-                          <option key={String(pId)} value={String(pId)}>
-                            {pName}{pos}{team}
-                          </option>
-                        );
-                      })}
-                    </select>
+                    <NomineePlayerSelectDropdown
+                      players={players}
+                      selectedPlayerId={nom.player}
+                      onChange={(pId) => handleNomineeChange(idx, "player", pId)}
+                      placeholder="Select Nominee Player..."
+                    />
                   </div>
 
                   {/* Stats Highlight */}

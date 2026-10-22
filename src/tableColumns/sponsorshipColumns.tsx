@@ -229,7 +229,7 @@ export const getSponsorshipColumns = (
           <button
             type="button"
             onClick={() => onEdit(item)}
-            className="w-7 h-7 rounded flex items-center justify-center text-slate-500 hover:text-slate-900 hover:bg-slate-100 transition-colors"
+            className="w-7 h-7 rounded flex items-center justify-center text-slate-500 hover:text-slate-900 hover:bg-slate-100 transition-colors cursor-pointer"
             title="Edit"
           >
             <FiEdit className="w-3.5 h-3.5" />
@@ -237,7 +237,7 @@ export const getSponsorshipColumns = (
           <button
             type="button"
             onClick={() => onDelete(item._id)}
-            className="w-7 h-7 rounded flex items-center justify-center text-slate-500 hover:text-rose-600 hover:bg-rose-50 transition-colors"
+            className="w-7 h-7 rounded flex items-center justify-center text-slate-500 hover:text-rose-600 hover:bg-rose-50 transition-colors cursor-pointer"
             title="Delete"
           >
             <FiTrash2 className="w-3.5 h-3.5" />

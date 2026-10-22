@@ -43,6 +43,27 @@ export const AVAILABLE_PERMISSIONS: IPermissionOption[] = [
     description: "Process tournament reward and trophy claims",
   },
   {
+    key: "SCORE_PREDICTION",
+    label: "Score Prediction Game",
+    route: "/score-prediction",
+    category: "Statistics & Voting",
+    description: "Manage 5-match score prediction rounds, coin rewards, and settlement",
+  },
+  {
+    key: "QUIZ_MANAGEMENT",
+    label: "Quiz Management",
+    route: "/quiz-management",
+    category: "Statistics & Voting",
+    description: "Manage interactive play-to-win quizzes, questions, and rewards",
+  },
+  {
+    key: "REFEREE_VOTING",
+    label: "Referee Voting",
+    route: "/referee-voting",
+    category: "Statistics & Voting",
+    description: "Manage Referee of the Week and Referee of the Month voting polls",
+  },
+  {
     key: "PLAYER_VOTING",
     label: "Player Voting",
     route: "/player-voting",

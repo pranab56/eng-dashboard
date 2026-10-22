@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import React from "react";
 import {
+  HelpCircle,
   LayoutDashboard,
   Swords,
   Trophy,
@@ -238,6 +239,30 @@ export const sidebarSections: TSidebarSection[] = [
         title: "Player Voting",
         label: "/player-voting",
         requiredPermission: "PLAYER_VOTING",
+        allowedRoles: ["SUPER_ADMIN", "ADMIN", "MANAGER"],
+      },
+      {
+        id: 36,
+        icon: Award,
+        title: "Referee Voting",
+        label: "/referee-voting",
+        requiredPermission: "REFEREE_VOTING",
+        allowedRoles: ["SUPER_ADMIN", "ADMIN", "MANAGER"],
+      },
+      {
+        id: 34,
+        icon: HelpCircle,
+        title: "Quiz Management",
+        label: "/quiz-management",
+        requiredPermission: "QUIZ_MANAGEMENT",
+        allowedRoles: ["SUPER_ADMIN", "ADMIN", "MANAGER"],
+      },
+      {
+        id: 35,
+        icon: Sparkles,
+        title: "Score Prediction",
+        label: "/score-prediction",
+        requiredPermission: "SCORE_PREDICTION",
         allowedRoles: ["SUPER_ADMIN", "ADMIN", "MANAGER"],
       },
     ],
