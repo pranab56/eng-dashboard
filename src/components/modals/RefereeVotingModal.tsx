@@ -15,9 +15,10 @@ import CustomDatePicker from "@/components/ui/CustomDatePicker";
 import { NomineeRefereeSelectDropdown } from "@/components/dropdowns/NomineeRefereeSelectDropdown";
 import { useGetAllLeagueQuery } from "@/features/leagueManagement/leagueApi";
 import { useGetEligibleRefereesQuery } from "@/features/refereeVoting/refereeVotingApi";
+import { useGetRefereeQuery } from "@/features/referee/refereeApi";
 import { TRefereeVoting } from "@/types/columnTypes";
 import { formatImagePath } from "@/utils/formatImagePath";
-import { X, Upload, Loader2, Plus, Trash2, AlertCircle, Shield } from "lucide-react";
+import { X, Upload, Loader2, Plus, Trash2, AlertCircle } from "lucide-react";
 
 interface RefereeVotingModalProps {
   isOpen: boolean;
@@ -63,13 +64,29 @@ export default function RefereeVotingModal({
     return [];
   }, [leaguesData]);
 
-  // Fetch eligible referees from backend
-  const { data: refereesRes, isLoading: isLoadingReferees } =
-    useGetEligibleRefereesQuery({});
+  // Fetch eligible referees (tries both endpoints for maximum compatibility)
+  const { data: eligibleRes, isLoading: isLoadingEligible } = useGetEligibleRefereesQuery({});
+  const { data: userRefRes, isLoading: isLoadingUserRef } = useGetRefereeQuery(undefined);
+
   const referees: any[] = useMemo(() => {
-    if (Array.isArray(refereesRes?.data)) return refereesRes.data;
-    return [];
-  }, [refereesRes]);
+    const list1 = Array.isArray(eligibleRes?.data)
+      ? eligibleRes.data
+      : Array.isArray(eligibleRes?.data?.result)
+      ? eligibleRes.data.result
+      : [];
+    if (list1.length > 0) return list1;
+
+    const list2 = Array.isArray(userRefRes?.data)
+      ? userRefRes.data
+      : Array.isArray(userRefRes?.data?.result)
+      ? userRefRes.data.result
+      : Array.isArray(userRefRes)
+      ? userRefRes
+      : [];
+    return list2;
+  }, [eligibleRes, userRefRes]);
+
+  const isLoadingReferees = isLoadingEligible && isLoadingUserRef;
 
   // Initialize or populate form
   useEffect(() => {
@@ -117,7 +134,6 @@ export default function RefereeVotingModal({
       );
       setBannerFile(null);
     } else {
-      // Default new form
       const now = new Date();
       const end = new Date();
       end.setDate(now.getDate() + 7);
@@ -143,7 +159,6 @@ export default function RefereeVotingModal({
     setErrorMsg("");
   }, [isOpen, editingItem]);
 
-  // Handle Nominee changes
   const handleNomineeChange = (
     index: number,
     field: "referee" | "statsHighlight",
@@ -162,13 +177,12 @@ export default function RefereeVotingModal({
 
   const removeNominee = (index: number) => {
     if (nominees.length <= 2) {
-      setErrorMsg("A referee voting round requires at least 2 nominees.");
+      setErrorMsg("A minimum of 2 referee nominees is required.");
       return;
     }
     setNominees((prev) => prev.filter((_, idx) => idx !== index));
   };
 
-  // Handle File Selection
   const handleBannerChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
@@ -177,18 +191,17 @@ export default function RefereeVotingModal({
     }
   };
 
-  // Submit Handler
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMsg("");
 
     if (!title.trim()) {
-      setErrorMsg("Please enter a campaign title.");
+      setErrorMsg("Campaign title is required.");
       return;
     }
 
     if (!startDate || !endDate) {
-      setErrorMsg("Please set both start and end dates.");
+      setErrorMsg("Both start and end dates are required.");
       return;
     }
 
@@ -197,7 +210,6 @@ export default function RefereeVotingModal({
       return;
     }
 
-    // Nominees validation
     const validNominees = nominees.filter((n) => n.referee.trim() !== "");
     if (validNominees.length < 2) {
       setErrorMsg("Please select at least 2 official referee nominees.");
@@ -206,7 +218,7 @@ export default function RefereeVotingModal({
 
     const uniqueRefIds = new Set(validNominees.map((n) => n.referee));
     if (uniqueRefIds.size !== validNominees.length) {
-      setErrorMsg("Duplicate referees cannot be chosen in the same voting round.");
+      setErrorMsg("Duplicate referees cannot be added to the same voting round.");
       return;
     }
 
@@ -248,63 +260,59 @@ export default function RefereeVotingModal({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
-      <div className="relative w-full max-w-2xl bg-white rounded-2xl shadow-2xl border border-slate-100 overflow-hidden flex flex-col max-h-[92vh]">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-[2px] p-4 overflow-y-auto">
+      <div className="bg-white rounded-lg border border-slate-200 shadow-xl w-full max-w-4xl my-8 overflow-hidden animate-in fade-in duration-150">
         {/* Header */}
-        <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between bg-slate-50/60">
-          <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-lg bg-[#800020]/10 flex items-center justify-center text-[#800020]">
-              <Shield className="w-4 h-4" />
-            </div>
-            <div>
-              <h2 className="text-base font-bold text-slate-800">
-                {editingItem ? "Edit Referee Voting Poll" : "Create Referee Voting Poll"}
-              </h2>
-              <p className="text-xs text-slate-500">
-                Configure Referee of the Week or Month voting poll
-              </p>
-            </div>
+        <div className="flex items-center justify-between px-6 py-4 border-b border-slate-200 bg-slate-50/70">
+          <div>
+            <h3 className="font-semibold text-slate-900 text-sm">
+              {editingItem ? "Edit Referee Voting Campaign" : "New Referee Voting Campaign"}
+            </h3>
+            <p className="text-xs text-slate-500 mt-0.5">
+              Configure official referee nomination ballots and schedule for Referee of the Week or Month.
+            </p>
           </div>
           <button
+            type="button"
             onClick={onClose}
-            className="p-1.5 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-colors"
+            className="w-7 h-7 rounded-md flex items-center justify-center text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-colors cursor-pointer"
           >
-            <X className="w-5 h-5" />
+            <X className="w-4 h-4" />
           </button>
         </div>
 
         {/* Form Body */}
-        <form onSubmit={handleSubmit} className="flex-1 overflow-y-auto p-6 space-y-5">
+        <form onSubmit={handleSubmit} className="p-6 space-y-4 max-h-[75vh] overflow-y-auto">
           {errorMsg && (
-            <div className="p-3 bg-rose-50 border border-rose-200 rounded-xl flex items-center gap-2.5 text-xs text-rose-700">
-              <AlertCircle className="w-4 h-4 shrink-0 text-rose-600" />
+            <div className="p-3 rounded-md border border-rose-200 bg-rose-50 text-rose-700 text-xs flex items-center gap-2">
+              <AlertCircle className="w-4 h-4 shrink-0" />
               <span>{errorMsg}</span>
             </div>
           )}
 
-          {/* Campaign Title & Type */}
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            <div className="sm:col-span-2 space-y-1.5">
-              <label className="text-xs font-semibold text-slate-700">
-                Campaign Title <span className="text-rose-500">*</span>
+          {/* Campaign Details */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+            <div className="sm:col-span-2">
+              <label className="block text-xs font-medium text-slate-700 mb-1">
+                Campaign Title
               </label>
               <input
                 type="text"
-                required
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
                 placeholder="e.g. Referee of the Week - Week 43"
-                className="w-full px-3 py-2 text-xs bg-white border border-slate-200 rounded-lg focus:outline-none focus:border-[#800020] text-slate-800"
+                className="w-full h-8 px-2.5 rounded-md border border-slate-200 text-xs text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-slate-400 bg-white"
+                required
               />
             </div>
 
-            <div className="space-y-1.5">
-              <label className="text-xs font-semibold text-slate-700">
-                Voting Period <span className="text-rose-500">*</span>
+            <div>
+              <label className="block text-xs font-medium text-slate-700 mb-1">
+                Campaign Type
               </label>
               <Select
                 value={votingType}
-                onValueChange={(val: "WEEK" | "MONTH") => {
+                onValueChange={(val: any) => {
                   setVotingType(val);
                   if (val === "WEEK") {
                     setTitle(`Referee of the Week - Week ${weekNumber}`);
@@ -313,22 +321,19 @@ export default function RefereeVotingModal({
                   }
                 }}
               >
-                <SelectTrigger className="text-xs bg-white border-slate-200">
-                  <SelectValue />
+                <SelectTrigger className="w-full h-8 px-2.5 rounded-md border border-slate-200 text-xs text-slate-900 bg-white">
+                  <SelectValue placeholder="Select type" />
                 </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="WEEK">Week Round</SelectItem>
-                  <SelectItem value="MONTH">Month Round</SelectItem>
+                <SelectContent className="bg-white border-slate-200 z-[100]">
+                  <SelectItem value="WEEK">Referee of the Week (ROTW)</SelectItem>
+                  <SelectItem value="MONTH">Referee of the Month (ROTM)</SelectItem>
                 </SelectContent>
               </Select>
             </div>
-          </div>
 
-          {/* Week/Month Number & League */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             {votingType === "WEEK" ? (
-              <div className="space-y-1.5">
-                <label className="text-xs font-semibold text-slate-700">
+              <div>
+                <label className="block text-xs font-medium text-slate-700 mb-1">
                   Week Number (1-53)
                 </label>
                 <input
@@ -341,237 +346,224 @@ export default function RefereeVotingModal({
                     setWeekNumber(num);
                     setTitle(`Referee of the Week - Week ${num}`);
                   }}
-                  className="w-full px-3 py-2 text-xs bg-white border border-slate-200 rounded-lg focus:outline-none focus:border-[#800020] text-slate-800"
+                  className="w-full h-8 px-2.5 rounded-md border border-slate-200 text-xs text-slate-900 focus:outline-none focus:border-slate-400 bg-white"
                 />
               </div>
             ) : (
-              <div className="space-y-1.5">
-                <label className="text-xs font-semibold text-slate-700">
+              <div>
+                <label className="block text-xs font-medium text-slate-700 mb-1">
                   Target Month
                 </label>
                 <input
                   type="month"
                   value={month}
                   onChange={(e) => setMonth(e.target.value)}
-                  className="w-full px-3 py-2 text-xs bg-white border border-slate-200 rounded-lg focus:outline-none focus:border-[#800020] text-slate-800"
+                  className="w-full h-8 px-2.5 rounded-md border border-slate-200 text-xs text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-slate-400 bg-white"
                 />
               </div>
             )}
 
-            <div className="space-y-1.5">
-              <label className="text-xs font-semibold text-slate-700">
-                Associated League (Optional)
-              </label>
-              <Select value={league} onValueChange={(val) => setLeague(val)}>
-                <SelectTrigger className="text-xs bg-white border-slate-200">
-                  <SelectValue placeholder="All Leagues / Open" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Leagues / System-wide</SelectItem>
-                  {leagues.map((l) => (
-                    <SelectItem key={l._id} value={l._id}>
-                      {l.leagueName} {l.ageGroup ? `(${l.ageGroup})` : ""}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
-
-          {/* Date Range & Status */}
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            <div className="space-y-1.5">
-              <label className="text-xs font-semibold text-slate-700">
-                Start Date <span className="text-rose-500">*</span>
-              </label>
-              <CustomDatePicker
-                date={startDate ? new Date(startDate) : undefined}
-                setDate={(d) => d && setStartDate(d.toISOString().substring(0, 10))}
-                placeholder="Start Date"
-              />
-            </div>
-
-            <div className="space-y-1.5">
-              <label className="text-xs font-semibold text-slate-700">
-                End Date <span className="text-rose-500">*</span>
-              </label>
-              <CustomDatePicker
-                date={endDate ? new Date(endDate) : undefined}
-                setDate={(d) => d && setEndDate(d.toISOString().substring(0, 10))}
-                placeholder="End Date"
-              />
-            </div>
-
-            <div className="space-y-1.5">
-              <label className="text-xs font-semibold text-slate-700">
-                Poll Status
+            <div>
+              <label className="block text-xs font-medium text-slate-700 mb-1">
+                Competition League (Optional)
               </label>
               <Select
-                value={status}
-                onValueChange={(val: "upcoming" | "active" | "completed") =>
-                  setStatus(val)
-                }
+                value={league || "all"}
+                onValueChange={(val: string) => setLeague(val)}
               >
-                <SelectTrigger className="text-xs bg-white border-slate-200 capitalize">
-                  <SelectValue />
+                <SelectTrigger className="w-full h-8 px-2.5 rounded-md border border-slate-200 text-xs text-slate-900 bg-white">
+                  <SelectValue placeholder="All Leagues / System-wide" />
                 </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="upcoming">Upcoming (Scheduled)</SelectItem>
-                  <SelectItem value="active">Active (Voting Live)</SelectItem>
-                  <SelectItem value="completed">Completed (Closed)</SelectItem>
+                <SelectContent className="bg-white border-slate-200 z-[100]">
+                  <SelectItem value="all">All Leagues / System-wide</SelectItem>
+                  {leagues
+                    .filter((l) => Boolean(l?._id))
+                    .map((l) => (
+                      <SelectItem key={String(l._id)} value={String(l._id)}>
+                        {l.leagueName} ({l.season || "Active"})
+                      </SelectItem>
+                    ))}
                 </SelectContent>
               </Select>
             </div>
+
+            <div>
+              <label className="block text-xs font-medium text-slate-700 mb-1">
+                Initial Status
+              </label>
+              <Select value={status} onValueChange={(val: any) => setStatus(val)}>
+                <SelectTrigger className="w-full h-8 px-2.5 rounded-md border border-slate-200 text-xs text-slate-900 bg-white capitalize">
+                  <SelectValue placeholder="Select status" />
+                </SelectTrigger>
+                <SelectContent className="bg-white border-slate-200 z-[100]">
+                  <SelectItem value="upcoming">Scheduled (Upcoming)</SelectItem>
+                  <SelectItem value="active">Active (Voting Live)</SelectItem>
+                  <SelectItem value="completed">Closed (Completed)</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* Custom Date Pickers */}
+            <div>
+              <CustomDatePicker
+                label="Voting Opens"
+                value={startDate}
+                onChange={(val) => setStartDate(val)}
+                placeholder="Select start date"
+              />
+            </div>
+
+            <div>
+              <CustomDatePicker
+                label="Voting Closes"
+                value={endDate}
+                onChange={(val) => setEndDate(val)}
+                placeholder="Select close date"
+              />
+            </div>
           </div>
 
-          {/* Referee Nominees Section */}
-          <div className="space-y-3 pt-2 border-t border-slate-100">
+          {/* Nominees Section */}
+          <div className="border border-slate-200 rounded-md p-3.5 bg-slate-50/50 space-y-3 pb-8">
             <div className="flex items-center justify-between">
               <div>
-                <h3 className="text-xs font-bold uppercase tracking-wider text-slate-800">
-                  Referee Nominees <span className="text-rose-500">*</span>
-                </h3>
-                <p className="text-[11px] text-slate-500">
-                  Select at least 2 official referees who will compete in this round
-                </p>
+                <span className="text-xs font-semibold text-slate-900 block">
+                  Ballot Nominees ({nominees.length})
+                </span>
+                <span className="text-[11px] text-slate-500">
+                  Select official referees and their performance highlights for this voting round.
+                </span>
               </div>
               <button
                 type="button"
                 onClick={addNominee}
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-[#800020] bg-[#800020]/10 hover:bg-[#800020]/20 rounded-lg transition-colors"
+                className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md border border-slate-200 bg-white text-xs font-medium text-slate-700 hover:bg-slate-50 transition-colors cursor-pointer"
               >
-                <Plus className="w-3.5 h-3.5" />
-                Add Nominee
+                <Plus className="w-3 h-3 text-slate-500" />
+                <span>Add Official</span>
               </button>
             </div>
 
             {isLoadingReferees ? (
               <div className="py-6 text-center text-xs text-slate-400">
-                Loading official referees list...
+                Loading referees list...
               </div>
             ) : (
-              <div className="space-y-3">
+              <div className="space-y-2.5">
                 {nominees.map((nom, idx) => (
                   <div
                     key={idx}
-                    className="p-3 rounded-xl border border-slate-200 bg-slate-50/50 space-y-2.5"
+                    className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 p-2.5 rounded-md border border-slate-200 bg-white"
                   >
-                    <div className="flex items-center justify-between text-xs font-medium text-slate-600">
-                      <span>Nominee #{idx + 1}</span>
-                      {nominees.length > 2 && (
-                        <button
-                          type="button"
-                          onClick={() => removeNominee(idx)}
-                          className="text-rose-500 hover:text-rose-700 p-1"
-                        >
-                          <Trash2 className="w-3.5 h-3.5" />
-                        </button>
-                      )}
-                    </div>
+                    <span className="w-5 text-center text-xs font-mono text-slate-400 font-medium">
+                      #{idx + 1}
+                    </span>
 
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                    {/* Custom Referee Select Dropdown */}
+                    <div className="flex-1 min-w-[200px]">
                       <NomineeRefereeSelectDropdown
                         referees={referees}
                         selectedRefereeId={nom.referee}
                         onChange={(refId) => handleNomineeChange(idx, "referee", refId)}
-                        placeholder="Choose official referee..."
+                        placeholder="Select official referee..."
                       />
+                    </div>
 
+                    {/* Stats Highlight */}
+                    <div className="flex-1 min-w-[180px]">
                       <input
                         type="text"
+                        placeholder="e.g. 4 Matches, 0 Red Cards"
                         value={nom.statsHighlight}
                         onChange={(e) =>
                           handleNomineeChange(idx, "statsHighlight", e.target.value)
                         }
-                        placeholder="e.g. 4 Matches, 0 Red Cards"
-                        className="w-full px-3 py-2 text-xs bg-white border border-slate-200 rounded-lg focus:outline-none focus:border-[#800020] text-slate-800"
+                        className="w-full h-8 px-2.5 rounded-md border border-slate-200 text-xs text-slate-800 placeholder:text-slate-400 focus:outline-none focus:border-slate-400 bg-white"
                       />
                     </div>
+
+                    {/* Remove Button */}
+                    <button
+                      type="button"
+                      onClick={() => removeNominee(idx)}
+                      disabled={nominees.length <= 2}
+                      className="w-7 h-8 flex items-center justify-center text-slate-400 hover:text-rose-600 disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer transition-colors"
+                      title="Remove Nominee"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                    </button>
                   </div>
                 ))}
               </div>
             )}
           </div>
 
-          {/* Banner Upload */}
-          <div className="space-y-1.5 pt-2 border-t border-slate-100">
-            <label className="text-xs font-semibold text-slate-700">
-              Banner Image (Optional)
+          {/* Description */}
+          <div>
+            <label className="block text-xs font-medium text-slate-700 mb-1">
+              Internal Notes / Summary
             </label>
-            <div className="flex items-center gap-4">
-              {bannerPreview ? (
-                <div className="relative w-24 h-16 rounded-lg overflow-hidden border border-slate-200 group shrink-0">
+            <textarea
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              rows={2}
+              placeholder="Context or notes about this referee voting round..."
+              className="w-full p-2.5 rounded-md border border-slate-200 text-xs text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-slate-400 bg-white resize-none"
+            />
+          </div>
+
+          {/* Banner Upload */}
+          <div>
+            <label className="block text-xs font-medium text-slate-700 mb-1">
+              Banner Artwork <span className="text-slate-400 font-normal">(Optional)</span>
+            </label>
+            <div className="border border-dashed border-slate-300 rounded-md p-3 flex items-center gap-3 bg-slate-50/50">
+              <div className="w-16 h-10 rounded border border-slate-200 bg-white flex items-center justify-center overflow-hidden shrink-0">
+                {bannerPreview ? (
                   <img
                     src={bannerPreview}
                     alt="Preview"
                     className="w-full h-full object-cover"
                   />
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setBannerFile(null);
-                      setBannerPreview(null);
-                    }}
-                    className="absolute inset-0 bg-black/50 text-white opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity"
-                  >
-                    <X className="w-4 h-4" />
-                  </button>
-                </div>
-              ) : null}
-
-              <label className="flex-1 flex flex-col items-center justify-center border-2 border-dashed border-slate-200 rounded-xl p-4 hover:border-[#800020] cursor-pointer transition-colors bg-white">
-                <Upload className="w-5 h-5 text-slate-400 mb-1" />
-                <span className="text-xs text-slate-600 font-medium">
-                  Upload campaign banner
-                </span>
-                <span className="text-[10px] text-slate-400">
-                  PNG, JPG or WEBP up to 5MB
-                </span>
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={handleBannerChange}
-                  className="hidden"
-                />
-              </label>
+                ) : (
+                  <span className="text-[10px] text-slate-400">None</span>
+                )}
+              </div>
+              <div className="flex-1 min-w-0">
+                <label className="cursor-pointer inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md border border-slate-200 bg-white text-xs font-medium text-slate-700 hover:bg-slate-50 transition-colors">
+                  <Upload className="w-3 h-3 text-slate-500" />
+                  <span>{bannerFile || bannerPreview ? "Replace File" : "Choose File"}</span>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={handleBannerChange}
+                    className="hidden"
+                  />
+                </label>
+              </div>
             </div>
           </div>
 
-          {/* Description */}
-          <div className="space-y-1.5">
-            <label className="text-xs font-semibold text-slate-700">
-              Description / Notes (Optional)
-            </label>
-            <textarea
-              rows={2}
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              placeholder="Highlight special performances, fair play moments, or rules..."
-              className="w-full px-3 py-2 text-xs bg-white border border-slate-200 rounded-lg focus:outline-none focus:border-[#800020] text-slate-800"
-            />
+          {/* Footer Buttons */}
+          <div className="pt-3 border-t border-slate-200 flex items-center justify-end gap-2">
+            <button
+              type="button"
+              onClick={onClose}
+              disabled={isLoading}
+              className="h-8 px-3 rounded-md border border-slate-200 text-xs font-medium text-slate-700 hover:bg-slate-50 transition-colors cursor-pointer"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              disabled={isLoading}
+              className="h-8 px-4 rounded-md bg-slate-900 hover:bg-slate-800 text-white text-xs font-medium transition-colors cursor-pointer disabled:opacity-50 inline-flex items-center gap-1.5"
+            >
+              {isLoading && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
+              <span>{editingItem ? "Save Changes" : "Create Campaign"}</span>
+            </button>
           </div>
         </form>
-
-        {/* Footer */}
-        <div className="px-6 py-4 bg-slate-50 border-t border-slate-100 flex items-center justify-end gap-3">
-          <button
-            type="button"
-            onClick={onClose}
-            disabled={isLoading}
-            className="px-4 py-2 text-xs font-medium text-slate-700 bg-white border border-slate-200 rounded-lg hover:bg-slate-100 transition-colors"
-          >
-            Cancel
-          </button>
-          <button
-            type="button"
-            onClick={handleSubmit}
-            disabled={isLoading}
-            className="inline-flex items-center gap-1.5 px-5 py-2 text-xs font-semibold text-white bg-[#800020] hover:bg-[#68001a] rounded-lg shadow-sm transition-colors disabled:opacity-50"
-          >
-            {isLoading && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
-            {editingItem ? "Update Campaign" : "Publish Voting Campaign"}
-          </button>
-        </div>
       </div>
     </div>
   );

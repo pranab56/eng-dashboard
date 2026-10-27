@@ -9,6 +9,8 @@ import {
   ClipboardCheck,
   Table2,
   Vote,
+  Award,
+  Megaphone,
   Shield,
   Users,
   UserCheck,
@@ -86,8 +88,8 @@ export function hasRoleOrPermission(
 ): boolean {
   if (!userRole) return false;
 
-  // SUPER_ADMIN has bypass authority over all menus
-  if (userRole === "SUPER_ADMIN") return true;
+  // SUPER_ADMIN and ADMIN have bypass authority over all menus
+  if (userRole === "SUPER_ADMIN" || userRole === "ADMIN") return true;
 
   // If specific roles are required, ensure user's role is in the whitelist
   if (allowedRoles && allowedRoles.length > 0) {
@@ -96,9 +98,14 @@ export function hasRoleOrPermission(
     }
   }
 
+  // If user has no specific permissions array or it is empty, allow access for their role
+  if (!userPermissions || userPermissions.length === 0) {
+    return true;
+  }
+
   // If a specific permission is required, verify user has it
   if (requiredPermission) {
-    if (!Array.isArray(userPermissions) || !userPermissions.includes(requiredPermission)) {
+    if (!userPermissions.includes(requiredPermission)) {
       return false;
     }
   }
@@ -314,6 +321,28 @@ export const sidebarSections: TSidebarSection[] = [
     ],
   },
   {
+    id: "marketing",
+    title: "Promotions & Sponsors",
+    items: [
+      {
+        id: 72,
+        icon: Megaphone,
+        title: "Promotional Zone",
+        label: "/promotional-zone",
+        requiredPermission: "PROMOTIONAL_ZONE",
+        allowedRoles: ["SUPER_ADMIN", "ADMIN", "MANAGER"],
+      },
+      {
+        id: 19,
+        icon: Handshake,
+        title: "Sponsors & Partners",
+        label: "/sponsorship",
+        requiredPermission: "SPONSORSHIP",
+        allowedRoles: ["SUPER_ADMIN", "ADMIN", "MANAGER"],
+      },
+    ],
+  },
+  {
     id: "users",
     title: "Users & Plans",
     items: [
@@ -400,14 +429,6 @@ export const sidebarSections: TSidebarSection[] = [
         title: "Social Media",
         label: "/social-media",
         requiredPermission: "SOCIAL_MEDIA",
-        allowedRoles: ["SUPER_ADMIN", "ADMIN"],
-      },
-      {
-        id: 19,
-        icon: Handshake,
-        title: "Sponsors & Partners",
-        label: "/sponsorship",
-        requiredPermission: "SPONSORSHIP",
         allowedRoles: ["SUPER_ADMIN", "ADMIN"],
       },
     ],

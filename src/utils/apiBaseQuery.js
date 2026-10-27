@@ -189,6 +189,7 @@ export const baseApi = createApi({
     "sponsorship",
     "playerVoting",
     "refereeVoting",
+    "promotionalZone",
     "quiz",
     "scorePrediction",
   ],

@@ -115,7 +115,7 @@ export default function RefereeVotingManagement() {
 
   useEffect(() => {
     setHeaders({
-      title: "Referee Voting Module",
+      title: "Referee Voting",
       des: "Referee of the Week & Month voting campaigns, standings, and fair play recognition.",
     });
   }, [setHeaders]);
@@ -163,18 +163,18 @@ export default function RefereeVotingManagement() {
           data: formData,
         }).unwrap();
         if (res?.success !== false) {
-          toast.success(res?.message || "Referee voting campaign updated successfully");
+          toast.success(res?.message || "Campaign updated successfully");
           handleCloseModal();
         }
       } else {
         const res = await createVoting(formData).unwrap();
         if (res?.success !== false) {
-          toast.success(res?.message || "Referee voting campaign created successfully");
+          toast.success(res?.message || "Campaign created successfully");
           handleCloseModal();
         }
       }
     } catch (err: any) {
-      toast.error(getErrorMessage(err, "Failed to save referee voting campaign"));
+      toast.error(getErrorMessage(err, "Failed to save campaign"));
     }
   };
 
@@ -183,11 +183,11 @@ export default function RefereeVotingManagement() {
     try {
       const res = await deleteVoting(deleteId).unwrap();
       if (res?.success !== false) {
-        toast.success(res?.message || "Referee voting campaign deleted");
+        toast.success(res?.message || "Campaign deleted");
         handleCloseDeleteModal();
       }
     } catch (err: any) {
-      toast.error(getErrorMessage(err, "Failed to delete referee voting campaign"));
+      toast.error(getErrorMessage(err, "Failed to delete campaign"));
     }
   };
 
@@ -215,191 +215,242 @@ export default function RefereeVotingManagement() {
   );
 
   return (
-    <div className="space-y-6">
-      {/* KPI Overview Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        {/* Card 1: Total Rounds */}
-        <div className="relative overflow-hidden rounded-xl border border-slate-200/80 bg-white p-4 shadow-sm hover:shadow transition-shadow">
+    <div className="w-full p-4 sm:p-6 lg:p-8 space-y-6 pb-16">
+      {/* 1. Executive Summary KPI Strip */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+        {/* Total Campaigns */}
+        <div className="bg-white border border-slate-200/80 rounded-lg p-3.5 sm:p-4 transition-all shadow-2xs">
           <div className="flex items-center justify-between">
             <span className="text-xs font-medium text-slate-500 uppercase tracking-wider">
               Total Campaigns
             </span>
-            <div className="w-8 h-8 rounded-lg bg-amber-50 text-amber-700 flex items-center justify-center">
+            <div className="w-8 h-8 rounded-md bg-slate-100 text-slate-600 flex items-center justify-center">
               <Shield className="w-4 h-4" />
             </div>
           </div>
           <div className="mt-2 flex items-baseline gap-2">
-            <span className="text-2xl font-bold tracking-tight text-slate-900">
+            <span className="text-2xl font-bold tracking-tight text-slate-900 tabular-nums">
               {kpis.totalRounds}
             </span>
-            <span className="text-[11px] text-slate-500">all time</span>
+            <span className="text-xs text-slate-400">rounds</span>
           </div>
         </div>
 
-        {/* Card 2: Active Polls */}
-        <div className="relative overflow-hidden rounded-xl border border-emerald-100 bg-emerald-50/30 p-4 shadow-sm hover:shadow transition-shadow">
+        {/* Active Ballots */}
+        <div className="bg-white border border-slate-200/80 rounded-lg p-3.5 sm:p-4 transition-all shadow-2xs">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-medium text-emerald-800 uppercase tracking-wider">
-              Live & Active
+            <span className="text-xs font-medium text-slate-500 uppercase tracking-wider">
+              Active Voting
             </span>
-            <div className="w-8 h-8 rounded-lg bg-emerald-100 text-emerald-700 flex items-center justify-center">
+            <div className="w-8 h-8 rounded-md bg-emerald-50 text-emerald-600 flex items-center justify-center">
               <Activity className="w-4 h-4" />
             </div>
           </div>
           <div className="mt-2 flex items-baseline gap-2">
-            <span className="text-2xl font-bold tracking-tight text-emerald-950">
+            <span className="text-2xl font-bold tracking-tight text-emerald-700 tabular-nums">
               {kpis.activePolls}
             </span>
-            <span className="text-[11px] text-emerald-700 font-medium">voting open</span>
+            <span className="inline-flex items-center gap-1 text-[11px] font-medium text-emerald-600">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+              Live
+            </span>
           </div>
         </div>
 
-        {/* Card 3: Total Votes Cast */}
-        <div className="relative overflow-hidden rounded-xl border border-indigo-100 bg-indigo-50/30 p-4 shadow-sm hover:shadow transition-shadow">
+        {/* Total Votes */}
+        <div className="bg-white border border-slate-200/80 rounded-lg p-3.5 sm:p-4 transition-all shadow-2xs">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-medium text-indigo-800 uppercase tracking-wider">
+            <span className="text-xs font-medium text-slate-500 uppercase tracking-wider">
               Total Votes Cast
             </span>
-            <div className="w-8 h-8 rounded-lg bg-indigo-100 text-indigo-700 flex items-center justify-center">
+            <div className="w-8 h-8 rounded-md bg-blue-50 text-blue-600 flex items-center justify-center">
               <Users className="w-4 h-4" />
             </div>
           </div>
           <div className="mt-2 flex items-baseline gap-2">
-            <span className="text-2xl font-bold tracking-tight text-indigo-950 font-mono">
-              {kpis.totalVotes}
+            <span className="text-2xl font-bold tracking-tight text-slate-900 tabular-nums">
+              {Number(kpis.totalVotes).toLocaleString()}
             </span>
-            <span className="text-[11px] text-indigo-700 font-medium">community votes</span>
+            <span className="text-xs text-slate-400">ballots</span>
           </div>
         </div>
 
-        {/* Card 4: Winners Awarded */}
-        <div className="relative overflow-hidden rounded-xl border border-amber-100 bg-amber-50/40 p-4 shadow-sm hover:shadow transition-shadow">
+        {/* Awarded Winners */}
+        <div className="bg-white border border-slate-200/80 rounded-lg p-3.5 sm:p-4 transition-all shadow-2xs">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-medium text-amber-800 uppercase tracking-wider">
-              Winners Crowned
+            <span className="text-xs font-medium text-slate-500 uppercase tracking-wider">
+              Certified Winners
             </span>
-            <div className="w-8 h-8 rounded-lg bg-amber-100 text-amber-700 flex items-center justify-center">
+            <div className="w-8 h-8 rounded-md bg-amber-50 text-amber-600 flex items-center justify-center">
               <Trophy className="w-4 h-4" />
             </div>
           </div>
           <div className="mt-2 flex items-baseline gap-2">
-            <span className="text-2xl font-bold tracking-tight text-amber-950">
+            <span className="text-2xl font-bold tracking-tight text-slate-900 tabular-nums">
               {kpis.winnersAwarded}
             </span>
-            <span className="text-[11px] text-amber-700 font-medium">completed polls</span>
+            <span className="text-xs text-slate-400">awarded</span>
           </div>
         </div>
       </div>
 
-      {/* Main Filter & Action Bar */}
-      <div className="bg-white rounded-xl border border-slate-200/80 p-4 shadow-sm space-y-3">
-        <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
-          {/* Search Box */}
-          <div className="relative flex-1 max-w-sm">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-            <input
-              type="text"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              placeholder="Search campaigns by title, season, month..."
-              className="w-full pl-9 pr-8 py-2 text-xs bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:border-[#800020] focus:bg-white text-slate-800 transition-colors"
-            />
-            {searchTerm && (
+      {/* 2. Main Table Container */}
+      <div className="bg-white border border-slate-200/80 rounded-lg overflow-hidden shadow-2xs">
+        {/* Filter Toolbar */}
+        <div className="p-4 sm:p-5 border-b border-slate-200/80 space-y-4">
+          {/* Top Row: Status Tabs & Add Button */}
+          <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-200/60 pb-3">
+            <div className="flex items-center gap-1 overflow-x-auto">
               <button
-                onClick={() => setSearchTerm("")}
-                className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
+                type="button"
+                onClick={() => {
+                  setStatusFilter("all");
+                  setSelectedType("all");
+                }}
+                className={`px-3 py-1.5 text-xs font-semibold rounded-md transition-all cursor-pointer ${
+                  statusFilter === "all" && selectedType === "all"
+                    ? "bg-slate-900 text-white shadow-2xs"
+                    : "text-slate-600 hover:text-slate-900 hover:bg-slate-100"
+                }`}
               >
-                <X className="w-3.5 h-3.5" />
+                All Campaigns
               </button>
-            )}
-          </div>
+              <button
+                type="button"
+                onClick={() => {
+                  setStatusFilter("active");
+                  setSelectedType("all");
+                }}
+                className={`px-3 py-1.5 text-xs font-semibold rounded-md transition-all cursor-pointer ${
+                  statusFilter === "active"
+                    ? "bg-slate-900 text-white shadow-2xs"
+                    : "text-slate-600 hover:text-slate-900 hover:bg-slate-100"
+                }`}
+              >
+                Active Live
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setSelectedType("WEEK");
+                  setStatusFilter("all");
+                }}
+                className={`px-3 py-1.5 text-xs font-semibold rounded-md transition-all cursor-pointer ${
+                  selectedType === "WEEK"
+                    ? "bg-slate-900 text-white shadow-2xs"
+                    : "text-slate-600 hover:text-slate-900 hover:bg-slate-100"
+                }`}
+              >
+                Referee of the Week
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setSelectedType("MONTH");
+                  setStatusFilter("all");
+                }}
+                className={`px-3 py-1.5 text-xs font-semibold rounded-md transition-all cursor-pointer ${
+                  selectedType === "MONTH"
+                    ? "bg-slate-900 text-white shadow-2xs"
+                    : "text-slate-600 hover:text-slate-900 hover:bg-slate-100"
+                }`}
+              >
+                Referee of the Month
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setStatusFilter("completed");
+                  setSelectedType("all");
+                }}
+                className={`px-3 py-1.5 text-xs font-semibold rounded-md transition-all cursor-pointer ${
+                  statusFilter === "completed"
+                    ? "bg-slate-900 text-white shadow-2xs"
+                    : "text-slate-600 hover:text-slate-900 hover:bg-slate-100"
+                }`}
+              >
+                Closed / Winners
+              </button>
+            </div>
 
-          {/* Action Button: Create New Poll */}
-          <button
-            onClick={handleOpenAddModal}
-            className="inline-flex items-center justify-center gap-2 px-4 py-2 text-xs font-semibold text-white bg-[#800020] hover:bg-[#68001a] rounded-lg shadow-sm transition-all"
-          >
-            <Plus className="w-4 h-4" />
-            Create Referee Poll
-          </button>
-        </div>
-
-        {/* Filter Dropdowns Bar */}
-        <div className="flex flex-wrap items-center gap-2 pt-2 border-t border-slate-100 text-xs">
-          {/* Type Filter */}
-          <div className="w-36">
-            <Select value={selectedType} onValueChange={(val) => setSelectedType(val)}>
-              <SelectTrigger className="h-8 text-xs bg-slate-50 border-slate-200">
-                <SelectValue placeholder="All Periods" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Periods</SelectItem>
-                <SelectItem value="WEEK">Week Rounds</SelectItem>
-                <SelectItem value="MONTH">Month Rounds</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-
-          {/* Status Filter */}
-          <div className="w-36">
-            <Select value={statusFilter} onValueChange={(val) => setStatusFilter(val)}>
-              <SelectTrigger className="h-8 text-xs bg-slate-50 border-slate-200">
-                <SelectValue placeholder="All Statuses" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Statuses</SelectItem>
-                <SelectItem value="active">Active Only</SelectItem>
-                <SelectItem value="upcoming">Upcoming</SelectItem>
-                <SelectItem value="completed">Closed</SelectItem>
-                <SelectItem value="cancelled">Cancelled</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-
-          {/* League Filter */}
-          <div className="w-44">
-            <Select value={selectedLeague} onValueChange={(val) => setSelectedLeague(val)}>
-              <SelectTrigger className="h-8 text-xs bg-slate-50 border-slate-200">
-                <SelectValue placeholder="All Leagues" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Leagues</SelectItem>
-                {leagues.map((l) => (
-                  <SelectItem key={l._id} value={l._id}>
-                    {l.leagueName}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-
-          {/* Clear Filters Button */}
-          {hasActiveFilters && (
             <button
-              onClick={handleResetFilters}
-              className="inline-flex items-center gap-1 px-2.5 py-1.5 text-xs text-slate-500 hover:text-slate-800 bg-slate-100 hover:bg-slate-200 rounded-md transition-colors"
+              type="button"
+              onClick={handleOpenAddModal}
+              className="inline-flex items-center justify-center gap-1.5 px-3.5 py-1.5 bg-slate-900 text-white rounded-md hover:bg-slate-800 active:scale-98 transition-all text-xs font-semibold shadow-2xs border border-slate-900 cursor-pointer shrink-0 select-none"
             >
-              <RotateCcw className="w-3 h-3" />
-              Reset Filters
+              <Plus className="w-3.5 h-3.5 text-slate-300" />
+              <span>Add Campaign</span>
             </button>
-          )}
-        </div>
-      </div>
+          </div>
 
-      {/* Table Section */}
-      <div className="bg-white rounded-xl border border-slate-200/80 shadow-sm overflow-hidden">
+          {/* Bottom Row: Search & Dropdown Filters */}
+          <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3">
+            {/* Search Input */}
+            <div className="relative flex-1 max-w-sm">
+              <Search className="size-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
+              <input
+                type="text"
+                placeholder="Search voting campaigns..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="w-full pl-8.5 pr-8 py-1.5 bg-slate-50/60 border border-slate-200 rounded-md text-xs text-slate-900 placeholder:text-slate-400 outline-none focus:bg-white focus:border-slate-400 focus:ring-1 focus:ring-slate-400 transition-all"
+              />
+              {searchTerm && (
+                <button
+                  type="button"
+                  onClick={() => setSearchTerm("")}
+                  className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 p-0.5"
+                >
+                  <X className="w-3.5 h-3.5" />
+                </button>
+              )}
+            </div>
+
+            {/* Dropdown Filters */}
+            <div className="flex flex-wrap items-center gap-2">
+              <div className="w-48">
+                <Select value={selectedLeague} onValueChange={(val) => setSelectedLeague(val)}>
+                  <SelectTrigger className="h-8 text-xs bg-slate-50/60 border-slate-200">
+                    <SelectValue placeholder="All Leagues" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Leagues</SelectItem>
+                    {leagues.map((l) => (
+                      <SelectItem key={l._id} value={l._id}>
+                        {l.leagueName}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {hasActiveFilters && (
+                <button
+                  type="button"
+                  onClick={handleResetFilters}
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-medium rounded-md transition-all cursor-pointer"
+                >
+                  <RotateCcw className="w-3.5 h-3.5 text-slate-500" />
+                  <span>Reset</span>
+                </button>
+              )}
+            </div>
+          </div>
+        </div>
+
+        {/* Main Table */}
         <CustomTable
           columns={columns}
           data={rawPolls}
           isLoading={isLoading}
         />
 
-        {/* Pagination */}
-        <div className="p-4 border-t border-slate-100">
-          <CustomPagination
-            total={pagination.total || 0}
-            totalPage={pagination.totalPage || 1}
-          />
+        {/* Pagination Footer */}
+        <div className="p-3 border-t border-slate-200 flex items-center justify-between">
+          <div className="text-xs text-slate-500">
+            Showing {rawPolls.length} of {pagination.total || rawPolls.length} campaigns
+          </div>
+          <CustomPagination TOTAL_PAGES={pagination.totalPage || 1} />
         </div>
       </div>
 
@@ -424,7 +475,7 @@ export default function RefereeVotingManagement() {
         onConfirm={handleDeleteConfirm}
         isLoading={isDeleting}
         title="Delete Referee Voting Poll"
-        message="Are you sure you want to permanently delete this referee voting campaign? All associated voting records will also be erased."
+        description="Are you sure you want to delete this referee voting campaign? All associated vote records will be permanently removed."
       />
     </div>
   );

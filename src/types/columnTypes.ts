@@ -456,3 +456,38 @@ export type TRefereeVoting = {
   createdAt?: string;
   updatedAt?: string;
 };
+
+export type TPromotionalZone = {
+  _id: string;
+  title: string;
+  websiteUrl?: string;
+  externalUrl?: string;
+  banner: string;
+  type?: string;
+  creatorRole?: string;
+  userId?: any;
+  teamId?: any;
+  gallery?: string[];
+  description?: string;
+  ageGroups?: string[];
+  city?: string;
+  venue?: string;
+  sessionDetails?: any;
+  teamDetails?: any;
+  contactInfo?: {
+    phone?: string;
+    whatsapp?: string;
+    email?: string;
+    registrationLink?: string;
+  };
+  status: "pending" | "approved" | "rejected" | "expired";
+  isFeatured: boolean;
+  startDate: string;
+  endDate: string;
+  viewsCount: number;
+  clicksCount?: number;
+  inquiriesCount?: number;
+  rejectionReason?: string;
+  createdAt: string;
+  updatedAt: string;
+};

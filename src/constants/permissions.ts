@@ -78,6 +78,13 @@ export const AVAILABLE_PERMISSIONS: IPermissionOption[] = [
     description: "View and edit standings and league points tables",
   },
   {
+    key: "PROMOTIONAL_ZONE",
+    label: "Promotional Zone",
+    route: "/promotional-zone",
+    category: "Promotions & Sponsors",
+    description: "Manage Coach training promotions and Team recruitment showcases",
+  },
+  {
     key: "TEAM_MANAGEMENT",
     label: "Team Management",
     route: "/team-management",
@@ -179,7 +186,7 @@ export const AVAILABLE_PERMISSIONS: IPermissionOption[] = [
     key: "SPONSORSHIP",
     label: "Sponsors & Partners",
     route: "/sponsorship",
-    category: "Media & Content",
+    category: "Promotions & Sponsors",
     description: "Manage official club sponsors, partners, and brand collaborations",
   },
   {
