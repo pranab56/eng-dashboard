@@ -491,3 +491,26 @@ export type TPromotionalZone = {
   createdAt: string;
   updatedAt: string;
 };
+
+export type TAppModal = {
+  _id: string;
+  title: string;
+  subtitle?: string;
+  description?: string;
+  image: string;
+  ctaText?: string;
+  actionType: "screen" | "external_url" | "dismiss_only";
+  targetScreen?: string;
+  screenName?: string;
+  screenConstant?: string;
+  targetUrl?: string;
+  status: "active" | "inactive" | "archived";
+  showFrequency: "once" | "once_per_day" | "always";
+  startDate?: string;
+  endDate?: string | null;
+  priority?: number;
+  viewsCount?: number;
+  clicksCount?: number;
+  createdAt?: string;
+  updatedAt?: string;
+};

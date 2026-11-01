@@ -85,6 +85,13 @@ export const AVAILABLE_PERMISSIONS: IPermissionOption[] = [
     description: "Manage Coach training promotions and Team recruitment showcases",
   },
   {
+    key: "APP_POPUP",
+    label: "App Open Popups",
+    route: "/app-popup",
+    category: "Promotions & Sponsors",
+    description: "Manage in-app startup popups, modal ads, and app screen redirects",
+  },
+  {
     key: "TEAM_MANAGEMENT",
     label: "Team Management",
     route: "/team-management",

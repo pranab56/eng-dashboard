@@ -333,6 +333,14 @@ export const sidebarSections: TSidebarSection[] = [
         allowedRoles: ["SUPER_ADMIN", "ADMIN", "MANAGER"],
       },
       {
+        id: 74,
+        icon: Sparkles,
+        title: "App Open Popups",
+        label: "/app-popup",
+        requiredPermission: "PROMOTIONAL_ZONE",
+        allowedRoles: ["SUPER_ADMIN", "ADMIN", "MANAGER"],
+      },
+      {
         id: 19,
         icon: Handshake,
         title: "Sponsors & Partners",
