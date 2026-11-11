@@ -3,7 +3,7 @@
 "use client";
 
 import React from "react";
-import { X, Award, Clock, User, CheckCircle2, Trophy } from "lucide-react";
+import { X, Award, Clock, Trophy } from "lucide-react";
 import { useGetQuizLeaderboardQuery } from "@/features/quiz/quizApi";
 import { formatImagePath } from "@/utils/formatImagePath";
 import dayjs from "dayjs";
@@ -95,7 +95,6 @@ export default function QuizLeaderboardModal({
                   user.userName ||
                   "Participant";
                 const profileImg = formatImagePath(user.profile);
-                const isTop3 = idx < 3;
 
                 return (
                   <div

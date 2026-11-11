@@ -1,7 +1,7 @@
 /* eslint-disable @next/next/no-img-element */
 import { ColumnDef } from "@tanstack/react-table";
 import { FiEdit, FiTrash2, FiEye } from "react-icons/fi";
-import { Coins, CheckCircle, Clock, ShieldCheck, AlertCircle } from "lucide-react";
+import { Coins, CheckCircle, Clock, ShieldCheck } from "lucide-react";
 import { formatImagePath } from "@/utils/formatImagePath";
 import dayjs from "dayjs";
 

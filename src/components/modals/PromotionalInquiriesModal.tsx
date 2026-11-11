@@ -2,7 +2,7 @@
 "use client";
 
 import React from "react";
-import { X, User, Phone, Mail, FileText, Check, Clock, AlertCircle } from "lucide-react";
+import { X, User, Phone, Mail, FileText } from "lucide-react";
 import {
   useGetPromotionInquiriesQuery,
   useUpdateInquiryStatusMutation,

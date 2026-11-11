@@ -6,15 +6,11 @@ import React, { useEffect, useState, useMemo } from "react";
 import { useSearchParams } from "next/navigation";
 import {
   Megaphone,
-  User,
-  Shield,
-  MessageSquare,
   Plus,
   Search,
   X,
   RotateCcw,
   Star,
-  Filter,
   CheckCircle,
   Eye,
   MousePointerClick,
@@ -39,7 +35,6 @@ import {
   useGetAllPromotionsQuery,
   useToggleFeaturePromotionMutation,
   useUpdatePromotionMutation,
-  useUpdatePromotionStatusMutation,
 } from "@/features/promotionalZone/promotionalZoneApi";
 import { useHeaders } from "@/hooks/useHeaders";
 import { getPromotionalZoneColumns } from "@/tableColumns/promotionalZoneColumns";
@@ -91,7 +86,6 @@ export default function PromotionalZoneManagement() {
   const [createPromotion, { isLoading: isCreating }] = useCreatePromotionMutation();
   const [updatePromotion, { isLoading: isUpdating }] = useUpdatePromotionMutation();
   const [deletePromotion, { isLoading: isDeleting }] = useDeletePromotionMutation();
-  const [updateStatus] = useUpdatePromotionStatusMutation();
   const [toggleFeature] = useToggleFeaturePromotionMutation();
 
   const rawPromotions: TPromotionalZone[] = useMemo(() => {
@@ -174,17 +168,6 @@ export default function PromotionalZoneManagement() {
     }
   };
 
-  // Quick Status Change (Approve / Reject)
-  const handleStatusChange = async (id: string, status: "approved" | "rejected") => {
-    try {
-      await updateStatus({ id, status }).unwrap();
-      toast.success(`Promotion marked as ${status}`);
-      await refetch();
-    } catch (error) {
-      toast.error(getErrorMessage(error));
-    }
-  };
-
   // Submit Promotion (Create / Update)
   const handleFormSubmit = async (formData: FormData) => {
     try {
@@ -240,8 +223,7 @@ export default function PromotionalZoneManagement() {
         handleOpenInquiriesModal,
         handleOpenEditModal,
         handleOpenDeleteModal,
-        handleToggleFeature,
-        handleStatusChange
+        handleToggleFeature
       ),
     []
   );

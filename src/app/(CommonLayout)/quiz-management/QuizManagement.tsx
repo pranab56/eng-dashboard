@@ -6,7 +6,6 @@ import {
   Plus,
   Search,
   RefreshCw,
-  Trophy,
   Award,
   Users,
   CheckCircle2,

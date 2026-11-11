@@ -110,7 +110,6 @@ export const getRefereeVotingColumns = (
     cell: ({ row }) => {
       const nominees = row.original.nominees || [];
       const visible = nominees.slice(0, 3);
-      const remaining = nominees.length - 3;
 
       return (
         <div className="flex items-center gap-2">

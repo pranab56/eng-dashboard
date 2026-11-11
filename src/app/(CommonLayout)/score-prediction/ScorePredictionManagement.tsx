@@ -9,7 +9,6 @@ import {
   Coins,
   ShieldCheck,
   CheckCircle2,
-  Clock,
   AlertCircle,
   Users,
 } from "lucide-react";

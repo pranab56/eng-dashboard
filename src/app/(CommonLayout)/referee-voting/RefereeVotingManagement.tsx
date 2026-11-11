@@ -8,7 +8,6 @@ import {
   Trophy,
   Activity,
   Users,
-  Award,
   Plus,
   Search,
   X,

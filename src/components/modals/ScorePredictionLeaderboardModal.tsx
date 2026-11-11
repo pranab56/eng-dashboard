@@ -3,7 +3,7 @@
 "use client";
 
 import React from "react";
-import { X, Trophy, Coins, CheckCircle, Clock } from "lucide-react";
+import { X, Trophy, Coins } from "lucide-react";
 import { useGetPredictionLeaderboardQuery } from "@/features/scorePrediction/scorePredictionApi";
 import { formatImagePath } from "@/utils/formatImagePath";
 import dayjs from "dayjs";

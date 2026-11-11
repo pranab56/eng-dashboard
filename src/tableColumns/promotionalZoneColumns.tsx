@@ -55,8 +55,7 @@ export const getPromotionalZoneColumns = (
   _onViewInquiries: (item: TPromotionalZone) => void,
   onEdit: (item: TPromotionalZone) => void,
   onDelete: (id: string) => void,
-  onToggleFeature: (id: string) => void,
-  _onStatusChange: (id: string, status: "approved" | "rejected") => void
+  onToggleFeature: (id: string) => void
 ): ColumnDef<TPromotionalZone>[] => [
   {
     accessorKey: "title",

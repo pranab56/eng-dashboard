@@ -56,7 +56,6 @@ export default function PlayerVotingModal({
   const [bannerFile, setBannerFile] = useState<File | null>(null);
   const [bannerPreview, setBannerPreview] = useState<string | null>(null);
   const [errorMsg, setErrorMsg] = useState("");
-  const [showAllAgeGroups, setShowAllAgeGroups] = useState(false);
 
   // Safely fetch leagues
   const { data: leaguesData } = useGetAllLeagueQuery({ limit: 100 });
@@ -119,13 +118,13 @@ export default function PlayerVotingModal({
   // Safely fetch players filtered by selected ageGroup (or all if toggled)
   const playerQueryParams = useMemo(() => {
     const params: Record<string, any> = { limit: 500 };
-    if (ageGroup && !showAllAgeGroups) {
+    if (ageGroup) {
       params.ageGroup = ageGroup;
     }
     return params;
-  }, [ageGroup, showAllAgeGroups]);
+  }, [ageGroup]);
 
-  const { data: playersData, isFetching: isFetchingPlayers } = useGetAllPlayerQuery(playerQueryParams);
+  const { data: playersData } = useGetAllPlayerQuery(playerQueryParams);
   const players: any[] = useMemo(() => {
     if (Array.isArray(playersData?.data?.players)) return playersData.data.players;
     if (Array.isArray(playersData?.data?.result)) return playersData.data.result;
