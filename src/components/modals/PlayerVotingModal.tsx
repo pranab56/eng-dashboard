@@ -28,9 +28,11 @@ interface PlayerVotingModalProps {
   isLoading: boolean;
 }
 
-const getInitialVotingType = (item: TPlayerVoting | null): "WEEK" | "MONTH" => {
+const getInitialVotingType = (item: TPlayerVoting | null): "WEEK" | "MONTH" | "OVERALL" => {
   const raw = String(item?.votingType || "WEEK").toUpperCase();
-  return raw === "MONTH" ? "MONTH" : "WEEK";
+  if (raw === "MONTH") return "MONTH";
+  if (raw === "OVERALL") return "OVERALL";
+  return "WEEK";
 };
 
 const getInitialLeagueId = (item: TPlayerVoting | null): string => {
@@ -78,7 +80,7 @@ export default function PlayerVotingModal({
   isLoading,
 }: PlayerVotingModalProps) {
   const [title, setTitle] = useState(() => editingItem?.title || "");
-  const [votingType, setVotingType] = useState<"WEEK" | "MONTH">(() =>
+  const [votingType, setVotingType] = useState<"WEEK" | "MONTH" | "OVERALL">(() =>
     getInitialVotingType(editingItem)
   );
   const [league, setLeague] = useState<string>(() =>
@@ -362,7 +364,8 @@ export default function PlayerVotingModal({
       setErrorMsg("Please provide a voting campaign title.");
       return;
     }
-    const isOverallRound = !league || league === "all" || league === "overall";
+    const isOverallRound =
+      votingType === "OVERALL" || !league || league === "all" || league === "overall";
 
     // Validate nominees: ensure at least 2 valid unique players
     const selectedPlayerIds = nominees
@@ -468,7 +471,19 @@ export default function PlayerVotingModal({
               <Select
                 value={votingType}
                 onValueChange={(val: any) => {
-                  if (val) setVotingType(val);
+                  if (val) {
+                    setVotingType(val);
+                    if (val === "OVERALL") {
+                      setLeague("all");
+                      if (!editingItem && (!title || title.startsWith("Player of the"))) {
+                        setTitle("Overall Player of the Season");
+                      }
+                    } else if (val === "WEEK" && !editingItem && (!title || title.startsWith("Overall") || title.startsWith("Player of the Month"))) {
+                      setTitle(`Player of the Week - Week ${weekNumber}`);
+                    } else if (val === "MONTH" && !editingItem && (!title || title.startsWith("Overall") || title.startsWith("Player of the Week"))) {
+                      setTitle(`Player of the Month${month ? ` - ${month}` : ""}`);
+                    }
+                  }
                 }}
               >
                 <SelectTrigger className="w-full h-8 px-2.5 rounded-md border border-slate-200 text-xs text-slate-900 bg-white">
@@ -477,6 +492,7 @@ export default function PlayerVotingModal({
                 <SelectContent>
                   <SelectItem value="WEEK">Player of the Week (POTW)</SelectItem>
                   <SelectItem value="MONTH">Player of the Month (POTM)</SelectItem>
+                  <SelectItem value="OVERALL">Overall Campaign (OVERALL)</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -495,7 +511,7 @@ export default function PlayerVotingModal({
                   className="w-full h-8 px-2.5 rounded-md border border-slate-200 text-xs text-slate-900 focus:outline-none focus:border-slate-400 bg-white"
                 />
               </div>
-            ) : (
+            ) : votingType === "MONTH" ? (
               <div>
                 <label className="block text-xs font-medium text-slate-700 mb-1">
                   Month
@@ -508,7 +524,7 @@ export default function PlayerVotingModal({
                   className="w-full h-8 px-2.5 rounded-md border border-slate-200 text-xs text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-slate-400 bg-white"
                 />
               </div>
-            )}
+            ) : null}
 
             <div>
               <label className="block text-xs font-medium text-slate-700 mb-1">

@@ -64,12 +64,18 @@ export const getPlayerVotingColumns = (
           <div className="flex items-center gap-1.5">
             <span
               className={`inline-block px-1.5 py-0.5 text-[10px] font-medium rounded ${
-                isWeek
+                votingType === "WEEK"
                   ? "bg-slate-100 text-slate-700 border border-slate-200"
-                  : "bg-indigo-50 text-indigo-700 border border-indigo-200"
+                  : votingType === "MONTH"
+                  ? "bg-indigo-50 text-indigo-700 border border-indigo-200"
+                  : "bg-amber-50 text-amber-700 border border-amber-200"
               }`}
             >
-              {isWeek ? "Player of the Week" : "Player of the Month"}
+              {votingType === "WEEK"
+                ? "Player of the Week"
+                : votingType === "MONTH"
+                ? "Player of the Month"
+                : "Overall Player"}
             </span>
             {weekNumber ? (
               <span className="text-[10px] font-mono text-slate-500">

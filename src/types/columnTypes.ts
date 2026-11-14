@@ -369,7 +369,7 @@ export type TPlayerVoting = {
   _id: string;
   id?: string;
   title: string;
-  votingType: 'WEEK' | 'MONTH';
+  votingType: 'WEEK' | 'MONTH' | 'OVERALL';
   league?: {
     _id: string;
     leagueName?: string;

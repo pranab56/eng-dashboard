@@ -418,6 +418,20 @@ export default function PlayerVotingManagement() {
               <button
                 type="button"
                 onClick={() => {
+                  setSelectedType("OVERALL");
+                  setStatusFilter("all");
+                }}
+                className={`px-3 py-1.5 text-xs font-semibold rounded-md transition-all cursor-pointer ${
+                  selectedType === "OVERALL"
+                    ? "bg-slate-900 text-white shadow-2xs"
+                    : "text-slate-600 hover:text-slate-900 hover:bg-slate-100"
+                }`}
+              >
+                Overall
+              </button>
+              <button
+                type="button"
+                onClick={() => {
                   setStatusFilter("completed");
                   setSelectedType("all");
                 }}
