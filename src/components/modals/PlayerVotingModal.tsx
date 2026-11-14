@@ -28,6 +28,48 @@ interface PlayerVotingModalProps {
   isLoading: boolean;
 }
 
+const getInitialVotingType = (item: TPlayerVoting | null): "WEEK" | "MONTH" => {
+  const raw = String(item?.votingType || "WEEK").toUpperCase();
+  return raw === "MONTH" ? "MONTH" : "WEEK";
+};
+
+const getInitialLeagueId = (item: TPlayerVoting | null): string => {
+  if (!item) return "all";
+  if (item.isOverall || !item.league) return "all";
+  if (typeof item.league === "object") {
+    return item.league._id ? String(item.league._id) : "all";
+  }
+  return String(item.league);
+};
+
+const getInitialStatus = (
+  item: TPlayerVoting | null
+): "upcoming" | "active" | "completed" => {
+  const raw = String(item?.status || "upcoming").toLowerCase();
+  if (raw === "active" || raw === "completed" || raw === "upcoming") {
+    return raw;
+  }
+  return "upcoming";
+};
+
+const getInitialNominees = (
+  item: TPlayerVoting | null
+): { player: string; statsHighlight: string }[] => {
+  if (item?.nominees && item.nominees.length >= 2) {
+    return item.nominees.map((n) => ({
+      player:
+        n.player && typeof n.player === "object"
+          ? String(n.player._id || "")
+          : String(n.player || ""),
+      statsHighlight: n.statsHighlight || "",
+    }));
+  }
+  return [
+    { player: "", statsHighlight: "" },
+    { player: "", statsHighlight: "" },
+  ];
+};
+
 export default function PlayerVotingModal({
   isOpen,
   onClose,
@@ -35,35 +77,63 @@ export default function PlayerVotingModal({
   editingItem,
   isLoading,
 }: PlayerVotingModalProps) {
-  const [title, setTitle] = useState("");
-  const [votingType, setVotingType] = useState<"WEEK" | "MONTH">("WEEK");
-  const [league, setLeague] = useState<string>("");
-  const [ageGroup, setAgeGroup] = useState<string>("");
-  const [weekNumber, setWeekNumber] = useState<number>(1);
-  const [month, setMonth] = useState("");
-  const [startDate, setStartDate] = useState("");
-  const [endDate, setEndDate] = useState("");
-  const [status, setStatus] = useState<"upcoming" | "active" | "completed">("upcoming");
-  const [description, setDescription] = useState("");
+  const [title, setTitle] = useState(() => editingItem?.title || "");
+  const [votingType, setVotingType] = useState<"WEEK" | "MONTH">(() =>
+    getInitialVotingType(editingItem)
+  );
+  const [league, setLeague] = useState<string>(() =>
+    getInitialLeagueId(editingItem)
+  );
+  const [ageGroup, setAgeGroup] = useState<string>(
+    () => editingItem?.ageGroup || ""
+  );
+  const [weekNumber, setWeekNumber] = useState<number>(
+    () => editingItem?.weekNumber || 1
+  );
+  const [month, setMonth] = useState(() => editingItem?.month || "");
+  const [startDate, setStartDate] = useState(() =>
+    editingItem?.startDate ? String(editingItem.startDate).split("T")[0] : ""
+  );
+  const [endDate, setEndDate] = useState(() =>
+    editingItem?.endDate ? String(editingItem.endDate).split("T")[0] : ""
+  );
+  const [status, setStatus] = useState<"upcoming" | "active" | "completed">(
+    () => getInitialStatus(editingItem)
+  );
+  const [description, setDescription] = useState(
+    () => editingItem?.description || ""
+  );
 
   const [nominees, setNominees] = useState<
     { player: string; statsHighlight: string }[]
-  >([
-    { player: "", statsHighlight: "" },
-    { player: "", statsHighlight: "" },
-  ]);
+  >(() => getInitialNominees(editingItem));
 
   const [bannerFile, setBannerFile] = useState<File | null>(null);
-  const [bannerPreview, setBannerPreview] = useState<string | null>(null);
+  const [bannerPreview, setBannerPreview] = useState<string | null>(() =>
+    editingItem?.banner ? formatImagePath(editingItem.banner) : null
+  );
   const [errorMsg, setErrorMsg] = useState("");
 
   // Safely fetch leagues
   const { data: leaguesData } = useGetAllLeagueQuery({ limit: 100 });
   const leagues: any[] = useMemo(() => {
-    if (Array.isArray(leaguesData?.data)) return leaguesData.data;
-    if (Array.isArray(leaguesData?.data?.result)) return leaguesData.data.result;
-    return [];
-  }, [leaguesData]);
+    const rawList: any[] = Array.isArray(leaguesData?.data)
+      ? leaguesData.data
+      : Array.isArray(leaguesData?.data?.result)
+      ? leaguesData.data.result
+      : [];
+
+    const editLeague = editingItem?.league;
+    if (
+      editLeague &&
+      typeof editLeague === "object" &&
+      editLeague._id &&
+      !rawList.some((l) => String(l?._id) === String(editLeague._id))
+    ) {
+      return [editLeague, ...rawList];
+    }
+    return rawList;
+  }, [leaguesData, editingItem]);
 
   // Dynamic Age Groups from DB (Categories + Leagues)
   const { data: ageGroupRes } = useGetAllAgeGroupQuery({});
@@ -107,13 +177,20 @@ export default function PlayerVotingModal({
       });
     }
 
+    if (editingItem?.ageGroup) {
+      addUnique(editingItem.ageGroup);
+    }
+    if (ageGroup) {
+      addUnique(ageGroup);
+    }
+
     return uniqueList.sort((a, b) => {
       const numA = parseInt(a.replace(/\D/g, ""), 10);
       const numB = parseInt(b.replace(/\D/g, ""), 10);
       if (!isNaN(numA) && !isNaN(numB)) return numA - numB;
       return a.localeCompare(b);
     });
-  }, [ageGroupRes, leagueAgeGroupsRes, leagues]);
+  }, [ageGroupRes, leagueAgeGroupsRes, leagues, editingItem, ageGroup]);
 
   // Safely fetch players filtered by selected ageGroup (or all if toggled)
   const playerQueryParams = useMemo(() => {
@@ -126,50 +203,69 @@ export default function PlayerVotingModal({
 
   const { data: playersData } = useGetAllPlayerQuery(playerQueryParams);
   const players: any[] = useMemo(() => {
-    if (Array.isArray(playersData?.data?.players)) return playersData.data.players;
-    if (Array.isArray(playersData?.data?.result)) return playersData.data.result;
-    if (Array.isArray(playersData?.data)) return playersData.data;
-    return [];
-  }, [playersData]);
+    const fetched: any[] = Array.isArray(playersData?.data?.players)
+      ? playersData.data.players
+      : Array.isArray(playersData?.data?.result)
+      ? playersData.data.result
+      : Array.isArray(playersData?.data)
+      ? playersData.data
+      : [];
+
+    // Ensure currently selected nominees from editingItem always exist in the dropdown list
+    const mergedMap = new Map<string, any>();
+    if (editingItem?.nominees) {
+      editingItem.nominees.forEach((n) => {
+        const p: any = n?.player;
+        if (p && typeof p === "object" && (p._id || p.id)) {
+          mergedMap.set(String(p._id || p.id), {
+            ...p,
+            selectTeam: n.team || p.selectTeam,
+          });
+        }
+      });
+    }
+    fetched.forEach((p) => {
+      if (p && (p._id || p.id)) {
+        mergedMap.set(String(p._id || p.id), p);
+      }
+    });
+    return Array.from(mergedMap.values());
+  }, [playersData, editingItem]);
 
   useEffect(() => {
     if (editingItem) {
       setTitle(editingItem.title || "");
-      setVotingType(editingItem.votingType || "WEEK");
-      setLeague(editingItem.league?._id || (editingItem.league as any) || "");
-      setAgeGroup(editingItem.ageGroup || "U16");
+      setVotingType(getInitialVotingType(editingItem));
+      setLeague(getInitialLeagueId(editingItem));
+
+      const rawAge = editingItem.ageGroup || "";
+      const matchedAge = rawAge
+        ? dynamicAgeGroups.find(
+            (ag) => ag.toLowerCase() === rawAge.toLowerCase()
+          ) || rawAge
+        : dynamicAgeGroups[0] || "";
+      setAgeGroup(matchedAge);
+
       setWeekNumber(editingItem.weekNumber || 1);
       setMonth(editingItem.month || "");
       setStartDate(
-        editingItem.startDate ? editingItem.startDate.split("T")[0] : ""
+        editingItem.startDate ? String(editingItem.startDate).split("T")[0] : ""
       );
-      setEndDate(editingItem.endDate ? editingItem.endDate.split("T")[0] : "");
-      setStatus(
-        editingItem.status === "cancelled" ? "upcoming" : editingItem.status || "upcoming"
+      setEndDate(
+        editingItem.endDate ? String(editingItem.endDate).split("T")[0] : ""
       );
+      setStatus(getInitialStatus(editingItem));
       setDescription(editingItem.description || "");
-
-      if (editingItem.nominees && editingItem.nominees.length >= 2) {
-        setNominees(
-          editingItem.nominees.map((n) => ({
-            player: n.player?._id || (n.player as any) || "",
-            statsHighlight: n.statsHighlight || "",
-          }))
-        );
-      } else {
-        setNominees([
-          { player: "", statsHighlight: "" },
-          { player: "", statsHighlight: "" },
-        ]);
-      }
-
-      setBannerPreview(formatImagePath(editingItem.banner));
+      setNominees(getInitialNominees(editingItem));
+      setBannerPreview(
+        editingItem.banner ? formatImagePath(editingItem.banner) : null
+      );
       setBannerFile(null);
     } else {
       setTitle("");
       setVotingType("WEEK");
-      setLeague(leagues[0]?._id ? String(leagues[0]._id) : "");
-      setAgeGroup(leagues[0]?.ageGroup || dynamicAgeGroups[0] || "");
+      setLeague("all");
+      setAgeGroup(dynamicAgeGroups[0] || leagues[0]?.ageGroup || "U16");
       setWeekNumber(1);
       setMonth("");
       const today = new Date().toISOString().split("T")[0];
@@ -190,6 +286,18 @@ export default function PlayerVotingModal({
     setErrorMsg("");
   }, [editingItem, isOpen]);
 
+  // Match editingItem.ageGroup casing once dynamicAgeGroups loads
+  useEffect(() => {
+    if (editingItem?.ageGroup && dynamicAgeGroups.length > 0) {
+      const exactMatch = dynamicAgeGroups.find(
+        (ag) => ag.toLowerCase() === editingItem.ageGroup.toLowerCase()
+      );
+      if (exactMatch && ageGroup && exactMatch !== ageGroup && exactMatch.toLowerCase() === ageGroup.toLowerCase()) {
+        setAgeGroup(exactMatch);
+      }
+    }
+  }, [dynamicAgeGroups, editingItem, ageGroup]);
+
   // Fallback auto-assign league & ageGroup when leagues finish loading
   useEffect(() => {
     if (!editingItem && leagues.length > 0) {
@@ -204,7 +312,9 @@ export default function PlayerVotingModal({
 
   // When admin switches league, auto-sync ageGroup from selected league
   const handleLeagueSelect = (selectedId: string) => {
+    if (!selectedId) return;
     setLeague(selectedId);
+    if (selectedId === "all") return;
     const matched = leagues.find((l) => String(l._id) === String(selectedId));
     if (matched?.ageGroup) {
       setAgeGroup(matched.ageGroup);
@@ -252,10 +362,7 @@ export default function PlayerVotingModal({
       setErrorMsg("Please provide a voting campaign title.");
       return;
     }
-    if (!league) {
-      setErrorMsg("Please select a competition league.");
-      return;
-    }
+    const isOverallRound = !league || league === "all" || league === "overall";
 
     // Validate nominees: ensure at least 2 valid unique players
     const selectedPlayerIds = nominees
@@ -279,18 +386,24 @@ export default function PlayerVotingModal({
       }));
 
     const formData = new FormData();
-    formData.append("title", title);
-    formData.append("votingType", votingType);
-    formData.append("league", league);
-    formData.append("ageGroup", ageGroup);
-    if (votingType === "WEEK") {
-      formData.append("weekNumber", String(weekNumber));
+    if (title) formData.append("title", title);
+    if (votingType) formData.append("votingType", votingType);
+    if (!isOverallRound && league) {
+      formData.append("league", league);
+      formData.append("isOverall", "false");
     } else {
+      formData.append("league", "all");
+      formData.append("isOverall", "true");
+    }
+    if (ageGroup) formData.append("ageGroup", ageGroup);
+    if (votingType === "WEEK") {
+      if (weekNumber) formData.append("weekNumber", String(weekNumber));
+    } else if (month) {
       formData.append("month", month);
     }
     if (startDate) formData.append("startDate", startDate);
     if (endDate) formData.append("endDate", endDate);
-    formData.append("status", status);
+    if (status) formData.append("status", status);
     if (description) formData.append("description", description);
     formData.append("nominees", JSON.stringify(payloadNominees));
 
@@ -354,7 +467,9 @@ export default function PlayerVotingModal({
               </label>
               <Select
                 value={votingType}
-                onValueChange={(val: any) => setVotingType(val)}
+                onValueChange={(val: any) => {
+                  if (val) setVotingType(val);
+                }}
               >
                 <SelectTrigger className="w-full h-8 px-2.5 rounded-md border border-slate-200 text-xs text-slate-900 bg-white">
                   <SelectValue placeholder="Select type" />
@@ -400,13 +515,14 @@ export default function PlayerVotingModal({
                 Competition League
               </label>
               <Select
-                value={league || undefined}
+                value={league || "all"}
                 onValueChange={handleLeagueSelect}
               >
                 <SelectTrigger className="w-full h-8 px-2.5 rounded-md border border-slate-200 text-xs text-slate-900 bg-white">
-                  <SelectValue placeholder="Select League" />
+                  <SelectValue placeholder="All Leagues (Overall)" />
                 </SelectTrigger>
                 <SelectContent className="bg-white border-slate-200">
+                  <SelectItem value="all">All Leagues (Overall)</SelectItem>
                   {leagues
                     .filter((l) => Boolean(l?._id))
                     .map((l) => (
@@ -423,8 +539,10 @@ export default function PlayerVotingModal({
                 Age Group / Division
               </label>
               <Select
-                value={ageGroup}
-                onValueChange={(val: any) => setAgeGroup(val)}
+                value={ageGroup || undefined}
+                onValueChange={(val: any) => {
+                  if (val) setAgeGroup(val);
+                }}
               >
                 <SelectTrigger className="w-full h-8 px-2.5 rounded-md border border-slate-200 text-xs text-slate-900 bg-white">
                   <SelectValue placeholder="Select Age Group" />
@@ -462,7 +580,12 @@ export default function PlayerVotingModal({
               <label className="block text-xs font-medium text-slate-700 mb-1">
                 Initial Status
               </label>
-              <Select value={status} onValueChange={(val: any) => setStatus(val)}>
+              <Select
+                value={status || undefined}
+                onValueChange={(val: any) => {
+                  if (val) setStatus(val);
+                }}
+              >
                 <SelectTrigger className="w-full h-8 px-2.5 rounded-md border border-slate-200 text-xs text-slate-900 bg-white">
                   <SelectValue placeholder="Select status" />
                 </SelectTrigger>

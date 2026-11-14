@@ -455,6 +455,7 @@ export default function RefereeVotingManagement() {
 
       {/* Modals */}
       <RefereeVotingModal
+        key={editingItem?._id || (isModalOpen ? "create" : "closed")}
         isOpen={isModalOpen}
         onClose={handleCloseModal}
         onSubmit={handleModalSubmit}

@@ -28,6 +28,47 @@ interface RefereeVotingModalProps {
   isLoading: boolean;
 }
 
+const getInitialRefVotingType = (item: TRefereeVoting | null): "WEEK" | "MONTH" => {
+  const raw = String(item?.votingType || "WEEK").toUpperCase();
+  return raw === "MONTH" ? "MONTH" : "WEEK";
+};
+
+const getInitialRefLeagueId = (item: TRefereeVoting | null): string => {
+  if (!item?.league) return "all";
+  if (typeof item.league === "object") {
+    return item.league._id ? String(item.league._id) : "all";
+  }
+  return String(item.league);
+};
+
+const getInitialRefStatus = (
+  item: TRefereeVoting | null
+): "upcoming" | "active" | "completed" => {
+  const raw = String(item?.status || "upcoming").toLowerCase();
+  if (raw === "active" || raw === "completed" || raw === "upcoming") {
+    return raw;
+  }
+  return "upcoming";
+};
+
+const getInitialRefNominees = (
+  item: TRefereeVoting | null
+): { referee: string; statsHighlight: string }[] => {
+  if (item?.nominees && item.nominees.length >= 2) {
+    return item.nominees.map((n) => ({
+      referee:
+        n.referee && typeof n.referee === "object"
+          ? String(n.referee._id || "")
+          : String(n.referee || ""),
+      statsHighlight: n.statsHighlight || "",
+    }));
+  }
+  return [
+    { referee: "", statsHighlight: "" },
+    { referee: "", statsHighlight: "" },
+  ];
+};
+
 export default function RefereeVotingModal({
   isOpen,
   onClose,
@@ -35,34 +76,60 @@ export default function RefereeVotingModal({
   editingItem,
   isLoading,
 }: RefereeVotingModalProps) {
-  const [title, setTitle] = useState("");
-  const [votingType, setVotingType] = useState<"WEEK" | "MONTH">("WEEK");
-  const [league, setLeague] = useState<string>("all");
-  const [weekNumber, setWeekNumber] = useState<number>(1);
-  const [month, setMonth] = useState("");
-  const [startDate, setStartDate] = useState("");
-  const [endDate, setEndDate] = useState("");
-  const [status, setStatus] = useState<"upcoming" | "active" | "completed">("upcoming");
-  const [description, setDescription] = useState("");
+  const [title, setTitle] = useState(() => editingItem?.title || "");
+  const [votingType, setVotingType] = useState<"WEEK" | "MONTH">(() =>
+    getInitialRefVotingType(editingItem)
+  );
+  const [league, setLeague] = useState<string>(() =>
+    getInitialRefLeagueId(editingItem)
+  );
+  const [weekNumber, setWeekNumber] = useState<number>(
+    () => editingItem?.weekNumber || 1
+  );
+  const [month, setMonth] = useState(() => editingItem?.month || "");
+  const [startDate, setStartDate] = useState(() =>
+    editingItem?.startDate ? String(editingItem.startDate).substring(0, 10) : ""
+  );
+  const [endDate, setEndDate] = useState(() =>
+    editingItem?.endDate ? String(editingItem.endDate).substring(0, 10) : ""
+  );
+  const [status, setStatus] = useState<"upcoming" | "active" | "completed">(
+    () => getInitialRefStatus(editingItem)
+  );
+  const [description, setDescription] = useState(
+    () => editingItem?.description || ""
+  );
 
   const [nominees, setNominees] = useState<
     { referee: string; statsHighlight: string }[]
-  >([
-    { referee: "", statsHighlight: "" },
-    { referee: "", statsHighlight: "" },
-  ]);
+  >(() => getInitialRefNominees(editingItem));
 
   const [bannerFile, setBannerFile] = useState<File | null>(null);
-  const [bannerPreview, setBannerPreview] = useState<string | null>(null);
+  const [bannerPreview, setBannerPreview] = useState<string | null>(() =>
+    editingItem?.banner ? formatImagePath(editingItem.banner) : null
+  );
   const [errorMsg, setErrorMsg] = useState("");
 
   // Fetch leagues
   const { data: leaguesData } = useGetAllLeagueQuery({ limit: 100 });
   const leagues: any[] = useMemo(() => {
-    if (Array.isArray(leaguesData?.data)) return leaguesData.data;
-    if (Array.isArray(leaguesData?.data?.result)) return leaguesData.data.result;
-    return [];
-  }, [leaguesData]);
+    const rawList: any[] = Array.isArray(leaguesData?.data)
+      ? leaguesData.data
+      : Array.isArray(leaguesData?.data?.result)
+      ? leaguesData.data.result
+      : [];
+
+    const editLeague = editingItem?.league;
+    if (
+      editLeague &&
+      typeof editLeague === "object" &&
+      editLeague._id &&
+      !rawList.some((l) => String(l?._id) === String(editLeague._id))
+    ) {
+      return [editLeague, ...rawList];
+    }
+    return rawList;
+  }, [leaguesData, editingItem]);
 
   // Fetch eligible referees (tries both endpoints for maximum compatibility)
   const { data: eligibleRes, isLoading: isLoadingEligible } = useGetEligibleRefereesQuery({});
@@ -74,8 +141,6 @@ export default function RefereeVotingModal({
       : Array.isArray(eligibleRes?.data?.result)
       ? eligibleRes.data.result
       : [];
-    if (list1.length > 0) return list1;
-
     const list2 = Array.isArray(userRefRes?.data)
       ? userRefRes.data
       : Array.isArray(userRefRes?.data?.result)
@@ -83,8 +148,24 @@ export default function RefereeVotingModal({
       : Array.isArray(userRefRes)
       ? userRefRes
       : [];
-    return list2;
-  }, [eligibleRes, userRefRes]);
+    const baseList = list1.length > 0 ? list1 : list2;
+
+    const mergedMap = new Map<string, any>();
+    if (editingItem?.nominees) {
+      editingItem.nominees.forEach((n) => {
+        const ref: any = n?.referee;
+        if (ref && typeof ref === "object" && (ref._id || ref.id)) {
+          mergedMap.set(String(ref._id || ref.id), ref);
+        }
+      });
+    }
+    baseList.forEach((r: any) => {
+      if (r && (r._id || r.id)) {
+        mergedMap.set(String(r._id || r.id), r);
+      }
+    });
+    return Array.from(mergedMap.values());
+  }, [eligibleRes, userRefRes, editingItem]);
 
   const isLoadingReferees = isLoadingEligible && isLoadingUserRef;
 
@@ -94,41 +175,19 @@ export default function RefereeVotingModal({
 
     if (editingItem) {
       setTitle(editingItem.title || "");
-      setVotingType(editingItem.votingType || "WEEK");
-      setLeague(
-        editingItem.league?._id
-          ? String(editingItem.league._id)
-          : editingItem.league
-          ? String(editingItem.league)
-          : "all"
-      );
+      setVotingType(getInitialRefVotingType(editingItem));
+      setLeague(getInitialRefLeagueId(editingItem));
       setWeekNumber(editingItem.weekNumber || 1);
       setMonth(editingItem.month || "");
       setStartDate(
-        editingItem.startDate ? editingItem.startDate.substring(0, 10) : ""
+        editingItem.startDate ? String(editingItem.startDate).substring(0, 10) : ""
       );
       setEndDate(
-        editingItem.endDate ? editingItem.endDate.substring(0, 10) : ""
+        editingItem.endDate ? String(editingItem.endDate).substring(0, 10) : ""
       );
-      setStatus(
-        editingItem.status === "cancelled" ? "upcoming" : editingItem.status || "upcoming"
-      );
+      setStatus(getInitialRefStatus(editingItem));
       setDescription(editingItem.description || "");
-
-      if (editingItem.nominees && editingItem.nominees.length >= 2) {
-        setNominees(
-          editingItem.nominees.map((n) => ({
-            referee: n.referee?._id ? String(n.referee._id) : String(n.referee || ""),
-            statsHighlight: n.statsHighlight || "",
-          }))
-        );
-      } else {
-        setNominees([
-          { referee: "", statsHighlight: "" },
-          { referee: "", statsHighlight: "" },
-        ]);
-      }
-
+      setNominees(getInitialRefNominees(editingItem));
       setBannerPreview(
         editingItem.banner ? formatImagePath(editingItem.banner) : null
       );
@@ -225,13 +284,19 @@ export default function RefereeVotingModal({
     const formData = new FormData();
     const payload: any = {
       title: title.trim(),
-      votingType,
       startDate: new Date(startDate).toISOString(),
       endDate: new Date(endDate).toISOString(),
-      status,
       description: description.trim(),
       nominees: validNominees,
     };
+
+    if (votingType) {
+      payload.votingType = votingType;
+    }
+
+    if (status) {
+      payload.status = status;
+    }
 
     if (league && league !== "all") {
       payload.league = league;
@@ -311,13 +376,16 @@ export default function RefereeVotingModal({
                 Campaign Type
               </label>
               <Select
-                value={votingType}
+                value={votingType || undefined}
                 onValueChange={(val: any) => {
+                  if (!val) return;
                   setVotingType(val);
-                  if (val === "WEEK") {
-                    setTitle(`Referee of the Week - Week ${weekNumber}`);
-                  } else {
-                    setTitle("Referee of the Month");
+                  if (!editingItem) {
+                    if (val === "WEEK") {
+                      setTitle(`Referee of the Week - Week ${weekNumber}`);
+                    } else {
+                      setTitle("Referee of the Month");
+                    }
                   }
                 }}
               >
@@ -344,7 +412,9 @@ export default function RefereeVotingModal({
                   onChange={(e) => {
                     const num = Number(e.target.value);
                     setWeekNumber(num);
-                    setTitle(`Referee of the Week - Week ${num}`);
+                    if (!editingItem) {
+                      setTitle(`Referee of the Week - Week ${num}`);
+                    }
                   }}
                   className="w-full h-8 px-2.5 rounded-md border border-slate-200 text-xs text-slate-900 focus:outline-none focus:border-slate-400 bg-white"
                 />
@@ -369,7 +439,9 @@ export default function RefereeVotingModal({
               </label>
               <Select
                 value={league || "all"}
-                onValueChange={(val: string) => setLeague(val)}
+                onValueChange={(val: string) => {
+                  if (val) setLeague(val);
+                }}
               >
                 <SelectTrigger className="w-full h-8 px-2.5 rounded-md border border-slate-200 text-xs text-slate-900 bg-white">
                   <SelectValue placeholder="All Leagues / System-wide" />
@@ -391,7 +463,12 @@ export default function RefereeVotingModal({
               <label className="block text-xs font-medium text-slate-700 mb-1">
                 Initial Status
               </label>
-              <Select value={status} onValueChange={(val: any) => setStatus(val)}>
+              <Select
+                value={status || undefined}
+                onValueChange={(val: any) => {
+                  if (val) setStatus(val);
+                }}
+              >
                 <SelectTrigger className="w-full h-8 px-2.5 rounded-md border border-slate-200 text-xs text-slate-900 bg-white capitalize">
                   <SelectValue placeholder="Select status" />
                 </SelectTrigger>

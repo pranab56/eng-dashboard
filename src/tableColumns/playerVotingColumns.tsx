@@ -97,19 +97,32 @@ export const getPlayerVotingColumns = (
       </span>
     ),
     cell: ({ row }) => {
-      const { league, ageGroup } = row.original;
+      const { league, ageGroup, isOverall } = row.original;
+      const isOverallRound = isOverall || !league;
       return (
         <div className="flex flex-col text-xs">
-          <span className="font-medium text-slate-800 leading-tight">
-            {league?.leagueName || "League"}
-          </span>
+          {isOverallRound ? (
+            <span className="inline-flex items-center gap-1 font-semibold text-blue-700 leading-tight">
+              <span className="w-1.5 h-1.5 rounded-full bg-blue-600" />
+              All Leagues (Overall)
+            </span>
+          ) : (
+            <span className="font-medium text-slate-800 leading-tight">
+              {league?.leagueName || "League"}
+            </span>
+          )}
           <div className="flex items-center gap-1.5 mt-0.5">
             <span className="inline-block px-1.5 py-0.2 text-[10px] font-mono font-medium rounded bg-slate-100 text-slate-700 border border-slate-200">
               {ageGroup}
             </span>
-            {league?.season && (
+            {league?.season && !isOverallRound && (
               <span className="text-[10px] text-slate-400 font-mono">
                 {league.season}
+              </span>
+            )}
+            {isOverallRound && (
+              <span className="text-[10px] text-blue-600 bg-blue-50 px-1.5 py-0.2 rounded font-medium border border-blue-100">
+                System-wide
               </span>
             )}
           </div>

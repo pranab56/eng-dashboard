@@ -35,6 +35,7 @@ import {
   Sliders,
   User,
   FileText,
+  Compass,
 } from "lucide-react";
 
 /**
@@ -338,6 +339,14 @@ export const sidebarSections: TSidebarSection[] = [
         title: "App Open Popups",
         label: "/app-popup",
         requiredPermission: "PROMOTIONAL_ZONE",
+        allowedRoles: ["SUPER_ADMIN", "ADMIN", "MANAGER"],
+      },
+      {
+        id: 75,
+        icon: Compass,
+        title: "Book A Scout",
+        label: "/book-a-scout",
+        requiredPermission: "BOOK_A_SCOUT",
         allowedRoles: ["SUPER_ADMIN", "ADMIN", "MANAGER"],
       },
       {

@@ -190,6 +190,7 @@ export const baseApi = createApi({
     "playerVoting",
     "refereeVoting",
     "promotionalZone",
+    "bookAScout",
     "quiz",
     "scorePrediction",
   ],

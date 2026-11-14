@@ -370,12 +370,13 @@ export type TPlayerVoting = {
   id?: string;
   title: string;
   votingType: 'WEEK' | 'MONTH';
-  league: {
+  league?: {
     _id: string;
     leagueName?: string;
     season?: string;
     ageGroup?: string;
   };
+  isOverall?: boolean;
   ageGroup: string;
   season?: string;
   weekNumber?: number;
@@ -509,6 +510,27 @@ export type TAppModal = {
   startDate?: string;
   endDate?: string | null;
   priority?: number;
+  viewsCount?: number;
+  clicksCount?: number;
+  createdAt?: string;
+  updatedAt?: string;
+};
+
+export type TBookAScout = {
+  _id: string;
+  id?: string;
+  sectionTitle: string;
+  badgeText: string;
+  title: string;
+  description?: string;
+  buttonText: string;
+  redirectUrl: string;
+  image: string;
+  status: "active" | "inactive" | "archived";
+  isFeatured?: boolean;
+  priority?: number;
+  startDate?: string;
+  endDate?: string | null;
   viewsCount?: number;
   clicksCount?: number;
   createdAt?: string;

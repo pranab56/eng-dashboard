@@ -70,9 +70,15 @@ export default function PlayerVotingManagement() {
   // Query Leagues safely
   const { data: leaguesData } = useGetAllLeagueQuery({ limit: 100 });
   const leagues: any[] = useMemo(() => {
-    if (Array.isArray(leaguesData?.data)) return leaguesData.data;
-    if (Array.isArray(leaguesData?.data?.result)) return leaguesData.data.result;
-    return [];
+    const list = Array.isArray(leaguesData?.data)
+      ? leaguesData.data
+      : Array.isArray(leaguesData?.data?.result)
+      ? leaguesData.data.result
+      : [];
+    return [
+      { _id: "overall", leagueName: "Overall (All Leagues)" },
+      ...list,
+    ];
   }, [leaguesData]);
 
   // Dynamic Age Groups from DB (Categories + Leagues)
@@ -533,6 +539,7 @@ export default function PlayerVotingManagement() {
 
       {/* Add / Edit Campaign Modal */}
       <PlayerVotingModal
+        key={editingItem?._id || (isModalOpen ? "create" : "closed")}
         isOpen={isModalOpen}
         onClose={handleCloseModal}
         onSubmit={handleModalSubmit}

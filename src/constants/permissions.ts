@@ -92,6 +92,13 @@ export const AVAILABLE_PERMISSIONS: IPermissionOption[] = [
     description: "Manage in-app startup popups, modal ads, and app screen redirects",
   },
   {
+    key: "BOOK_A_SCOUT",
+    label: "Book A Scout",
+    route: "/book-a-scout",
+    category: "Promotions & Sponsors",
+    description: "Manage Book A Scout showcase cards, image overlay badges, and redirect links",
+  },
+  {
     key: "TEAM_MANAGEMENT",
     label: "Team Management",
     route: "/team-management",
