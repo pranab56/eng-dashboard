@@ -425,7 +425,7 @@ export default function MatchRemindersSection() {
                 </tr>
               ) : (
                 matches.map((m: any) => {
-                  const matchTime = dayjs(m.scheduledAt || m.matchDate).tz("Europe/London");
+                  const matchTime = dayjs(m.matchDate || m.scheduledAt).tz("Europe/London");
                   const isSent = Boolean(m.oneDayReminderSent);
                   const isSending = sendingMatchId === m._id;
 
