@@ -193,5 +193,6 @@ export const baseApi = createApi({
     "bookAScout",
     "quiz",
     "scorePrediction",
+    "banner",
   ],
 });

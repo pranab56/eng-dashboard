@@ -29,6 +29,18 @@ export type ExtendedTransfer = TTransfer & {
   transferFee?: number;
   notes?: string;
   effectiveDate?: string;
+  isLiveMarket?: boolean;
+  playerApproval?: {
+    status: "PENDING" | "APPROVED" | "REJECTED";
+    respondedAt?: string;
+    rejectReason?: string;
+  };
+  managerApproval?: {
+    status: "PENDING" | "APPROVED" | "REJECTED";
+    respondedAt?: string;
+    rejectReason?: string;
+  };
+  note?: string;
 };
 
 interface TransferDetailModalProps {
@@ -51,6 +63,12 @@ const getStatusBadge = (status?: string) => {
       return {
         label: "Manager Approved",
         className: "bg-blue-50 text-blue-700 border-blue-200",
+        icon: CheckCircle2,
+      };
+    case "BOTH_APPROVED":
+      return {
+        label: "Both Approved",
+        className: "bg-purple-50 text-purple-700 border-purple-200",
         icon: CheckCircle2,
       };
     case "APPROVED":
@@ -91,7 +109,10 @@ const TransferDetailModal: React.FC<TransferDetailModalProps> = ({
 
   const statusConfig = getStatusBadge(transfer.status);
   const StatusIcon = statusConfig.icon;
-  const isActionable = transfer.status === "PENDING" || transfer.status === "MANAGER_APPROVED";
+  const isActionable =
+    transfer.status === "PENDING" ||
+    transfer.status === "MANAGER_APPROVED" ||
+    transfer.status === "BOTH_APPROVED";
 
   const playerInitials = `${transfer.playerFirstName?.[0] || ""}${transfer.playerLastName?.[0] || ""}`.toUpperCase() || "PL";
   const managerName = `${transfer.requestedByFirstName || ""} ${transfer.requestedByLastName || ""}`.trim() || "N/A";
@@ -294,6 +315,44 @@ const TransferDetailModal: React.FC<TransferDetailModalProps> = ({
               <div className="p-3.5 text-xs">
                 <div className="font-semibold text-slate-700 mb-1">Transfer Notes</div>
                 <div className="text-slate-600 leading-relaxed">{transfer.notes}</div>
+              </div>
+            )}
+
+            {/* Live Market Consent Status */}
+            {transfer.isLiveMarket && (
+              <div className="p-3.5 bg-indigo-50/40 border-t border-slate-100 text-xs space-y-2">
+                <div className="font-semibold text-indigo-900 flex items-center justify-between">
+                  <span>Live Market Consents</span>
+                  <span className="px-1.5 py-0.5 rounded text-[10px] bg-indigo-100 text-indigo-800 font-medium">
+                    Two-Party Consent
+                  </span>
+                </div>
+                <div className="grid grid-cols-2 gap-2 pt-1">
+                  <div className="p-2 rounded bg-white border border-slate-200">
+                    <span className="text-[10px] text-slate-500 uppercase font-semibold block">Player Consent</span>
+                    <span className={`text-xs font-semibold ${
+                      transfer.playerApproval?.status === "APPROVED"
+                        ? "text-emerald-700"
+                        : transfer.playerApproval?.status === "REJECTED"
+                        ? "text-rose-700"
+                        : "text-amber-700"
+                    }`}>
+                      {transfer.playerApproval?.status || "PENDING"}
+                    </span>
+                  </div>
+                  <div className="p-2 rounded bg-white border border-slate-200">
+                    <span className="text-[10px] text-slate-500 uppercase font-semibold block">Current Club Manager</span>
+                    <span className={`text-xs font-semibold ${
+                      transfer.managerApproval?.status === "APPROVED"
+                        ? "text-emerald-700"
+                        : transfer.managerApproval?.status === "REJECTED"
+                        ? "text-rose-700"
+                        : "text-amber-700"
+                    }`}>
+                      {transfer.managerApproval?.status || "PENDING"}
+                    </span>
+                  </div>
+                </div>
               </div>
             )}
           </div>

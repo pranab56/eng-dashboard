@@ -173,5 +173,5 @@ export const baseApi = createApi({
   reducerPath: "baseApi",
   baseQuery: baseQueryWithInterceptor,
   endpoints: () => ({}),
-  tagTypes: ["player", "user", "team", "match", "tournament", "auth"],
+  tagTypes: ["player", "user", "team", "match", "tournament", "auth", "banner"],
 });

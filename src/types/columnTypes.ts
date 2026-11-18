@@ -536,3 +536,18 @@ export type TBookAScout = {
   createdAt?: string;
   updatedAt?: string;
 };
+
+export type TBanner = {
+  _id: string;
+  id?: string;
+  title: string;
+  name?: string;
+  image: string;
+  section?: string;
+  subtitle?: string;
+  status: "active" | "inactive";
+  priority?: number;
+  link?: string;
+  createdAt?: string;
+  updatedAt?: string;
+};

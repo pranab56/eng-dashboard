@@ -12,6 +12,7 @@ import {
   CheckCircle2,
   XCircle,
   ArrowLeftRight,
+  Sparkles,
 } from "lucide-react";
 
 import CustomTable from "@/components/table/CustomTable";
@@ -27,6 +28,8 @@ import { getTransferColumns, ExtendedTransfer } from "@/tableColumns/transferCol
 import { TTransfer } from "@/types/columnTypes";
 import TransferConfirmModal from "./TransferConfirmModal";
 import TransferDetailModal from "./TransferDetailModal";
+import LiveMarketPlayersModal from "./LiveMarketPlayersModal";
+import { getErrorMessage } from "@/utils/getErrorMessage";
 
 type StatusTab = "ALL" | "ACTION_REQUIRED" | "APPROVED" | "REJECTED";
 
@@ -49,6 +52,8 @@ const TransferManagement = () => {
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
   const [isApproveModalOpen, setIsApproveModalOpen] = useState(false);
   const [isRejectModalOpen, setIsRejectModalOpen] = useState(false);
+  const [isLiveMarketPlayersModalOpen, setIsLiveMarketPlayersModalOpen] = useState(false);
+  const [marketTypeFilter, setMarketTypeFilter] = useState<"ALL" | "LIVE" | "REGULAR">("ALL");
 
   // Set page headers
   useEffect(() => {
@@ -74,6 +79,9 @@ const TransferManagement = () => {
     refetch: refetchOverview,
   } = useGetTransferOverviewQuery(undefined);
 
+  const isLiveMarketParam =
+    marketTypeFilter === "LIVE" ? "true" : marketTypeFilter === "REGULAR" ? "false" : undefined;
+
   const {
     data: transferData,
     isLoading: isTransfersLoading,
@@ -83,6 +91,7 @@ const TransferManagement = () => {
     page: pageParam,
     status: statusFilter,
     searchTerm: debouncedSearch,
+    isLiveMarket: isLiveMarketParam,
   });
 
   const [approveTransfer, { isLoading: isApproving }] = useAproveTransferMutation();
@@ -132,8 +141,8 @@ const TransferManagement = () => {
       setIsApproveModalOpen(false);
       setIsDetailModalOpen(false);
       refetchOverview();
-    } catch {
-      toast.error("Failed to approve transfer request");
+    } catch (error: any) {
+      toast.error(getErrorMessage(error, "Failed to approve transfer request"));
     }
   };
 
@@ -145,8 +154,8 @@ const TransferManagement = () => {
       setIsRejectModalOpen(false);
       setIsDetailModalOpen(false);
       refetchOverview();
-    } catch {
-      toast.error("Failed to reject transfer request");
+    } catch (error: any) {
+      toast.error(getErrorMessage(error, "Failed to reject transfer request"));
     }
   };
 
@@ -198,6 +207,21 @@ const TransferManagement = () => {
         </div>
 
         <div className="flex items-center gap-2">
+          <button
+            type="button"
+            onClick={() => setIsLiveMarketPlayersModalOpen(true)}
+            className="inline-flex items-center gap-1.5 px-3 py-2 text-xs font-semibold text-indigo-700 bg-indigo-50 hover:bg-indigo-100 border border-indigo-200 rounded-lg transition-colors cursor-pointer shadow-2xs"
+            title="Browse active players currently listed on the Live Transfer Market"
+          >
+            <Sparkles className="w-3.5 h-3.5 text-indigo-600" />
+            <span>Live Market Players</span>
+            {Number(overview?.activeLiveMarketListings || 0) > 0 && (
+              <span className="px-1.5 py-0.2 rounded-full text-[10px] bg-indigo-600 text-white font-mono">
+                {overview.activeLiveMarketListings}
+              </span>
+            )}
+          </button>
+
           <button
             type="button"
             onClick={handleRefreshAll}
@@ -326,26 +350,67 @@ const TransferManagement = () => {
             })}
           </div>
 
-          {/* Search Input */}
-          <div className="relative w-full md:w-72">
-            <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
-            <input
-              type="text"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              placeholder="Search player, club, email..."
-              className="w-full pl-9 pr-8 py-1.5 text-xs bg-slate-50 border border-slate-200 rounded-lg text-slate-900 placeholder:text-slate-400 focus:bg-white focus:outline-hidden focus:ring-1 focus:ring-slate-900 focus:border-slate-900 transition-colors"
-            />
-            {searchTerm && (
+          {/* Controls: Market Filter & Search */}
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 w-full md:w-auto">
+            {/* Market Type Filter */}
+            <div className="flex items-center gap-1 bg-slate-100 p-0.5 rounded-lg text-xs shrink-0">
               <button
                 type="button"
-                onClick={() => setSearchTerm("")}
-                className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 cursor-pointer"
-                title="Clear search"
+                onClick={() => setMarketTypeFilter("ALL")}
+                className={`px-2.5 py-1 rounded-md text-[11px] transition-colors cursor-pointer ${
+                  marketTypeFilter === "ALL"
+                    ? "bg-white text-slate-900 shadow-2xs font-semibold"
+                    : "text-slate-600 hover:text-slate-900"
+                }`}
               >
-                <X className="w-3.5 h-3.5" />
+                All
               </button>
-            )}
+              <button
+                type="button"
+                onClick={() => setMarketTypeFilter("LIVE")}
+                className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-[11px] transition-colors cursor-pointer ${
+                  marketTypeFilter === "LIVE"
+                    ? "bg-indigo-600 text-white shadow-2xs font-semibold"
+                    : "text-slate-600 hover:text-slate-900"
+                }`}
+              >
+                <Sparkles className="w-2.5 h-2.5" />
+                Live Market
+              </button>
+              <button
+                type="button"
+                onClick={() => setMarketTypeFilter("REGULAR")}
+                className={`px-2.5 py-1 rounded-md text-[11px] transition-colors cursor-pointer ${
+                  marketTypeFilter === "REGULAR"
+                    ? "bg-white text-slate-900 shadow-2xs font-semibold"
+                    : "text-slate-600 hover:text-slate-900"
+                }`}
+              >
+                Regular
+              </button>
+            </div>
+
+            {/* Search Input */}
+            <div className="relative w-full sm:w-64">
+              <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+              <input
+                type="text"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                placeholder="Search player, club, email..."
+                className="w-full pl-9 pr-8 py-1.5 text-xs bg-slate-50 border border-slate-200 rounded-lg text-slate-900 placeholder:text-slate-400 focus:bg-white focus:outline-hidden focus:ring-1 focus:ring-slate-900 focus:border-slate-900 transition-colors"
+              />
+              {searchTerm && (
+                <button
+                  type="button"
+                  onClick={() => setSearchTerm("")}
+                  className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 cursor-pointer"
+                  title="Clear search"
+                >
+                  <X className="w-3.5 h-3.5" />
+                </button>
+              )}
+            </div>
           </div>
         </div>
 
@@ -419,6 +484,12 @@ const TransferManagement = () => {
         toTeam={selectedTransfer?.toTeamName}
         isLoading={isRejecting}
         type="reject"
+      />
+
+      {/* Live Market Players Inspection Modal */}
+      <LiveMarketPlayersModal
+        isOpen={isLiveMarketPlayersModalOpen}
+        onClose={() => setIsLiveMarketPlayersModalOpen(false)}
       />
     </div>
   );

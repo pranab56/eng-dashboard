@@ -22,6 +22,18 @@ export type ExtendedTransfer = TTransfer & {
   transferFee?: number;
   notes?: string;
   effectiveDate?: string;
+  isLiveMarket?: boolean;
+  playerApproval?: {
+    status: "PENDING" | "APPROVED" | "REJECTED";
+    respondedAt?: string;
+    rejectReason?: string;
+  };
+  managerApproval?: {
+    status: "PENDING" | "APPROVED" | "REJECTED";
+    respondedAt?: string;
+    rejectReason?: string;
+  };
+  note?: string;
 };
 
 interface TransferColumnsProps {
@@ -204,6 +216,10 @@ export const getTransferColumns = ({
         badgeClasses = "bg-blue-50 text-blue-700 border-blue-200";
         IconComponent = CheckCircle2;
         label = "Manager Approved";
+      } else if (status === "BOTH_APPROVED") {
+        badgeClasses = "bg-purple-50 text-purple-700 border-purple-200";
+        IconComponent = CheckCircle2;
+        label = "Both Approved";
       } else if (status === "APPROVED") {
         badgeClasses = "bg-emerald-50 text-emerald-700 border-emerald-200";
         IconComponent = CheckCircle2;
@@ -219,12 +235,19 @@ export const getTransferColumns = ({
       }
 
       return (
-        <span
-          className={`inline-flex items-center gap-1 px-2 py-0.5 rounded text-[11px] font-medium border ${badgeClasses}`}
-        >
-          <IconComponent className="w-3 h-3" />
-          <span>{label}</span>
-        </span>
+        <div className="flex flex-col items-start gap-1">
+          <span
+            className={`inline-flex items-center gap-1 px-2 py-0.5 rounded text-[11px] font-medium border ${badgeClasses}`}
+          >
+            <IconComponent className="w-3 h-3" />
+            <span>{label}</span>
+          </span>
+          {row.original.isLiveMarket && (
+            <span className="px-1.5 py-0.2 rounded text-[9px] font-semibold bg-indigo-50 text-indigo-700 border border-indigo-200">
+              Live Market
+            </span>
+          )}
+        </div>
       );
     },
   },
@@ -237,7 +260,16 @@ export const getTransferColumns = ({
     ),
     cell: ({ row }) => {
       const status = row.original.status;
-      const isActionable = status === "PENDING" || status === "MANAGER_APPROVED";
+      const isLiveMarket = Boolean(row.original.isLiveMarket);
+
+      const isActionable =
+        status === "PENDING" ||
+        status === "MANAGER_APPROVED" ||
+        status === "BOTH_APPROVED";
+
+      const canApprove = isLiveMarket
+        ? status === "BOTH_APPROVED"
+        : status === "PENDING" || status === "MANAGER_APPROVED";
 
       return (
         <div className="flex items-center justify-end gap-1.5 pr-2">
@@ -251,17 +283,26 @@ export const getTransferColumns = ({
             <Eye className="w-3.5 h-3.5" />
           </button>
 
-          {/* Quick Actions for Pending / Manager Approved */}
+          {/* Quick Actions for Actionable Transfers */}
           {isActionable && (
             <>
-              <button
-                type="button"
-                onClick={() => onApprove(row.original)}
-                className="w-7 h-7 rounded border border-emerald-200 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 flex items-center justify-center transition-colors cursor-pointer"
-                title="Approve Transfer"
-              >
-                <Check className="w-3.5 h-3.5 stroke-[2.5]" />
-              </button>
+              {canApprove ? (
+                <button
+                  type="button"
+                  onClick={() => onApprove(row.original)}
+                  className="w-7 h-7 rounded border border-emerald-200 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 flex items-center justify-center transition-colors cursor-pointer"
+                  title="Approve Transfer"
+                >
+                  <Check className="w-3.5 h-3.5 stroke-[2.5]" />
+                </button>
+              ) : isLiveMarket ? (
+                <span
+                  className="text-[10px] text-amber-700 bg-amber-50 border border-amber-200 px-1.5 py-1 rounded font-medium cursor-help"
+                  title="Awaiting Player and Selling Club Manager consent before Admin approval"
+                >
+                  Awaiting Consent
+                </span>
+              ) : null}
               <button
                 type="button"
                 onClick={() => onReject(row.original)}

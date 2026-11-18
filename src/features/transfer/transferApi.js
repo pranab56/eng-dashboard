@@ -11,6 +11,9 @@ export const transferApi = baseApi.injectEndpoints({
           if (params.limit) searchParams.append("limit", params.limit);
           if (params.status) searchParams.append("status", params.status);
           if (params.searchTerm) searchParams.append("searchTerm", params.searchTerm);
+          if (params.isLiveMarket !== undefined && params.isLiveMarket !== "") {
+            searchParams.append("isLiveMarket", params.isLiveMarket);
+          }
           const queryString = searchParams.toString();
           return {
             url: `/transfers${queryString ? `?${queryString}` : ""}`,
@@ -33,12 +36,28 @@ export const transferApi = baseApi.injectEndpoints({
       providesTags: ["transfer"],
     }),
 
+    getLiveMarketPlayers: builder.query({
+      query: (params) => {
+        const searchParams = new URLSearchParams();
+        if (params?.page) searchParams.append("page", params.page);
+        if (params?.limit) searchParams.append("limit", params.limit);
+        if (params?.searchTerm) searchParams.append("searchTerm", params.searchTerm);
+        if (params?.position) searchParams.append("position", params.position);
+        const queryString = searchParams.toString();
+        return {
+          url: `/live-transfer/players${queryString ? `?${queryString}` : ""}`,
+          method: "GET",
+        };
+      },
+      providesTags: ["transfer", "liveTransferMarket"],
+    }),
+
     aproveTransfer: builder.mutation({
       query: ({ id }) => ({
         url: `/transfers/${id}/approve`,
         method: "PATCH",
       }),
-      invalidatesTags: ["transfer"],
+      invalidatesTags: ["transfer", "liveTransferMarket"],
     }),
 
     rejectTransfer: builder.mutation({
@@ -46,7 +65,7 @@ export const transferApi = baseApi.injectEndpoints({
         url: `/transfers/${id}/reject`,
         method: "PATCH",
       }),
-      invalidatesTags: ["transfer"],
+      invalidatesTags: ["transfer", "liveTransferMarket"],
     }),
   }),
 });
@@ -55,6 +74,7 @@ export const transferApi = baseApi.injectEndpoints({
 export const {
   useGetAllTransferQuery,
   useGetTransferOverviewQuery,
+  useGetLiveMarketPlayersQuery,
   useAproveTransferMutation,
   useRejectTransferMutation,
 } = transferApi;

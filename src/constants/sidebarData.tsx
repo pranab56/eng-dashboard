@@ -441,6 +441,13 @@ export const sidebarSections: TSidebarSection[] = [
         allowedRoles: ["SUPER_ADMIN", "ADMIN"],
       },
       {
+        id: 171,
+        icon: ImageIcon,
+        title: "Section Banners",
+        label: "/section-banner",
+        allowedRoles: ["SUPER_ADMIN", "ADMIN", "MANAGER"],
+      },
+      {
         id: 18,
         icon: Share2,
         title: "Social Media",
