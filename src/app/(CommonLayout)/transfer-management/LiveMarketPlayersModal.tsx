@@ -9,10 +9,8 @@ import {
   Search,
   X,
   Building2,
-  Calendar,
   Sparkles,
   Coins,
-  Shield,
   User,
   RefreshCw,
 } from "lucide-react";

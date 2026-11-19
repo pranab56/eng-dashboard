@@ -57,7 +57,6 @@ export const getPlayerVotingColumns = (
     ),
     cell: ({ row }) => {
       const { title, votingType, weekNumber, month } = row.original;
-      const isWeek = votingType === "WEEK";
 
       return (
         <div className="flex flex-col min-w-[220px] py-1">
