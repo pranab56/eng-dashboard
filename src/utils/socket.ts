@@ -34,11 +34,11 @@ export const getSocket = (): Socket => {
     });
 
     socket.on("connect", () => {
-      console.log("🔌 Connected to ENG WebSocket with auth:", socket?.id);
+      console.log("Connected to ENG WebSocket with auth:", socket?.id);
     });
 
     socket.on("connect_error", (err) => {
-      console.warn("⚠️ WebSocket connection error:", err.message);
+      console.warn("WebSocket connection error:", err.message);
     });
   }
 

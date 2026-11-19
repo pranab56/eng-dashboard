@@ -55,7 +55,7 @@ const defaultValues: Partial<LoginFormValues> = {
 };
 
 /**
- * ⚽ 3D Realistic Football Soccer Ball Component
+ * 3D Realistic Football Soccer Ball Component
  */
 function Football3D() {
   return (
@@ -125,7 +125,7 @@ function Football3D() {
 
 
 /**
- * 🐼 Fully Animated Interactive Panda Mascot
+ * Fully Animated Interactive Panda Mascot
  * - 100% covers both eyes when password input is focused
  * - Peeks with left eye when showPassword is clicked
  * - Pupils follow downwards when typing email
@@ -306,7 +306,7 @@ const Login = () => {
   const dispatch = useDispatch();
   const [login, { isLoading }] = useLoginMutation();
 
-  // 🌊 Autonomous Physics-Based 3D Engine: Continuous Cinematic Sway + Interactive Mouse Parallax
+  // Autonomous Physics-Based 3D Engine: Continuous Cinematic Sway + Interactive Mouse Parallax
   const [parallax, setParallax] = useState({ x: 0, y: 0, time: 0 });
   const targetParallax = React.useRef({ x: 0, y: 0 });
   const currentParallax = React.useRef({ x: 0, y: 0 });
@@ -318,7 +318,7 @@ const Login = () => {
     const animate = (now: number) => {
       const elapsed = (now - startTime) * 0.001;
 
-      // 🌊 Continuous organic stadium camera sway (composite harmonic wave)
+      // Continuous organic stadium camera sway (composite harmonic wave)
       // Generates vibrant, natural autonomous movement across all axes
       const autoDriftX = Math.sin(elapsed * 0.95) * 0.7 + Math.sin(elapsed * 0.42) * 0.25;
       const autoDriftY = Math.cos(elapsed * 0.75) * 0.6 + Math.sin(elapsed * 0.31) * 0.25;
@@ -386,7 +386,7 @@ const Login = () => {
         return;
       }
 
-      // 🛑 Role check: strictly allow ADMIN & SUPER_ADMIN only
+      // Role check: strictly allow ADMIN & SUPER_ADMIN only
       const userRole =
         decodeRoleFromToken(accessToken) ||
         (res?.data?.role || res?.role || "").toUpperCase();
@@ -431,7 +431,7 @@ const Login = () => {
   return (
     <div className="min-h-[100dvh] w-full flex flex-col lg:flex-row bg-slate-50 lg:bg-slate-950">
       {/* ========================================================= */}
-      {/* 🏟️ LEFT PANEL: 3D Sports Stadium & Environment (~55%)    */}
+      {/* LEFT PANEL: 3D Sports Stadium & Environment (~55%)    */}
       {/* ========================================================= */}
       <div
         onMouseMove={handleMouseMove}
@@ -543,7 +543,7 @@ const Login = () => {
               <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-white/10 pointer-events-none" />
             </div>
 
-            {/* ⚽ 3D Football Hovering on Pitch (Autonomous Floating Levitation) */}
+            {/* 3D Football Hovering on Pitch (Autonomous Floating Levitation) */}
             <div
               className="absolute z-20"
               style={{
@@ -625,7 +625,7 @@ const Login = () => {
       </div>
 
       {/* ========================================================= */}
-      {/* 🔐 RIGHT PANEL: Clean Enterprise Authentication Form (45%) */}
+      {/* RIGHT PANEL: Clean Enterprise Authentication Form (45%) */}
       {/* ========================================================= */}
       <div className="w-full lg:w-[45%] min-h-[100dvh] bg-slate-50 relative overflow-y-auto text-slate-900 flex flex-col justify-between p-4 sm:p-8 lg:p-12 xl:p-16">
         {/* Subtle Ambient Light Mesh & Radiance (Matching Forgot Password) */}
@@ -659,7 +659,7 @@ const Login = () => {
         {/* Center Main Form */}
         <div className="relative z-10 max-w-[390px] w-full mx-auto my-auto py-4 sm:py-8">
           <div className="mb-6 text-center">
-            {/* 🐼 Interactive Panda (Centered directly over Administrator Portal) */}
+            {/* Interactive Panda (Centered directly over Administrator Portal) */}
             <div className="flex justify-center mb-1">
               <InteractivePanda
                 isPasswordFocused={isPasswordFocused}

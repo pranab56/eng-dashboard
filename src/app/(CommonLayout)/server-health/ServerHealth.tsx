@@ -371,7 +371,7 @@ export default function ServerHealth() {
       </div>
 
       {/* ======================================================== */}
-      {/* 🚀 REDIS CACHE & BULLMQ QUEUE MANAGEMENT SECTION */}
+      {/* REDIS CACHE & BULLMQ QUEUE MANAGEMENT SECTION */}
       {/* ======================================================== */}
       <div className="space-y-4 pt-2">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">

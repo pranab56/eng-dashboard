@@ -15,7 +15,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 
-// ✅ Zod Schema
+// Zod Schema
 const createIndustrySchema = z.object({
   name: z.string().min(1, "Industry name is required"),
   image: z
@@ -27,7 +27,7 @@ const createIndustrySchema = z.object({
     .optional(),
 });
 
-// ✅ Type
+// Type
 type CreateIndustryValues = z.infer<typeof createIndustrySchema>;
 
 const defaultValues: Partial<CreateIndustryValues> = {
@@ -41,7 +41,7 @@ const CreateCategory = () => {
     mode: "onChange",
   });
 
-  // ✅ Submit Handler
+  // Submit Handler
   async function onSubmit(data: CreateIndustryValues) {
     const payload = {
       name: data.name,

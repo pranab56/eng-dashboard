@@ -66,7 +66,7 @@ export const pushNotificationApi = baseApi.injectEndpoints({
             invalidatesTags: ["pushNotification"]
         }),
 
-        // 🔔 Dynamic Match Reminder Endpoints
+        // Dynamic Match Reminder Endpoints
         getMatchReminderSettings: builder.query({
             query: () => ({
                 url: "/push-notification/match-reminders/settings",
