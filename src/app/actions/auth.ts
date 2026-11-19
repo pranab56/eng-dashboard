@@ -5,9 +5,11 @@ import { cookies } from 'next/headers';
 export async function setAuthCookie(token: string, refreshToken?: string) {
   if (!token || typeof token !== 'string') return;
   const cookieStore = await cookies();
+  const isProduction = process.env.NODE_ENV === 'production';
+
   cookieStore.set('alexandertel-admin-token', token, {
     httpOnly: true,
-    secure: false,
+    secure: isProduction,
     sameSite: 'lax',
     path: '/',
     maxAge: 60 * 60 * 24 * 7, // 1 week
@@ -16,7 +18,7 @@ export async function setAuthCookie(token: string, refreshToken?: string) {
   if (refreshToken) {
     cookieStore.set('alexandertel-admin-refresh-token', refreshToken, {
       httpOnly: true,
-      secure: false,
+      secure: isProduction,
       sameSite: 'lax',
       path: '/',
       maxAge: 60 * 60 * 24 * 30, // 30 days

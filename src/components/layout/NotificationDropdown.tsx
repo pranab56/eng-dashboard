@@ -1,8 +1,9 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import Link from "next/link";
+import { getSocket } from "@/utils/socket";
 import {
   Bell,
   CheckCheck,
@@ -38,7 +39,7 @@ export default function NotificationDropdown() {
   const [activeTab, setActiveTab] = useState<"ALL" | "UNREAD">("ALL");
 
   // Fetch unread count for badge
-  const { data: unreadData } = useNotificationUnReadCountQuery(undefined, {
+  const { data: unreadData, refetch: refetchUnread } = useNotificationUnReadCountQuery(undefined, {
     pollingInterval: 30000,
   });
   const unreadCount = unreadData?.data?.unreadCount || 0;
@@ -53,6 +54,29 @@ export default function NotificationDropdown() {
     { page: 1, limit: 15 },
     { skip: !isOpen }
   );
+
+  // Real-time socket notification listener with auth
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const socket = getSocket();
+
+    const handleNewNotification = (data: any) => {
+      refetch();
+      refetchUnread();
+      const title = data?.title || "New Notification";
+      const description =
+        data?.message || data?.body || data?.description || "You have received a new notification.";
+      toast.info(title, { description });
+    };
+
+    socket.on("notification", handleNewNotification);
+    socket.on("notification::all", handleNewNotification);
+
+    return () => {
+      socket.off("notification", handleNewNotification);
+      socket.off("notification::all", handleNewNotification);
+    };
+  }, [refetch, refetchUnread]);
 
   const [readSingleNotification] = useReadSingleNotificationMutation();
   const [readAllNotification, { isLoading: isMarkingAll }] = useReadAllNotificationMutation();
