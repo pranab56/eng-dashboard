@@ -19,12 +19,7 @@ export const getTeamColumns = (
         <div className="flex items-center gap-3">
           <div className="relative w-10 h-10 rounded overflow-hidden border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 flex items-center justify-center shrink-0">
             {logoUrl ? (
-              <Image
-                src={logoUrl}
-                alt="logo"
-                fill
-                className="object-contain p-1"
-              />
+              <Image src={logoUrl} alt="logo" fill className="object-contain p-1" />
             ) : (
               <Shield className="w-5 h-5 text-slate-400" />
             )}
@@ -68,12 +63,13 @@ export const getTeamColumns = (
     cell: ({ row }) => {
       const manager = row.original.managers;
       if (!manager) {
-        return (
-          <span className="text-xs text-slate-400 italic">Unassigned</span>
-        );
+        return <span className="text-xs text-slate-400 italic">Unassigned</span>;
       }
       const profileUrl = formatImagePath(manager.profile);
-      const name = `${manager.firstName || ""} ${manager.lastName || ""}`.trim() || manager.userName || "Manager";
+      const name =
+        `${manager.firstName || ""} ${manager.lastName || ""}`.trim() ||
+        manager.userName ||
+        "Manager";
 
       return (
         <div className="flex items-center gap-2">

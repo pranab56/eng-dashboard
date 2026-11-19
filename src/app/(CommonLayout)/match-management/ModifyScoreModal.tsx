@@ -2,25 +2,13 @@
 "use client";
 
 import React, { useEffect, useState, useMemo, useRef } from "react";
-import {
-  Dialog,
-  DialogContent,
-  DialogTitle,
-} from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { useModifyScoreMutation, useGetSingleMatchQuery } from "@/features/match/matchApi";
 import { useGetSingleTeamQuery } from "@/features/teamManagement/teamApi";
 import { toast } from "sonner";
 import Image from "next/image";
 import { formatImagePath } from "../../../utils/formatImagePath";
-import {
-  X,
-  Plus,
-  Trash2,
-  Loader2,
-  ChevronDown,
-  Search,
-  Check,
-} from "lucide-react";
+import { X, Plus, Trash2, Loader2, ChevronDown, Search, Check } from "lucide-react";
 
 interface ModifyScoreModalProps {
   match: any;
@@ -99,7 +87,9 @@ const CustomGoalTypeDropdown = ({
                   setIsOpen(false);
                 }}
                 className={`w-full px-3 py-2 text-xs flex items-center justify-between text-left transition-colors cursor-pointer ${
-                  isSelected ? "bg-slate-50 text-slate-900 font-semibold" : "text-slate-700 hover:bg-slate-50"
+                  isSelected
+                    ? "bg-slate-50 text-slate-900 font-semibold"
+                    : "text-slate-700 hover:bg-slate-50"
                 }`}
               >
                 <span>{opt.label}</span>
@@ -157,7 +147,8 @@ const SearchablePlayerDropdown = ({
     ? selectedItem.name ||
       `${selectedItem.firstName || ""} ${selectedItem.lastName || ""}`.trim() ||
       (selectedItem.player
-        ? selectedItem.player.name || `${selectedItem.player.firstName || ""} ${selectedItem.player.lastName || ""}`.trim()
+        ? selectedItem.player.name ||
+          `${selectedItem.player.firstName || ""} ${selectedItem.player.lastName || ""}`.trim()
         : "") ||
       "Selected Player"
     : "";
@@ -229,7 +220,9 @@ const SearchablePlayerDropdown = ({
                   setIsOpen(false);
                 }}
                 className={`w-full px-2.5 py-1.5 text-xs flex items-center justify-between text-left rounded-md transition-colors cursor-pointer ${
-                  !value ? "bg-slate-100 font-semibold text-slate-900" : "text-slate-600 hover:bg-slate-50"
+                  !value
+                    ? "bg-slate-100 font-semibold text-slate-900"
+                    : "text-slate-600 hover:bg-slate-50"
                 }`}
               >
                 <span>{noneLabel}</span>
@@ -262,14 +255,14 @@ const SearchablePlayerDropdown = ({
                       setIsOpen(false);
                     }}
                     className={`w-full px-2.5 py-1.5 text-xs flex items-center justify-between text-left rounded-md transition-colors cursor-pointer ${
-                      isSelected ? "bg-slate-100 font-semibold text-slate-900" : "text-slate-700 hover:bg-slate-50"
+                      isSelected
+                        ? "bg-slate-100 font-semibold text-slate-900"
+                        : "text-slate-700 hover:bg-slate-50"
                     }`}
                   >
                     <div className="flex items-center gap-2 truncate">
                       <span className="truncate">{name}</span>
-                      {team && (
-                        <span className="text-[10px] text-slate-400">({team})</span>
-                      )}
+                      {team && <span className="text-[10px] text-slate-400">({team})</span>}
                       {pos && (
                         <span className="px-1.5 py-0.2 rounded text-[10px] font-medium bg-slate-100 text-slate-500 uppercase">
                           {pos}
@@ -340,9 +333,12 @@ const ModifyScoreModal = ({ match, isOpen, onClose }: ModifyScoreModalProps) => 
   }, [homeMembers, awayMembers, match]);
 
   // Detailed match info query
-  const { data: singleMatchData, isLoading: isMatchLoading } = useGetSingleMatchQuery(currentMatchId, {
-    skip: !currentMatchId || !isOpen,
-  });
+  const { data: singleMatchData, isLoading: isMatchLoading } = useGetSingleMatchQuery(
+    currentMatchId,
+    {
+      skip: !currentMatchId || !isOpen,
+    }
+  );
 
   // Only reset form when opening modal for a new/different match
   useEffect(() => {
@@ -571,9 +567,7 @@ const ModifyScoreModal = ({ match, isOpen, onClose }: ModifyScoreModalProps) => 
           {/* Player of the Day Section */}
           <div className="border border-amber-200/70 bg-amber-50/40 rounded-lg p-3 sm:flex sm:items-center sm:justify-between gap-4">
             <div className="mb-2 sm:mb-0">
-              <h4 className="text-xs font-semibold text-amber-950">
-                Player of the Match (POTD)
-              </h4>
+              <h4 className="text-xs font-semibold text-amber-950">Player of the Match (POTD)</h4>
               <p className="text-[11px] text-amber-800/80 mt-0.5">
                 Award coin bonus and market value for standout match performance.
               </p>
@@ -594,9 +588,7 @@ const ModifyScoreModal = ({ match, isOpen, onClose }: ModifyScoreModalProps) => 
           <div className="space-y-4">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
               <div>
-                <h4 className="text-sm font-semibold text-slate-900">
-                  Assign Goal Scorers
-                </h4>
+                <h4 className="text-sm font-semibold text-slate-900">Assign Goal Scorers</h4>
                 <p className="text-xs text-slate-500 mt-0.5">
                   Select players to credit goals, assists, coins and stats.
                 </p>

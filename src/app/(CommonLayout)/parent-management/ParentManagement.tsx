@@ -100,7 +100,9 @@ const ParentManagement = () => {
       const email = (parent.email || "").toLowerCase();
       const phone = (parent.phone || "").toLowerCase();
       const childrenNames = (parent.myPlayers || parent.children || [])
-        .map((c: any) => `${c.firstName || ""} ${c.lastName || ""} ${c.userName || ""}`.toLowerCase())
+        .map((c: any) =>
+          `${c.firstName || ""} ${c.lastName || ""} ${c.userName || ""}`.toLowerCase()
+        )
         .join(" ");
 
       return (

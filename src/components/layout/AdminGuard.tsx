@@ -7,10 +7,7 @@ import { removeAuthCookie } from "@/app/actions/auth";
 import { toast } from "sonner";
 import { usePathname, useRouter } from "next/navigation";
 import { useGetProfileQuery } from "@/features/profile/profileApi";
-import {
-  getFirstPermittedRoute,
-  isRouteAllowedForAdmin,
-} from "@/constants/permissions";
+import { getFirstPermittedRoute, isRouteAllowedForAdmin } from "@/constants/permissions";
 
 export const decodeRoleFromToken = (token: string): string | null => {
   try {
@@ -60,11 +57,7 @@ export default function AdminGuard({ children }: { children: React.ReactNode }) 
       return;
     }
 
-    const role = (
-      profileUser?.role ||
-      decodeRoleFromToken(token) ||
-      ""
-    ).toUpperCase();
+    const role = (profileUser?.role || decodeRoleFromToken(token) || "").toUpperCase();
 
     // 1. Strictly block non-admin accounts from the dashboard
     if (role && role !== "ADMIN" && role !== "SUPER_ADMIN") {

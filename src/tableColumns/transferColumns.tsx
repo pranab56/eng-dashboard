@@ -4,16 +4,7 @@ import { ColumnDef } from "@tanstack/react-table";
 import { TTransfer } from "@/types/columnTypes";
 import Image from "next/image";
 import { formatImagePath } from "@/utils/formatImagePath";
-import {
-  ArrowRight,
-  Eye,
-  Check,
-  X,
-  Clock,
-  CheckCircle2,
-  XCircle,
-  Building2,
-} from "lucide-react";
+import { ArrowRight, Eye, Check, X, Clock, CheckCircle2, XCircle, Building2 } from "lucide-react";
 import dayjs from "dayjs";
 
 export type ExtendedTransfer = TTransfer & {
@@ -50,13 +41,12 @@ export const getTransferColumns = ({
   {
     accessorKey: "playerFirstName",
     header: () => (
-      <div className="text-xs font-semibold text-slate-600 uppercase tracking-wider">
-        Player
-      </div>
+      <div className="text-xs font-semibold text-slate-600 uppercase tracking-wider">Player</div>
     ),
     cell: ({ row }) => {
       const { playerFirstName, playerLastName, playerEmail, playerProfile } = row.original;
-      const initials = `${playerFirstName?.[0] || ""}${playerLastName?.[0] || ""}`.toUpperCase() || "PL";
+      const initials =
+        `${playerFirstName?.[0] || ""}${playerLastName?.[0] || ""}`.toUpperCase() || "PL";
 
       return (
         <div className="flex items-center gap-2.5 py-1">
@@ -77,9 +67,7 @@ export const getTransferColumns = ({
             <span className="font-semibold text-xs text-slate-900 truncate">
               {playerFirstName} {playerLastName}
             </span>
-            <span className="text-[11px] text-slate-500 truncate">
-              {playerEmail || "No email"}
-            </span>
+            <span className="text-[11px] text-slate-500 truncate">{playerEmail || "No email"}</span>
           </div>
         </div>
       );
@@ -167,7 +155,9 @@ export const getTransferColumns = ({
             {type ? type.replace(/_/g, " ") : "Standard"}
           </span>
           <span className="text-[11px] text-slate-500">
-            {fee !== undefined && fee !== null && fee > 0 ? `$${fee.toLocaleString()}` : "Free Transfer"}
+            {fee !== undefined && fee !== null && fee > 0
+              ? `$${fee.toLocaleString()}`
+              : "Free Transfer"}
           </span>
         </div>
       );
@@ -181,7 +171,8 @@ export const getTransferColumns = ({
       </div>
     ),
     cell: ({ row }) => {
-      const managerName = `${row.original.requestedByFirstName || ""} ${row.original.requestedByLastName || ""}`.trim();
+      const managerName =
+        `${row.original.requestedByFirstName || ""} ${row.original.requestedByLastName || ""}`.trim();
       return (
         <div className="flex flex-col text-xs">
           <span className="font-medium text-slate-800 truncate max-w-[140px]">
@@ -197,9 +188,7 @@ export const getTransferColumns = ({
   {
     accessorKey: "status",
     header: () => (
-      <div className="text-xs font-semibold text-slate-600 uppercase tracking-wider">
-        Status
-      </div>
+      <div className="text-xs font-semibold text-slate-600 uppercase tracking-wider">Status</div>
     ),
     cell: ({ row }) => {
       const status = row.original.status;
@@ -263,9 +252,7 @@ export const getTransferColumns = ({
       const isLiveMarket = Boolean(row.original.isLiveMarket);
 
       const isActionable =
-        status === "PENDING" ||
-        status === "MANAGER_APPROVED" ||
-        status === "BOTH_APPROVED";
+        status === "PENDING" || status === "MANAGER_APPROVED" || status === "BOTH_APPROVED";
 
       const canApprove = isLiveMarket
         ? status === "BOTH_APPROVED"

@@ -166,9 +166,7 @@ export const getPromotionalZoneColumns = (
               {clicks} clicks
             </span>
           </div>
-          <div className="text-[10px] text-slate-400 font-medium">
-            CTR: {ctr}%
-          </div>
+          <div className="text-[10px] text-slate-400 font-medium">CTR: {ctr}%</div>
         </div>
       );
     },
@@ -186,7 +184,9 @@ export const getPromotionalZoneColumns = (
         <div className="space-y-0.5 text-xs">
           <div className="flex items-center gap-1 text-slate-700 font-medium">
             <Calendar className="w-3 h-3 text-slate-400 shrink-0" />
-            <span>{dayjs(item.startDate).format("MMM D")} - {dayjs(item.endDate).format("MMM D, YYYY")}</span>
+            <span>
+              {dayjs(item.startDate).format("MMM D")} - {dayjs(item.endDate).format("MMM D, YYYY")}
+            </span>
           </div>
           <div className="text-[10px] text-slate-400">
             {dayjs().isAfter(dayjs(item.endDate)) ? (
@@ -202,9 +202,7 @@ export const getPromotionalZoneColumns = (
   {
     accessorKey: "status",
     header: () => (
-      <span className="font-semibold text-xs text-slate-600 uppercase tracking-wider">
-        Status
-      </span>
+      <span className="font-semibold text-xs text-slate-600 uppercase tracking-wider">Status</span>
     ),
     cell: ({ row }) => {
       const item = row.original;

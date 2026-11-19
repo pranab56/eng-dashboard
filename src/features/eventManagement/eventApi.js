@@ -7,7 +7,7 @@ export const eventApi = baseApi.injectEndpoints({
         url: page ? `/event?page=${page}` : "/event",
         method: "GET",
       }),
-      providesTags: ["event"]
+      providesTags: ["event"],
     }),
 
     getEventAnalytics: builder.query({
@@ -15,7 +15,7 @@ export const eventApi = baseApi.injectEndpoints({
         url: "/event/analytics",
         method: "GET",
       }),
-      providesTags: ["event"]
+      providesTags: ["event"],
     }),
 
     singleEvent: builder.query({
@@ -23,7 +23,7 @@ export const eventApi = baseApi.injectEndpoints({
         url: `/event/${id}`,
         method: "GET",
       }),
-      providesTags: ["event"]
+      providesTags: ["event"],
     }),
 
     createEvent: builder.mutation({
@@ -32,7 +32,7 @@ export const eventApi = baseApi.injectEndpoints({
         method: "POST",
         body: data,
       }),
-      invalidatesTags: ["event"]
+      invalidatesTags: ["event"],
     }),
 
     editevent: builder.mutation({
@@ -41,7 +41,7 @@ export const eventApi = baseApi.injectEndpoints({
         method: "PATCH",
         body: data,
       }),
-      invalidatesTags: ["event"]
+      invalidatesTags: ["event"],
     }),
 
     deleteevent: builder.mutation({
@@ -49,7 +49,7 @@ export const eventApi = baseApi.injectEndpoints({
         url: `/event/${id}`,
         method: "DELETE",
       }),
-      invalidatesTags: ["event"]
+      invalidatesTags: ["event"],
     }),
 
     rearrangeEvents: builder.mutation({

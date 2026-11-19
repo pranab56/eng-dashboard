@@ -81,9 +81,7 @@ export const getMatchColumns = (
                   className="object-cover"
                 />
               ) : (
-                <span className="text-[10px] font-bold text-slate-500">
-                  {homeName[0] || "H"}
-                </span>
+                <span className="text-[10px] font-bold text-slate-500">{homeName[0] || "H"}</span>
               )}
             </div>
             <div className="w-8 h-8 rounded-full bg-slate-100 border border-slate-200 overflow-hidden relative flex items-center justify-center shrink-0 -ml-2">
@@ -95,9 +93,7 @@ export const getMatchColumns = (
                   className="object-cover"
                 />
               ) : (
-                <span className="text-[10px] font-bold text-slate-500">
-                  {awayName[0] || "A"}
-                </span>
+                <span className="text-[10px] font-bold text-slate-500">{awayName[0] || "A"}</span>
               )}
             </div>
           </div>
@@ -142,9 +138,7 @@ export const getMatchColumns = (
   {
     accessorKey: "venueName",
     header: () => (
-      <div className="text-xs font-semibold text-slate-600 uppercase tracking-wider">
-        Venue
-      </div>
+      <div className="text-xs font-semibold text-slate-600 uppercase tracking-wider">Venue</div>
     ),
     cell: ({ row }) => {
       const venue = row.original.venueName || "Unassigned";
@@ -161,9 +155,7 @@ export const getMatchColumns = (
   {
     accessorKey: "score",
     header: () => (
-      <div className="text-xs font-semibold text-slate-600 uppercase tracking-wider">
-        Score
-      </div>
+      <div className="text-xs font-semibold text-slate-600 uppercase tracking-wider">Score</div>
     ),
     cell: ({ row }) => {
       const homeScore = row.original.homeScore ?? 0;
@@ -186,9 +178,7 @@ export const getMatchColumns = (
   {
     accessorKey: "matchType",
     header: () => (
-      <div className="text-xs font-semibold text-slate-600 uppercase tracking-wider">
-        Type
-      </div>
+      <div className="text-xs font-semibold text-slate-600 uppercase tracking-wider">Type</div>
     ),
     cell: ({ row }) => {
       const type = (row.original.matchType || "league").toLowerCase();
@@ -212,9 +202,7 @@ export const getMatchColumns = (
   {
     accessorKey: "status",
     header: () => (
-      <div className="text-xs font-semibold text-slate-600 uppercase tracking-wider">
-        Status
-      </div>
+      <div className="text-xs font-semibold text-slate-600 uppercase tracking-wider">Status</div>
     ),
     cell: ({ row }) => {
       const match = row.original;
@@ -231,9 +219,7 @@ export const getMatchColumns = (
           )} inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full capitalize font-medium text-xs border transition-colors cursor-pointer`}
           title="Click to update status & stage"
         >
-          {isLive && (
-            <span className="w-1.5 h-1.5 rounded-full bg-rose-500 animate-pulse" />
-          )}
+          {isLive && <span className="w-1.5 h-1.5 rounded-full bg-rose-500 animate-pulse" />}
           <span>{displayStatus.replace(/_/g, " ")}</span>
         </button>
       );

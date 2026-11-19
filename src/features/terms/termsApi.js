@@ -1,16 +1,14 @@
 import { baseApi } from "../../utils/apiBaseQuery";
 
-
 export const termsApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
-
     createTerms: builder.mutation({
       query: (data) => ({
         url: "/terms-and-conditions",
         method: "POST",
         body: data,
       }),
-      invalidatesTags: ["terms"]
+      invalidatesTags: ["terms"],
     }),
 
     getTerms: builder.query({
@@ -18,14 +16,10 @@ export const termsApi = baseApi.injectEndpoints({
         url: "/terms-and-conditions",
         method: "GET",
       }),
-      providesTags: ["terms"]
+      providesTags: ["terms"],
     }),
-
   }),
 });
 
 // Export hooks
-export const {
-  useCreateTermsMutation,
-  useGetTermsQuery,
-} = termsApi;
+export const { useCreateTermsMutation, useGetTermsQuery } = termsApi;

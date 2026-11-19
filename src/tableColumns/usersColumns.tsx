@@ -20,9 +20,7 @@ export const getUsersColumns = (
   {
     accessorKey: "userName",
     header: () => (
-      <div className="text-xs font-semibold text-slate-600 uppercase tracking-wider">
-        Member
-      </div>
+      <div className="text-xs font-semibold text-slate-600 uppercase tracking-wider">Member</div>
     ),
     cell: ({ row }) => {
       const profileUrl = formatImagePath(row.original.profile || row.original.profilePic);
@@ -36,17 +34,9 @@ export const getUsersColumns = (
           {/* Avatar with subtle ring & fallback */}
           <div className="relative w-9 h-9 rounded-full bg-slate-100 border border-slate-200 overflow-hidden flex items-center justify-center shrink-0 shadow-2xs">
             {profileUrl ? (
-              <Image
-                src={profileUrl}
-                alt={name}
-                fill
-                sizes="36px"
-                className="object-cover"
-              />
+              <Image src={profileUrl} alt={name} fill sizes="36px" className="object-cover" />
             ) : (
-              <span className="text-xs font-bold text-slate-600 font-mono">
-                {initials}
-              </span>
+              <span className="text-xs font-bold text-slate-600 font-mono">{initials}</span>
             )}
           </div>
 
@@ -55,7 +45,10 @@ export const getUsersColumns = (
             <span className="font-semibold text-xs text-slate-900 truncate" title={name}>
               {name}
             </span>
-            <span className="text-[11px] text-slate-500 truncate" title={row.original.email || "Managed Player Profile"}>
+            <span
+              className="text-[11px] text-slate-500 truncate"
+              title={row.original.email || "Managed Player Profile"}
+            >
               {row.original.email || "Managed Player Profile"}
             </span>
           </div>
@@ -66,9 +59,7 @@ export const getUsersColumns = (
   {
     accessorKey: "role",
     header: () => (
-      <div className="text-xs font-semibold text-slate-600 uppercase tracking-wider">
-        Role
-      </div>
+      <div className="text-xs font-semibold text-slate-600 uppercase tracking-wider">Role</div>
     ),
     cell: ({ row }) => {
       const rawRole = (row.original.role || "USER").toUpperCase();
@@ -140,15 +131,18 @@ export const getUsersColumns = (
                 currentStatus === "APPROVED"
                   ? "text-emerald-700 bg-emerald-50 border-emerald-200"
                   : currentStatus === "REJECTED"
-                  ? "text-rose-700 bg-rose-50 border-rose-200"
-                  : currentStatus === "UNVERIFIED" || !isVerified
-                  ? "text-amber-700 bg-amber-50 border-amber-200"
-                  : "text-blue-700 bg-blue-50 border-blue-200"
+                    ? "text-rose-700 bg-rose-50 border-rose-200"
+                    : currentStatus === "UNVERIFIED" || !isVerified
+                      ? "text-amber-700 bg-amber-50 border-amber-200"
+                      : "text-blue-700 bg-blue-50 border-blue-200"
               }`}
             >
               {currentStatus}
             </span>
-            <span className="text-[10px] text-rose-600 font-medium bg-rose-50/70 px-1.5 py-0.5 rounded border border-rose-100 max-w-[160px] truncate" title={reason}>
+            <span
+              className="text-[10px] text-rose-600 font-medium bg-rose-50/70 px-1.5 py-0.5 rounded border border-rose-100 max-w-[160px] truncate"
+              title={reason}
+            >
               {reason}
             </span>
           </div>
@@ -170,7 +164,9 @@ export const getUsersColumns = (
           <div className="flex items-center gap-2">
             <button
               type="button"
-              onClick={() => onUpdateUserStatus(row.original._id, isApproved ? "REJECTED" : "APPROVED")}
+              onClick={() =>
+                onUpdateUserStatus(row.original._id, isApproved ? "REJECTED" : "APPROVED")
+              }
               className={`relative inline-flex h-5 w-9 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-hidden ${
                 isApproved ? "bg-emerald-600" : "bg-slate-200"
               }`}
@@ -186,8 +182,8 @@ export const getUsersColumns = (
                 isApproved
                   ? "text-emerald-600"
                   : currentStatus === "REJECTED"
-                  ? "text-rose-600"
-                  : "text-amber-600"
+                    ? "text-rose-600"
+                    : "text-amber-600"
               }`}
             >
               {currentStatus}
@@ -214,8 +210,8 @@ export const getUsersColumns = (
               isApproved
                 ? "text-emerald-700 bg-emerald-50 border-emerald-200"
                 : currentStatus === "REJECTED"
-                ? "text-rose-700 bg-rose-50 border-rose-200"
-                : "text-amber-700 bg-amber-50 border-amber-200"
+                  ? "text-rose-700 bg-rose-50 border-rose-200"
+                  : "text-amber-700 bg-amber-50 border-amber-200"
             }`}
           >
             {isApproved ? (

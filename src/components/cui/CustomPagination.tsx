@@ -33,20 +33,11 @@ function MyPaginationSuspense({
 
   const safeTotalPages = Math.max(1, TOTAL_PAGES || 1);
   const rawPage = parseInt(searchParams.get(qryName) || "1", 10);
-  const currentPage = Math.min(
-    safeTotalPages,
-    Math.max(1, Number.isNaN(rawPage) ? 1 : rawPage)
-  );
+  const currentPage = Math.min(safeTotalPages, Math.max(1, Number.isNaN(rawPage) ? 1 : rawPage));
 
   // Proper sliding window for pages
-  const startPage = Math.max(
-    1,
-    currentPage - Math.floor(MAX_PAGE_WINDOW / 2)
-  );
-  const endPage = Math.min(
-    safeTotalPages,
-    startPage + MAX_PAGE_WINDOW - 1
-  );
+  const startPage = Math.max(1, currentPage - Math.floor(MAX_PAGE_WINDOW / 2));
+  const endPage = Math.min(safeTotalPages, startPage + MAX_PAGE_WINDOW - 1);
 
   // Recalculate startPage if endPage is near the end
   const adjustedStartPage = Math.max(1, endPage - MAX_PAGE_WINDOW + 1);
@@ -79,8 +70,14 @@ function MyPaginationSuspense({
     >
       {showPageInfo && (
         <span className="text-xs text-slate-500 font-medium select-none">
-          Page <strong className="font-semibold text-slate-800 dark:text-slate-200">{currentPage}</strong> of{" "}
-          <strong className="font-semibold text-slate-800 dark:text-slate-200">{safeTotalPages}</strong>
+          Page{" "}
+          <strong className="font-semibold text-slate-800 dark:text-slate-200">
+            {currentPage}
+          </strong>{" "}
+          of{" "}
+          <strong className="font-semibold text-slate-800 dark:text-slate-200">
+            {safeTotalPages}
+          </strong>
         </span>
       )}
 
@@ -131,7 +128,9 @@ function MyPaginationSuspense({
             <PaginationItem key={page}>
               <PaginationLink
                 isActive={currentPage === page}
-                className={currentPage === page ? "cursor-default pointer-events-none" : "cursor-pointer"}
+                className={
+                  currentPage === page ? "cursor-default pointer-events-none" : "cursor-pointer"
+                }
                 onClick={(e) => {
                   e.preventDefault();
                   handlePageChange(page);

@@ -3,7 +3,7 @@ export const selectStatusValues = [
   { value: "completed", label: "Completed" },
   { value: "scheduled", label: "Scheduled" },
   { value: "ongoing", label: "On Going" },
-]
+];
 
 export const selectPositionValues = [
   { value: "any", label: "Any Position" },
@@ -39,7 +39,7 @@ export const languageSelectOptions = [
   { label: "English (US)", value: "English (US)" },
   { label: "Bengali", value: "Bengali" },
   { label: "Spanish", value: "Spanish" },
-]
+];
 
 export const statusOptions = [
   { label: "Completed", value: "Completed" },

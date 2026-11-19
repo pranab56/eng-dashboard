@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-"use client"
-import React, { useState, useRef, useEffect } from 'react';
-import { ArrowUpDown, Check, ChevronDown } from 'lucide-react';
+"use client";
+import React, { useState, useRef, useEffect } from "react";
+import { ArrowUpDown, Check, ChevronDown } from "lucide-react";
 
 interface SortSelectDropdownProps {
   sortBy: string;
@@ -18,15 +18,15 @@ export const SortSelectDropdown: React.FC<SortSelectDropdownProps> = ({
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   const sortOptions = [
-    { value: 'newest', label: 'Newest First' },
-    { value: 'oldest', label: 'Oldest First' },
-    { value: 'name_asc', label: 'Name (A to Z)' },
-    { value: 'name_desc', label: 'Name (Z to A)' },
-    { value: 'coins_desc', label: 'Coins (High to Low)' },
-    { value: 'coins_asc', label: 'Coins (Low to High)' },
+    { value: "newest", label: "Newest First" },
+    { value: "oldest", label: "Oldest First" },
+    { value: "name_asc", label: "Name (A to Z)" },
+    { value: "name_desc", label: "Name (Z to A)" },
+    { value: "coins_desc", label: "Coins (High to Low)" },
+    { value: "coins_asc", label: "Coins (Low to High)" },
   ];
 
-  const selectedOpt = sortOptions.find(o => o.value === sortBy) || sortOptions[0];
+  const selectedOpt = sortOptions.find((o) => o.value === sortBy) || sortOptions[0];
 
   // Close dropdown on click outside
   useEffect(() => {
@@ -35,8 +35,8 @@ export const SortSelectDropdown: React.FC<SortSelectDropdownProps> = ({
         setIsOpen(false);
       }
     };
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
   return (
@@ -50,14 +50,12 @@ export const SortSelectDropdown: React.FC<SortSelectDropdownProps> = ({
       >
         <div className="flex items-center gap-2 truncate">
           <ArrowUpDown className="w-3.5 h-3.5 text-blue-600 shrink-0" />
-          <span className="truncate font-bold text-slate-900">
-            Sort: {selectedOpt.label}
-          </span>
+          <span className="truncate font-bold text-slate-900">Sort: {selectedOpt.label}</span>
         </div>
 
         <ChevronDown
           className={`w-3.5 h-3.5 text-slate-400 transition-transform duration-200 ${
-            isOpen ? 'rotate-180 text-blue-600' : ''
+            isOpen ? "rotate-180 text-blue-600" : ""
           }`}
         />
       </button>
@@ -81,8 +79,8 @@ export const SortSelectDropdown: React.FC<SortSelectDropdownProps> = ({
                 }}
                 className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-left text-xs transition-colors cursor-pointer ${
                   isSelected
-                    ? 'bg-slate-900 text-white font-bold'
-                    : 'text-slate-800 hover:bg-slate-100 hover:text-slate-900 font-medium'
+                    ? "bg-slate-900 text-white font-bold"
+                    : "text-slate-800 hover:bg-slate-100 hover:text-slate-900 font-medium"
                 }`}
               >
                 <span>{opt.label}</span>

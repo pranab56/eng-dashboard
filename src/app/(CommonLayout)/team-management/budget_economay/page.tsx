@@ -1,24 +1,27 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable @typescript-eslint/no-explicit-any */
-"use client"
+"use client";
 
-import CancelButton from '@/components/buttons/CancelButton';
-import SubmitButton from '@/components/buttons/SubmitButton';
-import { useGetBudgetAndEconomayQuery, useUpdateBudgetAndEconomayMutation } from '@/features/teamManagement/teamApi';
-import { useHeaders } from '@/hooks/useHeaders';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { ArrowLeft, Calculator } from 'lucide-react';
-import Link from 'next/link';
-import { useRouter } from 'next/navigation';
-import { useEffect } from 'react';
-import { useForm } from 'react-hook-form';
-import { toast } from 'sonner';
-import * as z from 'zod';
+import CancelButton from "@/components/buttons/CancelButton";
+import SubmitButton from "@/components/buttons/SubmitButton";
+import {
+  useGetBudgetAndEconomayQuery,
+  useUpdateBudgetAndEconomayMutation,
+} from "@/features/teamManagement/teamApi";
+import { useHeaders } from "@/hooks/useHeaders";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { ArrowLeft, Calculator } from "lucide-react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
+import { useForm } from "react-hook-form";
+import { toast } from "sonner";
+import * as z from "zod";
 
 // Zod Schema verification
 const coinBudgetSchema = z.object({
   coin: z.number(),
-  budgetValue: z.number()
+  budgetValue: z.number(),
 });
 
 const budgetEconomySchema = z.object({
@@ -52,7 +55,7 @@ export default function BudgetEconomyPage() {
     setValue,
     watch,
     reset,
-    formState: { errors }
+    formState: { errors },
   } = useForm<BudgetEconomyFormValues>({
     resolver: zodResolver(budgetEconomySchema),
     defaultValues: {
@@ -69,13 +72,13 @@ export default function BudgetEconomyPage() {
       averageConduct: { coin: 0, budgetValue: 0 },
       poorConduct: { coin: 0, budgetValue: 0 },
       unprofessionalConduct: { coin: 0, budgetValue: 0 },
-    }
+    },
   });
 
   useEffect(() => {
     setHeaders({
       title: "Club Economy Settings",
-      des: "Configure base coin rewards, negative conducts, and multipliers for squad budgets."
+      des: "Configure base coin rewards, negative conducts, and multipliers for squad budgets.",
     });
   }, [setHeaders]);
 
@@ -84,24 +87,54 @@ export default function BudgetEconomyPage() {
       const data = budgetData.data;
       const rate = Number(data.conversionRate) || 10;
       const initialBudget = Number(data.startingBudget) || 100000;
-      const initialCoins = data.startingCoins !== undefined
-        ? Number(data.startingCoins)
-        : (rate > 0 ? Math.round(initialBudget / rate) : 10000);
+      const initialCoins =
+        data.startingCoins !== undefined
+          ? Number(data.startingCoins)
+          : rate > 0
+            ? Math.round(initialBudget / rate)
+            : 10000;
 
       reset({
         startingCoins: initialCoins,
         startingBudget: initialCoins * rate,
         conversionRate: rate,
         minReserveCoins: data.minReserveCoins !== undefined ? Number(data.minReserveCoins) : 100000,
-        attendMatch: { coin: data.attendMatch?.coin || 0, budgetValue: (data.attendMatch?.coin || 0) * rate },
-        drawMatch: { coin: data.drawMatch?.coin || 0, budgetValue: (data.drawMatch?.coin || 0) * rate },
-        winMatch: { coin: data.winMatch?.coin || 0, budgetValue: (data.winMatch?.coin || 0) * rate },
-        exceptionalConduct: { coin: data.exceptionalConduct?.coin || 0, budgetValue: (data.exceptionalConduct?.coin || 0) * rate },
-        goodConduct: { coin: data.goodConduct?.coin || 0, budgetValue: (data.goodConduct?.coin || 0) * rate },
-        satisfactoryConduct: { coin: data.satisfactoryConduct?.coin || 0, budgetValue: (data.satisfactoryConduct?.coin || 0) * rate },
-        averageConduct: { coin: data.averageConduct?.coin || 0, budgetValue: (data.averageConduct?.coin || 0) * rate },
-        poorConduct: { coin: data.poorConduct?.coin || 0, budgetValue: (data.poorConduct?.coin || 0) * rate },
-        unprofessionalConduct: { coin: data.unprofessionalConduct?.coin || 0, budgetValue: (data.unprofessionalConduct?.coin || 0) * rate },
+        attendMatch: {
+          coin: data.attendMatch?.coin || 0,
+          budgetValue: (data.attendMatch?.coin || 0) * rate,
+        },
+        drawMatch: {
+          coin: data.drawMatch?.coin || 0,
+          budgetValue: (data.drawMatch?.coin || 0) * rate,
+        },
+        winMatch: {
+          coin: data.winMatch?.coin || 0,
+          budgetValue: (data.winMatch?.coin || 0) * rate,
+        },
+        exceptionalConduct: {
+          coin: data.exceptionalConduct?.coin || 0,
+          budgetValue: (data.exceptionalConduct?.coin || 0) * rate,
+        },
+        goodConduct: {
+          coin: data.goodConduct?.coin || 0,
+          budgetValue: (data.goodConduct?.coin || 0) * rate,
+        },
+        satisfactoryConduct: {
+          coin: data.satisfactoryConduct?.coin || 0,
+          budgetValue: (data.satisfactoryConduct?.coin || 0) * rate,
+        },
+        averageConduct: {
+          coin: data.averageConduct?.coin || 0,
+          budgetValue: (data.averageConduct?.coin || 0) * rate,
+        },
+        poorConduct: {
+          coin: data.poorConduct?.coin || 0,
+          budgetValue: (data.poorConduct?.coin || 0) * rate,
+        },
+        unprofessionalConduct: {
+          coin: data.unprofessionalConduct?.coin || 0,
+          budgetValue: (data.unprofessionalConduct?.coin || 0) * rate,
+        },
       });
     }
   }, [budgetData, reset]);
@@ -202,7 +235,10 @@ export default function BudgetEconomyPage() {
     <form onSubmit={handleSubmit(onSubmit)} className="w-full py-5 px-6 space-y-8">
       {/* Top Header Row with Custom Back Button */}
       <div className="flex items-center gap-4">
-        <Link href="/team-management" className="w-10 h-10 border-2 border-yellow-600 rounded-full flex items-center justify-center text-yellow-600 hover:bg-yellow-50 transition-all select-none cursor-pointer">
+        <Link
+          href="/team-management"
+          className="w-10 h-10 border-2 border-yellow-600 rounded-full flex items-center justify-center text-yellow-600 hover:bg-yellow-50 transition-all select-none cursor-pointer"
+        >
           <ArrowLeft className="w-5 h-5 stroke-[2.5]" />
         </Link>
         <div className="text-sm font-semibold text-gray-500 flex items-center gap-1.5">
@@ -219,11 +255,12 @@ export default function BudgetEconomyPage() {
             <h2 className="text-xl font-semibold text-gray-900 flex items-center gap-2">
               General Valuation Configurations
             </h2>
-            <p className="text-xs text-gray-400 mt-0.5">Define coin starting balance and base conversion multiplier for squad budgets</p>
+            <p className="text-xs text-gray-400 mt-0.5">
+              Define coin starting balance and base conversion multiplier for squad budgets
+            </p>
           </div>
           <div className="hidden sm:flex items-center gap-1.5 px-3 py-1 bg-amber-50 text-amber-700 border border-amber-200 rounded-xl text-xs font-semibold">
-            <Calculator className="w-3.5 h-3.5" />
-            1 Coin = £{watch("conversionRate") || 0}
+            <Calculator className="w-3.5 h-3.5" />1 Coin = £{watch("conversionRate") || 0}
           </div>
         </div>
 
@@ -245,13 +282,17 @@ export default function BudgetEconomyPage() {
                 placeholder="e.g. 10000"
               />
             </div>
-            {errors.startingCoins && <p className="text-xs text-red-500">{errors.startingCoins.message}</p>}
+            {errors.startingCoins && (
+              <p className="text-xs text-red-500">{errors.startingCoins.message}</p>
+            )}
             <p className="text-[11px] text-gray-400">Initial coins allocated to new team budgets</p>
           </div>
 
           {/* Conversion Rate Input */}
           <div className="space-y-2">
-            <label className="text-sm font-medium text-gray-700">Conversion Rate (£ per Coin)</label>
+            <label className="text-sm font-medium text-gray-700">
+              Conversion Rate (£ per Coin)
+            </label>
             <div className="relative">
               <input
                 type="number"
@@ -266,14 +307,20 @@ export default function BudgetEconomyPage() {
                 placeholder="e.g. 10"
               />
             </div>
-            {errors.conversionRate && <p className="text-xs text-red-500">{errors.conversionRate.message}</p>}
-            <p className="text-[11px] text-gray-400">Multiplier used to evaluate budget valuations</p>
+            {errors.conversionRate && (
+              <p className="text-xs text-red-500">{errors.conversionRate.message}</p>
+            )}
+            <p className="text-[11px] text-gray-400">
+              Multiplier used to evaluate budget valuations
+            </p>
           </div>
 
           {/* Starting Budget (Disabled / Auto Calculated) */}
           <div className="space-y-2">
             <div className="flex items-center justify-between">
-              <label className="text-sm font-medium text-gray-700">Default Starting Budget (£)</label>
+              <label className="text-sm font-medium text-gray-700">
+                Default Starting Budget (£)
+              </label>
               <span className="text-[10px] font-semibold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
                 Auto Calculated
               </span>
@@ -287,9 +334,12 @@ export default function BudgetEconomyPage() {
                 className="w-full py-3.5 px-4 bg-gray-100 border border-gray-200 rounded-xl text-gray-600 font-bold text-sm h-12 select-none cursor-not-allowed outline-none"
               />
             </div>
-            {errors.startingBudget && <p className="text-xs text-red-500">{errors.startingBudget.message}</p>}
+            {errors.startingBudget && (
+              <p className="text-xs text-red-500">{errors.startingBudget.message}</p>
+            )}
             <p className="text-[11px] text-emerald-600 font-medium">
-              = {(Number(watch("startingCoins")) || 0).toLocaleString()} Coins × £{Number(watch("conversionRate")) || 0}
+              = {(Number(watch("startingCoins")) || 0).toLocaleString()} Coins × £
+              {Number(watch("conversionRate")) || 0}
             </p>
           </div>
         </div>
@@ -308,7 +358,8 @@ export default function BudgetEconomyPage() {
               </span>
             </div>
             <p className="text-xs text-gray-400 mt-1">
-              Minimum ENG coins balance that clubs must retain in their wallet after bidding for and purchasing players
+              Minimum ENG coins balance that clubs must retain in their wallet after bidding for and
+              purchasing players
             </p>
           </div>
         </div>
@@ -324,8 +375,12 @@ export default function BudgetEconomyPage() {
                 placeholder="e.g. 100000"
               />
             </div>
-            {errors.minReserveCoins && <p className="text-xs text-red-500">{errors.minReserveCoins.message}</p>}
-            <p className="text-[11px] text-gray-400">Clubs cannot complete player transfers if remaining balance falls below this amount</p>
+            {errors.minReserveCoins && (
+              <p className="text-xs text-red-500">{errors.minReserveCoins.message}</p>
+            )}
+            <p className="text-[11px] text-gray-400">
+              Clubs cannot complete player transfers if remaining balance falls below this amount
+            </p>
           </div>
         </div>
       </section>
@@ -334,7 +389,8 @@ export default function BudgetEconomyPage() {
       <section className="bg-white rounded-2xl p-8 border border-gray-100 shadow-xl shadow-gray-200/50 text-gray-800">
         <h2 className="text-2xl font-medium text-gray-900 leading-tight">Economy Settings</h2>
         <p className="text-sm text-gray-400 font-semibold mb-8">
-          Configure base coin rewards for squad matches (Budget values are auto-calculated and disabled)
+          Configure base coin rewards for squad matches (Budget values are auto-calculated and
+          disabled)
         </p>
 
         <div className="space-y-6">

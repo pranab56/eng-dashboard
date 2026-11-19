@@ -6,16 +6,10 @@ let socket: Socket | null = null;
 const getAuthToken = (): string | null => {
   if (typeof window === "undefined") return null;
 
-  const match = document.cookie.match(
-    new RegExp("(?:^|; )alexandertel-admin-token=([^;]*)")
-  );
+  const match = document.cookie.match(new RegExp("(?:^|; )alexandertel-admin-token=([^;]*)"));
   if (match) return decodeURIComponent(match[1]);
 
-  return (
-    localStorage.getItem("accessToken") ||
-    localStorage.getItem("token") ||
-    null
-  );
+  return localStorage.getItem("accessToken") || localStorage.getItem("token") || null;
 };
 
 export const getSocket = (): Socket => {

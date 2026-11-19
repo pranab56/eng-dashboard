@@ -14,7 +14,8 @@ const JoditEditor = dynamic(() => import("jodit-react"), { ssr: false });
 const joditConfig = {
   height: 580,
   readonly: false,
-  placeholder: "Draft official privacy policy clauses, data collection protocols, and GDPR compliance statements...",
+  placeholder:
+    "Draft official privacy policy clauses, data collection protocols, and GDPR compliance statements...",
   toolbarSticky: false,
   buttons: [
     "bold",
@@ -135,7 +136,12 @@ const PrivacyPolicy = () => {
             </div>
             <p className="text-xs text-slate-500 mt-1">
               {lastUpdated ? (
-                <>Last published: <strong className="text-slate-700 font-medium">{dayjs(lastUpdated).format("MMM DD, YYYY · hh:mm A")}</strong></>
+                <>
+                  Last published:{" "}
+                  <strong className="text-slate-700 font-medium">
+                    {dayjs(lastUpdated).format("MMM DD, YYYY · hh:mm A")}
+                  </strong>
+                </>
               ) : (
                 "Define user data retention and security terms for athletes, managers, and parents."
               )}

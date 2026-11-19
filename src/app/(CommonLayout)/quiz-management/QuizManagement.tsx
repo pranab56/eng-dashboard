@@ -27,11 +27,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import {
-  useReactTable,
-  getCoreRowModel,
-  flexRender,
-} from "@tanstack/react-table";
+import { useReactTable, getCoreRowModel, flexRender } from "@tanstack/react-table";
 import { toast } from "react-hot-toast";
 
 const CATEGORIES = [
@@ -172,7 +168,8 @@ export default function QuizManagement() {
             </span>
           </div>
           <p className="text-xs text-slate-500 mt-1">
-            Create quizzes, set reward points, and boost fan and player engagement with interactive trivia.
+            Create quizzes, set reward points, and boost fan and player engagement with interactive
+            trivia.
           </p>
         </div>
 
@@ -194,9 +191,7 @@ export default function QuizManagement() {
           </div>
           <div>
             <span className="text-xs text-slate-500 block">Total Quizzes</span>
-            <span className="text-lg font-bold text-slate-900 font-mono">
-              {stats.totalQuizzes}
-            </span>
+            <span className="text-lg font-bold text-slate-900 font-mono">{stats.totalQuizzes}</span>
           </div>
         </div>
 
@@ -218,9 +213,7 @@ export default function QuizManagement() {
           </div>
           <div>
             <span className="text-xs text-slate-500 block">Quiz Attempts</span>
-            <span className="text-lg font-bold text-sky-700 font-mono">
-              {stats.totalAttempts}
-            </span>
+            <span className="text-lg font-bold text-sky-700 font-mono">{stats.totalAttempts}</span>
           </div>
         </div>
 
@@ -254,20 +247,13 @@ export default function QuizManagement() {
 
           {/* Custom Category Filter */}
           <div className="w-[160px]">
-            <Select
-              value={categoryFilter}
-              onValueChange={(val) => setCategoryFilter(val)}
-            >
+            <Select value={categoryFilter} onValueChange={(val) => setCategoryFilter(val)}>
               <SelectTrigger className="w-full h-8 px-2.5 rounded-md border border-slate-200 text-xs text-slate-900 bg-slate-50 shadow-2xs">
                 <SelectValue placeholder="Category" />
               </SelectTrigger>
               <SelectContent className="bg-white border-slate-200">
                 {CATEGORIES.map((cat) => (
-                  <SelectItem
-                    key={cat}
-                    value={cat === "All" ? "all" : cat}
-                    className="text-xs"
-                  >
+                  <SelectItem key={cat} value={cat === "All" ? "all" : cat} className="text-xs">
                     {cat === "All" ? "All Categories" : cat}
                   </SelectItem>
                 ))}
@@ -277,18 +263,23 @@ export default function QuizManagement() {
 
           {/* Custom Status Filter */}
           <div className="w-[140px]">
-            <Select
-              value={statusFilter}
-              onValueChange={(val) => setStatusFilter(val)}
-            >
+            <Select value={statusFilter} onValueChange={(val) => setStatusFilter(val)}>
               <SelectTrigger className="w-full h-8 px-2.5 rounded-md border border-slate-200 text-xs text-slate-900 bg-slate-50 shadow-2xs">
                 <SelectValue placeholder="Status" />
               </SelectTrigger>
               <SelectContent className="bg-white border-slate-200">
-                <SelectItem value="all" className="text-xs">All Statuses</SelectItem>
-                <SelectItem value="active" className="text-xs">Active</SelectItem>
-                <SelectItem value="draft" className="text-xs">Draft</SelectItem>
-                <SelectItem value="completed" className="text-xs">Completed</SelectItem>
+                <SelectItem value="all" className="text-xs">
+                  All Statuses
+                </SelectItem>
+                <SelectItem value="active" className="text-xs">
+                  Active
+                </SelectItem>
+                <SelectItem value="draft" className="text-xs">
+                  Draft
+                </SelectItem>
+                <SelectItem value="completed" className="text-xs">
+                  Completed
+                </SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -300,9 +291,7 @@ export default function QuizManagement() {
           className="p-1.5 text-slate-500 hover:text-slate-700 hover:bg-slate-100 rounded-md transition-colors cursor-pointer shrink-0"
           title="Refresh table"
         >
-          <RefreshCw
-            className={`w-4 h-4 ${isFetching ? "animate-spin text-slate-900" : ""}`}
-          />
+          <RefreshCw className={`w-4 h-4 ${isFetching ? "animate-spin text-slate-900" : ""}`} />
         </button>
       </div>
 
@@ -312,18 +301,12 @@ export default function QuizManagement() {
           <table className="w-full text-left border-collapse">
             <thead>
               {table.getHeaderGroups().map((headerGroup) => (
-                <tr
-                  key={headerGroup.id}
-                  className="bg-slate-50/75 border-b border-slate-200"
-                >
+                <tr key={headerGroup.id} className="bg-slate-50/75 border-b border-slate-200">
                   {headerGroup.headers.map((header) => (
                     <th key={header.id} className="px-4 py-3 text-xs">
                       {header.isPlaceholder
                         ? null
-                        : flexRender(
-                            header.column.columnDef.header,
-                            header.getContext()
-                          )}
+                        : flexRender(header.column.columnDef.header, header.getContext())}
                     </th>
                   ))}
                 </tr>
@@ -350,16 +333,10 @@ export default function QuizManagement() {
                 </tr>
               ) : (
                 table.getRowModel().rows.map((row) => (
-                  <tr
-                    key={row.id}
-                    className="hover:bg-slate-50/70 transition-colors"
-                  >
+                  <tr key={row.id} className="hover:bg-slate-50/70 transition-colors">
                     {row.getVisibleCells().map((cell) => (
                       <td key={cell.id} className="px-4 py-3 text-xs">
-                        {flexRender(
-                          cell.column.columnDef.cell,
-                          cell.getContext()
-                        )}
+                        {flexRender(cell.column.columnDef.cell, cell.getContext())}
                       </td>
                     ))}
                   </tr>
@@ -427,7 +404,8 @@ export default function QuizManagement() {
               <span>Delete Quiz</span>
             </div>
             <p className="text-xs text-slate-600 leading-relaxed">
-              Are you sure you want to permanently delete this quiz? All participant attempts and results will be permanently removed.
+              Are you sure you want to permanently delete this quiz? All participant attempts and
+              results will be permanently removed.
             </p>
             <div className="flex items-center justify-end gap-2 pt-2">
               <button

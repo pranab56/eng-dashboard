@@ -3,16 +3,7 @@ import Image from "next/image";
 import { ColumnDef } from "@tanstack/react-table";
 import { TPlayer } from "@/types/columnTypes";
 import { formatImagePath } from "@/utils/formatImagePath";
-import {
-  Eye,
-  Edit3,
-  Trash2,
-  MoreVertical,
-  Activity,
-  Coins,
-  Shield,
-  User,
-} from "lucide-react";
+import { Eye, Edit3, Trash2, MoreVertical, Activity, Coins, Shield, User } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -56,7 +47,8 @@ export const PlayerNameCell: React.FC<{ player: TPlayer }> = ({ player }) => {
           {fullName}
         </span>
         <span className="text-[11px] text-slate-400 truncate">
-          {player.email || ((player as any).role ? (player as any).role.replace(/_/g, ' ') : "Player")}
+          {player.email ||
+            ((player as any).role ? (player as any).role.replace(/_/g, " ") : "Player")}
         </span>
       </div>
     </div>
@@ -84,7 +76,9 @@ export const PlayerTeamCell: React.FC<{ player: TPlayer }> = ({ player }) => {
       <div className="flex items-baseline gap-1 min-w-0">
         <span className="font-medium text-slate-800 text-xs truncate">{teamName}</span>
         {player.shortName && (
-          <span className="hidden md:inline text-[11px] text-slate-400 shrink-0">({player.shortName})</span>
+          <span className="hidden md:inline text-[11px] text-slate-400 shrink-0">
+            ({player.shortName})
+          </span>
         )}
       </div>
     </div>
@@ -143,7 +137,10 @@ export const PlayerActionCell: React.FC<{
             <MoreVertical className="w-3.5 h-3.5" />
           </button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent align="end" className="w-48 p-1 bg-white rounded-md shadow-md border border-slate-200 text-xs">
+        <DropdownMenuContent
+          align="end"
+          className="w-48 p-1 bg-white rounded-md shadow-md border border-slate-200 text-xs"
+        >
           <DropdownMenuItem
             onClick={() => onView(player)}
             className="flex items-center gap-2 px-2.5 py-1.5 rounded text-slate-700 hover:bg-slate-100 font-medium cursor-pointer"
@@ -250,7 +247,12 @@ export const getPlayerColumns = (
           </span>
         );
       }
-      const pkgName = rawSub.packageName || rawSub.package?.title || rawSub.package?.packageName || rawSub.package?.name || 'Active Plan';
+      const pkgName =
+        rawSub.packageName ||
+        rawSub.package?.title ||
+        rawSub.package?.packageName ||
+        rawSub.package?.name ||
+        "Active Plan";
       const pkgPrice = rawSub.price ?? rawSub.package?.price ?? 0;
       return (
         <span className="inline-flex items-center gap-1.5 text-[11px] font-semibold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
@@ -273,8 +275,8 @@ export const getPlayerColumns = (
             isApproved
               ? "text-emerald-700 bg-emerald-50 border-emerald-200"
               : status === "REJECTED"
-              ? "text-rose-700 bg-rose-50 border-rose-200"
-              : "text-amber-700 bg-amber-50 border-amber-200"
+                ? "text-rose-700 bg-rose-50 border-rose-200"
+                : "text-amber-700 bg-amber-50 border-amber-200"
           }`}
         >
           {status}
@@ -290,7 +292,9 @@ export const getPlayerColumns = (
   },
   {
     id: "actions",
-    header: () => <div className="text-right pr-4 font-semibold text-xs text-slate-600">Actions</div>,
+    header: () => (
+      <div className="text-right pr-4 font-semibold text-xs text-slate-600">Actions</div>
+    ),
     enableSorting: false,
     cell: ({ row }) => (
       <PlayerActionCell

@@ -13,9 +13,7 @@ import { ArrowLeft } from "lucide-react";
 import InputField from "@/components/form/InputField";
 import SelectField from "@/components/form/SelectField";
 import TextareaField from "@/components/form/TextareaField";
-import ImageUploadField, {
-  ImageChildrenComponent,
-} from "@/components/form/ImageUploadField";
+import ImageUploadField, { ImageChildrenComponent } from "@/components/form/ImageUploadField";
 import { publishStatusOptions } from "@/constants/selectData";
 import { useHeaders } from "@/hooks/useHeaders";
 import { getErrorMessage } from "@/utils/getErrorMessage";
@@ -49,12 +47,9 @@ const CreateEvent = () => {
 
   const [createEvent, { isLoading: isCreating }] = useCreateEventMutation();
   const [updateEvent, { isLoading: isUpdating }] = useEditeventMutation();
-  const { data: eventData, isLoading: isFetching } = useSingleEventQuery(
-    eventId,
-    {
-      skip: !isEditMode,
-    }
-  );
+  const { data: eventData, isLoading: isFetching } = useSingleEventQuery(eventId, {
+    skip: !isEditMode,
+  });
 
   const {
     register,
@@ -139,12 +134,7 @@ const CreateEvent = () => {
         }
       }
     } catch (error: any) {
-      toast.error(
-        getErrorMessage(
-          error,
-          `Failed to ${isEditMode ? "update" : "create"} event`
-        )
-      );
+      toast.error(getErrorMessage(error, `Failed to ${isEditMode ? "update" : "create"} event`));
     }
   };
 
@@ -186,9 +176,7 @@ const CreateEvent = () => {
               <h2 className="text-sm font-semibold uppercase tracking-wider text-slate-700 dark:text-slate-300">
                 Event Content
               </h2>
-              <span className="text-[11px] text-slate-400">
-                Required fields are indicated
-              </span>
+              <span className="text-[11px] text-slate-400">Required fields are indicated</span>
             </div>
 
             <div className="space-y-4">

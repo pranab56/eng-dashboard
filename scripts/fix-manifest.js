@@ -1,11 +1,11 @@
-const fs = require('fs');
-const path = require('path');
+const fs = require("fs");
+const path = require("path");
 
-const manifestPath = path.join(process.cwd(), '.next', 'routes-manifest.json');
+const manifestPath = path.join(process.cwd(), ".next", "routes-manifest.json");
 
 if (fs.existsSync(manifestPath)) {
   try {
-    const data = JSON.parse(fs.readFileSync(manifestPath, 'utf8'));
+    const data = JSON.parse(fs.readFileSync(manifestPath, "utf8"));
     let modified = false;
 
     if (!Array.isArray(data.dataRoutes)) {
@@ -23,11 +23,13 @@ if (fs.existsSync(manifestPath)) {
 
     if (modified) {
       fs.writeFileSync(manifestPath, JSON.stringify(data, null, 2));
-      console.log('✓ Successfully patched .next/routes-manifest.json (added dataRoutes/staticRoutes/dynamicRoutes).');
+      console.log(
+        "✓ Successfully patched .next/routes-manifest.json (added dataRoutes/staticRoutes/dynamicRoutes)."
+      );
     }
   } catch (err) {
-    console.error('Failed to patch routes-manifest.json:', err);
+    console.error("Failed to patch routes-manifest.json:", err);
   }
 } else {
-  console.warn('.next/routes-manifest.json not found. Run npm run build first.');
+  console.warn(".next/routes-manifest.json not found. Run npm run build first.");
 }

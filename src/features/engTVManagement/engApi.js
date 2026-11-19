@@ -8,7 +8,7 @@ export const engApi = baseApi.injectEndpoints({
         method: "POST",
         body: data,
       }),
-      invalidatesTags: ["video"]
+      invalidatesTags: ["video"],
     }),
 
     updateVideo: builder.mutation({
@@ -17,7 +17,7 @@ export const engApi = baseApi.injectEndpoints({
         method: "PATCH",
         body: data,
       }),
-      invalidatesTags: ["video"]
+      invalidatesTags: ["video"],
     }),
 
     getAllVideo: builder.query({
@@ -25,7 +25,7 @@ export const engApi = baseApi.injectEndpoints({
         let page = "1";
         let category = "";
 
-        if (params && typeof params === 'object') {
+        if (params && typeof params === "object") {
           page = params.page || "1";
           category = params.category || "";
         } else if (params) {
@@ -42,7 +42,7 @@ export const engApi = baseApi.injectEndpoints({
           method: "GET",
         };
       },
-      providesTags: ["video"]
+      providesTags: ["video"],
     }),
 
     getVideoAnalytics: builder.query({
@@ -50,7 +50,7 @@ export const engApi = baseApi.injectEndpoints({
         url: "/video/analytics",
         method: "GET",
       }),
-      providesTags: ["video"]
+      providesTags: ["video"],
     }),
 
     getSingleVideo: builder.query({
@@ -58,7 +58,7 @@ export const engApi = baseApi.injectEndpoints({
         url: `/video/${id}`,
         method: "GET",
       }),
-      providesTags: ["video"]
+      providesTags: ["video"],
     }),
 
     deleteVideo: builder.mutation({
@@ -66,7 +66,7 @@ export const engApi = baseApi.injectEndpoints({
         url: `/video/${id}`,
         method: "DELETE",
       }),
-      invalidatesTags: ["video"]
+      invalidatesTags: ["video"],
     }),
 
     frontEndVideo: builder.query({
@@ -78,7 +78,7 @@ export const engApi = baseApi.injectEndpoints({
           method: "GET",
         };
       },
-      providesTags: ["video"]
+      providesTags: ["video"],
     }),
 
     updateVideoFile: builder.mutation({
@@ -88,7 +88,7 @@ export const engApi = baseApi.injectEndpoints({
         headers: contentType ? { "Content-Type": contentType } : {},
         body: data,
       }),
-      invalidatesTags: ["video"]
+      invalidatesTags: ["video"],
     }),
 
     rearrangeVideos: builder.mutation({
@@ -97,7 +97,7 @@ export const engApi = baseApi.injectEndpoints({
         method: "PATCH",
         body: data,
       }),
-      invalidatesTags: ["video"]
+      invalidatesTags: ["video"],
     }),
   }),
 });

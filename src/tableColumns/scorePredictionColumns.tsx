@@ -79,9 +79,7 @@ export const getScorePredictionColumns = (
               {count} {count === 1 ? "Match" : "Matches"}
             </span>
           </div>
-          <span className="font-medium text-slate-900 text-xs mt-1.5 leading-snug">
-            {title}
-          </span>
+          <span className="font-medium text-slate-900 text-xs mt-1.5 leading-snug">{title}</span>
         </div>
       );
     },
@@ -143,8 +141,11 @@ export const getScorePredictionColumns = (
       </span>
     ),
     cell: ({ row }) => {
-      const { coinsPerExactScore = 50, coinsPerCorrectOutcome = 10, jackpotBonusCoins = 500 } =
-        row.original;
+      const {
+        coinsPerExactScore = 50,
+        coinsPerCorrectOutcome = 10,
+        jackpotBonusCoins = 500,
+      } = row.original;
 
       return (
         <div className="flex flex-col gap-0.5">
@@ -173,7 +174,9 @@ export const getScorePredictionColumns = (
 
       return (
         <div className="flex flex-col text-xs">
-          <span className={`font-mono text-[11px] ${isPast ? "text-slate-400" : "text-slate-900 font-medium"}`}>
+          <span
+            className={`font-mono text-[11px] ${isPast ? "text-slate-400" : "text-slate-900 font-medium"}`}
+          >
             {formatted}
           </span>
           <span className="text-[10px] text-slate-400">
@@ -207,9 +210,7 @@ export const getScorePredictionColumns = (
   {
     accessorKey: "status",
     header: () => (
-      <span className="font-semibold text-xs text-slate-600 uppercase tracking-wider">
-        Status
-      </span>
+      <span className="font-semibold text-xs text-slate-600 uppercase tracking-wider">Status</span>
     ),
     cell: ({ row }) => {
       return getStatusBadge(row.original.status, row.original.isSettled);

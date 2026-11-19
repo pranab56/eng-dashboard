@@ -5,16 +5,7 @@ import React, { useEffect, useState, useMemo } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { toast } from "sonner";
-import {
-  Trophy,
-  Users,
-  Search,
-  RefreshCw,
-  Plus,
-  Calendar,
-  X,
-  Layers,
-} from "lucide-react";
+import { Trophy, Users, Search, RefreshCw, Plus, Calendar, X, Layers } from "lucide-react";
 
 import CustomPagination from "@/components/cui/CustomPagination";
 import CustomTable from "@/components/table/CustomTable";
@@ -52,10 +43,8 @@ export default function LeagueTeamManagement() {
 
   const overview = overviewRes?.data;
 
-  const [deleteLeagueTeam, { isLoading: isDeletingTeam }] =
-    useDeleteLeagueTeamMutation();
-  const [deleteLeagueEntry, { isLoading: isDeletingEntry }] =
-    useDeleteLeagueEntryMutation();
+  const [deleteLeagueTeam, { isLoading: isDeletingTeam }] = useDeleteLeagueTeamMutation();
+  const [deleteLeagueEntry, { isLoading: isDeletingEntry }] = useDeleteLeagueEntryMutation();
 
   // Search filter
   const [searchTerm, setSearchTerm] = useState("");
@@ -82,10 +71,7 @@ export default function LeagueTeamManagement() {
   }, [setHeaders]);
 
   // Raw data from API
-  const rawData: any[] = useMemo(
-    () => leagueTeamData?.data || [],
-    [leagueTeamData]
-  );
+  const rawData: any[] = useMemo(() => leagueTeamData?.data || [], [leagueTeamData]);
 
   // Filtered rows by search term
   const filteredData = useMemo(() => {
@@ -112,9 +98,7 @@ export default function LeagueTeamManagement() {
 
   // Backend-computed analytics metrics (with reliable database fallback)
   const totalLeaguesCount =
-    overview?.totalLeagues ??
-    leagueTeamData?.pagination?.total ??
-    rawData.length;
+    overview?.totalLeagues ?? leagueTeamData?.pagination?.total ?? rawData.length;
   const totalAllocatedTeamsCount = overview?.totalAllocatedTeams ?? 0;
   const avgTeamsCount = overview?.avgTeamsPerLeague ?? "0";
   const activeSeasonsCount = overview?.activeSeasons ?? 0;
@@ -161,16 +145,12 @@ export default function LeagueTeamManagement() {
           teamId: deletingParams.teamId!,
         }).unwrap();
         if (res.success) {
-          toast.success(
-            res.message || "Team removed from league successfully"
-          );
+          toast.success(res.message || "Team removed from league successfully");
           setIsDeleteModalOpen(false);
           refetchOverview();
 
           if (viewData) {
-            const updatedTeams = viewData.teams.filter(
-              (t) => t._id !== deletingParams.teamId
-            );
+            const updatedTeams = viewData.teams.filter((t) => t._id !== deletingParams.teamId);
             if (updatedTeams.length === 0) {
               setViewData(null);
             } else {
@@ -212,9 +192,7 @@ export default function LeagueTeamManagement() {
             title="Refresh league teams and analytics"
           >
             <RefreshCw
-              className={`w-3.5 h-3.5 text-slate-500 ${
-                isRefreshing ? "animate-spin" : ""
-              }`}
+              className={`w-3.5 h-3.5 text-slate-500 ${isRefreshing ? "animate-spin" : ""}`}
             />
             <span className="hidden sm:inline">Refresh</span>
           </button>
@@ -246,9 +224,7 @@ export default function LeagueTeamManagement() {
             </span>
             <span className="text-xs text-slate-500">leagues</span>
           </div>
-          <p className="text-[11px] text-slate-400 mt-1">
-            Active registered league groups
-          </p>
+          <p className="text-[11px] text-slate-400 mt-1">Active registered league groups</p>
         </div>
 
         <div className="p-4 bg-white border border-slate-200 rounded-xl shadow-2xs">
@@ -260,9 +236,7 @@ export default function LeagueTeamManagement() {
           </div>
           <div className="mt-2 flex items-baseline gap-2">
             <span className="text-xl font-bold font-mono text-slate-900">
-              {isOverviewLoading
-                ? "—"
-                : totalAllocatedTeamsCount.toLocaleString()}
+              {isOverviewLoading ? "—" : totalAllocatedTeamsCount.toLocaleString()}
             </span>
             <span className="text-xs text-slate-500">assignments</span>
           </div>
@@ -284,9 +258,7 @@ export default function LeagueTeamManagement() {
             </span>
             <span className="text-xs text-slate-500">teams</span>
           </div>
-          <p className="text-[11px] text-slate-400 mt-1">
-            Roster density per competition
-          </p>
+          <p className="text-[11px] text-slate-400 mt-1">Roster density per competition</p>
         </div>
 
         <div className="p-4 bg-white border border-slate-200 rounded-xl shadow-2xs">
@@ -302,9 +274,7 @@ export default function LeagueTeamManagement() {
             </span>
             <span className="text-xs text-slate-500">seasons</span>
           </div>
-          <p className="text-[11px] text-slate-400 mt-1">
-            Distinct competitive campaign years
-          </p>
+          <p className="text-[11px] text-slate-400 mt-1">Distinct competitive campaign years</p>
         </div>
       </div>
 
@@ -397,11 +367,7 @@ export default function LeagueTeamManagement() {
         }}
         onConfirm={handleConfirmDelete}
         isLoading={isDeletingTeam || isDeletingEntry}
-        title={
-          deleteMode === "league"
-            ? "Delete League Entry"
-            : "Remove Team from League"
-        }
+        title={deleteMode === "league" ? "Delete League Entry" : "Remove Team from League"}
         description={
           deleteMode === "league"
             ? "Are you sure you want to remove all team associations for this league? This action cannot be undone."

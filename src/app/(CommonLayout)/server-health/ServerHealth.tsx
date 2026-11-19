@@ -245,7 +245,10 @@ export default function ServerHealth() {
   }, [isLoading, health, memPct]);
 
   const totalFailedJobs = (queueData?.queues || []).reduce((acc, q) => acc + (q.failed || 0), 0);
-  const totalCompletedJobs = (queueData?.queues || []).reduce((acc, q) => acc + (q.completed || 0), 0);
+  const totalCompletedJobs = (queueData?.queues || []).reduce(
+    (acc, q) => acc + (q.completed || 0),
+    0
+  );
 
   return (
     <div className="p-4 sm:p-6 lg:p-8 space-y-6 w-full text-slate-900">
@@ -293,7 +296,9 @@ export default function ServerHealth() {
             disabled={isFetching || isQueueFetching}
             className="inline-flex items-center gap-1.5 h-8 px-3 rounded-md text-xs font-medium bg-slate-900 hover:bg-slate-800 text-white transition-colors disabled:opacity-50 cursor-pointer"
           >
-            <RefreshCw className={`w-3.5 h-3.5 ${isFetching || isQueueFetching ? "animate-spin" : ""}`} />
+            <RefreshCw
+              className={`w-3.5 h-3.5 ${isFetching || isQueueFetching ? "animate-spin" : ""}`}
+            />
             <span>Sync</span>
           </button>
         </div>
@@ -308,7 +313,9 @@ export default function ServerHealth() {
             <Cpu className="w-4 h-4 text-slate-400" />
           </div>
           <div className="flex items-baseline gap-2">
-            <span className="text-2xl font-bold font-mono text-slate-900">{health?.cpuCores ?? 0}</span>
+            <span className="text-2xl font-bold font-mono text-slate-900">
+              {health?.cpuCores ?? 0}
+            </span>
             <span className="text-xs text-slate-500 font-medium">Logical Cores</span>
           </div>
           <div className="mt-2 text-[11px] text-slate-500 font-mono">
@@ -319,7 +326,9 @@ export default function ServerHealth() {
         {/* KPI 2: Memory Density */}
         <div className="bg-white border border-slate-200 rounded-xl p-4 shadow-2xs">
           <div className="flex items-center justify-between text-slate-500 mb-2">
-            <span className="text-[11px] font-medium uppercase tracking-wider">Memory Allocation</span>
+            <span className="text-[11px] font-medium uppercase tracking-wider">
+              Memory Allocation
+            </span>
             <HardDrive className="w-4 h-4 text-slate-400" />
           </div>
           <div className="flex items-baseline gap-2">
@@ -425,10 +434,11 @@ export default function ServerHealth() {
         <div className="bg-white border border-slate-200 rounded-xl p-4 shadow-2xs">
           <div className="grid grid-cols-2 md:grid-cols-5 gap-4 divide-y md:divide-y-0 md:divide-x divide-slate-100 text-xs">
             <div className="pt-2 md:pt-0">
-              <span className="text-[11px] text-slate-400 font-medium block mb-1">Redis Engine</span>
+              <span className="text-[11px] text-slate-400 font-medium block mb-1">
+                Redis Engine
+              </span>
               <div className="flex items-center gap-1.5 font-bold text-slate-800 text-sm">
-                <Zap className="w-3.5 h-3.5 text-amber-500" />
-                v{queueData?.redis?.version || "7.x"}
+                <Zap className="w-3.5 h-3.5 text-amber-500" />v{queueData?.redis?.version || "7.x"}
               </div>
               <span className="text-[10px] text-slate-400 font-mono mt-0.5 block">
                 Uptime: {Math.floor((queueData?.redis?.uptimeSeconds || 0) / 3600)}h
@@ -436,17 +446,24 @@ export default function ServerHealth() {
             </div>
 
             <div className="pt-2 md:pt-0 md:pl-4">
-              <span className="text-[11px] text-slate-400 font-medium block mb-1">Resident Memory</span>
+              <span className="text-[11px] text-slate-400 font-medium block mb-1">
+                Resident Memory
+              </span>
               <span className="font-bold text-slate-800 text-sm block">
                 {queueData?.redis?.usedMemoryHuman || "0M"}
               </span>
               <span className="text-[10px] text-slate-400 block mt-0.5 font-mono">
-                {(queueData?.redis?.usedMemoryBytes ? (queueData.redis.usedMemoryBytes / 1024 / 1024).toFixed(2) : 0)} MB
+                {queueData?.redis?.usedMemoryBytes
+                  ? (queueData.redis.usedMemoryBytes / 1024 / 1024).toFixed(2)
+                  : 0}{" "}
+                MB
               </span>
             </div>
 
             <div className="pt-2 md:pt-0 md:pl-4">
-              <span className="text-[11px] text-slate-400 font-medium block mb-1">Total DB Keys</span>
+              <span className="text-[11px] text-slate-400 font-medium block mb-1">
+                Total DB Keys
+              </span>
               <span className="font-bold text-slate-800 text-sm block">
                 {(queueData?.redis?.totalKeys || 0).toLocaleString()}
               </span>
@@ -454,15 +471,21 @@ export default function ServerHealth() {
             </div>
 
             <div className="pt-2 md:pt-0 md:pl-4">
-              <span className="text-[11px] text-slate-400 font-medium block mb-1">BullMQ Queue Keys</span>
+              <span className="text-[11px] text-slate-400 font-medium block mb-1">
+                BullMQ Queue Keys
+              </span>
               <span className="font-bold text-indigo-600 text-sm block">
                 {(queueData?.redis?.bullKeys || 0).toLocaleString()}
               </span>
-              <span className="text-[10px] text-slate-400 block mt-0.5">Queue definitions & jobs</span>
+              <span className="text-[10px] text-slate-400 block mt-0.5">
+                Queue definitions & jobs
+              </span>
             </div>
 
             <div className="pt-2 md:pt-0 md:pl-4">
-              <span className="text-[11px] text-slate-400 font-medium block mb-1">App Cache Keys</span>
+              <span className="text-[11px] text-slate-400 font-medium block mb-1">
+                App Cache Keys
+              </span>
               <span className="font-bold text-emerald-600 text-sm block">
                 {(queueData?.redis?.appCacheKeys || 0).toLocaleString()}
               </span>
@@ -475,9 +498,7 @@ export default function ServerHealth() {
         <div className="flex flex-wrap items-center justify-between gap-3 bg-slate-50 p-3 rounded-xl border border-slate-200">
           <div className="flex items-center gap-2">
             <Layers className="w-4 h-4 text-slate-600" />
-            <span className="text-xs font-semibold text-slate-800">
-              Bulk Queue Operations:
-            </span>
+            <span className="text-xs font-semibold text-slate-800">Bulk Queue Operations:</span>
             <span className="text-xs text-slate-500">
               ({totalFailedJobs} failed / {totalCompletedJobs} completed across all queues)
             </span>
@@ -489,7 +510,9 @@ export default function ServerHealth() {
               onClick={() => handleQueueAction("all", "retry-failed")}
               className="inline-flex items-center gap-1.5 h-7 px-2.5 rounded-md text-xs font-semibold bg-indigo-50 border border-indigo-200 text-indigo-700 hover:bg-indigo-100 disabled:opacity-40 transition-colors cursor-pointer"
             >
-              <RotateCcw className={`w-3 h-3 ${actionLoadingKey === "all-retry-failed" ? "animate-spin" : ""}`} />
+              <RotateCcw
+                className={`w-3 h-3 ${actionLoadingKey === "all-retry-failed" ? "animate-spin" : ""}`}
+              />
               Retry All Failed ({totalFailedJobs})
             </button>
 
@@ -498,7 +521,9 @@ export default function ServerHealth() {
               onClick={() => handleQueueAction("all", "clean-completed")}
               className="inline-flex items-center gap-1.5 h-7 px-2.5 rounded-md text-xs font-semibold bg-white border border-slate-200 text-slate-700 hover:bg-slate-100 disabled:opacity-40 transition-colors cursor-pointer"
             >
-              <Trash2 className={`w-3 h-3 ${actionLoadingKey === "all-clean-completed" ? "animate-spin" : ""}`} />
+              <Trash2
+                className={`w-3 h-3 ${actionLoadingKey === "all-clean-completed" ? "animate-spin" : ""}`}
+              />
               Clean All Completed
             </button>
 
@@ -507,7 +532,9 @@ export default function ServerHealth() {
               onClick={() => handleQueueAction("all", "clean-failed")}
               className="inline-flex items-center gap-1.5 h-7 px-2.5 rounded-md text-xs font-semibold bg-rose-50 border border-rose-200 text-rose-700 hover:bg-rose-100 disabled:opacity-40 transition-colors cursor-pointer"
             >
-              <Trash2 className={`w-3 h-3 ${actionLoadingKey === "all-clean-failed" ? "animate-spin" : ""}`} />
+              <Trash2
+                className={`w-3 h-3 ${actionLoadingKey === "all-clean-failed" ? "animate-spin" : ""}`}
+              />
               Clean All Failed
             </button>
           </div>
@@ -526,7 +553,8 @@ export default function ServerHealth() {
             const isRetrying = actionLoadingKey === `${q.name}-retry-failed`;
             const isCleaningCompleted = actionLoadingKey === `${q.name}-clean-completed`;
             const isCleaningFailed = actionLoadingKey === `${q.name}-clean-failed`;
-            const isTogglingPause = actionLoadingKey === `${q.name}-${isPaused ? "resume" : "pause"}`;
+            const isTogglingPause =
+              actionLoadingKey === `${q.name}-${isPaused ? "resume" : "pause"}`;
 
             return (
               <div
@@ -540,9 +568,7 @@ export default function ServerHealth() {
                       <div className="w-6 h-6 rounded-md bg-slate-50 flex items-center justify-center">
                         {meta.icon}
                       </div>
-                      <span className="font-bold text-slate-900 text-sm">
-                        {meta.label}
-                      </span>
+                      <span className="font-bold text-slate-900 text-sm">{meta.label}</span>
                     </div>
 
                     <span
@@ -556,15 +582,15 @@ export default function ServerHealth() {
                     </span>
                   </div>
 
-                  <p className="text-[11px] text-slate-400 mb-3.5 line-clamp-1">
-                    {meta.desc}
-                  </p>
+                  <p className="text-[11px] text-slate-400 mb-3.5 line-clamp-1">{meta.desc}</p>
 
                   {/* Counters */}
                   <div className="grid grid-cols-3 gap-1.5 mb-2 text-center text-xs">
                     <div className="bg-slate-50 p-2 rounded-lg border border-slate-100">
                       <span className="text-[10px] font-medium text-slate-400 block">Waiting</span>
-                      <span className="font-bold font-mono text-slate-800 text-sm">{q.waiting}</span>
+                      <span className="font-bold font-mono text-slate-800 text-sm">
+                        {q.waiting}
+                      </span>
                     </div>
 
                     <div className="bg-slate-50 p-2 rounded-lg border border-slate-100">
@@ -574,14 +600,20 @@ export default function ServerHealth() {
 
                     <div className="bg-slate-50 p-2 rounded-lg border border-slate-100">
                       <span className="text-[10px] font-medium text-slate-400 block">Delayed</span>
-                      <span className="font-bold font-mono text-amber-600 text-sm">{q.delayed}</span>
+                      <span className="font-bold font-mono text-amber-600 text-sm">
+                        {q.delayed}
+                      </span>
                     </div>
                   </div>
 
                   <div className="grid grid-cols-2 gap-1.5 mb-3 text-center text-xs">
                     <div className="bg-emerald-50/60 p-2 rounded-lg border border-emerald-100">
-                      <span className="text-[10px] font-medium text-emerald-700 block">Completed</span>
-                      <span className="font-bold font-mono text-emerald-700 text-sm">{q.completed}</span>
+                      <span className="text-[10px] font-medium text-emerald-700 block">
+                        Completed
+                      </span>
+                      <span className="font-bold font-mono text-emerald-700 text-sm">
+                        {q.completed}
+                      </span>
                     </div>
 
                     <div
@@ -672,7 +704,9 @@ export default function ServerHealth() {
         <div className="bg-white border border-slate-200 rounded-xl p-4 shadow-2xs">
           <div className="flex items-center justify-between mb-3">
             <div>
-              <h3 className="text-xs font-semibold text-slate-800">Memory Utilization Trajectory</h3>
+              <h3 className="text-xs font-semibold text-slate-800">
+                Memory Utilization Trajectory
+              </h3>
               <p className="text-[11px] text-slate-500">RAM allocation percentage over time</p>
             </div>
             <span className="font-mono text-xs font-semibold text-slate-700 bg-slate-100 px-2 py-0.5 rounded">
@@ -684,8 +718,18 @@ export default function ServerHealth() {
             <ResponsiveContainer width="100%" height="100%">
               <AreaChart data={memoryHistory} margin={{ top: 5, right: 5, left: -25, bottom: 0 }}>
                 <CartesianGrid strokeDasharray="2 2" vertical={false} stroke="#f1f5f9" />
-                <XAxis dataKey="time" tick={{ fontSize: 10, fill: "#94a3b8" }} axisLine={{ stroke: "#e2e8f0" }} tickLine={false} />
-                <YAxis domain={[0, 100]} tick={{ fontSize: 10, fill: "#94a3b8" }} axisLine={false} tickLine={false} />
+                <XAxis
+                  dataKey="time"
+                  tick={{ fontSize: 10, fill: "#94a3b8" }}
+                  axisLine={{ stroke: "#e2e8f0" }}
+                  tickLine={false}
+                />
+                <YAxis
+                  domain={[0, 100]}
+                  tick={{ fontSize: 10, fill: "#94a3b8" }}
+                  axisLine={false}
+                  tickLine={false}
+                />
                 <ChartTooltip
                   content={({ active, payload }) => {
                     if (active && payload && payload.length) {
@@ -698,7 +742,14 @@ export default function ServerHealth() {
                     return null;
                   }}
                 />
-                <Area type="monotone" dataKey="usage" stroke="#0f172a" strokeWidth={1.5} fill="#f1f5f9" fillOpacity={0.6} />
+                <Area
+                  type="monotone"
+                  dataKey="usage"
+                  stroke="#0f172a"
+                  strokeWidth={1.5}
+                  fill="#f1f5f9"
+                  fillOpacity={0.6}
+                />
               </AreaChart>
             </ResponsiveContainer>
           </div>
@@ -720,7 +771,12 @@ export default function ServerHealth() {
             <ResponsiveContainer width="100%" height="100%">
               <AreaChart data={loadHistory} margin={{ top: 5, right: 5, left: -25, bottom: 0 }}>
                 <CartesianGrid strokeDasharray="2 2" vertical={false} stroke="#f1f5f9" />
-                <XAxis dataKey="time" tick={{ fontSize: 10, fill: "#94a3b8" }} axisLine={{ stroke: "#e2e8f0" }} tickLine={false} />
+                <XAxis
+                  dataKey="time"
+                  tick={{ fontSize: 10, fill: "#94a3b8" }}
+                  axisLine={{ stroke: "#e2e8f0" }}
+                  tickLine={false}
+                />
                 <YAxis tick={{ fontSize: 10, fill: "#94a3b8" }} axisLine={false} tickLine={false} />
                 <ChartTooltip
                   content={({ active, payload }) => {
@@ -734,7 +790,14 @@ export default function ServerHealth() {
                     return null;
                   }}
                 />
-                <Area type="monotone" dataKey="load" stroke="#0f172a" strokeWidth={1.5} fill="#f1f5f9" fillOpacity={0.6} />
+                <Area
+                  type="monotone"
+                  dataKey="load"
+                  stroke="#0f172a"
+                  strokeWidth={1.5}
+                  fill="#f1f5f9"
+                  fillOpacity={0.6}
+                />
               </AreaChart>
             </ResponsiveContainer>
           </div>
@@ -746,11 +809,11 @@ export default function ServerHealth() {
         <div className="px-4 py-3 border-b border-slate-200 bg-slate-50/50 flex items-center justify-between">
           <div>
             <h3 className="text-xs font-semibold text-slate-900">System Specifications</h3>
-            <p className="text-[11px] text-slate-500">Configuration and runtime environment telemetry</p>
+            <p className="text-[11px] text-slate-500">
+              Configuration and runtime environment telemetry
+            </p>
           </div>
-          <span className="text-[11px] font-mono text-slate-500">
-            Host Port: 5005
-          </span>
+          <span className="text-[11px] font-mono text-slate-500">Host Port: 5005</span>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 divide-y sm:divide-y-0 sm:divide-x divide-slate-100 text-xs">
@@ -772,12 +835,15 @@ export default function ServerHealth() {
           <div className="p-4 space-y-3">
             <div className="flex items-center justify-between">
               <span className="text-slate-500">Available Cores</span>
-              <span className="font-mono font-medium text-slate-900">{health?.cpuCores || 0} Units</span>
+              <span className="font-mono font-medium text-slate-900">
+                {health?.cpuCores || 0} Units
+              </span>
             </div>
             <div className="flex items-center justify-between">
               <span className="text-slate-500">Load Avg (1 / 5 / 15m)</span>
               <span className="font-mono text-slate-700">
-                {health?.loadAverage?.["1min"] ?? 0} / {health?.loadAverage?.["5min"] ?? 0} / {health?.loadAverage?.["15min"] ?? 0}
+                {health?.loadAverage?.["1min"] ?? 0} / {health?.loadAverage?.["5min"] ?? 0} /{" "}
+                {health?.loadAverage?.["15min"] ?? 0}
               </span>
             </div>
             <div className="flex items-center justify-between">
@@ -792,15 +858,21 @@ export default function ServerHealth() {
           <div className="p-4 space-y-3">
             <div className="flex items-center justify-between">
               <span className="text-slate-500">Total System RAM</span>
-              <span className="font-mono text-slate-900">{health?.memory?.totalMemory?.GB || 0} GB</span>
+              <span className="font-mono text-slate-900">
+                {health?.memory?.totalMemory?.GB || 0} GB
+              </span>
             </div>
             <div className="flex items-center justify-between">
               <span className="text-slate-500">Allocated RAM</span>
-              <span className="font-mono text-slate-900">{health?.memory?.usedMemory?.GB || 0} GB ({memPct}%)</span>
+              <span className="font-mono text-slate-900">
+                {health?.memory?.usedMemory?.GB || 0} GB ({memPct}%)
+              </span>
             </div>
             <div className="flex items-center justify-between">
               <span className="text-slate-500">Unallocated RAM</span>
-              <span className="font-mono text-slate-900">{health?.memory?.freeMemory?.GB || 0} GB</span>
+              <span className="font-mono text-slate-900">
+                {health?.memory?.freeMemory?.GB || 0} GB
+              </span>
             </div>
           </div>
         </div>
@@ -813,9 +885,7 @@ export default function ServerHealth() {
             <div className="flex items-center gap-3 mb-2">
               <div
                 className={`w-10 h-10 rounded-xl flex items-center justify-center ${
-                  flushType === "all"
-                    ? "bg-rose-100 text-rose-600"
-                    : "bg-amber-100 text-amber-600"
+                  flushType === "all" ? "bg-rose-100 text-rose-600" : "bg-amber-100 text-amber-600"
                 }`}
               >
                 {flushType === "all" ? (
@@ -844,7 +914,8 @@ export default function ServerHealth() {
                   <Info className="w-4 h-4 shrink-0 mt-0.5 text-emerald-600" />
                   <p>
                     <strong>Safe Operation:</strong> This deletes only application cache keys.
-                    BullMQ queues (emails, SMS, notifications) and Socket connections will <strong>NOT</strong> be affected.
+                    BullMQ queues (emails, SMS, notifications) and Socket connections will{" "}
+                    <strong>NOT</strong> be affected.
                   </p>
                 </div>
               </div>
@@ -854,14 +925,16 @@ export default function ServerHealth() {
                   <div className="flex items-start gap-2">
                     <AlertCircle className="w-4 h-4 shrink-0 mt-0.5 text-rose-600" />
                     <p>
-                      <strong>Warning:</strong> This will wipe <strong>ALL</strong> keys in Redis DB 0, including pending BullMQ jobs and active queues.
+                      <strong>Warning:</strong> This will wipe <strong>ALL</strong> keys in Redis DB
+                      0, including pending BullMQ jobs and active queues.
                     </p>
                   </div>
                 </div>
 
                 <div>
                   <label className="block text-xs font-semibold text-slate-700 mb-1">
-                    Type <span className="font-mono text-rose-600 font-bold">FLUSH</span> to confirm:
+                    Type <span className="font-mono text-rose-600 font-bold">FLUSH</span> to
+                    confirm:
                   </label>
                   <input
                     type="text"
@@ -885,7 +958,9 @@ export default function ServerHealth() {
             </button>
             <button
               type="button"
-              disabled={isFlushing || (flushType === "all" && confirmInput.trim().toUpperCase() !== "FLUSH")}
+              disabled={
+                isFlushing || (flushType === "all" && confirmInput.trim().toUpperCase() !== "FLUSH")
+              }
               onClick={handleFlushCache}
               className={`px-4 py-2 text-xs font-semibold rounded-lg text-white transition-colors disabled:opacity-50 cursor-pointer ${
                 flushType === "all"

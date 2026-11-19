@@ -1,8 +1,8 @@
-import CancelButton from '@/components/buttons/CancelButton';
-import CustomButton from '@/components/buttons/CustomButton';
-import { closeCustomModal } from '@/components/modals/CustomModal';
-import React from 'react';
-import { toast } from 'sonner';
+import CancelButton from "@/components/buttons/CancelButton";
+import CustomButton from "@/components/buttons/CustomButton";
+import { closeCustomModal } from "@/components/modals/CustomModal";
+import React from "react";
+import { toast } from "sonner";
 
 interface UserDetailProps {
   fullName: string;
@@ -13,7 +13,6 @@ interface UserDetailProps {
 }
 
 const UserDetails = () => {
-
   const userData: UserDetailProps = {
     fullName: "Jane Doe",
     role: "Manager",
@@ -36,7 +35,6 @@ const UserDetails = () => {
   return (
     <div className="bg-white rounded-lg">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-
         {/* Full Name */}
         <div className="space-y-2">
           <label className="block text-sm font-semibold text-gray-900">Full Name</label>

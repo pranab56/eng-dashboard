@@ -39,7 +39,8 @@ export const appModalApi = baseApi.injectEndpoints({
         if (limit) params.push(`limit=${limit}`);
         if (searchValue) params.push(`searchTerm=${encodeURIComponent(searchValue)}`);
         if (status && status !== "all") params.push(`status=${encodeURIComponent(status)}`);
-        if (actionType && actionType !== "all") params.push(`actionType=${encodeURIComponent(actionType)}`);
+        if (actionType && actionType !== "all")
+          params.push(`actionType=${encodeURIComponent(actionType)}`);
 
         if (params.length > 0) {
           url += `?${params.join("&")}`;
@@ -67,10 +68,7 @@ export const appModalApi = baseApi.injectEndpoints({
         url: `/app-modal/${id}`,
         method: "GET",
       }),
-      providesTags: (result, error, id) => [
-        "appModal",
-        { type: "appModal", id },
-      ],
+      providesTags: (result, error, id) => ["appModal", { type: "appModal", id }],
     }),
 
     deleteAppModal: builder.mutation({
@@ -108,4 +106,3 @@ export const {
   useDeleteAppModalMutation,
   useToggleAppModalStatusMutation,
 } = appModalApi;
-

@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-"use client"
-import React, { useState, useRef, useEffect } from 'react';
-import { Layers, Check, ChevronDown, X } from 'lucide-react';
+"use client";
+import React, { useState, useRef, useEffect } from "react";
+import { Layers, Check, ChevronDown, X } from "lucide-react";
 
 interface TeamTypeSelectDropdownProps {
   types: string[];
@@ -28,8 +28,8 @@ export const TeamTypeSelectDropdown: React.FC<TeamTypeSelectDropdownProps> = ({
         setIsOpen(false);
       }
     };
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
   return (
@@ -63,7 +63,7 @@ export const TeamTypeSelectDropdown: React.FC<TeamTypeSelectDropdownProps> = ({
           )}
           <ChevronDown
             className={`w-3.5 h-3.5 text-gray-400 transition-transform duration-200 ${
-              isOpen ? 'rotate-180 text-blue-600' : ''
+              isOpen ? "rotate-180 text-blue-600" : ""
             }`}
           />
         </div>
@@ -81,8 +81,8 @@ export const TeamTypeSelectDropdown: React.FC<TeamTypeSelectDropdownProps> = ({
             }}
             className={`w-full flex items-center justify-between p-2 rounded-xl text-left text-xs transition-colors cursor-pointer ${
               selectedType === "ALL"
-                ? 'bg-blue-50 text-blue-950 font-bold'
-                : 'text-gray-700 hover:bg-gray-100 font-medium'
+                ? "bg-blue-50 text-blue-950 font-bold"
+                : "text-gray-700 hover:bg-gray-100 font-medium"
             }`}
           >
             <span className="flex items-center gap-2">
@@ -104,8 +104,8 @@ export const TeamTypeSelectDropdown: React.FC<TeamTypeSelectDropdownProps> = ({
                 }}
                 className={`w-full flex items-center justify-between p-2 rounded-xl text-left text-xs transition-colors cursor-pointer ${
                   isSelected
-                    ? 'bg-blue-50 text-blue-950 font-bold'
-                    : 'text-gray-800 hover:bg-gray-50 hover:text-blue-700 font-medium'
+                    ? "bg-blue-50 text-blue-950 font-bold"
+                    : "text-gray-800 hover:bg-gray-50 hover:text-blue-700 font-medium"
                 }`}
               >
                 <span>{type}</span>

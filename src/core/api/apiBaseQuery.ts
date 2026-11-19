@@ -1,4 +1,10 @@
-import { createApi, fetchBaseQuery, BaseQueryFn, FetchArgs, FetchBaseQueryError } from "@reduxjs/toolkit/query/react";
+import {
+  createApi,
+  fetchBaseQuery,
+  BaseQueryFn,
+  FetchArgs,
+  FetchBaseQueryError,
+} from "@reduxjs/toolkit/query/react";
 import { toast } from "sonner";
 import { baseURL } from "@/utils/BaseURL";
 import { logout, setTokens } from "@/features/auth/authSlice";
@@ -114,8 +120,7 @@ export const baseQueryWithInterceptor: BaseQueryFn<
             );
 
             const newAccessToken =
-              refreshResult?.data?.data?.accessToken ||
-              refreshResult?.data?.accessToken;
+              refreshResult?.data?.data?.accessToken || refreshResult?.data?.accessToken;
 
             if (newAccessToken) {
               api.dispatch(

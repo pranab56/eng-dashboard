@@ -1,8 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-"use client"
+"use client";
 
-import { Control, Controller, FieldError } from "react-hook-form"
-import { Checkbox } from "@/components/ui/checkbox"
+import { Control, Controller, FieldError } from "react-hook-form";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   Field,
   FieldDescription,
@@ -10,21 +10,21 @@ import {
   FieldLabel,
   FieldLegend,
   FieldSet,
-} from "@/components/ui/field"
+} from "@/components/ui/field";
 
 type Option = {
-  label: string
-  value: string
-}
+  label: string;
+  value: string;
+};
 
 type CheckboxGroupProps = {
-  name: string
-  label?: string
-  description?: string
-  control: Control<any>
-  options: Option[]
-  error?: FieldError
-}
+  name: string;
+  label?: string;
+  description?: string;
+  control: Control<any>;
+  options: Option[];
+  error?: FieldError;
+};
 
 const CheckboxGroup = ({
   name,
@@ -37,23 +37,21 @@ const CheckboxGroup = ({
   return (
     <FieldSet>
       {label && <FieldLegend variant="label">{label}</FieldLegend>}
-      {description && (
-        <FieldDescription>{description}</FieldDescription>
-      )}
+      {description && <FieldDescription>{description}</FieldDescription>}
 
       <Controller
         control={control}
         name={name}
         render={({ field }) => {
-          const value: string[] = field.value || []
+          const value: string[] = field.value || [];
 
           const toggleValue = (val: string) => {
             if (value.includes(val)) {
-              field.onChange(value.filter((v) => v !== val))
+              field.onChange(value.filter((v) => v !== val));
             } else {
-              field.onChange([...value, val])
+              field.onChange([...value, val]);
             }
-          }
+          };
 
           return (
             <FieldGroup className="gap-3">
@@ -69,17 +67,13 @@ const CheckboxGroup = ({
                 </Field>
               ))}
             </FieldGroup>
-          )
+          );
         }}
       />
 
-      {error && (
-        <p className="text-sm text-red-500 mt-2">
-          {error.message}
-        </p>
-      )}
+      {error && <p className="text-sm text-red-500 mt-2">{error.message}</p>}
     </FieldSet>
-  )
-}
+  );
+};
 
-export default CheckboxGroup
+export default CheckboxGroup;

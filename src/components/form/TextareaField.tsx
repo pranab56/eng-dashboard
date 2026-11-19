@@ -10,13 +10,7 @@ type TextareaFieldProps = {
   error?: FieldError;
 };
 
-const TextareaField = ({
-  title,
-  name,
-  placeholder,
-  register,
-  error,
-}: TextareaFieldProps) => {
+const TextareaField = ({ title, name, placeholder, register, error }: TextareaFieldProps) => {
   return (
     <div className="space-y-3">
       <label className="block text-[15px] font-semibold text-gray-800">{title}</label>
@@ -25,17 +19,14 @@ const TextareaField = ({
           {...register(name)}
           placeholder={placeholder}
           className={`w-full bg-[#f3f4f6] border-2 rounded-lg py-3 px-6 text-gray-900 font-medium placeholder:text-gray-400 outline-none transition-all hover:bg-[#ecedf0]
-        ${error
-              ? "border-red-400 focus:ring-red-100 bg-red-50/30"
-              : "border-transparent focus:ring-gray-200"
-            }`}
+        ${
+          error
+            ? "border-red-400 focus:ring-red-100 bg-red-50/30"
+            : "border-transparent focus:ring-gray-200"
+        }`}
         />
 
-        {error && (
-          <p className="text-sm font-medium text-red-500 mt-2 px-1">
-            {error.message}
-          </p>
-        )}
+        {error && <p className="text-sm font-medium text-red-500 mt-2 px-1">{error.message}</p>}
       </div>
     </div>
   );

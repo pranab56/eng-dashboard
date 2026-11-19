@@ -9,10 +9,7 @@ export const promotionalZoneApi = baseApi.injectEndpoints({
         method: "POST",
         body: data,
       }),
-      invalidatesTags: [
-        "promotionalZone",
-        { type: "promotionalZone", id: "LIST" },
-      ],
+      invalidatesTags: ["promotionalZone", { type: "promotionalZone", id: "LIST" }],
     }),
 
     updatePromotion: builder.mutation({
@@ -74,10 +71,7 @@ export const promotionalZoneApi = baseApi.injectEndpoints({
         url: `/promotional-zone/${id}`,
         method: "GET",
       }),
-      providesTags: (result, error, id) => [
-        "promotionalZone",
-        { type: "promotionalZone", id },
-      ],
+      providesTags: (result, error, id) => ["promotionalZone", { type: "promotionalZone", id }],
     }),
 
     deletePromotion: builder.mutation({

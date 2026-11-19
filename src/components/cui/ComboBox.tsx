@@ -2,11 +2,7 @@
 
 import React, { useState } from "react";
 import { Check, ChevronsUpDown, Search, Plus } from "lucide-react";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 
 interface ComboBoxProps {
   value: string;
@@ -34,9 +30,7 @@ export default function ComboBox({
 
   const isCustomOption =
     searchQuery.trim().length > 0 &&
-    !options.some(
-      (opt) => opt.toLowerCase() === searchQuery.trim().toLowerCase()
-    );
+    !options.some((opt) => opt.toLowerCase() === searchQuery.trim().toLowerCase());
 
   const handleSelect = (val: string) => {
     onChange(val);
@@ -52,9 +46,7 @@ export default function ComboBox({
           disabled={disabled}
           className="w-full h-11 px-3.5 bg-gray-50 border border-gray-200 rounded-lg text-sm flex items-center justify-between font-medium text-gray-800 hover:bg-gray-100/70 focus:outline-none focus:border-blue-500 transition-all cursor-pointer disabled:opacity-50"
         >
-          <span className="truncate">
-            {value ? value : placeholder}
-          </span>
+          <span className="truncate">{value ? value : placeholder}</span>
           <ChevronsUpDown className="w-4 h-4 text-gray-400 shrink-0 ml-2" />
         </button>
       </PopoverTrigger>
@@ -105,9 +97,7 @@ export default function ComboBox({
           )}
 
           {filteredOptions.length === 0 && !isCustomOption && (
-            <p className="p-3 text-center text-xs text-gray-400">
-              No matching options found
-            </p>
+            <p className="p-3 text-center text-xs text-gray-400">No matching options found</p>
           )}
         </div>
       </PopoverContent>

@@ -30,7 +30,8 @@ const getPlatformIcon = (platformName: string, iconUrl?: string) => {
   if (p.includes("facebook")) return <FaFacebook className="w-5 h-5 text-blue-600 shrink-0" />;
   if (p.includes("github")) return <FaGithub className="w-5 h-5 text-slate-900 shrink-0" />;
   if (p.includes("instagram")) return <FaInstagram className="w-5 h-5 text-pink-600 shrink-0" />;
-  if (p.includes("twitter") || p.includes("x")) return <FaTwitter className="w-5 h-5 text-sky-500 shrink-0" />;
+  if (p.includes("twitter") || p.includes("x"))
+    return <FaTwitter className="w-5 h-5 text-sky-500 shrink-0" />;
   if (p.includes("youtube")) return <FaYoutube className="w-5 h-5 text-red-600 shrink-0" />;
   if (p.includes("linkedin")) return <FaLinkedin className="w-5 h-5 text-blue-700 shrink-0" />;
 
@@ -95,9 +96,7 @@ export const getSocialColumns = (
           }`}
         >
           <span
-            className={`w-1.5 h-1.5 rounded-full ${
-              isActive ? "bg-emerald-500" : "bg-slate-400"
-            }`}
+            className={`w-1.5 h-1.5 rounded-full ${isActive ? "bg-emerald-500" : "bg-slate-400"}`}
           />
           {isActive ? "Active" : "Inactive"}
         </span>

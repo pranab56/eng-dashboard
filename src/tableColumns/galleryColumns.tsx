@@ -18,12 +18,7 @@ export const getGalleryColumns = (
         <div className="flex items-center gap-3">
           {imgUrl ? (
             <div className="relative w-14 h-10 rounded-lg overflow-hidden border border-slate-200 bg-slate-50 shrink-0 shadow-2xs">
-              <Image
-                src={imgUrl}
-                alt="gallery preview"
-                fill
-                className="object-cover"
-              />
+              <Image src={imgUrl} alt="gallery preview" fill className="object-cover" />
             </div>
           ) : (
             <div className="w-14 h-10 rounded-lg bg-slate-100 flex items-center justify-center text-slate-400 font-medium text-xs border border-slate-200 shrink-0">
@@ -40,8 +35,10 @@ export const getGalleryColumns = (
     cell: ({ row }) => {
       const cat = row.original.category as any;
       const sub = row.original.subCategory as any;
-      const catName = typeof cat === "object" && cat ? cat.name : typeof cat === "string" ? cat : "";
-      const subName = typeof sub === "object" && sub ? sub.name : typeof sub === "string" ? sub : "";
+      const catName =
+        typeof cat === "object" && cat ? cat.name : typeof cat === "string" ? cat : "";
+      const subName =
+        typeof sub === "object" && sub ? sub.name : typeof sub === "string" ? sub : "";
 
       return (
         <div className="flex items-center gap-1.5 flex-wrap">
@@ -72,9 +69,7 @@ export const getGalleryColumns = (
           }`}
         >
           <span
-            className={`w-1.5 h-1.5 rounded-full ${
-              isActive ? "bg-emerald-500" : "bg-slate-400"
-            }`}
+            className={`w-1.5 h-1.5 rounded-full ${isActive ? "bg-emerald-500" : "bg-slate-400"}`}
           />
           <span className="capitalize">{status}</span>
         </span>
@@ -95,7 +90,9 @@ export const getGalleryColumns = (
   },
   {
     id: "action",
-    header: () => <div className="text-right pr-2 font-semibold text-xs text-slate-700">Actions</div>,
+    header: () => (
+      <div className="text-right pr-2 font-semibold text-xs text-slate-700">Actions</div>
+    ),
     cell: ({ row }) => {
       const item = row.original;
       return (

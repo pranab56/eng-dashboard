@@ -85,7 +85,11 @@ export default function SponsorshipModal({
       setTier(editingItem.tier || "official");
       setWebsiteUrl(editingItem.websiteUrl || "");
       setDescription(editingItem.description || "");
-      setPlacements(editingItem.placements && editingItem.placements.length > 0 ? editingItem.placements : ["home"]);
+      setPlacements(
+        editingItem.placements && editingItem.placements.length > 0
+          ? editingItem.placements
+          : ["home"]
+      );
       setOrder(editingItem.order ?? 0);
       setStatus(editingItem.status || "active");
       setContactEmail(editingItem.contactEmail || "");
@@ -284,9 +288,7 @@ export default function SponsorshipModal({
           {/* Grid: Website & Order */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
             <div>
-              <label className="block text-xs font-medium text-slate-700 mb-1">
-                Website URL
-              </label>
+              <label className="block text-xs font-medium text-slate-700 mb-1">Website URL</label>
               <input
                 type="text"
                 value={websiteUrl}
@@ -427,9 +429,7 @@ export default function SponsorshipModal({
           {/* Status (Custom Select) & Contacts */}
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5 pt-1">
             <div>
-              <label className="block text-xs font-medium text-slate-700 mb-1">
-                Status
-              </label>
+              <label className="block text-xs font-medium text-slate-700 mb-1">Status</label>
               <Select value={status} onValueChange={(val: any) => setStatus(val)}>
                 <SelectTrigger className="w-full h-8 px-2.5 rounded-md border border-slate-200 text-xs text-slate-900 bg-white hover:border-slate-300">
                   <SelectValue placeholder="Select status" />
@@ -442,9 +442,7 @@ export default function SponsorshipModal({
             </div>
 
             <div>
-              <label className="block text-xs font-medium text-slate-700 mb-1">
-                Contact Email
-              </label>
+              <label className="block text-xs font-medium text-slate-700 mb-1">Contact Email</label>
               <input
                 type="email"
                 value={contactEmail}
@@ -455,9 +453,7 @@ export default function SponsorshipModal({
             </div>
 
             <div>
-              <label className="block text-xs font-medium text-slate-700 mb-1">
-                Contact Phone
-              </label>
+              <label className="block text-xs font-medium text-slate-700 mb-1">Contact Phone</label>
               <input
                 type="text"
                 value={contactPhone}

@@ -1,11 +1,8 @@
-import React from 'react'
-import ProfileContent from './ProfileContent'
-
+import React from "react";
+import ProfileContent from "./ProfileContent";
 
 const ProfilePage = () => {
-  return (
-    <ProfileContent />
-  )
-}
+  return <ProfileContent />;
+};
 
-export default ProfilePage
+export default ProfilePage;

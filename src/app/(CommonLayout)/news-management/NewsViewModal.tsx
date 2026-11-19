@@ -2,27 +2,12 @@
 "use client";
 
 import React, { useState } from "react";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 import Image from "next/image";
 import Link from "next/link";
-import {
-  Calendar,
-  Clock,
-  X,
-  Newspaper,
-  Tag,
-  Globe,
-  Copy,
-  Check,
-  BookOpen,
-} from "lucide-react";
+import { Calendar, Clock, X, Newspaper, Tag, Globe, Copy, Check, BookOpen } from "lucide-react";
 import { FiEdit } from "react-icons/fi";
 import { toast } from "sonner";
 import { formatImagePath } from "@/utils/formatImagePath";
@@ -35,11 +20,7 @@ interface NewsViewModalProps {
   onClose: () => void;
 }
 
-const NewsViewModal: React.FC<NewsViewModalProps> = ({
-  news,
-  isOpen,
-  onClose,
-}) => {
+const NewsViewModal: React.FC<NewsViewModalProps> = ({ news, isOpen, onClose }) => {
   const [copiedId, setCopiedId] = useState(false);
 
   if (!news) return null;
@@ -192,9 +173,7 @@ const NewsViewModal: React.FC<NewsViewModalProps> = ({
                 Timeline Status
               </span>
               <p className="font-semibold text-slate-800">
-                {news.publishDateTime
-                  ? dayjs(news.publishDateTime).fromNow()
-                  : "Draft mode"}
+                {news.publishDateTime ? dayjs(news.publishDateTime).fromNow() : "Draft mode"}
               </p>
             </div>
 

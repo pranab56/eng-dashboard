@@ -56,7 +56,9 @@ export const myFetch = async (
   };
 
   try {
-    const targetUrl = url.startsWith("http") ? url : `${baseURL}/api/v1${url.startsWith("/") ? "" : "/"}${url}`;
+    const targetUrl = url.startsWith("http")
+      ? url
+      : `${baseURL}/api/v1${url.startsWith("/") ? "" : "/"}${url}`;
     const response = await fetch(targetUrl, {
       method,
       headers: reqHeaders,
@@ -66,7 +68,11 @@ export const myFetch = async (
     });
 
     // If 401 Unauthorized and not already retrying, try to refresh token
-    if ((response.status === 401 || response.status === 403) && !isRetry && !url.includes("refresh-token")) {
+    if (
+      (response.status === 401 || response.status === 403) &&
+      !isRetry &&
+      !url.includes("refresh-token")
+    ) {
       const refreshToken = await getRefreshToken();
       if (refreshToken) {
         const refreshRes = await fetch(`${baseURL}/api/v1/auth/refresh-token`, {
@@ -88,9 +94,7 @@ export const myFetch = async (
             refreshData?.accessToken ||
             refreshData?.token;
           const newRefreshToken =
-            refreshData?.data?.refreshToken ||
-            refreshData?.refreshToken ||
-            refreshToken;
+            refreshData?.data?.refreshToken || refreshData?.refreshToken || refreshToken;
 
           if (newAccessToken) {
             await setAuthCookie(newAccessToken, newRefreshToken);

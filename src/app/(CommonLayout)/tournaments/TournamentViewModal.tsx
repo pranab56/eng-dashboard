@@ -2,12 +2,7 @@
 "use client";
 
 import React, { useState } from "react";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { TTournament } from "@/types/columnTypes";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
@@ -41,10 +36,12 @@ export default function TournamentViewModal({
   const [selectedPosIndex, setSelectedPosIndex] = useState(0);
   const [isDownloading, setIsDownloading] = useState(false);
 
-  const { data: qrResponse, isLoading: isQrLoading } =
-    useGetTournamentQrCodeQuery(tournament?._id || tournament?.id, {
+  const { data: qrResponse, isLoading: isQrLoading } = useGetTournamentQrCodeQuery(
+    tournament?._id || tournament?.id,
+    {
       skip: !isOpen || (!tournament?._id && !tournament?.id),
-    });
+    }
+  );
 
   if (!tournament) return null;
 
@@ -88,8 +85,7 @@ export default function TournamentViewModal({
   }
 
   const positionQrCodes = qrData?.positionQrCodes || [];
-  const currentPosQr =
-    positionQrCodes[selectedPosIndex] || positionQrCodes[0] || null;
+  const currentPosQr = positionQrCodes[selectedPosIndex] || positionQrCodes[0] || null;
 
   const qrImageUrl = currentPosQr?.qrPayloadString
     ? `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(
@@ -175,9 +171,7 @@ export default function TournamentViewModal({
           </DialogTitle>
 
           {tournament.description && (
-            <p className="text-xs text-slate-500 mt-0.5 line-clamp-2">
-              {tournament.description}
-            </p>
+            <p className="text-xs text-slate-500 mt-0.5 line-clamp-2">{tournament.description}</p>
           )}
         </DialogHeader>
 
@@ -203,8 +197,7 @@ export default function TournamentViewModal({
                 <div className="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-none">
                   {positionQrCodes.map((posQr: any, idx: number) => {
                     const isSelected =
-                      idx === selectedPosIndex ||
-                      (!positionQrCodes[selectedPosIndex] && idx === 0);
+                      idx === selectedPosIndex || (!positionQrCodes[selectedPosIndex] && idx === 0);
 
                     return (
                       <button
@@ -275,8 +268,7 @@ export default function TournamentViewModal({
                       <strong className="text-slate-900 font-semibold">
                         {currentPosQr?.positionName} (Rank #{currentPosQr?.position})
                       </strong>{" "}
-                      can scan this code using their ENG mobile application to
-                      claim their coins.
+                      can scan this code using their ENG mobile application to claim their coins.
                     </p>
 
                     <div className="space-y-1 text-[11px] text-slate-500 font-medium">
@@ -321,77 +313,72 @@ export default function TournamentViewModal({
           </div>
 
           {/* Configured Position Rewards Breakdown */}
-          {tournament.positionRewards &&
-            tournament.positionRewards.length > 0 && (
-              <div className="space-y-2.5">
-                <div className="flex items-center gap-1.5">
-                  <Award className="w-4 h-4 text-slate-600" />
-                  <h4 className="text-xs font-bold text-slate-900 uppercase tracking-wider">
-                    Configured Position Rewards ({tournament.positionRewards.length})
-                  </h4>
-                </div>
+          {tournament.positionRewards && tournament.positionRewards.length > 0 && (
+            <div className="space-y-2.5">
+              <div className="flex items-center gap-1.5">
+                <Award className="w-4 h-4 text-slate-600" />
+                <h4 className="text-xs font-bold text-slate-900 uppercase tracking-wider">
+                  Configured Position Rewards ({tournament.positionRewards.length})
+                </h4>
+              </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
-                  {tournament.positionRewards.map((reward, idx) => {
-                    const is1st = reward.position === 1;
-                    const is2nd = reward.position === 2;
-                    const is3rd = reward.position === 3;
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+                {tournament.positionRewards.map((reward, idx) => {
+                  const is1st = reward.position === 1;
+                  const is2nd = reward.position === 2;
+                  const is3rd = reward.position === 3;
 
-                    let rankLabel = `Rank #${reward.position}`;
-                    let badgeStyle =
-                      "bg-slate-50 border-slate-200 text-slate-700";
+                  let rankLabel = `Rank #${reward.position}`;
+                  let badgeStyle = "bg-slate-50 border-slate-200 text-slate-700";
 
-                    if (is1st) {
-                      rankLabel = "1st Place";
-                      badgeStyle = "bg-amber-50 border-amber-200 text-amber-900";
-                    } else if (is2nd) {
-                      rankLabel = "2nd Place";
-                      badgeStyle = "bg-slate-100 border-slate-200 text-slate-900";
-                    } else if (is3rd) {
-                      rankLabel = "3rd Place";
-                      badgeStyle =
-                        "bg-amber-50/50 border-amber-200/80 text-amber-950";
-                    }
+                  if (is1st) {
+                    rankLabel = "1st Place";
+                    badgeStyle = "bg-amber-50 border-amber-200 text-amber-900";
+                  } else if (is2nd) {
+                    rankLabel = "2nd Place";
+                    badgeStyle = "bg-slate-100 border-slate-200 text-slate-900";
+                  } else if (is3rd) {
+                    rankLabel = "3rd Place";
+                    badgeStyle = "bg-amber-50/50 border-amber-200/80 text-amber-950";
+                  }
 
-                    return (
-                      <div
-                        key={idx}
-                        className="p-3 rounded-md border border-slate-200 bg-white space-y-1.5 shadow-2xs"
-                      >
-                        <div className="flex items-center justify-between">
-                          <span
-                            className={`text-[10px] font-bold px-1.5 py-0.2 rounded border ${badgeStyle}`}
-                          >
-                            {rankLabel}
-                          </span>
-                          <span className="text-[10px] font-mono text-slate-400">
-                            #{reward.position}
-                          </span>
-                        </div>
+                  return (
+                    <div
+                      key={idx}
+                      className="p-3 rounded-md border border-slate-200 bg-white space-y-1.5 shadow-2xs"
+                    >
+                      <div className="flex items-center justify-between">
+                        <span
+                          className={`text-[10px] font-bold px-1.5 py-0.2 rounded border ${badgeStyle}`}
+                        >
+                          {rankLabel}
+                        </span>
+                        <span className="text-[10px] font-mono text-slate-400">
+                          #{reward.position}
+                        </span>
+                      </div>
 
-                        <div>
-                          <h5 className="font-semibold text-xs text-slate-900 truncate">
-                            {reward.positionName}
-                          </h5>
-                          <div className="flex items-center gap-1 mt-1 text-xs font-bold text-slate-900">
-                            <Coins className="w-3 h-3 text-amber-500" />
-                            <span>{reward.points.toLocaleString()} Coins</span>
-                          </div>
+                      <div>
+                        <h5 className="font-semibold text-xs text-slate-900 truncate">
+                          {reward.positionName}
+                        </h5>
+                        <div className="flex items-center gap-1 mt-1 text-xs font-bold text-slate-900">
+                          <Coins className="w-3 h-3 text-amber-500" />
+                          <span>{reward.points.toLocaleString()} Coins</span>
                         </div>
                       </div>
-                    );
-                  })}
-                </div>
+                    </div>
+                  );
+                })}
               </div>
-            )}
+            </div>
+          )}
 
           {/* Timeline Info Footer */}
           {tournament.createdAt && (
             <div className="pt-3 border-t border-slate-100 flex items-center justify-between text-[11px] text-slate-400">
               <span>Created {dayjs(tournament.createdAt).fromNow()}</span>
-              <span>
-                {dayjs(tournament.createdAt).format("DD MMM YYYY, hh:mm A")}
-              </span>
+              <span>{dayjs(tournament.createdAt).format("DD MMM YYYY, hh:mm A")}</span>
             </div>
           )}
         </div>

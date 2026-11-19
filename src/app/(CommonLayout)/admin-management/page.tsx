@@ -31,10 +31,7 @@ import {
   useUpdateAdminMutation,
   useDeleteAdminMutation,
 } from "@/features/admin/adminApi";
-import {
-  AVAILABLE_PERMISSIONS,
-  PERMISSION_CATEGORIES,
-} from "@/constants/permissions";
+import { AVAILABLE_PERMISSIONS, PERMISSION_CATEGORIES } from "@/constants/permissions";
 
 // ============================================================================
 // 1. REUSABLE ADMIN FORM MODAL (CREATE & EDIT)
@@ -105,9 +102,7 @@ function AdminFormModal({
 
   // Toggle all permissions in a specific category
   const handleToggleCategory = (category: string) => {
-    const catKeys = AVAILABLE_PERMISSIONS.filter((p) => p.category === category).map(
-      (p) => p.key
-    );
+    const catKeys = AVAILABLE_PERMISSIONS.filter((p) => p.category === category).map((p) => p.key);
     const allSelected = catKeys.every((k) => formData.permissions.includes(k));
 
     setFormData((prev) => ({
@@ -266,7 +261,9 @@ function AdminFormModal({
               {!isEditMode && (
                 <p className="text-[11px] text-slate-500 mt-1.5 flex items-center gap-1.5">
                   <Mail className="w-3.5 h-3.5 text-slate-500 shrink-0" />
-                  <span>Login credentials will be automatically sent to the administrator's email.</span>
+                  <span>
+                    Login credentials will be automatically sent to the administrator's email.
+                  </span>
                 </p>
               )}
             </div>
@@ -283,8 +280,10 @@ function AdminFormModal({
                   </h4>
                 </div>
                 <p className="text-[11px] text-slate-500 mt-0.5">
-                  <strong className="text-slate-900 font-semibold">{formData.permissions.length}</strong> of{" "}
-                  {AVAILABLE_PERMISSIONS.length} pages granted
+                  <strong className="text-slate-900 font-semibold">
+                    {formData.permissions.length}
+                  </strong>{" "}
+                  of {AVAILABLE_PERMISSIONS.length} pages granted
                 </p>
               </div>
 
@@ -446,7 +445,9 @@ function AdminViewModal({
         <div className="px-6 py-4 border-b border-slate-200 flex items-center justify-between bg-slate-50/60">
           <div>
             <h3 className="text-base font-bold text-slate-900">Administrator Details</h3>
-            <p className="text-xs text-slate-500">Overview of account profile and granted permissions</p>
+            <p className="text-xs text-slate-500">
+              Overview of account profile and granted permissions
+            </p>
           </div>
           <button
             type="button"
@@ -506,9 +507,12 @@ function AdminViewModal({
               <div className="p-4 rounded-lg bg-emerald-50 border border-emerald-200 flex items-start gap-3">
                 <CheckCircle2 className="w-5 h-5 text-emerald-600 shrink-0 mt-0.5" />
                 <div>
-                  <p className="text-xs font-bold text-emerald-900">Unrestricted Full System Access</p>
+                  <p className="text-xs font-bold text-emerald-900">
+                    Unrestricted Full System Access
+                  </p>
                   <p className="text-[11px] text-emerald-700 mt-0.5">
-                    This administrator has full access to all sections and pages across the entire ENG Dashboard.
+                    This administrator has full access to all sections and pages across the entire
+                    ENG Dashboard.
                   </p>
                 </div>
               </div>
@@ -523,7 +527,10 @@ function AdminViewModal({
                   if (catPerms.length === 0) return null;
 
                   return (
-                    <div key={cat} className="p-3 rounded-lg border border-slate-200 bg-slate-50/50">
+                    <div
+                      key={cat}
+                      className="p-3 rounded-lg border border-slate-200 bg-slate-50/50"
+                    >
                       <p className="text-[11px] font-bold text-slate-700 uppercase tracking-wider mb-2">
                         {cat} ({catPerms.length})
                       </p>
@@ -625,7 +632,8 @@ function AdminDeleteModal({
 
         <div className="px-6 py-4 bg-slate-50/50 border-y border-slate-100 space-y-2">
           <p className="text-xs text-slate-600 leading-relaxed">
-            Are you sure you want to permanently revoke all access privileges for this administrator?
+            Are you sure you want to permanently revoke all access privileges for this
+            administrator?
           </p>
           <div className="bg-white p-3 rounded-lg border border-slate-200 text-xs space-y-1">
             <p className="text-slate-700">
@@ -697,11 +705,16 @@ export default function AdminManagementPage() {
   const filteredAdmins = useMemo(() => {
     return admins.filter((adm) => {
       const q = searchTerm.toLowerCase().trim();
-      const fullName = ((adm.firstName || "") + " " + (adm.lastName || "") + " " + (adm.name || "")).toLowerCase();
+      const fullName = (
+        (adm.firstName || "") +
+        " " +
+        (adm.lastName || "") +
+        " " +
+        (adm.name || "")
+      ).toLowerCase();
       const email = (adm.email || "").toLowerCase();
       const phone = (adm.phone || "").toLowerCase();
-      const matchesSearch =
-        !q || fullName.includes(q) || email.includes(q) || phone.includes(q);
+      const matchesSearch = !q || fullName.includes(q) || email.includes(q) || phone.includes(q);
 
       if (!matchesSearch) return false;
 
@@ -878,14 +891,10 @@ export default function AdminManagementPage() {
             <Users className="w-4 h-4 text-slate-400" />
           </div>
           <div className="mt-2 flex items-baseline gap-2">
-            <span className="text-xl font-bold font-mono text-slate-900">
-              {admins.length}
-            </span>
+            <span className="text-xl font-bold font-mono text-slate-900">{admins.length}</span>
             <span className="text-xs text-slate-500">accounts</span>
           </div>
-          <p className="text-[11px] text-slate-400 mt-1">
-            Active console management accounts
-          </p>
+          <p className="text-[11px] text-slate-400 mt-1">Active console management accounts</p>
         </div>
 
         {/* Full System Access */}
@@ -897,9 +906,7 @@ export default function AdminManagementPage() {
             <ShieldCheck className="w-4 h-4 text-emerald-600" />
           </div>
           <div className="mt-2 flex items-baseline gap-2">
-            <span className="text-xl font-bold font-mono text-slate-900">
-              {fullAccessCount}
-            </span>
+            <span className="text-xl font-bold font-mono text-slate-900">{fullAccessCount}</span>
             <span className="text-xs text-emerald-600 font-semibold">
               {admins.length > 0 ? Math.round((fullAccessCount / admins.length) * 100) + "%" : "0%"}
             </span>
@@ -918,16 +925,14 @@ export default function AdminManagementPage() {
             <Lock className="w-4 h-4 text-amber-600" />
           </div>
           <div className="mt-2 flex items-baseline gap-2">
-            <span className="text-xl font-bold font-mono text-slate-900">
-              {customAccessCount}
-            </span>
+            <span className="text-xl font-bold font-mono text-slate-900">{customAccessCount}</span>
             <span className="text-xs text-amber-600 font-semibold">
-              {admins.length > 0 ? Math.round((customAccessCount / admins.length) * 100) + "%" : "0%"}
+              {admins.length > 0
+                ? Math.round((customAccessCount / admins.length) * 100) + "%"
+                : "0%"}
             </span>
           </div>
-          <p className="text-[11px] text-slate-400 mt-1">
-            Restricted to designated pages only
-          </p>
+          <p className="text-[11px] text-slate-400 mt-1">Restricted to designated pages only</p>
         </div>
       </div>
 
@@ -1033,7 +1038,9 @@ export default function AdminManagementPage() {
               <h3 className="text-sm font-semibold text-slate-900">No administrators found</h3>
               <p className="text-xs text-slate-500 mt-1 max-w-sm mx-auto leading-relaxed">
                 {searchTerm
-                  ? 'No accounts match "' + searchTerm + '". Try a different keyword or clear the search filter.'
+                  ? 'No accounts match "' +
+                    searchTerm +
+                    '". Try a different keyword or clear the search filter.'
                   : "No administrative accounts exist under this filter category."}
               </p>
               {searchTerm && (
@@ -1077,10 +1084,7 @@ export default function AdminManagementPage() {
                     perms.length === 0 || perms.length === AVAILABLE_PERMISSIONS.length;
 
                   return (
-                    <tr
-                      key={adm._id}
-                      className="hover:bg-slate-50/60 transition-colors group"
-                    >
+                    <tr key={adm._id} className="hover:bg-slate-50/60 transition-colors group">
                       <td className="py-3.5 px-4">
                         <div className="flex items-center gap-3">
                           <div className="w-8 h-8 rounded-full bg-slate-100 border border-slate-200 flex items-center justify-center font-bold text-slate-700 text-xs shrink-0 select-none">
@@ -1182,7 +1186,8 @@ export default function AdminManagementPage() {
         {/* Table Footer Summary */}
         <div className="px-4 py-3 bg-slate-50/50 border-t border-slate-200 text-[11px] text-slate-500 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-1">
           <span>
-            Showing <strong className="font-semibold text-slate-700">{filteredAdmins.length}</strong> of{" "}
+            Showing{" "}
+            <strong className="font-semibold text-slate-700">{filteredAdmins.length}</strong> of{" "}
             <strong className="font-semibold text-slate-700">{admins.length}</strong> administrators
           </span>
           <span className="text-slate-400">Strict Role-Based Access Control (RBAC)</span>

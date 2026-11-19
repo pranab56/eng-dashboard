@@ -28,10 +28,7 @@ export const NomineePlayerSelectDropdown: React.FC<NomineePlayerSelectDropdownPr
   // Close dropdown on click outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (
-        dropdownRef.current &&
-        !dropdownRef.current.contains(event.target as Node)
-      ) {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
         setIsOpen(false);
       }
     };
@@ -43,9 +40,7 @@ export const NomineePlayerSelectDropdown: React.FC<NomineePlayerSelectDropdownPr
 
   // Find selected player object
   const selectedPlayer = useMemo(() => {
-    return players.find(
-      (p) => String(p._id || p.id) === String(selectedPlayerId)
-    );
+    return players.find((p) => String(p._id || p.id) === String(selectedPlayerId));
   }, [players, selectedPlayerId]);
 
   // Filter players by name, position, or team
@@ -57,12 +52,7 @@ export const NomineePlayerSelectDropdown: React.FC<NomineePlayerSelectDropdownPr
       const userName = (p.userName || "").toLowerCase();
       const pos = (p.position || "").toLowerCase();
       const team = (p.selectTeam?.teamName || "").toLowerCase();
-      return (
-        name.includes(q) ||
-        userName.includes(q) ||
-        pos.includes(q) ||
-        team.includes(q)
-      );
+      return name.includes(q) || userName.includes(q) || pos.includes(q) || team.includes(q);
     });
   }, [players, searchTerm]);
 
@@ -94,18 +84,12 @@ export const NomineePlayerSelectDropdown: React.FC<NomineePlayerSelectDropdownPr
             <>
               <div className="w-5 h-5 rounded-full overflow-hidden bg-slate-100 border border-slate-200 shrink-0 flex items-center justify-center text-[9px] font-semibold text-slate-600">
                 {profileImg ? (
-                  <img
-                    src={profileImg}
-                    alt={displayName}
-                    className="w-full h-full object-cover"
-                  />
+                  <img src={profileImg} alt={displayName} className="w-full h-full object-cover" />
                 ) : (
                   displayName.slice(0, 2).toUpperCase()
                 )}
               </div>
-              <span className="font-medium text-slate-900 truncate">
-                {displayName}
-              </span>
+              <span className="font-medium text-slate-900 truncate">{displayName}</span>
               {selectedPlayer.position && (
                 <span className="text-[10px] text-slate-500 bg-slate-100 px-1 py-0.2 rounded font-mono">
                   {selectedPlayer.position}
@@ -193,11 +177,7 @@ export const NomineePlayerSelectDropdown: React.FC<NomineePlayerSelectDropdownPr
                     <div className="flex items-center gap-2 min-w-0">
                       <div className="w-6 h-6 rounded-full overflow-hidden bg-slate-100 border border-slate-200 shrink-0 flex items-center justify-center text-[10px] font-semibold text-slate-600">
                         {pImg ? (
-                          <img
-                            src={pImg}
-                            alt={pName}
-                            className="w-full h-full object-cover"
-                          />
+                          <img src={pImg} alt={pName} className="w-full h-full object-cover" />
                         ) : (
                           pName.slice(0, 2).toUpperCase()
                         )}
@@ -219,9 +199,7 @@ export const NomineePlayerSelectDropdown: React.FC<NomineePlayerSelectDropdownPr
                       </div>
                     </div>
 
-                    {isSelected && (
-                      <Check className="w-3.5 h-3.5 text-slate-900 shrink-0 ml-2" />
-                    )}
+                    {isSelected && <Check className="w-3.5 h-3.5 text-slate-900 shrink-0 ml-2" />}
                   </button>
                 );
               })

@@ -253,9 +253,7 @@ const TransferManagement = () => {
             </span>
             <span className="text-xs text-slate-500">requests</span>
           </div>
-          <p className="text-[11px] text-slate-400 mt-1">
-            All-time player transfer requests
-          </p>
+          <p className="text-[11px] text-slate-400 mt-1">All-time player transfer requests</p>
         </div>
 
         {/* Action Required */}
@@ -272,9 +270,7 @@ const TransferManagement = () => {
             </span>
             <span className="text-xs text-slate-500">awaiting check</span>
           </div>
-          <p className="text-[11px] text-slate-400 mt-1">
-            Pending manager or admin verification
-          </p>
+          <p className="text-[11px] text-slate-400 mt-1">Pending manager or admin verification</p>
         </div>
 
         {/* Approved Transfers */}
@@ -291,9 +287,7 @@ const TransferManagement = () => {
             </span>
             <span className="text-xs text-slate-500">completed</span>
           </div>
-          <p className="text-[11px] text-slate-400 mt-1">
-            Transfers finalized and active
-          </p>
+          <p className="text-[11px] text-slate-400 mt-1">Transfers finalized and active</p>
         </div>
 
         {/* Rejected Transfers */}
@@ -310,9 +304,7 @@ const TransferManagement = () => {
             </span>
             <span className="text-xs text-slate-500">declined</span>
           </div>
-          <p className="text-[11px] text-slate-400 mt-1">
-            Rejected or withdrawn transfer requests
-          </p>
+          <p className="text-[11px] text-slate-400 mt-1">Rejected or withdrawn transfer requests</p>
         </div>
       </div>
 
@@ -338,9 +330,7 @@ const TransferManagement = () => {
                   <span>{tab.label}</span>
                   <span
                     className={`px-1.5 py-0.2 rounded-full text-[10px] font-mono ${
-                      isActive
-                        ? "bg-slate-800 text-slate-200"
-                        : "bg-slate-100 text-slate-600"
+                      isActive ? "bg-slate-800 text-slate-200" : "bg-slate-100 text-slate-600"
                     }`}
                   >
                     {isOverviewLoading ? "—" : tab.count}
@@ -423,7 +413,8 @@ const TransferManagement = () => {
             </span>
             {debouncedSearch && (
               <span className="text-slate-600">
-                Filtered by: &ldquo;<span className="font-medium text-slate-900">{debouncedSearch}</span>&rdquo;
+                Filtered by: &ldquo;
+                <span className="font-medium text-slate-900">{debouncedSearch}</span>&rdquo;
               </span>
             )}
           </div>

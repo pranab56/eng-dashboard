@@ -4,15 +4,7 @@
 
 import React, { useEffect, useState } from "react";
 import { useSearchParams, useRouter, usePathname } from "next/navigation";
-import {
-  Users,
-  Clock,
-  CheckCircle2,
-  Shield,
-  Search,
-  X,
-  RefreshCw,
-} from "lucide-react";
+import { Users, Clock, CheckCircle2, Shield, Search, X, RefreshCw } from "lucide-react";
 import { toast } from "sonner";
 
 import CustomPagination from "@/components/cui/CustomPagination";
@@ -79,24 +71,17 @@ const UserManagement = () => {
   };
 
   // Modals State
-  const [selectedUser, setSelectedUser] = useState<TUserManagement | null>(
-    null,
-  );
-  const [isVerificationModalOpen, setIsVerificationModalOpen] =
-    useState<boolean>(false);
+  const [selectedUser, setSelectedUser] = useState<TUserManagement | null>(null);
+  const [isVerificationModalOpen, setIsVerificationModalOpen] = useState<boolean>(false);
 
-  const [assignTargetUser, setAssignTargetUser] =
-    useState<TUserManagement | null>(null);
+  const [assignTargetUser, setAssignTargetUser] = useState<TUserManagement | null>(null);
   const [isAssignModalOpen, setIsAssignModalOpen] = useState<boolean>(false);
 
-  const [deleteTargetUser, setDeleteTargetUser] =
-    useState<TUserManagement | null>(null);
+  const [deleteTargetUser, setDeleteTargetUser] = useState<TUserManagement | null>(null);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState<boolean>(false);
   const [isDeletingUser, setIsDeletingUser] = useState<boolean>(false);
 
-  const [editTargetUser, setEditTargetUser] = useState<TUserManagement | null>(
-    null,
-  );
+  const [editTargetUser, setEditTargetUser] = useState<TUserManagement | null>(null);
   const [isEditModalOpen, setIsEditModalOpen] = useState<boolean>(false);
 
   // Queries
@@ -129,13 +114,9 @@ const UserManagement = () => {
   // Keep selected user details in sync when list refetches
   useEffect(() => {
     if (selectedUser) {
-      const list = Array.isArray(userData?.data)
-        ? userData.data
-        : userData?.data?.result || [];
+      const list = Array.isArray(userData?.data) ? userData.data : userData?.data?.result || [];
       const updated = list.find(
-        (u: any) =>
-          (u._id || u.id) ===
-          ((selectedUser as any)._id || (selectedUser as any).id),
+        (u: any) => (u._id || u.id) === ((selectedUser as any)._id || (selectedUser as any).id)
       );
       if (updated) {
         setSelectedUser(updated);
@@ -144,8 +125,7 @@ const UserManagement = () => {
   }, [userData, selectedUser]);
 
   const [toggleStatus] = useUpdateStatusMutation();
-  const [updateUserStatus, { isLoading: isUpdatingUserStatus }] =
-    useUpdateUserStatusMutation();
+  const [updateUserStatus, { isLoading: isUpdatingUserStatus }] = useUpdateUserStatusMutation();
   const [deleteUser] = useDeleteUserMutation();
 
   useEffect(() => {
@@ -160,16 +140,14 @@ const UserManagement = () => {
       await toggleStatus({ id }).unwrap();
       toast.success("User verification status updated");
     } catch (error: any) {
-      toast.error(
-        error?.data?.message || "Failed to update verification status",
-      );
+      toast.error(error?.data?.message || "Failed to update verification status");
     }
   };
 
   const handleUpdateUserStatus = async (
     id: string,
     status: "APPROVED" | "REJECTED",
-    rejectionReason?: string,
+    rejectionReason?: string
   ) => {
     try {
       await updateUserStatus({
@@ -196,10 +174,7 @@ const UserManagement = () => {
     await handleUpdateUserStatus(id, "APPROVED");
   };
 
-  const handleRejectVerification = async (
-    id: string,
-    rejectionReason?: string,
-  ) => {
+  const handleRejectVerification = async (id: string, rejectionReason?: string) => {
     await handleUpdateUserStatus(id, "REJECTED", rejectionReason);
   };
 
@@ -219,9 +194,7 @@ const UserManagement = () => {
     try {
       setIsDeletingUser(true);
       await deleteUser({ id }).unwrap();
-      toast.success(
-        "Account deleted successfully! Email is now free to register again.",
-      );
+      toast.success("Account deleted successfully! Email is now free to register again.");
       setIsDeleteModalOpen(false);
       setDeleteTargetUser(null);
     } catch (error: any) {
@@ -245,23 +218,14 @@ const UserManagement = () => {
       user.password === null ||
       !user.email ||
       (userRole === "PLAYER" &&
-        (!!user.position ||
-          !!user.dateOfBirth ||
-          !!user.ageGroup ||
-          !!user.selectTeam));
+        (!!user.position || !!user.dateOfBirth || !!user.ageGroup || !!user.selectTeam));
     const isParent =
       !isChildPlayer &&
       !user.parentId &&
       !!user.email &&
-      ![
-        "MANAGER",
-        "REFEREE",
-        "CLUB",
-        "CLUBS",
-        "OTHER_CLUBS",
-        "ADMIN",
-        "SUPER_ADMIN",
-      ].includes(userRole) &&
+      !["MANAGER", "REFEREE", "CLUB", "CLUBS", "OTHER_CLUBS", "ADMIN", "SUPER_ADMIN"].includes(
+        userRole
+      ) &&
       !user.position &&
       !user.dateOfBirth;
 
@@ -271,12 +235,9 @@ const UserManagement = () => {
     // Require active subscription / paid access for player profiles (PLAYER, OTHER_CLUBS, TOURNAMENT_PLAYER)
     // EXCEPT when reviewing PENDING requests or PENDING status
     const isPlayerRole =
-      ["PLAYER", "OTHER_CLUBS", "CLUB", "CLUBS", "TOURNAMENT_PLAYER"].includes(
-        userRole,
-      ) || isChildPlayer;
-    const isPaid = Boolean(
-      user.subscription || user.activeSubscription || user.isPaid,
-    );
+      ["PLAYER", "OTHER_CLUBS", "CLUB", "CLUBS", "TOURNAMENT_PLAYER"].includes(userRole) ||
+      isChildPlayer;
+    const isPaid = Boolean(user.subscription || user.activeSubscription || user.isPaid);
 
     if (activeRole === "PENDING_REQUESTS") {
       if (userStatus !== "PENDING") return false;
@@ -285,17 +246,11 @@ const UserManagement = () => {
       if (activeRole === "PLAYER") {
         if (!isChildPlayer && userRole !== "PLAYER") return false;
       } else if (activeRole === "OTHER_CLUBS") {
-        if (
-          userRole !== "OTHER_CLUBS" &&
-          userRole !== "CLUB" &&
-          userRole !== "CLUBS"
-        )
-          return false;
+        if (userRole !== "OTHER_CLUBS" && userRole !== "CLUB" && userRole !== "CLUBS") return false;
       } else if (activeRole === "TOURNAMENT_PLAYER") {
         if (userRole !== "TOURNAMENT_PLAYER") return false;
       } else if (activeRole !== "ALL") {
-        if (userRole !== activeRole && !userRole.includes(activeRole))
-          return false;
+        if (userRole !== activeRole && !userRole.includes(activeRole)) return false;
       }
     }
 
@@ -321,9 +276,7 @@ const UserManagement = () => {
       ).toLowerCase();
       const emailMatch = (user.email || "").toLowerCase().includes(q);
       const roleMatch = (user.role || "").toLowerCase().includes(q);
-      const phoneMatch = (user.phone || user.phoneNumber || "")
-        .toLowerCase()
-        .includes(q);
+      const phoneMatch = (user.phone || user.phoneNumber || "").toLowerCase().includes(q);
 
       return fullName.includes(q) || emailMatch || roleMatch || phoneMatch;
     }
@@ -334,9 +287,7 @@ const UserManagement = () => {
   const analytics = analyticsData?.data || {};
   const pendingCount =
     analytics.pendingRequests ??
-    (userData?.data || []).filter(
-      (u: any) => (u.status || "").toUpperCase() === "PENDING",
-    ).length;
+    (userData?.data || []).filter((u: any) => (u.status || "").toUpperCase() === "PENDING").length;
 
   const columns = getUsersColumns(
     handleToggleStatus,
@@ -345,7 +296,7 @@ const UserManagement = () => {
     handleViewUser,
     handleAssignTeams,
     activeRole,
-    handleEditProfile,
+    handleEditProfile
   );
 
   const displayTableData = [...filteredUsers].sort((a: any, b: any) => {
@@ -353,10 +304,7 @@ const UserManagement = () => {
     const statusB = (b.status || "").toUpperCase();
     if (statusA === "PENDING" && statusB !== "PENDING") return -1;
     if (statusA !== "PENDING" && statusB === "PENDING") return 1;
-    return (
-      new Date(b.createdAt || 0).getTime() -
-      new Date(a.createdAt || 0).getTime()
-    );
+    return new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime();
   });
 
   const handleResetFilters = () => {
@@ -383,8 +331,8 @@ const UserManagement = () => {
             User Directory & Player Approval
           </h1>
           <p className="text-xs sm:text-sm text-slate-500 mt-1">
-            Review pending registrations, manage verified player profiles, and
-            control role permissions.
+            Review pending registrations, manage verified player profiles, and control role
+            permissions.
           </p>
         </div>
 
@@ -416,15 +364,11 @@ const UserManagement = () => {
           </div>
           <div className="mt-2 flex items-baseline gap-2">
             <span className="text-xl font-bold font-mono text-slate-900">
-              {isAnalyticsLoading
-                ? "—"
-                : (analytics.totalUsers ?? 0).toLocaleString()}
+              {isAnalyticsLoading ? "—" : (analytics.totalUsers ?? 0).toLocaleString()}
             </span>
             <span className="text-xs text-slate-500">accounts</span>
           </div>
-          <p className="text-[11px] text-slate-400 mt-1">
-            Registered players, managers & staff
-          </p>
+          <p className="text-[11px] text-slate-400 mt-1">Registered players, managers & staff</p>
         </div>
 
         {/* Pending Approvals */}
@@ -439,9 +383,7 @@ const UserManagement = () => {
             <span className="text-xl font-bold font-mono text-amber-700">
               {isAnalyticsLoading ? "—" : pendingCount.toLocaleString()}
             </span>
-            <span className="text-xs text-amber-700 font-medium">
-              awaiting review
-            </span>
+            <span className="text-xs text-amber-700 font-medium">awaiting review</span>
           </div>
           <p className="text-[11px] text-slate-400 mt-1">
             Youth registrations requiring admin approval
@@ -458,15 +400,11 @@ const UserManagement = () => {
           </div>
           <div className="mt-2 flex items-baseline gap-2">
             <span className="text-xl font-bold font-mono text-slate-900">
-              {isAnalyticsLoading
-                ? "—"
-                : (analytics.approvedPlayers ?? 0).toLocaleString()}
+              {isAnalyticsLoading ? "—" : (analytics.approvedPlayers ?? 0).toLocaleString()}
             </span>
             <span className="text-xs text-slate-500">verified youth</span>
           </div>
-          <p className="text-[11px] text-slate-400 mt-1">
-            Confirmed league squad members
-          </p>
+          <p className="text-[11px] text-slate-400 mt-1">Confirmed league squad members</p>
         </div>
 
         {/* Staff & Officials */}
@@ -482,18 +420,14 @@ const UserManagement = () => {
               {isAnalyticsLoading
                 ? "—"
                 : (
-                    (analytics.totalManagers ?? 0) +
-                    (analytics.totalReferees ?? 0)
+                    (analytics.totalManagers ?? 0) + (analytics.totalReferees ?? 0)
                   ).toLocaleString()}
             </span>
             <span className="text-xs text-slate-500">
-              {analytics.totalManagers ?? 0} mgrs •{" "}
-              {analytics.totalReferees ?? 0} refs
+              {analytics.totalManagers ?? 0} mgrs • {analytics.totalReferees ?? 0} refs
             </span>
           </div>
-          <p className="text-[11px] text-slate-400 mt-1">
-            Team managers and match referees
-          </p>
+          <p className="text-[11px] text-slate-400 mt-1">Team managers and match referees</p>
         </div>
       </div>
 
@@ -524,9 +458,7 @@ const UserManagement = () => {
                   {isPendingTab && pendingCount > 0 && (
                     <span
                       className={`px-1.5 py-0.2 rounded-full text-[10px] font-bold ${
-                        isSelected
-                          ? "bg-amber-400 text-slate-950"
-                          : "bg-amber-200 text-amber-900"
+                        isSelected ? "bg-amber-400 text-slate-950" : "bg-amber-200 text-amber-900"
                       }`}
                     >
                       {pendingCount}
@@ -614,27 +546,16 @@ const UserManagement = () => {
           <div className="text-xs text-slate-500 mb-3 flex items-center justify-between">
             <span>
               Showing{" "}
-              <span className="font-semibold text-slate-800">
-                {displayTableData.length}
-              </span>{" "}
+              <span className="font-semibold text-slate-800">{displayTableData.length}</span>{" "}
               members (Page {currentPage} of{" "}
-              {userData?.pagination?.totalPage ||
-                userData?.pagination?.totalPages ||
-                1}
-              )
+              {userData?.pagination?.totalPage || userData?.pagination?.totalPages || 1})
             </span>
             {hasActiveFilters && (
-              <span className="text-slate-600 text-[11px] font-medium">
-                Filtered view active
-              </span>
+              <span className="text-slate-600 text-[11px] font-medium">Filtered view active</span>
             )}
           </div>
 
-          <CustomTable
-            columns={columns}
-            data={displayTableData}
-            isLoading={isLoading}
-          />
+          <CustomTable columns={columns} data={displayTableData} isLoading={isLoading} />
 
           {/* Pagination Section */}
           <div className="pt-4 border-t border-slate-100 mt-4 flex flex-col sm:flex-row items-center justify-between gap-3">
@@ -656,9 +577,7 @@ const UserManagement = () => {
                     ? 1
                     : Math.max(
                         1,
-                        userData.pagination.totalPage ||
-                          userData.pagination.totalPages ||
-                          1,
+                        userData.pagination.totalPage || userData.pagination.totalPages || 1
                       )
                 }
                 qryName="userPage"

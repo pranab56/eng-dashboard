@@ -1,12 +1,7 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import {
-  ColumnDef,
-  flexRender,
-  getCoreRowModel,
-  useReactTable,
-} from "@tanstack/react-table"
+import * as React from "react";
+import { ColumnDef, flexRender, getCoreRowModel, useReactTable } from "@tanstack/react-table";
 
 import {
   Table,
@@ -44,7 +39,12 @@ function CustomTable<TData>({
       cell: () => (
         <div className="flex justify-center items-center cursor-grab active:cursor-grabbing text-slate-400 hover:text-slate-600 transition-colors">
           <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 8h16M4 16h16" />
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M4 8h16M4 16h16"
+            />
           </svg>
         </div>
       ),
@@ -97,7 +97,10 @@ function CustomTable<TData>({
       <Table className="min-w-full divide-y divide-slate-200/60">
         <TableHeader className="bg-slate-50/90">
           {table.getHeaderGroups().map((headerGroup) => (
-            <TableRow key={headerGroup.id} className="hover:bg-transparent border-b border-slate-200/80">
+            <TableRow
+              key={headerGroup.id}
+              className="hover:bg-transparent border-b border-slate-200/80"
+            >
               {headerGroup.headers.map((header) => {
                 return (
                   <TableHead
@@ -106,10 +109,7 @@ function CustomTable<TData>({
                   >
                     {header.isPlaceholder
                       ? null
-                      : flexRender(
-                        header.column.columnDef.header,
-                        header.getContext()
-                      )}
+                      : flexRender(header.column.columnDef.header, header.getContext())}
                   </TableHead>
                 );
               })}
@@ -129,7 +129,8 @@ function CustomTable<TData>({
             ))
           ) : table.getRowModel().rows?.length ? (
             table.getRowModel().rows.map((row, index) => {
-              let rowClassName = "bg-white hover:bg-slate-50/80 text-slate-800 transition-colors duration-150";
+              let rowClassName =
+                "bg-white hover:bg-slate-50/80 text-slate-800 transition-colors duration-150";
               if (index === draggedIndex) {
                 rowClassName += " opacity-40 bg-slate-100";
               } else if (index === dragOverIndex) {
@@ -154,10 +155,7 @@ function CustomTable<TData>({
                 >
                   {row.getVisibleCells().map((cell) => (
                     <TableCell key={cell.id} className="py-3 px-4 text-sm align-middle">
-                      {flexRender(
-                        cell.column.columnDef.cell,
-                        cell.getContext()
-                      )}
+                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
                     </TableCell>
                   ))}
                 </TableRow>
@@ -165,17 +163,18 @@ function CustomTable<TData>({
             })
           ) : (
             <TableRow>
-              <TableCell
-                colSpan={columns.length}
-                className="h-48 text-center"
-              >
+              <TableCell colSpan={columns.length} className="h-48 text-center">
                 <div className="flex flex-col items-center justify-center space-y-3 py-8">
                   <div className="w-12 h-12 rounded-full bg-slate-100 flex items-center justify-center border border-slate-200/60 shadow-xs">
-                    <span className="text-xl" aria-hidden="true">📊</span>
+                    <span className="text-xl" aria-hidden="true">
+                      📊
+                    </span>
                   </div>
                   <div className="space-y-1">
                     <p className="text-sm font-semibold text-slate-900">No records found</p>
-                    <p className="text-xs text-slate-500">There are no items to display right now.</p>
+                    <p className="text-xs text-slate-500">
+                      There are no items to display right now.
+                    </p>
                   </div>
                 </div>
               </TableCell>
@@ -187,4 +186,4 @@ function CustomTable<TData>({
   );
 }
 
-export default CustomTable
+export default CustomTable;

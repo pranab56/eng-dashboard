@@ -11,9 +11,7 @@ import { ArrowLeft } from "lucide-react";
 
 import InputField from "@/components/form/InputField";
 import SelectField from "@/components/form/SelectField";
-import ImageUploadField, {
-  ImageChildrenComponent,
-} from "@/components/form/ImageUploadField";
+import ImageUploadField, { ImageChildrenComponent } from "@/components/form/ImageUploadField";
 import { useHeaders } from "@/hooks/useHeaders";
 import { getErrorMessage } from "@/utils/getErrorMessage";
 import { baseURL } from "@/utils/BaseURL";
@@ -55,17 +53,12 @@ const AddTeam = () => {
 
   const [createTeam, { isLoading: isCreating }] = useCreateTeamMutation();
   const [updateTeam, { isLoading: isUpdating }] = useUpdateTeamMutation();
-  const [assignTeamManager, { isLoading: isAssigning }] =
-    useAssignTeamManagerMutation();
-  const [removeTeamManager, { isLoading: isRemoving }] =
-    useRemoveTeamManagerMutation();
+  const [assignTeamManager, { isLoading: isAssigning }] = useAssignTeamManagerMutation();
+  const [removeTeamManager, { isLoading: isRemoving }] = useRemoveTeamManagerMutation();
 
-  const { data: teamData, isLoading: isFetching } = useGetSingleTeamQuery(
-    teamId,
-    {
-      skip: !isEditMode,
-    }
-  );
+  const { data: teamData, isLoading: isFetching } = useGetSingleTeamQuery(teamId, {
+    skip: !isEditMode,
+  });
   const { data: leaguesData } = useGetAllLeagueQuery({ limit: 100 });
   const { data: managersData } = useGetAllManagerTeamQuery({ limit: 100 });
   const { data: ageGroupsData } = useGetAllAgeGroupQuery({});
@@ -213,14 +206,11 @@ const AddTeam = () => {
         }
       }
     } catch (error: any) {
-      toast.error(
-        getErrorMessage(error, `Failed to ${isEditMode ? "update" : "create"} team`)
-      );
+      toast.error(getErrorMessage(error, `Failed to ${isEditMode ? "update" : "create"} team`));
     }
   };
 
-  const isSubmitting =
-    isCreating || isUpdating || isAssigning || isRemoving;
+  const isSubmitting = isCreating || isUpdating || isAssigning || isRemoving;
 
   if (isEditMode && isFetching) {
     return (
@@ -260,9 +250,7 @@ const AddTeam = () => {
               <h2 className="text-sm font-semibold uppercase tracking-wider text-slate-700 dark:text-slate-300">
                 Squad Information
               </h2>
-              <span className="text-[11px] text-slate-400">
-                Required fields are indicated
-              </span>
+              <span className="text-[11px] text-slate-400">Required fields are indicated</span>
             </div>
 
             <div className="space-y-4">
@@ -326,8 +314,6 @@ const AddTeam = () => {
                   scrollable
                 />
               </div>
-
-              
             </div>
           </div>
 

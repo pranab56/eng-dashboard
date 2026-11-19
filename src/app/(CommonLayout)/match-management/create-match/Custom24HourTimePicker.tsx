@@ -54,10 +54,7 @@ export const Custom24HourTimePicker: React.FC<Custom24HourTimePickerProps> = ({
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (
-        containerRef.current &&
-        !containerRef.current.contains(event.target as Node)
-      ) {
+      if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
         setIsOpen(false);
       }
     };
@@ -99,32 +96,27 @@ export const Custom24HourTimePicker: React.FC<Custom24HourTimePickerProps> = ({
     setIsOpen(false);
   };
 
-  const hoursList = Array.from({ length: 24 }, (_, i) =>
-    i < 10 ? `0${i}` : `${i}`
-  );
+  const hoursList = Array.from({ length: 24 }, (_, i) => (i < 10 ? `0${i}` : `${i}`));
 
-  const minutesList = [
-    "00", "05", "10", "15", "20", "25",
-    "30", "35", "40", "45", "50", "55",
-  ];
+  const minutesList = ["00", "05", "10", "15", "20", "25", "30", "35", "40", "45", "50", "55"];
 
   const presetsList = [
-    "09:00", "10:30", "12:00", "13:30",
-    "15:00", "16:30", "18:00", "19:30", "20:00",
+    "09:00",
+    "10:30",
+    "12:00",
+    "13:30",
+    "15:00",
+    "16:30",
+    "18:00",
+    "19:30",
+    "20:00",
   ];
 
   const displayTime = value ? `${value} (24h)` : "";
 
   return (
-    <div
-      className={`space-y-1.5 relative ${isOpen ? "z-50" : "z-10"}`}
-      ref={containerRef}
-    >
-      {label && (
-        <label className="block text-xs font-semibold text-slate-700">
-          {label}
-        </label>
-      )}
+    <div className={`space-y-1.5 relative ${isOpen ? "z-50" : "z-10"}`} ref={containerRef}>
+      {label && <label className="block text-xs font-semibold text-slate-700">{label}</label>}
 
       {/* Input Trigger Button (Matches standard h-10 enterprise inputs) */}
       <button
@@ -134,17 +126,15 @@ export const Custom24HourTimePicker: React.FC<Custom24HourTimePickerProps> = ({
           error
             ? "border-rose-400 focus:ring-rose-500/10 bg-rose-50/20"
             : isOpen
-            ? "border-slate-500 ring-2 ring-slate-900/5 bg-white"
-            : "border-slate-200 hover:border-slate-300"
+              ? "border-slate-500 ring-2 ring-slate-900/5 bg-white"
+              : "border-slate-200 hover:border-slate-300"
         }`}
       >
         <div className="flex items-center gap-2.5 truncate">
           <Clock className="w-4 h-4 text-slate-500 shrink-0" />
           <span
             className={`truncate ${
-              displayTime
-                ? "text-slate-900 font-medium font-mono"
-                : "text-slate-400 font-normal"
+              displayTime ? "text-slate-900 font-medium font-mono" : "text-slate-400 font-normal"
             }`}
           >
             {displayTime || placeholder}

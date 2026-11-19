@@ -111,11 +111,7 @@ export const getRewardsColumns = (
         );
       }
 
-      return (
-        <span className="text-xs text-slate-400 font-medium">
-          Order dispatch
-        </span>
-      );
+      return <span className="text-xs text-slate-400 font-medium">Order dispatch</span>;
     },
   },
   {

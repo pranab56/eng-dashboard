@@ -29,7 +29,11 @@ export const SidebarProvider = ({ children }: { children: React.ReactNode }) => 
       const stored = localStorage.getItem(STORAGE_KEY);
       if (stored !== null) {
         setIsCollapsedState(stored === "true");
-      } else if (typeof window !== "undefined" && window.innerWidth >= 768 && window.innerWidth < 1200) {
+      } else if (
+        typeof window !== "undefined" &&
+        window.innerWidth >= 768 &&
+        window.innerWidth < 1200
+      ) {
         // Default to collapsed on medium/tablet viewports for optimal dashboard space
         setIsCollapsedState(true);
       }

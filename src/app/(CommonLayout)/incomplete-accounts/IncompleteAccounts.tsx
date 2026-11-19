@@ -1,38 +1,38 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable @typescript-eslint/no-explicit-any */
-"use client"
+"use client";
 
-import CustomPagination from '@/components/cui/CustomPagination';
-import GeneralStateCard from '@/components/cui/GeneralStateCard';
-import TableHeader from '@/components/cui/TableHeader';
-import CustomTable from '@/components/table/CustomTable';
+import CustomPagination from "@/components/cui/CustomPagination";
+import GeneralStateCard from "@/components/cui/GeneralStateCard";
+import TableHeader from "@/components/cui/TableHeader";
+import CustomTable from "@/components/table/CustomTable";
 import {
   useDeleteUserMutation,
   useGetIncompleteUsersQuery,
   useGetIncompleteUsersAnalyticsQuery,
   useUpdateStatusMutation,
   useUpdateUserStatusMutation,
-} from '@/features/userManagement/userApi';
-import { useHeaders } from '@/hooks/useHeaders';
-import { getUsersColumns } from '@/tableColumns/usersColumns';
-import { TUserManagement } from '@/types/columnTypes';
-import { Check, ChevronsUpDown, Filter, RotateCcw, Search, X } from 'lucide-react';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { useSearchParams } from 'next/navigation';
-import { useEffect, useState } from 'react';
-import toast from 'react-hot-toast';
-import UserVerificationModal from '../user-management/UserVerificationModal';
-import AssignTeamsModal from '../user-management/AssignTeamsModal';
-import DeleteConfirmationModal from '../user-management/DeleteConfirmationModal';
-import UserEditProfileModal from '../user-management/UserEditProfileModal';
+} from "@/features/userManagement/userApi";
+import { useHeaders } from "@/hooks/useHeaders";
+import { getUsersColumns } from "@/tableColumns/usersColumns";
+import { TUserManagement } from "@/types/columnTypes";
+import { Check, ChevronsUpDown, Filter, RotateCcw, Search, X } from "lucide-react";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { useSearchParams } from "next/navigation";
+import { useEffect, useState } from "react";
+import toast from "react-hot-toast";
+import UserVerificationModal from "../user-management/UserVerificationModal";
+import AssignTeamsModal from "../user-management/AssignTeamsModal";
+import DeleteConfirmationModal from "../user-management/DeleteConfirmationModal";
+import UserEditProfileModal from "../user-management/UserEditProfileModal";
 
 const IncompleteAccounts = () => {
   const { setHeaders } = useHeaders();
   const searchParams = useSearchParams();
-  const page = searchParams.get('userPage') || '1';
+  const page = searchParams.get("userPage") || "1";
 
-  const [searchTerm, setSearchTerm] = useState<string>('');
-  const [statusFilter, setStatusFilter] = useState<string>('ALL');
+  const [searchTerm, setSearchTerm] = useState<string>("");
+  const [statusFilter, setStatusFilter] = useState<string>("ALL");
   const [statusPopoverOpen, setStatusPopoverOpen] = useState<boolean>(false);
 
   const [selectedUser, setSelectedUser] = useState<TUserManagement | null>(null);
@@ -65,7 +65,7 @@ const IncompleteAccounts = () => {
   useEffect(() => {
     setHeaders({
       title: "Incomplete & Abandoned Accounts",
-      des: "Review accounts with unverified emails, rejected applications, or incomplete registration setups."
+      des: "Review accounts with unverified emails, rejected applications, or incomplete registration setups.",
     });
   }, [setHeaders]);
 
@@ -93,7 +93,11 @@ const IncompleteAccounts = () => {
     }
   };
 
-  const handleUpdateUserStatus = async (id: string, status: "APPROVED" | "REJECTED", rejectionReason?: string) => {
+  const handleUpdateUserStatus = async (
+    id: string,
+    status: "APPROVED" | "REJECTED",
+    rejectionReason?: string
+  ) => {
     try {
       await updateUserStatus({ id, data: { status, rejectionReason } }).unwrap();
       toast.success(`User status updated to ${status}`);
@@ -123,7 +127,8 @@ const IncompleteAccounts = () => {
   const rawList = incompleteData?.data || [];
 
   // Count breakdowns directly from dedicated backend analytics API
-  const totalIncomplete = analytics.totalIncomplete ?? (incompleteData?.pagination?.total || rawList.length);
+  const totalIncomplete =
+    analytics.totalIncomplete ?? (incompleteData?.pagination?.total || rawList.length);
   const unverifiedCount = analytics.unverifiedCount ?? 0;
   const verifiedCount = analytics.verifiedCount ?? 0;
   const rejectedCount = analytics.rejectedCount ?? 0;
@@ -191,7 +196,7 @@ const IncompleteAccounts = () => {
   const tableHeaderPayload = {
     title: "Incomplete / Abandoned & Rejected Accounts",
     des: "Delete abandoned signups or rejected registrations so parents/users can re-register cleanly.",
-    url: "#"
+    url: "#",
   };
 
   const columns = getUsersColumns(
@@ -206,7 +211,7 @@ const IncompleteAccounts = () => {
 
   return (
     <div className="w-full p-4 sm:p-6 lg:p-8 space-y-6 pb-16">
-      <GeneralStateCard items={items} className='grid-cols-4' />
+      <GeneralStateCard items={items} className="grid-cols-4" />
 
       <div className="bg-white rounded-md py-4 flex flex-col space-y-4 shadow-sm border border-gray-100">
         {/* Table Header */}
@@ -219,11 +224,11 @@ const IncompleteAccounts = () => {
           {/* Status Quick Filter Tabs */}
           <div className="flex flex-wrap items-center gap-1.5">
             {[
-              { id: 'ALL', label: 'All Accounts', count: totalIncomplete },
-              { id: 'UNVERIFIED', label: 'Unverified Email', count: unverifiedCount },
-              { id: 'REJECTED', label: 'Rejected', count: rejectedCount },
-              { id: 'PENDING', label: 'Pending Approval', count: pendingCount },
-              { id: 'VERIFIED', label: 'Verified', count: verifiedCount },
+              { id: "ALL", label: "All Accounts", count: totalIncomplete },
+              { id: "UNVERIFIED", label: "Unverified Email", count: unverifiedCount },
+              { id: "REJECTED", label: "Rejected", count: rejectedCount },
+              { id: "PENDING", label: "Pending Approval", count: pendingCount },
+              { id: "VERIFIED", label: "Verified", count: verifiedCount },
             ].map((tab) => (
               <button
                 key={tab.id}
@@ -231,16 +236,16 @@ const IncompleteAccounts = () => {
                 onClick={() => setStatusFilter(tab.id)}
                 className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer flex items-center gap-1.5 ${
                   statusFilter === tab.id
-                    ? 'bg-slate-900 text-white shadow-xs font-bold'
-                    : 'bg-white text-slate-600 hover:text-slate-900 border border-gray-200 hover:border-gray-300'
+                    ? "bg-slate-900 text-white shadow-xs font-bold"
+                    : "bg-white text-slate-600 hover:text-slate-900 border border-gray-200 hover:border-gray-300"
                 }`}
               >
                 <span>{tab.label}</span>
                 <span
                   className={`text-[10px] px-1.5 py-0.2 rounded-full ${
                     statusFilter === tab.id
-                      ? 'bg-white/20 text-white font-bold'
-                      : 'bg-slate-100 text-slate-600 font-semibold'
+                      ? "bg-white/20 text-white font-bold"
+                      : "bg-slate-100 text-slate-600 font-semibold"
                   }`}
                 >
                   {tab.count}
@@ -253,13 +258,39 @@ const IncompleteAccounts = () => {
             {/* Custom Styled Status Filter Popover */}
             {(() => {
               const statusOptions = [
-                { value: 'ALL', label: 'All Statuses', count: totalIncomplete, dotColor: 'bg-slate-400' },
-                { value: 'UNVERIFIED', label: 'Unverified Email', count: unverifiedCount, dotColor: 'bg-amber-500' },
-                { value: 'REJECTED', label: 'Rejected Status', count: rejectedCount, dotColor: 'bg-rose-500' },
-                { value: 'PENDING', label: 'Pending Approval', count: pendingCount, dotColor: 'bg-blue-500' },
-                { value: 'VERIFIED', label: 'Verified Email', count: verifiedCount, dotColor: 'bg-emerald-500' },
+                {
+                  value: "ALL",
+                  label: "All Statuses",
+                  count: totalIncomplete,
+                  dotColor: "bg-slate-400",
+                },
+                {
+                  value: "UNVERIFIED",
+                  label: "Unverified Email",
+                  count: unverifiedCount,
+                  dotColor: "bg-amber-500",
+                },
+                {
+                  value: "REJECTED",
+                  label: "Rejected Status",
+                  count: rejectedCount,
+                  dotColor: "bg-rose-500",
+                },
+                {
+                  value: "PENDING",
+                  label: "Pending Approval",
+                  count: pendingCount,
+                  dotColor: "bg-blue-500",
+                },
+                {
+                  value: "VERIFIED",
+                  label: "Verified Email",
+                  count: verifiedCount,
+                  dotColor: "bg-emerald-500",
+                },
               ];
-              const selectedOpt = statusOptions.find(o => o.value === statusFilter) || statusOptions[0];
+              const selectedOpt =
+                statusOptions.find((o) => o.value === statusFilter) || statusOptions[0];
 
               return (
                 <Popover open={statusPopoverOpen} onOpenChange={setStatusPopoverOpen}>
@@ -281,7 +312,10 @@ const IncompleteAccounts = () => {
                       </div>
                     </button>
                   </PopoverTrigger>
-                  <PopoverContent align="start" className="w-56 p-1.5 bg-white border border-gray-200 shadow-xl rounded-xl z-50">
+                  <PopoverContent
+                    align="start"
+                    className="w-56 p-1.5 bg-white border border-gray-200 shadow-xl rounded-xl z-50"
+                  >
                     <div className="px-2.5 py-1.5 text-[10px] font-bold text-slate-400 uppercase tracking-wider">
                       Filter by Status
                     </div>
@@ -297,18 +331,22 @@ const IncompleteAccounts = () => {
                           }}
                           className={`w-full px-2.5 py-2 text-xs rounded-lg flex items-center justify-between transition-all cursor-pointer text-left ${
                             isSelected
-                              ? 'bg-slate-900 text-white font-bold shadow-xs'
-                              : 'text-slate-700 hover:bg-slate-100 hover:text-slate-900 font-medium'
+                              ? "bg-slate-900 text-white font-bold shadow-xs"
+                              : "text-slate-700 hover:bg-slate-100 hover:text-slate-900 font-medium"
                           }`}
                         >
                           <div className="flex items-center gap-2">
-                            <div className={`w-2 h-2 rounded-full ${isSelected ? 'bg-white' : opt.dotColor}`} />
+                            <div
+                              className={`w-2 h-2 rounded-full ${isSelected ? "bg-white" : opt.dotColor}`}
+                            />
                             <span>{opt.label}</span>
                           </div>
                           <div className="flex items-center gap-1.5">
                             <span
                               className={`text-[10px] px-1.5 py-0.2 rounded-full font-bold ${
-                                isSelected ? 'bg-white/20 text-white' : 'bg-slate-100 text-slate-600'
+                                isSelected
+                                  ? "bg-white/20 text-white"
+                                  : "bg-slate-100 text-slate-600"
                               }`}
                             >
                               {opt.count}
@@ -336,7 +374,7 @@ const IncompleteAccounts = () => {
               {searchTerm && (
                 <button
                   type="button"
-                  onClick={() => setSearchTerm('')}
+                  onClick={() => setSearchTerm("")}
                   className="absolute right-2.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 cursor-pointer"
                 >
                   <X className="size-4" />
@@ -345,12 +383,12 @@ const IncompleteAccounts = () => {
             </div>
 
             {/* Reset Filters Button */}
-            {(statusFilter !== 'ALL' || searchTerm !== '') && (
+            {(statusFilter !== "ALL" || searchTerm !== "") && (
               <button
                 type="button"
                 onClick={() => {
-                  setStatusFilter('ALL');
-                  setSearchTerm('');
+                  setStatusFilter("ALL");
+                  setSearchTerm("");
                 }}
                 className="px-3 py-2 text-xs font-semibold text-rose-600 hover:text-rose-700 bg-rose-50 hover:bg-rose-100 border border-rose-200 rounded-lg transition-colors cursor-pointer flex items-center gap-1 shrink-0"
               >
@@ -363,25 +401,29 @@ const IncompleteAccounts = () => {
 
         {/* Table Section */}
         <div className="px-6">
-          <CustomTable
-            columns={columns}
-            data={displayTableData}
-            isLoading={isLoading}
-          />
+          <CustomTable columns={columns} data={displayTableData} isLoading={isLoading} />
         </div>
 
         {/* Pagination Section */}
         <div className="px-6 pt-4 flex justify-between items-center border-t border-gray-100">
           <p className="text-xs text-gray-500 font-medium">
-            Showing <span className="font-semibold text-gray-900">{displayTableData.length}</span> entries
+            Showing <span className="font-semibold text-gray-900">{displayTableData.length}</span>{" "}
+            entries
           </p>
 
           {incompleteData?.pagination && (
             <CustomPagination
               TOTAL_PAGES={
-                (searchTerm.trim() !== '' || statusFilter !== 'ALL') && displayTableData.length < 10 && Number(page) === 1
+                (searchTerm.trim() !== "" || statusFilter !== "ALL") &&
+                displayTableData.length < 10 &&
+                Number(page) === 1
                   ? 1
-                  : Math.max(1, incompleteData.pagination.totalPage || incompleteData.pagination.totalPages || 1)
+                  : Math.max(
+                      1,
+                      incompleteData.pagination.totalPage ||
+                        incompleteData.pagination.totalPages ||
+                        1
+                    )
               }
               qryName="userPage"
             />

@@ -4,16 +4,7 @@
 
 import React, { useEffect, useState, useMemo } from "react";
 import { useSearchParams } from "next/navigation";
-import {
-  Trophy,
-  Activity,
-  Users,
-  Plus,
-  Search,
-  X,
-  RotateCcw,
-  Shield,
-} from "lucide-react";
+import { Trophy, Activity, Users, Plus, Search, X, RotateCcw, Shield } from "lucide-react";
 import { toast } from "sonner";
 
 import CustomPagination from "@/components/cui/CustomPagination";
@@ -198,18 +189,10 @@ export default function RefereeVotingManagement() {
   };
 
   const hasActiveFilters =
-    searchTerm ||
-    statusFilter !== "all" ||
-    selectedType !== "all" ||
-    selectedLeague !== "all";
+    searchTerm || statusFilter !== "all" || selectedType !== "all" || selectedLeague !== "all";
 
   const columns = useMemo(
-    () =>
-      getRefereeVotingColumns(
-        handleViewResults,
-        handleOpenEditModal,
-        handleOpenDeleteModal
-      ),
+    () => getRefereeVotingColumns(handleViewResults, handleOpenEditModal, handleOpenDeleteModal),
     []
   );
 
@@ -438,11 +421,7 @@ export default function RefereeVotingManagement() {
         </div>
 
         {/* Main Table */}
-        <CustomTable
-          columns={columns}
-          data={rawPolls}
-          isLoading={isLoading}
-        />
+        <CustomTable columns={columns} data={rawPolls} isLoading={isLoading} />
 
         {/* Pagination Footer */}
         <div className="p-3 border-t border-slate-200 flex items-center justify-between">

@@ -1,24 +1,25 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-"use client"
+"use client";
 
-
-import CreateButton from '@/components/buttons/CreateButton';
-import CustomPagination from '@/components/cui/CustomPagination';
-import TableHeader from '@/components/cui/TableHeader';
-import { CustomModal } from '@/components/modals/CustomModal';
-import CustomTable from '@/components/table/CustomTable';
-import { useGetAllNotificationsQuery, useReadNotificationMutation } from '@/features/notification/notificationApi';
-import { useHeaders } from '@/hooks/useHeaders';
-import { notificationColumns } from '@/tableColumns/notificationColumns';
-import { TNotification } from '@/types/columnTypes';
-import { useSearchParams } from 'next/navigation';
-import { useEffect } from 'react';
-import SendNotification from './SendNotification';
-
+import CreateButton from "@/components/buttons/CreateButton";
+import CustomPagination from "@/components/cui/CustomPagination";
+import TableHeader from "@/components/cui/TableHeader";
+import { CustomModal } from "@/components/modals/CustomModal";
+import CustomTable from "@/components/table/CustomTable";
+import {
+  useGetAllNotificationsQuery,
+  useReadNotificationMutation,
+} from "@/features/notification/notificationApi";
+import { useHeaders } from "@/hooks/useHeaders";
+import { notificationColumns } from "@/tableColumns/notificationColumns";
+import { TNotification } from "@/types/columnTypes";
+import { useSearchParams } from "next/navigation";
+import { useEffect } from "react";
+import SendNotification from "./SendNotification";
 
 const Notification = () => {
   const searchParams = useSearchParams();
-  const page = searchParams.get('page') || '1';
+  const page = searchParams.get("page") || "1";
 
   const { setHeaders } = useHeaders();
   const { data: notificationData, isLoading } = useGetAllNotificationsQuery(page);
@@ -31,29 +32,32 @@ const Notification = () => {
   useEffect(() => {
     setHeaders({
       title: "Notification Center",
-      des: "Review and manage all system and user notifications."
-    })
-  }, [setHeaders])
+      des: "Review and manage all system and user notifications.",
+    });
+  }, [setHeaders]);
 
   const tableHeaderPayload = {
     title: "Notifications",
     des: "A complete list of all broadcasted notifications.",
-    url: ""
-  }
-
+    url: "",
+  };
 
   return (
     <div className="w-full p-4 sm:p-6 lg:p-8 space-y-6 pb-16">
       <div className="flex flex-wrap items-center justify-end">
         <CustomModal
           title="Send New Notification"
-          trigger={<button><CreateButton text="Send Notification" /></button>}
+          trigger={
+            <button>
+              <CreateButton text="Send Notification" />
+            </button>
+          }
         >
           <SendNotification />
         </CustomModal>
       </div>
       <div className=" bg-white rounded-md py-4 flex flex-col">
-        <div className='flex-1 pb-4'>
+        <div className="flex-1 pb-4">
           <TableHeader payload={tableHeaderPayload} />
           <div className="pt-4 px-4 overflow-hidden">
             <CustomTable<TNotification>
@@ -63,7 +67,7 @@ const Notification = () => {
             />
           </div>
         </div>
-        <div className='pt-8 px-4'>
+        <div className="pt-8 px-4">
           <CustomPagination
             TOTAL_PAGES={notificationData?.pagination?.totalPage || 1}
             qryName="page"
@@ -71,7 +75,7 @@ const Notification = () => {
         </div>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default Notification
+export default Notification;

@@ -11,18 +11,12 @@ import { toast } from "sonner";
 import { FiRotateCcw } from "react-icons/fi";
 import { FaYoutube } from "react-icons/fa";
 import { HiOutlineTrash } from "react-icons/hi";
-import {
-  ArrowLeft,
-  Check,
-  Upload,
-} from "lucide-react";
+import { ArrowLeft, Check, Upload } from "lucide-react";
 
 import InputField from "@/components/form/InputField";
 import SelectField from "@/components/form/SelectField";
 import TextareaField from "@/components/form/TextareaField";
-import ImageUploadField, {
-  ImageChildrenComponent,
-} from "@/components/form/ImageUploadField";
+import ImageUploadField, { ImageChildrenComponent } from "@/components/form/ImageUploadField";
 import { publishStatusOptions } from "@/constants/selectData";
 import {
   useCreateVideoMutation,
@@ -61,17 +55,14 @@ const CreateVideos = () => {
 
   const [createVideo, { isLoading: isCreating }] = useCreateVideoMutation();
   const [updateVideo, { isLoading: isUpdating }] = useUpdateVideoMutation();
-  const { data: singleVideoData, isLoading: isFetchingSingle } =
-    useGetSingleVideoQuery(id, { skip: !id });
+  const { data: singleVideoData, isLoading: isFetchingSingle } = useGetSingleVideoQuery(id, {
+    skip: !id,
+  });
   const { data: categoryData } = useGetAllVideoCategoryQuery({});
   const [fetchPresignedUrl] = useLazyFrontEndVideoQuery();
 
-  const [videoSourceType, setVideoSourceType] = useState<"file" | "youtube">(
-    "youtube"
-  );
-  const [localVideoPreview, setLocalVideoPreview] = useState<string | null>(
-    null
-  );
+  const [videoSourceType, setVideoSourceType] = useState<"file" | "youtube">("youtube");
+  const [localVideoPreview, setLocalVideoPreview] = useState<string | null>(null);
   const [isExistingVideoRemoved, setIsExistingVideoRemoved] = useState(false);
 
   const {
@@ -115,15 +106,10 @@ const CreateVideos = () => {
       const v = singleVideoData.data;
       setValue("videoTitle", v.title || "");
       setValue("description", v.description || "");
-      setValue(
-        "category",
-        typeof v.category === "object" ? v.category?._id : v.category || ""
-      );
+      setValue("category", typeof v.category === "object" ? v.category?._id : v.category || "");
       setValue(
         "subCategory",
-        typeof v.subCategory === "object"
-          ? v.subCategory?._id
-          : v.subCategory || ""
+        typeof v.subCategory === "object" ? v.subCategory?._id : v.subCategory || ""
       );
       setValue("pubStatus", v.status || "publish");
       setValue("isHighlight", !!v.isHighlight);
@@ -164,9 +150,7 @@ const CreateVideos = () => {
       label: cat.name,
     })) || [];
 
-  const activeCategoryObj = categoryData?.data?.find(
-    (c: any) => c._id === selectedCategory
-  );
+  const activeCategoryObj = categoryData?.data?.find((c: any) => c._id === selectedCategory);
   const subCategoriesList = activeCategoryObj?.subCategories || [];
   const subCategoryOptions = subCategoriesList.map((sub: any) => ({
     value: sub._id,
@@ -199,9 +183,7 @@ const CreateVideos = () => {
     let finalVideoUrl = "";
 
     const existingVideoUrl = singleVideoData?.data?.videoUrl;
-    const existingIsYoutube = existingVideoUrl
-      ? !!getYouTubeEmbedUrl(existingVideoUrl)
-      : false;
+    const existingIsYoutube = existingVideoUrl ? !!getYouTubeEmbedUrl(existingVideoUrl) : false;
 
     if (videoSourceType === "file") {
       if (data.video?.[0] instanceof File) {
@@ -241,12 +223,7 @@ const CreateVideos = () => {
           });
           return;
         }
-      } else if (
-        id &&
-        !isExistingVideoRemoved &&
-        existingVideoUrl &&
-        !existingIsYoutube
-      ) {
+      } else if (id && !isExistingVideoRemoved && existingVideoUrl && !existingIsYoutube) {
         finalVideoUrl = existingVideoUrl;
       } else {
         toast.error("Video file is required");
@@ -261,12 +238,7 @@ const CreateVideos = () => {
           return;
         }
         finalVideoUrl = urlInput;
-      } else if (
-        id &&
-        !isExistingVideoRemoved &&
-        existingVideoUrl &&
-        existingIsYoutube
-      ) {
+      } else if (id && !isExistingVideoRemoved && existingVideoUrl && existingIsYoutube) {
         finalVideoUrl = existingVideoUrl;
       } else {
         toast.error("YouTube video URL is required");
@@ -360,9 +332,7 @@ const CreateVideos = () => {
               <h2 className="text-sm font-semibold uppercase tracking-wider text-slate-700 dark:text-slate-300">
                 General Video Information
               </h2>
-              <span className="text-[11px] text-slate-400">
-                Required fields are indicated
-              </span>
+              <span className="text-[11px] text-slate-400">Required fields are indicated</span>
             </div>
 
             <div className="space-y-4">
@@ -550,30 +520,29 @@ const CreateVideos = () => {
               )}
 
             {/* File Upload Mode */}
-            {videoSourceType === "file" &&
-              (!id || isExistingVideoRemoved || !existingVideoUrl) && (
-                <div className="space-y-3">
-                  <label className="block text-xs font-medium text-slate-700 dark:text-slate-300">
-                    Upload MP4 / MOV Video File
-                  </label>
-                  <input
-                    type="file"
-                    accept="video/mp4,video/quicktime,video/webm"
-                    {...register("video")}
-                    className="block w-full text-xs text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-xs file:font-medium file:bg-slate-100 file:text-slate-700 dark:file:bg-slate-800 dark:file:text-slate-200 hover:file:bg-slate-200 dark:hover:file:bg-slate-700 cursor-pointer"
-                  />
+            {videoSourceType === "file" && (!id || isExistingVideoRemoved || !existingVideoUrl) && (
+              <div className="space-y-3">
+                <label className="block text-xs font-medium text-slate-700 dark:text-slate-300">
+                  Upload MP4 / MOV Video File
+                </label>
+                <input
+                  type="file"
+                  accept="video/mp4,video/quicktime,video/webm"
+                  {...register("video")}
+                  className="block w-full text-xs text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-xs file:font-medium file:bg-slate-100 file:text-slate-700 dark:file:bg-slate-800 dark:file:text-slate-200 hover:file:bg-slate-200 dark:hover:file:bg-slate-700 cursor-pointer"
+                />
 
-                  {localVideoPreview && (
-                    <div className="aspect-video max-w-md bg-black rounded-lg overflow-hidden border border-slate-200 dark:border-slate-800">
-                      <video
-                        src={localVideoPreview}
-                        controls
-                        className="w-full h-full object-contain"
-                      />
-                    </div>
-                  )}
-                </div>
-              )}
+                {localVideoPreview && (
+                  <div className="aspect-video max-w-md bg-black rounded-lg overflow-hidden border border-slate-200 dark:border-slate-800">
+                    <video
+                      src={localVideoPreview}
+                      controls
+                      className="w-full h-full object-contain"
+                    />
+                  </div>
+                )}
+              </div>
+            )}
           </div>
         </div>
 
@@ -622,11 +591,7 @@ const CreateVideos = () => {
                   </span>
                 </div>
                 <label className="relative inline-flex items-center cursor-pointer select-none">
-                  <input
-                    type="checkbox"
-                    {...register("isHighlight")}
-                    className="sr-only peer"
-                  />
+                  <input type="checkbox" {...register("isHighlight")} className="sr-only peer" />
                   <div className="w-9 h-5 bg-slate-300 dark:bg-slate-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-emerald-600"></div>
                 </label>
               </div>

@@ -1,9 +1,7 @@
 import { baseApi } from "../../utils/apiBaseQuery";
 
-
 export const userApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
-
     getUser: builder.query({
       query: (params) => {
         let pageNumber = 1;
@@ -30,7 +28,7 @@ export const userApi = baseApi.injectEndpoints({
           method: "GET",
         };
       },
-      providesTags: ["user"]
+      providesTags: ["user"],
     }),
 
     updateStatus: builder.mutation({
@@ -38,7 +36,7 @@ export const userApi = baseApi.injectEndpoints({
         url: `/user-management/toggle-verified/${id}`,
         method: "PATCH",
       }),
-      invalidatesTags: ["user"]
+      invalidatesTags: ["user"],
     }),
 
     deleteUser: builder.mutation({
@@ -46,17 +44,16 @@ export const userApi = baseApi.injectEndpoints({
         url: `/user-management/${id}`,
         method: "DELETE",
       }),
-      invalidatesTags: ["user"]
+      invalidatesTags: ["user"],
     }),
 
     updateUserStatus: builder.mutation({
       query: ({ id, data }) => ({
-        
         url: `/user/${id}/approve-status`,
         method: "PATCH",
         body: data,
       }),
-      invalidatesTags: ["user"]
+      invalidatesTags: ["user"],
     }),
 
     getUserAnalytics: builder.query({
@@ -64,7 +61,7 @@ export const userApi = baseApi.injectEndpoints({
         url: `/user-management/analytics`,
         method: "GET",
       }),
-      providesTags: ["user"]
+      providesTags: ["user"],
     }),
 
     updateUserProfileByAdmin: builder.mutation({
@@ -73,7 +70,7 @@ export const userApi = baseApi.injectEndpoints({
         method: "PATCH",
         body: data,
       }),
-      invalidatesTags: ["user"]
+      invalidatesTags: ["user"],
     }),
 
     getParentOverview: builder.query({
@@ -104,7 +101,7 @@ export const userApi = baseApi.injectEndpoints({
           method: "GET",
         };
       },
-      providesTags: ["user", "parent"]
+      providesTags: ["user", "parent"],
     }),
 
     getIncompleteUsers: builder.query({
@@ -133,7 +130,7 @@ export const userApi = baseApi.injectEndpoints({
           method: "GET",
         };
       },
-      providesTags: ["user"]
+      providesTags: ["user"],
     }),
 
     getIncompleteUsersAnalytics: builder.query({
@@ -141,7 +138,7 @@ export const userApi = baseApi.injectEndpoints({
         url: `/user-management/incomplete/analytics`,
         method: "GET",
       }),
-      providesTags: ["user"]
+      providesTags: ["user"],
     }),
 
     assignTeamToUser: builder.mutation({
@@ -150,7 +147,7 @@ export const userApi = baseApi.injectEndpoints({
         method: "PATCH",
         body: data,
       }),
-      invalidatesTags: ["user", "player", "team"]
+      invalidatesTags: ["user", "player", "team"],
     }),
 
     updateJerseyNumber: builder.mutation({
@@ -159,9 +156,8 @@ export const userApi = baseApi.injectEndpoints({
         method: "PATCH",
         body: data,
       }),
-      invalidatesTags: ["user", "player", "team"]
+      invalidatesTags: ["user", "player", "team"],
     }),
-
   }),
 });
 

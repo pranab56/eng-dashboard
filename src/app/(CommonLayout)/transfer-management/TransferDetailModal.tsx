@@ -2,11 +2,7 @@
 
 import React from "react";
 import Image from "next/image";
-import {
-  Dialog,
-  DialogContent,
-  DialogTitle,
-} from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { TTransfer } from "@/types/columnTypes";
 import { formatImagePath } from "@/utils/formatImagePath";
 import {
@@ -114,8 +110,11 @@ const TransferDetailModal: React.FC<TransferDetailModalProps> = ({
     transfer.status === "MANAGER_APPROVED" ||
     transfer.status === "BOTH_APPROVED";
 
-  const playerInitials = `${transfer.playerFirstName?.[0] || ""}${transfer.playerLastName?.[0] || ""}`.toUpperCase() || "PL";
-  const managerName = `${transfer.requestedByFirstName || ""} ${transfer.requestedByLastName || ""}`.trim() || "N/A";
+  const playerInitials =
+    `${transfer.playerFirstName?.[0] || ""}${transfer.playerLastName?.[0] || ""}`.toUpperCase() ||
+    "PL";
+  const managerName =
+    `${transfer.requestedByFirstName || ""} ${transfer.requestedByLastName || ""}`.trim() || "N/A";
   const approverName = transfer.approvedByFirstName
     ? `${transfer.approvedByFirstName} ${transfer.approvedByLastName || ""}`.trim()
     : null;
@@ -163,7 +162,9 @@ const TransferDetailModal: React.FC<TransferDetailModalProps> = ({
             <div className="grid grid-cols-[1fr,auto,1fr] items-center gap-3">
               {/* Origin Team */}
               <div className="p-3 bg-white border border-slate-200 rounded-md">
-                <div className="text-[10px] uppercase font-semibold text-slate-400">Current Club</div>
+                <div className="text-[10px] uppercase font-semibold text-slate-400">
+                  Current Club
+                </div>
                 <div className="flex items-center gap-2 mt-1">
                   <div className="w-6 h-6 rounded bg-slate-100 border border-slate-200 flex items-center justify-center shrink-0 overflow-hidden text-slate-500">
                     {transfer.fromTeamLogo ? (
@@ -193,7 +194,9 @@ const TransferDetailModal: React.FC<TransferDetailModalProps> = ({
 
               {/* Destination Team */}
               <div className="p-3 bg-white border border-slate-200 rounded-md">
-                <div className="text-[10px] uppercase font-semibold text-slate-400">Target Club</div>
+                <div className="text-[10px] uppercase font-semibold text-slate-400">
+                  Target Club
+                </div>
                 <div className="flex items-center gap-2 mt-1">
                   <div className="w-6 h-6 rounded bg-slate-100 border border-slate-200 flex items-center justify-center shrink-0 overflow-hidden text-slate-500">
                     {transfer.toTeamLogo ? (
@@ -228,7 +231,9 @@ const TransferDetailModal: React.FC<TransferDetailModalProps> = ({
                   <DollarSign className="w-3.5 h-3.5 text-slate-400" />
                   <span className="text-slate-400">Fee:</span>
                   <span className="font-semibold text-slate-900">
-                    {transfer.transferFee > 0 ? `$${transfer.transferFee.toLocaleString()}` : "Free Transfer"}
+                    {transfer.transferFee > 0
+                      ? `$${transfer.transferFee.toLocaleString()}`
+                      : "Free Transfer"}
                   </span>
                 </div>
               )}
@@ -258,7 +263,9 @@ const TransferDetailModal: React.FC<TransferDetailModalProps> = ({
                 <div className="text-sm font-semibold text-slate-900 truncate">
                   {transfer.playerFirstName} {transfer.playerLastName}
                 </div>
-                <div className="text-xs text-slate-500 truncate">{transfer.playerEmail || "No email registered"}</div>
+                <div className="text-xs text-slate-500 truncate">
+                  {transfer.playerEmail || "No email registered"}
+                </div>
               </div>
             </div>
           </div>
@@ -284,7 +291,9 @@ const TransferDetailModal: React.FC<TransferDetailModalProps> = ({
                 <span>Submitted On</span>
               </div>
               <div className="font-medium text-slate-900">
-                {transfer.createdAt ? dayjs(transfer.createdAt).format("MMM D, YYYY · h:mm A") : "N/A"}
+                {transfer.createdAt
+                  ? dayjs(transfer.createdAt).format("MMM D, YYYY · h:mm A")
+                  : "N/A"}
               </div>
             </div>
 
@@ -329,26 +338,34 @@ const TransferDetailModal: React.FC<TransferDetailModalProps> = ({
                 </div>
                 <div className="grid grid-cols-2 gap-2 pt-1">
                   <div className="p-2 rounded bg-white border border-slate-200">
-                    <span className="text-[10px] text-slate-500 uppercase font-semibold block">Player Consent</span>
-                    <span className={`text-xs font-semibold ${
-                      transfer.playerApproval?.status === "APPROVED"
-                        ? "text-emerald-700"
-                        : transfer.playerApproval?.status === "REJECTED"
-                        ? "text-rose-700"
-                        : "text-amber-700"
-                    }`}>
+                    <span className="text-[10px] text-slate-500 uppercase font-semibold block">
+                      Player Consent
+                    </span>
+                    <span
+                      className={`text-xs font-semibold ${
+                        transfer.playerApproval?.status === "APPROVED"
+                          ? "text-emerald-700"
+                          : transfer.playerApproval?.status === "REJECTED"
+                            ? "text-rose-700"
+                            : "text-amber-700"
+                      }`}
+                    >
                       {transfer.playerApproval?.status || "PENDING"}
                     </span>
                   </div>
                   <div className="p-2 rounded bg-white border border-slate-200">
-                    <span className="text-[10px] text-slate-500 uppercase font-semibold block">Current Club Manager</span>
-                    <span className={`text-xs font-semibold ${
-                      transfer.managerApproval?.status === "APPROVED"
-                        ? "text-emerald-700"
-                        : transfer.managerApproval?.status === "REJECTED"
-                        ? "text-rose-700"
-                        : "text-amber-700"
-                    }`}>
+                    <span className="text-[10px] text-slate-500 uppercase font-semibold block">
+                      Current Club Manager
+                    </span>
+                    <span
+                      className={`text-xs font-semibold ${
+                        transfer.managerApproval?.status === "APPROVED"
+                          ? "text-emerald-700"
+                          : transfer.managerApproval?.status === "REJECTED"
+                            ? "text-rose-700"
+                            : "text-amber-700"
+                      }`}
+                    >
                       {transfer.managerApproval?.status || "PENDING"}
                     </span>
                   </div>
@@ -361,7 +378,8 @@ const TransferDetailModal: React.FC<TransferDetailModalProps> = ({
         {/* Modal Footer */}
         <div className="flex items-center justify-between px-6 py-3.5 border-t border-slate-100 bg-slate-50/50">
           <div className="text-[11px] text-slate-400">
-            Last updated: {transfer.updatedAt ? dayjs(transfer.updatedAt).format("MMM D, YYYY") : "N/A"}
+            Last updated:{" "}
+            {transfer.updatedAt ? dayjs(transfer.updatedAt).format("MMM D, YYYY") : "N/A"}
           </div>
 
           <div className="flex items-center gap-2">

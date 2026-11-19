@@ -1,6 +1,5 @@
 import { baseApi } from "../../utils/apiBaseQuery";
 
-
 export const rewordApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
     createReword: builder.mutation({
@@ -9,7 +8,7 @@ export const rewordApi = baseApi.injectEndpoints({
         method: "POST",
         body: data,
       }),
-      invalidatesTags: ["reword"]
+      invalidatesTags: ["reword"],
     }),
 
     updateReword: builder.mutation({
@@ -18,7 +17,7 @@ export const rewordApi = baseApi.injectEndpoints({
         method: "PATCH",
         body: data,
       }),
-      invalidatesTags: ["reword"]
+      invalidatesTags: ["reword"],
     }),
 
     getAllReword: builder.query({
@@ -26,7 +25,7 @@ export const rewordApi = baseApi.injectEndpoints({
         url: `/reward-products?page=${pageNumber}`,
         method: "GET",
       }),
-      providesTags: ["reword"]
+      providesTags: ["reword"],
     }),
 
     getSingleReword: builder.query({
@@ -34,16 +33,15 @@ export const rewordApi = baseApi.injectEndpoints({
         url: `/reward-products/${id}`,
         method: "GET",
       }),
-      providesTags: ["reword"]
+      providesTags: ["reword"],
     }),
-
 
     deleteReword: builder.mutation({
       query: (id) => ({
         url: `/reward-products/${id}`,
         method: "DELETE",
       }),
-      invalidatesTags: ["reword"]
+      invalidatesTags: ["reword"],
     }),
 
     getRewardOverview: builder.query({

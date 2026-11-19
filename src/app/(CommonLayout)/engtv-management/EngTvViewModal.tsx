@@ -1,27 +1,13 @@
 "use client";
 
 import React from "react";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { baseURL } from "@/utils/BaseURL";
 import { formatImagePath } from "@/utils/formatImagePath";
 import { getYouTubeEmbedUrl } from "@/utils/getYouTubeEmbedUrl";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
-import {
-  X,
-  Tv,
-  Calendar,
-  Clock,
-  Tag,
-  Star,
-  Film,
-  Hash,
-} from "lucide-react";
+import { X, Tv, Calendar, Clock, Tag, Star, Film, Hash } from "lucide-react";
 import { TEngtv } from "@/types/columnTypes";
 
 dayjs.extend(relativeTime);
@@ -32,28 +18,16 @@ interface EngTvViewModalProps {
   onClose: () => void;
 }
 
-const EngTvViewModal: React.FC<EngTvViewModalProps> = ({
-  video,
-  isOpen,
-  onClose,
-}) => {
+const EngTvViewModal: React.FC<EngTvViewModalProps> = ({ video, isOpen, onClose }) => {
   if (!video) return null;
 
   const catVal = video.category as any;
   const catName =
-    typeof catVal === "object" && catVal
-      ? catVal.name
-      : typeof catVal === "string"
-      ? catVal
-      : "";
+    typeof catVal === "object" && catVal ? catVal.name : typeof catVal === "string" ? catVal : "";
 
   const subVal = (video as any).subCategory;
   const subName =
-    typeof subVal === "object" && subVal
-      ? subVal.name
-      : typeof subVal === "string"
-      ? subVal
-      : "";
+    typeof subVal === "object" && subVal ? subVal.name : typeof subVal === "string" ? subVal : "";
 
   const youtubeEmbed = getYouTubeEmbedUrl(video.videoUrl);
   const posterUrl = video.thumbnail ? formatImagePath(video.thumbnail) : "";
@@ -102,8 +76,8 @@ const EngTvViewModal: React.FC<EngTvViewModalProps> = ({
                     isPublished
                       ? "bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950/40 dark:text-emerald-400 dark:border-emerald-800"
                       : isDraft
-                      ? "bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-950/40 dark:text-amber-400 dark:border-amber-800"
-                      : "bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-950/40 dark:text-blue-400 dark:border-blue-800"
+                        ? "bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-950/40 dark:text-amber-400 dark:border-amber-800"
+                        : "bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-950/40 dark:text-blue-400 dark:border-blue-800"
                   }`}
                 >
                   {video.status || "Draft"}
@@ -180,9 +154,7 @@ const EngTvViewModal: React.FC<EngTvViewModalProps> = ({
                   <Calendar className="w-3.5 h-3.5 text-slate-400" /> Created Date
                 </span>
                 <span className="font-medium text-slate-900 dark:text-slate-100">
-                  {video.createdAt
-                    ? dayjs(video.createdAt).format("DD MMM YYYY, h:mm A")
-                    : "N/A"}
+                  {video.createdAt ? dayjs(video.createdAt).format("DD MMM YYYY, h:mm A") : "N/A"}
                 </span>
               </div>
 

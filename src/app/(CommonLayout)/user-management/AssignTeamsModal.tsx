@@ -1,21 +1,16 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-"use client"
-import React, { useState, useEffect } from 'react';
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import { useGetAllTeamQuery } from '@/features/teamManagement/teamApi';
+"use client";
+import React, { useState, useEffect } from "react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { useGetAllTeamQuery } from "@/features/teamManagement/teamApi";
 import {
   useGetManagerTeamsForAdminQuery,
-  useBulkAssignTeamsMutation
-} from '@/features/managerTeam/managerTeamApi';
-import { TUserManagement } from '@/types/columnTypes';
-import { Search, Loader2, CheckSquare, Square, Building2, Save } from 'lucide-react';
-import { formatImagePath } from '@/utils/formatImagePath';
-import toast from 'react-hot-toast';
+  useBulkAssignTeamsMutation,
+} from "@/features/managerTeam/managerTeamApi";
+import { TUserManagement } from "@/types/columnTypes";
+import { Search, Loader2, CheckSquare, Square, Building2, Save } from "lucide-react";
+import { formatImagePath } from "@/utils/formatImagePath";
+import toast from "react-hot-toast";
 
 interface AssignTeamsModalProps {
   user: TUserManagement | null;
@@ -23,12 +18,8 @@ interface AssignTeamsModalProps {
   onClose: () => void;
 }
 
-const AssignTeamsModal: React.FC<AssignTeamsModalProps> = ({
-  user,
-  isOpen,
-  onClose,
-}) => {
-  const [searchTerm, setSearchTerm] = useState('');
+const AssignTeamsModal: React.FC<AssignTeamsModalProps> = ({ user, isOpen, onClose }) => {
+  const [searchTerm, setSearchTerm] = useState("");
   const [selectedTeams, setSelectedTeams] = useState<string[]>([]);
 
   // 1. Fetch all teams in the system (high limit to list all)
@@ -38,7 +29,7 @@ const AssignTeamsModal: React.FC<AssignTeamsModalProps> = ({
 
   // 2. Fetch teams currently managed by this coach
   const { data: currentMappings, isLoading: isLoadingMappings } = useGetManagerTeamsForAdminQuery(
-    user?._id || '',
+    user?._id || "",
     { skip: !user?._id || !isOpen }
   );
 
@@ -47,7 +38,9 @@ const AssignTeamsModal: React.FC<AssignTeamsModalProps> = ({
   // Populate selected teams when current assignments are loaded
   useEffect(() => {
     if (currentMappings?.data) {
-      const assignedIds = currentMappings.data.map((m: any) => m.team?._id || m.team).filter(Boolean);
+      const assignedIds = currentMappings.data
+        .map((m: any) => m.team?._id || m.team)
+        .filter(Boolean);
       setSelectedTeams(assignedIds);
     }
   }, [currentMappings, isOpen]);
@@ -57,16 +50,15 @@ const AssignTeamsModal: React.FC<AssignTeamsModalProps> = ({
   const allTeams = teamsData?.data || [];
 
   // Filter teams by search term
-  const filteredTeams = allTeams.filter((team: any) =>
-    (team.teamName || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
-    (team.shortName || '').toLowerCase().includes(searchTerm.toLowerCase())
+  const filteredTeams = allTeams.filter(
+    (team: any) =>
+      (team.teamName || "").toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (team.shortName || "").toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   const handleToggleTeam = (teamId: string) => {
     setSelectedTeams((prev) =>
-      prev.includes(teamId)
-        ? prev.filter((id: string) => id !== teamId)
-        : [...prev, teamId]
+      prev.includes(teamId) ? prev.filter((id: string) => id !== teamId) : [...prev, teamId]
     );
   };
 
@@ -113,7 +105,7 @@ const AssignTeamsModal: React.FC<AssignTeamsModalProps> = ({
       // Let's rewrite managerTeamApi.js to export useBulkAssignTeamsMutation as well.
       // Wait! We can do that. But first, let's construct handleSave in AssignTeamsModal:
       // It can just call bulkAssignTeams mutation!
-      
+
       const payload = {
         manager: user._id,
         teams: selectedTeams,
@@ -138,7 +130,10 @@ const AssignTeamsModal: React.FC<AssignTeamsModalProps> = ({
             Assign Teams to Coach
           </DialogTitle>
           <p className="text-sm text-gray-500 mt-1">
-            Manage team assignments for <span className="font-semibold text-gray-700">{user.firstName} {user.lastName}</span>
+            Manage team assignments for{" "}
+            <span className="font-semibold text-gray-700">
+              {user.firstName} {user.lastName}
+            </span>
           </p>
         </DialogHeader>
 
@@ -221,9 +216,7 @@ const AssignTeamsModal: React.FC<AssignTeamsModalProps> = ({
                     {team.teamLogo ? (
                       /* eslint-disable-next-line @next/next/no-img-element */
                       <img
-                        src={
-                          formatImagePath(team.teamLogo)
-                        }
+                        src={formatImagePath(team.teamLogo)}
                         alt="logo"
                         className="w-10 h-10 rounded-lg object-cover border border-gray-100 shrink-0"
                         onError={(e: any) => {
@@ -312,11 +305,7 @@ const AssignTeamsModal: React.FC<AssignTeamsModalProps> = ({
             disabled={isSaving}
             className="px-5 py-2.5 rounded-xl bg-black hover:bg-gray-900 text-white text-sm font-semibold flex items-center gap-2 shadow-lg shadow-black/10 transition-colors cursor-pointer disabled:opacity-50"
           >
-            {isSaving ? (
-              <Loader2 className="w-4 h-4 animate-spin" />
-            ) : (
-              <Save className="w-4 h-4" />
-            )}
+            {isSaving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
             Save Assignments
           </button>
         </div>

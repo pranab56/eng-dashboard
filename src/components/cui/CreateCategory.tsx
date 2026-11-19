@@ -5,13 +5,7 @@ import { useForm } from "react-hook-form";
 import * as z from "zod";
 
 import { Button } from "@/components/ui/button";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormMessage,
-} from "@/components/ui/form";
+import { Form, FormControl, FormField, FormItem, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 
@@ -45,8 +39,8 @@ const CreateCategory = () => {
   async function onSubmit(data: CreateIndustryValues) {
     const payload = {
       name: data.name,
-      image: data.image
-    }
+      image: data.image,
+    };
     console.log("Submitted Data:", payload);
     toast.success("Industry created successfully");
   }
@@ -83,14 +77,14 @@ const CreateCategory = () => {
                 <FormItem>
                   <FormControl>
                     <Input
-                        id="profileImgCtrl"
-                        type="file"
-                        accept="image/*"
-                        className="h-12 py-2"
-                        onChange={e => {
-                          field.onChange(e.target.files?.[0]);
-                        }}
-                      />
+                      id="profileImgCtrl"
+                      type="file"
+                      accept="image/*"
+                      className="h-12 py-2"
+                      onChange={(e) => {
+                        field.onChange(e.target.files?.[0]);
+                      }}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -110,6 +104,6 @@ const CreateCategory = () => {
       </Form>
     </div>
   );
-}
+};
 
 export default CreateCategory;

@@ -33,14 +33,12 @@ dayjs.extend(relativeTime);
 dayjs.extend(utc);
 dayjs.extend(timezone);
 
-
 export default function MatchRemindersSection() {
   // Settings Query & Mutation
-  const {
-    data: settingsRes,
-    refetch: refetchSettings,
-  } = useGetMatchReminderSettingsQuery(undefined);
-  const [updateSettings, { isLoading: isUpdatingSettings }] = useUpdateMatchReminderSettingsMutation();
+  const { data: settingsRes, refetch: refetchSettings } =
+    useGetMatchReminderSettingsQuery(undefined);
+  const [updateSettings, { isLoading: isUpdatingSettings }] =
+    useUpdateMatchReminderSettingsMutation();
 
   // Upcoming Matches Query & Mutations
   const [page, setPage] = useState(1);
@@ -57,8 +55,10 @@ export default function MatchRemindersSection() {
     status: statusFilter !== "ALL" ? statusFilter : undefined,
   });
 
-  const [triggerRemindersNow, { isLoading: isTriggeringNow }] = useTriggerMatchRemindersNowMutation();
-  const [sendSingleReminder, { isLoading: isSendingSingle }] = useSendSingleMatchReminderNowMutation();
+  const [triggerRemindersNow, { isLoading: isTriggeringNow }] =
+    useTriggerMatchRemindersNowMutation();
+  const [sendSingleReminder, { isLoading: isSendingSingle }] =
+    useSendSingleMatchReminderNowMutation();
 
   // Local Form State for Settings
   const [isEnabled, setIsEnabled] = useState(true);
@@ -136,11 +136,10 @@ export default function MatchRemindersSection() {
               <Clock className="w-5 h-5 text-amber-600" />
             </div>
             <div>
-              <h3 className="text-base font-bold text-slate-900">
-                Automated Match Reminder Rules
-              </h3>
+              <h3 className="text-base font-bold text-slate-900">Automated Match Reminder Rules</h3>
               <p className="text-xs text-slate-500 mt-0.5">
-                Configure when and to whom push notifications are automatically dispatched before kickoff.
+                Configure when and to whom push notifications are automatically dispatched before
+                kickoff.
               </p>
             </div>
           </div>
@@ -193,11 +192,14 @@ export default function MatchRemindersSection() {
                 </button>
               </div>
               <p className="text-[11px] text-slate-500 mt-2">
-                When enabled, BullMQ periodically checks upcoming fixtures and sends push notifications at the configured advance time.
+                When enabled, BullMQ periodically checks upcoming fixtures and sends push
+                notifications at the configured advance time.
               </p>
             </div>
             <div className="mt-3 pt-3 border-t border-slate-200/60 flex items-center gap-1.5 text-xs font-medium">
-              <span className={`w-2 h-2 rounded-full ${isEnabled ? "bg-emerald-500" : "bg-slate-400"}`} />
+              <span
+                className={`w-2 h-2 rounded-full ${isEnabled ? "bg-emerald-500" : "bg-slate-400"}`}
+              />
               <span className={isEnabled ? "text-emerald-700" : "text-slate-500"}>
                 {isEnabled ? "Active (Running automatically)" : "Paused (No auto reminders)"}
               </span>
@@ -263,7 +265,8 @@ export default function MatchRemindersSection() {
                 <div className="text-xs">
                   <span className="font-bold text-slate-900 block">Match Stakeholders Only</span>
                   <span className="text-[11px] text-slate-500 block">
-                    Players, parents, team managers, team bell subscribers & referee of both participating teams.
+                    Players, parents, team managers, team bell subscribers & referee of both
+                    participating teams.
                   </span>
                 </div>
               </label>
@@ -297,7 +300,9 @@ export default function MatchRemindersSection() {
           >
             <Settings2 className="w-3.5 h-3.5 text-amber-600" />
             <span>Customize Notification Message Template</span>
-            <span className="text-[10px] text-slate-400">({isTemplateExpanded ? "Hide" : "Edit template"})</span>
+            <span className="text-[10px] text-slate-400">
+              ({isTemplateExpanded ? "Hide" : "Edit template"})
+            </span>
           </button>
 
           {isTemplateExpanded && (
@@ -314,7 +319,9 @@ export default function MatchRemindersSection() {
               </div>
 
               <div className="space-y-1">
-                <label className="text-xs font-semibold text-slate-700">Notification Message Body:</label>
+                <label className="text-xs font-semibold text-slate-700">
+                  Notification Message Body:
+                </label>
                 <textarea
                   rows={2}
                   value={customMessage}
@@ -326,11 +333,21 @@ export default function MatchRemindersSection() {
 
               <div className="text-[11px] text-slate-500 flex flex-wrap items-center gap-2">
                 <span className="font-semibold text-slate-600">Dynamic placeholders:</span>
-                <code className="bg-white px-1.5 py-0.5 rounded border border-slate-200 text-slate-700">{"{homeTeam}"}</code>
-                <code className="bg-white px-1.5 py-0.5 rounded border border-slate-200 text-slate-700">{"{awayTeam}"}</code>
-                <code className="bg-white px-1.5 py-0.5 rounded border border-slate-200 text-slate-700">{"{date}"}</code>
-                <code className="bg-white px-1.5 py-0.5 rounded border border-slate-200 text-slate-700">{"{time}"}</code>
-                <code className="bg-white px-1.5 py-0.5 rounded border border-slate-200 text-slate-700">{"{venue}"}</code>
+                <code className="bg-white px-1.5 py-0.5 rounded border border-slate-200 text-slate-700">
+                  {"{homeTeam}"}
+                </code>
+                <code className="bg-white px-1.5 py-0.5 rounded border border-slate-200 text-slate-700">
+                  {"{awayTeam}"}
+                </code>
+                <code className="bg-white px-1.5 py-0.5 rounded border border-slate-200 text-slate-700">
+                  {"{date}"}
+                </code>
+                <code className="bg-white px-1.5 py-0.5 rounded border border-slate-200 text-slate-700">
+                  {"{time}"}
+                </code>
+                <code className="bg-white px-1.5 py-0.5 rounded border border-slate-200 text-slate-700">
+                  {"{venue}"}
+                </code>
               </div>
             </div>
           )}
@@ -350,7 +367,8 @@ export default function MatchRemindersSection() {
               </span>
             </div>
             <p className="text-xs text-slate-500 mt-0.5">
-              Live schedule of upcoming fixtures showing reminder dispatch statuses and target recipient counts.
+              Live schedule of upcoming fixtures showing reminder dispatch statuses and target
+              recipient counts.
             </p>
           </div>
 
@@ -386,7 +404,9 @@ export default function MatchRemindersSection() {
               className="p-1.5 rounded-lg border border-slate-200 hover:bg-slate-50 text-slate-600 cursor-pointer"
               title="Refresh queue"
             >
-              <RefreshCw className={`w-4 h-4 ${isFetchingMatches ? "animate-spin text-amber-600" : ""}`} />
+              <RefreshCw
+                className={`w-4 h-4 ${isFetchingMatches ? "animate-spin text-amber-600" : ""}`}
+              />
             </button>
           </div>
         </div>
@@ -442,14 +462,15 @@ export default function MatchRemindersSection() {
                   } else if (totalDays >= 2) {
                     remainingDaysText = `${totalDays} days remaining`;
                   } else if (totalDays === 1) {
-                    remainingDaysText = leftHours > 0 ? `1 day, ${leftHours}h remaining` : "1 day remaining";
+                    remainingDaysText =
+                      leftHours > 0 ? `1 day, ${leftHours}h remaining` : "1 day remaining";
                   } else if (totalHours >= 2) {
                     remainingDaysText = `${totalHours} hours remaining`;
                   } else if (totalHours === 1) {
                     remainingDaysText = "1 hour remaining";
                   } else {
                     remainingDaysText = "Less than 1h remaining";
-                  };
+                  }
 
                   return (
                     <tr key={m._id} className="hover:bg-slate-50/70 transition-colors">
@@ -516,11 +537,19 @@ export default function MatchRemindersSection() {
                       {/* Venue */}
                       <td className="py-3 px-4 max-w-[170px]">
                         {(() => {
-                          const raw = (m.venueName || m.venueCategory?.name || m.venue || "").trim();
+                          const raw = (
+                            m.venueName ||
+                            m.venueCategory?.name ||
+                            m.venue ||
+                            ""
+                          ).trim();
                           const isHexId = /^[0-9a-fA-F]{24}$/.test(raw);
-                          const safeVenue = isHexId ? (m.venueCategory?.name || "") : raw;
+                          const safeVenue = isHexId ? m.venueCategory?.name || "" : raw;
                           return safeVenue ? (
-                            <div className="flex items-start gap-1 truncate text-slate-700" title={safeVenue}>
+                            <div
+                              className="flex items-start gap-1 truncate text-slate-700"
+                              title={safeVenue}
+                            >
                               <MapPin className="w-3.5 h-3.5 text-slate-400 shrink-0 mt-0.5" />
                               <span className="truncate">{safeVenue}</span>
                             </div>
@@ -571,7 +600,9 @@ export default function MatchRemindersSection() {
                           title="Manually trigger reminder push notification for this match immediately"
                         >
                           <Send className={`w-3 h-3 ${isSending ? "animate-spin" : ""}`} />
-                          <span>{isSending ? "Sending..." : isSent ? "Resend Reminder" : "Send Now"}</span>
+                          <span>
+                            {isSending ? "Sending..." : isSent ? "Resend Reminder" : "Send Now"}
+                          </span>
                         </button>
                       </td>
                     </tr>

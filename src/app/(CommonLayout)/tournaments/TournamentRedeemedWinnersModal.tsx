@@ -2,24 +2,13 @@
 "use client";
 
 import React from "react";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { TTournament } from "@/types/columnTypes";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 import Image from "next/image";
 import { formatImagePath } from "@/utils/formatImagePath";
-import {
-  X,
-  UserCheck,
-  Award,
-  Coins,
-  Calendar,
-} from "lucide-react";
+import { X, UserCheck, Award, Coins, Calendar } from "lucide-react";
 import { useGetTournamentQrCodeQuery } from "@/features/tournaments/tournamentsApi";
 
 dayjs.extend(relativeTime);
@@ -78,10 +67,7 @@ export default function TournamentRedeemedWinnersModal({
               </div>
 
               <p className="text-xs text-slate-500 mt-0.5 truncate max-w-md">
-                Tournament:{" "}
-                <span className="font-semibold text-slate-700">
-                  {tournament.title}
-                </span>
+                Tournament: <span className="font-semibold text-slate-700">{tournament.title}</span>
               </p>
             </div>
           </div>
@@ -97,27 +83,19 @@ export default function TournamentRedeemedWinnersModal({
             <div className="space-y-2.5">
               {redeemedPlayers.map((rp: any, idx: number) => {
                 const playerObj = rp.player;
-                const isPopulated =
-                  typeof playerObj === "object" && playerObj !== null;
+                const isPopulated = typeof playerObj === "object" && playerObj !== null;
                 const playerName = isPopulated
                   ? playerObj.fullName ||
-                    [playerObj.firstName, playerObj.lastName]
-                      .filter(Boolean)
-                      .join(" ")
-                      .trim() ||
+                    [playerObj.firstName, playerObj.lastName].filter(Boolean).join(" ").trim() ||
                     playerObj.userName ||
                     "Player"
                   : "Player";
 
                 const getValidEmail = (val?: string | null) =>
-                  val && typeof val === "string" && val.includes("@")
-                    ? val
-                    : "";
+                  val && typeof val === "string" && val.includes("@") ? val : "";
 
                 const parentObj =
-                  typeof playerObj?.parentId === "object"
-                    ? playerObj.parentId
-                    : null;
+                  typeof playerObj?.parentId === "object" ? playerObj.parentId : null;
 
                 const playerEmail = isPopulated
                   ? getValidEmail(playerObj.email) ||
@@ -127,9 +105,7 @@ export default function TournamentRedeemedWinnersModal({
                   : "";
 
                 const playerPic =
-                  isPopulated && playerObj.profile
-                    ? formatImagePath(playerObj.profile)
-                    : null;
+                  isPopulated && playerObj.profile ? formatImagePath(playerObj.profile) : null;
                 const initials = playerName.substring(0, 2).toUpperCase();
 
                 const is1st = rp.position === 1;
@@ -171,12 +147,7 @@ export default function TournamentRedeemedWinnersModal({
                       {/* Avatar */}
                       <div className="relative w-9 h-9 rounded-md bg-slate-100 border border-slate-200 overflow-hidden flex items-center justify-center shrink-0 text-xs font-bold text-slate-600">
                         {playerPic ? (
-                          <Image
-                            src={playerPic}
-                            alt={playerName}
-                            fill
-                            className="object-cover"
-                          />
+                          <Image src={playerPic} alt={playerName} fill className="object-cover" />
                         ) : (
                           <span>{initials}</span>
                         )}
@@ -230,9 +201,8 @@ export default function TournamentRedeemedWinnersModal({
                 No Winners Have Claimed Rewards Yet
               </h5>
               <p className="text-xs text-slate-500 max-w-sm mx-auto">
-                No players have scanned the position QR codes for this
-                tournament yet. As soon as a player redeems their placement QR code,
-                their record will appear here.
+                No players have scanned the position QR codes for this tournament yet. As soon as a
+                player redeems their placement QR code, their record will appear here.
               </p>
             </div>
           )}

@@ -2,12 +2,7 @@
 "use client";
 
 import React, { useState, useMemo } from "react";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import dayjs from "dayjs";
 import { Calendar, Globe, MapPin, Search, Shield, Trash2, Trophy, X } from "lucide-react";
 import Image from "next/image";
@@ -54,10 +49,7 @@ export default function LeagueTeamViewModal({
   const [searchQuery, setSearchQuery] = useState("");
 
   const league = data?.league;
-  const teams = useMemo(
-    () => (data?.teams || []).filter(Boolean),
-    [data?.teams]
-  );
+  const teams = useMemo(() => (data?.teams || []).filter(Boolean), [data?.teams]);
 
   const filteredTeams = useMemo(() => {
     if (!searchQuery.trim()) return teams;
@@ -73,12 +65,8 @@ export default function LeagueTeamViewModal({
 
   if (!data) return null;
 
-  const startDate = league?.startDate
-    ? dayjs(league.startDate).format("DD MMM YYYY")
-    : "N/A";
-  const endDate = league?.endDate
-    ? dayjs(league.endDate).format("DD MMM YYYY")
-    : "N/A";
+  const startDate = league?.startDate ? dayjs(league.startDate).format("DD MMM YYYY") : "N/A";
+  const endDate = league?.endDate ? dayjs(league.endDate).format("DD MMM YYYY") : "N/A";
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>

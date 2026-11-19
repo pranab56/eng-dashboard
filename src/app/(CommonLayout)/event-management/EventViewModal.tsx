@@ -1,25 +1,12 @@
 "use client";
 
 import React from "react";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 import Image from "next/image";
 import { formatImagePath } from "@/utils/formatImagePath";
-import {
-  MapPin,
-  Calendar,
-  Clock,
-  X,
-  CalendarDays,
-  Send,
-  Image as ImageIcon,
-} from "lucide-react";
+import { MapPin, Calendar, Clock, X, CalendarDays, Send, Image as ImageIcon } from "lucide-react";
 
 dayjs.extend(relativeTime);
 
@@ -29,11 +16,7 @@ interface EventViewModalProps {
   onClose: () => void;
 }
 
-const EventViewModal: React.FC<EventViewModalProps> = ({
-  event,
-  isOpen,
-  onClose,
-}) => {
+const EventViewModal: React.FC<EventViewModalProps> = ({ event, isOpen, onClose }) => {
   if (!event) return null;
 
   const isPublished = event.status?.toLowerCase() === "publish";
@@ -62,8 +45,8 @@ const EventViewModal: React.FC<EventViewModalProps> = ({
                     isPublished
                       ? "bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950/40 dark:text-emerald-400 dark:border-emerald-800"
                       : isDraft
-                      ? "bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-950/40 dark:text-amber-400 dark:border-amber-800"
-                      : "bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-950/40 dark:text-blue-400 dark:border-blue-800"
+                        ? "bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-950/40 dark:text-amber-400 dark:border-amber-800"
+                        : "bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-950/40 dark:text-blue-400 dark:border-blue-800"
                   }`}
                 >
                   {event.status || "Draft"}
@@ -135,9 +118,7 @@ const EventViewModal: React.FC<EventViewModalProps> = ({
                   <Calendar className="w-3.5 h-3.5 text-slate-400" /> Event Date
                 </span>
                 <span className="font-medium text-slate-900 dark:text-slate-100">
-                  {event.eventDate
-                    ? dayjs(event.eventDate).format("DD MMM YYYY, h:mm A")
-                    : "N/A"}
+                  {event.eventDate ? dayjs(event.eventDate).format("DD MMM YYYY, h:mm A") : "N/A"}
                 </span>
               </div>
             </div>

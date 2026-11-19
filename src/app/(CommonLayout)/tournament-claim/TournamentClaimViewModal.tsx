@@ -1,26 +1,13 @@
 "use client";
 
 import React from "react";
-import {
-  Dialog,
-  DialogContent,
-  DialogTitle,
-} from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { TTournamentClaim } from "@/types/columnTypes";
 import { formatImagePath } from "@/utils/formatImagePath";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 import Image from "next/image";
-import {
-  Trophy,
-  Calendar,
-  FileText,
-  X,
-  Check,
-  Clock,
-  CheckCircle2,
-  XCircle,
-} from "lucide-react";
+import { Trophy, Calendar, FileText, X, Check, Clock, CheckCircle2, XCircle } from "lucide-react";
 
 dayjs.extend(relativeTime);
 
@@ -178,9 +165,7 @@ export default function TournamentClaimViewModal({
               </span>
             </div>
 
-            <span
-              className={`px-3 py-1 rounded-md text-xs font-mono border ${posBadgeTheme}`}
-            >
+            <span className={`px-3 py-1 rounded-md text-xs font-mono border ${posBadgeTheme}`}>
               Position #{pos || "—"}
             </span>
           </div>

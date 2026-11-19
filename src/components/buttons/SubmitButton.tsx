@@ -1,6 +1,6 @@
-import { cn } from '@/lib/utils'
-import { Loader2 } from 'lucide-react'
-import React from 'react'
+import { cn } from "@/lib/utils";
+import { Loader2 } from "lucide-react";
+import React from "react";
 
 interface SubmitButtonProps {
   isSubmitting?: boolean;
@@ -34,7 +34,7 @@ const SubmitButton: React.FC<SubmitButtonProps> = ({
       {loading && <Loader2 className="w-4 h-4 animate-spin" />}
       <span>{loading ? "Processing..." : buttonText}</span>
     </button>
-  )
-}
+  );
+};
 
-export default SubmitButton
+export default SubmitButton;

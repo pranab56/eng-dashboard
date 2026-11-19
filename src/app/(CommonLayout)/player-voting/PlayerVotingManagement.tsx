@@ -4,16 +4,7 @@
 
 import React, { useEffect, useState, useMemo } from "react";
 import { useSearchParams } from "next/navigation";
-import {
-  Trophy,
-  Activity,
-  Users,
-  Award,
-  Plus,
-  Search,
-  X,
-  RotateCcw,
-} from "lucide-react";
+import { Trophy, Activity, Users, Award, Plus, Search, X, RotateCcw } from "lucide-react";
 import { toast } from "sonner";
 
 import CustomPagination from "@/components/cui/CustomPagination";
@@ -34,7 +25,10 @@ import {
   useGetAllPlayerVotingQuery,
   useUpdatePlayerVotingMutation,
 } from "@/features/playerVoting/playerVotingApi";
-import { useGetAllLeagueQuery, useGetLeagueAgeGroupsQuery } from "@/features/leagueManagement/leagueApi";
+import {
+  useGetAllLeagueQuery,
+  useGetLeagueAgeGroupsQuery,
+} from "@/features/leagueManagement/leagueApi";
 import { useGetAllAgeGroupQuery } from "@/features/categoryManagement/categoryApi";
 import { LeagueSelectDropdown } from "@/components/dropdowns/LeagueSelectDropdown";
 import { AgeGroupSelectDropdown } from "@/components/dropdowns/AgeGroupSelectDropdown";
@@ -73,12 +67,9 @@ export default function PlayerVotingManagement() {
     const list = Array.isArray(leaguesData?.data)
       ? leaguesData.data
       : Array.isArray(leaguesData?.data?.result)
-      ? leaguesData.data.result
-      : [];
-    return [
-      { _id: "overall", leagueName: "Overall (All Leagues)" },
-      ...list,
-    ];
+        ? leaguesData.data.result
+        : [];
+    return [{ _id: "overall", leagueName: "Overall (All Leagues)" }, ...list];
   }, [leaguesData]);
 
   // Dynamic Age Groups from DB (Categories + Leagues)
@@ -508,11 +499,21 @@ export default function PlayerVotingManagement() {
                     <SelectValue placeholder="Status" />
                   </SelectTrigger>
                   <SelectContent className="bg-white border-slate-200">
-                    <SelectItem value="all" className="text-xs">All Statuses</SelectItem>
-                    <SelectItem value="upcoming" className="text-xs">Scheduled</SelectItem>
-                    <SelectItem value="active" className="text-xs">Active</SelectItem>
-                    <SelectItem value="completed" className="text-xs">Closed</SelectItem>
-                    <SelectItem value="cancelled" className="text-xs">Cancelled</SelectItem>
+                    <SelectItem value="all" className="text-xs">
+                      All Statuses
+                    </SelectItem>
+                    <SelectItem value="upcoming" className="text-xs">
+                      Scheduled
+                    </SelectItem>
+                    <SelectItem value="active" className="text-xs">
+                      Active
+                    </SelectItem>
+                    <SelectItem value="completed" className="text-xs">
+                      Closed
+                    </SelectItem>
+                    <SelectItem value="cancelled" className="text-xs">
+                      Cancelled
+                    </SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -535,11 +536,7 @@ export default function PlayerVotingManagement() {
 
         {/* Table View */}
         <div className="overflow-x-auto">
-          <CustomTable
-            columns={columns}
-            data={rawPolls}
-            isLoading={isLoading}
-          />
+          <CustomTable columns={columns} data={rawPolls} isLoading={isLoading} />
         </div>
 
         {/* Pagination */}

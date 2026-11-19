@@ -1,24 +1,27 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable @typescript-eslint/no-explicit-any */
-"use client"
+"use client";
 
-import CancelButton from '@/components/buttons/CancelButton';
-import SubmitButton from '@/components/buttons/SubmitButton';
-import { useHeaders } from '@/hooks/useHeaders';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { useEffect } from 'react';
-import { useForm } from 'react-hook-form';
-import { toast } from 'sonner';
-import * as z from 'zod';
-import { useCreatePlayerEconomyMutation, useGetPlayerEconomyQuery } from '@/features/player/playerApi';
-import { useRouter } from 'next/navigation';
-import { ArrowLeft, Calculator } from 'lucide-react';
-import Link from 'next/link';
+import CancelButton from "@/components/buttons/CancelButton";
+import SubmitButton from "@/components/buttons/SubmitButton";
+import { useHeaders } from "@/hooks/useHeaders";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useEffect } from "react";
+import { useForm } from "react-hook-form";
+import { toast } from "sonner";
+import * as z from "zod";
+import {
+  useCreatePlayerEconomyMutation,
+  useGetPlayerEconomyQuery,
+} from "@/features/player/playerApi";
+import { useRouter } from "next/navigation";
+import { ArrowLeft, Calculator } from "lucide-react";
+import Link from "next/link";
 
 // Zod Schema verification
 const coinMarketSchema = z.object({
   coin: z.number(),
-  marketValue: z.number()
+  marketValue: z.number(),
 });
 
 const playerEconomySchema = z.object({
@@ -56,7 +59,7 @@ export default function PlayerEconomyPage() {
     setValue,
     watch,
     reset,
-    formState: { errors }
+    formState: { errors },
   } = useForm<PlayerEconomyFormValues>({
     resolver: zodResolver(playerEconomySchema),
     defaultValues: {
@@ -77,13 +80,13 @@ export default function PlayerEconomyPage() {
       disrespectToReferee: { coin: 0, marketValue: 0 },
       grossMisconduct: { coin: 0, marketValue: 0 },
       foul: { coin: 0, marketValue: 0 },
-    }
+    },
   });
 
   useEffect(() => {
     setHeaders({
       title: "Player Economy Settings",
-      des: "Configure coin scales, penalties, and multipliers affecting player valuations."
+      des: "Configure coin scales, penalties, and multipliers affecting player valuations.",
     });
   }, [setHeaders]);
 
@@ -92,27 +95,57 @@ export default function PlayerEconomyPage() {
       const data = economyData.data;
       const rate = Number(data.conversionRate) || 100;
       const initialMarketVal = Number(data.startingMarketValue) || 100000;
-      const initialCoins = data.startingCoins !== undefined
-        ? Number(data.startingCoins)
-        : (rate > 0 ? Math.round(initialMarketVal / rate) : 1000);
+      const initialCoins =
+        data.startingCoins !== undefined
+          ? Number(data.startingCoins)
+          : rate > 0
+            ? Math.round(initialMarketVal / rate)
+            : 1000;
 
       reset({
         startingCoins: initialCoins,
         startingMarketValue: initialCoins * rate,
         conversionRate: rate,
-        playingMatch: { coin: data.playingMatch?.coin || 0, marketValue: (data.playingMatch?.coin || 0) * rate },
+        playingMatch: {
+          coin: data.playingMatch?.coin || 0,
+          marketValue: (data.playingMatch?.coin || 0) * rate,
+        },
         goal: { coin: data.goal?.coin || 0, marketValue: (data.goal?.coin || 0) * rate },
         assist: { coin: data.assist?.coin || 0, marketValue: (data.assist?.coin || 0) * rate },
-        cleanSheet: { coin: data.cleanSheet?.coin || 0, marketValue: (data.cleanSheet?.coin || 0) * rate },
-        goodRating: { coin: data.goodRating?.coin || 0, marketValue: (data.goodRating?.coin || 0) * rate },
-        greatRating: { coin: data.greatRating?.coin || 0, marketValue: (data.greatRating?.coin || 0) * rate },
-        eliteRating: { coin: data.eliteRating?.coin || 0, marketValue: (data.eliteRating?.coin || 0) * rate },
-        playerOfTheDay: { coin: data.playerOfTheDay?.coin || 0, marketValue: (data.playerOfTheDay?.coin || 0) * rate },
-        yellowCard: { coin: data.yellowCard?.coin || 0, marketValue: (data.yellowCard?.coin || 0) * rate },
+        cleanSheet: {
+          coin: data.cleanSheet?.coin || 0,
+          marketValue: (data.cleanSheet?.coin || 0) * rate,
+        },
+        goodRating: {
+          coin: data.goodRating?.coin || 0,
+          marketValue: (data.goodRating?.coin || 0) * rate,
+        },
+        greatRating: {
+          coin: data.greatRating?.coin || 0,
+          marketValue: (data.greatRating?.coin || 0) * rate,
+        },
+        eliteRating: {
+          coin: data.eliteRating?.coin || 0,
+          marketValue: (data.eliteRating?.coin || 0) * rate,
+        },
+        playerOfTheDay: {
+          coin: data.playerOfTheDay?.coin || 0,
+          marketValue: (data.playerOfTheDay?.coin || 0) * rate,
+        },
+        yellowCard: {
+          coin: data.yellowCard?.coin || 0,
+          marketValue: (data.yellowCard?.coin || 0) * rate,
+        },
         sinBin: { coin: data.sinBin?.coin || 0, marketValue: (data.sinBin?.coin || 0) * rate },
         redCard: { coin: data.redCard?.coin || 0, marketValue: (data.redCard?.coin || 0) * rate },
-        disrespectToReferee: { coin: data.disrespectToReferee?.coin || 0, marketValue: (data.disrespectToReferee?.coin || 0) * rate },
-        grossMisconduct: { coin: data.grossMisconduct?.coin || 0, marketValue: (data.grossMisconduct?.coin || 0) * rate },
+        disrespectToReferee: {
+          coin: data.disrespectToReferee?.coin || 0,
+          marketValue: (data.disrespectToReferee?.coin || 0) * rate,
+        },
+        grossMisconduct: {
+          coin: data.grossMisconduct?.coin || 0,
+          marketValue: (data.grossMisconduct?.coin || 0) * rate,
+        },
         foul: { coin: data.foul?.coin || 0, marketValue: (data.foul?.coin || 0) * rate },
       });
     }
@@ -229,7 +262,10 @@ export default function PlayerEconomyPage() {
     <form onSubmit={handleSubmit(onSubmit)} className="w-full py-5 px-6 space-y-8">
       {/* Top Header Row with Custom Back Button */}
       <div className="flex items-center gap-4">
-        <Link href="/player-management" className="w-10 h-10 border-2 border-yellow-600 rounded-full flex items-center justify-center text-yellow-600 hover:bg-yellow-50 transition-all select-none cursor-pointer">
+        <Link
+          href="/player-management"
+          className="w-10 h-10 border-2 border-yellow-600 rounded-full flex items-center justify-center text-yellow-600 hover:bg-yellow-50 transition-all select-none cursor-pointer"
+        >
           <ArrowLeft className="w-5 h-5 stroke-[2.5]" />
         </Link>
         <div className="text-sm font-semibold text-gray-500 flex items-center gap-1.5">
@@ -246,11 +282,12 @@ export default function PlayerEconomyPage() {
             <h2 className="text-xl font-semibold text-gray-900 flex items-center gap-2">
               General Valuation Configurations
             </h2>
-            <p className="text-xs text-gray-400 mt-0.5">Define coin starting balance and base conversion multiplier</p>
+            <p className="text-xs text-gray-400 mt-0.5">
+              Define coin starting balance and base conversion multiplier
+            </p>
           </div>
           <div className="hidden sm:flex items-center gap-1.5 px-3 py-1 bg-amber-50 text-amber-700 border border-amber-200 rounded-xl text-xs font-semibold">
-            <Calculator className="w-3.5 h-3.5" />
-            1 Coin = £{watch("conversionRate") || 0}
+            <Calculator className="w-3.5 h-3.5" />1 Coin = £{watch("conversionRate") || 0}
           </div>
         </div>
 
@@ -272,13 +309,19 @@ export default function PlayerEconomyPage() {
                 placeholder="e.g. 1000"
               />
             </div>
-            {errors.startingCoins && <p className="text-xs text-red-500">{errors.startingCoins.message}</p>}
-            <p className="text-[11px] text-gray-400">Initial coins allocated to new player profiles</p>
+            {errors.startingCoins && (
+              <p className="text-xs text-red-500">{errors.startingCoins.message}</p>
+            )}
+            <p className="text-[11px] text-gray-400">
+              Initial coins allocated to new player profiles
+            </p>
           </div>
 
           {/* Conversion Rate Input */}
           <div className="space-y-2">
-            <label className="text-sm font-medium text-gray-700">Conversion Rate (£ per Coin)</label>
+            <label className="text-sm font-medium text-gray-700">
+              Conversion Rate (£ per Coin)
+            </label>
             <div className="relative">
               <input
                 type="number"
@@ -293,8 +336,12 @@ export default function PlayerEconomyPage() {
                 placeholder="e.g. 100"
               />
             </div>
-            {errors.conversionRate && <p className="text-xs text-red-500">{errors.conversionRate.message}</p>}
-            <p className="text-[11px] text-gray-400">Multiplier used to evaluate market valuations</p>
+            {errors.conversionRate && (
+              <p className="text-xs text-red-500">{errors.conversionRate.message}</p>
+            )}
+            <p className="text-[11px] text-gray-400">
+              Multiplier used to evaluate market valuations
+            </p>
           </div>
 
           {/* Starting Market Value (Disabled / Auto Calculated) */}
@@ -314,9 +361,12 @@ export default function PlayerEconomyPage() {
                 className="w-full py-3.5 px-4 bg-gray-100 border border-gray-200 rounded-xl text-gray-600 font-bold text-sm h-12 select-none cursor-not-allowed outline-none"
               />
             </div>
-            {errors.startingMarketValue && <p className="text-xs text-red-500">{errors.startingMarketValue.message}</p>}
+            {errors.startingMarketValue && (
+              <p className="text-xs text-red-500">{errors.startingMarketValue.message}</p>
+            )}
             <p className="text-[11px] text-emerald-600 font-medium">
-              = {(Number(watch("startingCoins")) || 0).toLocaleString()} Coins × £{Number(watch("conversionRate")) || 0}
+              = {(Number(watch("startingCoins")) || 0).toLocaleString()} Coins × £
+              {Number(watch("conversionRate")) || 0}
             </p>
           </div>
         </div>

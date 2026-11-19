@@ -1,10 +1,8 @@
-import React from 'react'
-import CreatePlayer from './CreatePlayer'
+import React from "react";
+import CreatePlayer from "./CreatePlayer";
 
 const page = () => {
-  return (
-    <CreatePlayer />
-  )
-}
+  return <CreatePlayer />;
+};
 
-export default page
+export default page;

@@ -1,8 +1,8 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { myFetch } from '@/utils/myFetch';
-import dynamic from 'next/dynamic';
-import { useEffect, useState } from 'react';
-import { toast } from 'sonner';
+import { myFetch } from "@/utils/myFetch";
+import dynamic from "next/dynamic";
+import { useEffect, useState } from "react";
+import { toast } from "sonner";
 const joditConfig = {
   height: 550,
   readonly: false,
@@ -30,12 +30,12 @@ const joditConfig = {
     "|",
     "undo",
     "redo",
-    "fullsize"
+    "fullsize",
   ],
   showCharsCounter: false,
   showWordsCounter: false,
   showXPathInStatusbar: false,
-}
+};
 
 // Dynamically import JoditEditor and disable SSR
 const JoditEditor = dynamic(() => import("jodit-react"), { ssr: false });
@@ -88,7 +88,12 @@ const CustomJodit = ({ url }: { url: string }) => {
         />
       </div>
       <div className="flex justify-end mt-4">
-        <button onClick={handleOnSave} className="inline-block w-100 px-10 py-2 bg-black hover:bg-black/80 text-white border border-gray-400 rounded transitionClr">Save</button>
+        <button
+          onClick={handleOnSave}
+          className="inline-block w-100 px-10 py-2 bg-black hover:bg-black/80 text-white border border-gray-400 rounded transitionClr"
+        >
+          Save
+        </button>
       </div>
     </>
   );

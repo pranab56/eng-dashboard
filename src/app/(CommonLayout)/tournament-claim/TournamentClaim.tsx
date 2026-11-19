@@ -12,16 +12,7 @@ import { useHeaders } from "@/hooks/useHeaders";
 import { getTournamentClaimColumns } from "@/tableColumns/tournamentClaimColumns";
 import { TTournamentClaim } from "@/types/columnTypes";
 import { getErrorMessage } from "@/utils/getErrorMessage";
-import {
-  Search,
-  RefreshCw,
-  Trophy,
-  Clock,
-  CheckCircle2,
-  XCircle,
-  Filter,
-  X,
-} from "lucide-react";
+import { Search, RefreshCw, Trophy, Clock, CheckCircle2, XCircle, Filter, X } from "lucide-react";
 import { useSearchParams } from "next/navigation";
 import { toast } from "sonner";
 import TournamentClaimViewModal from "./TournamentClaimViewModal";
@@ -49,8 +40,7 @@ export default function TournamentClaim() {
 
   const overview = overviewRes?.data;
 
-  const [updateTournamentClaimStatus] =
-    useUpdateTournamentClaimStatusMutation();
+  const [updateTournamentClaimStatus] = useUpdateTournamentClaimStatusMutation();
 
   // Selection & Modal States
   const [selectedClaim, setSelectedClaim] = useState<TTournamentClaim | null>(null);
@@ -68,10 +58,7 @@ export default function TournamentClaim() {
     });
   }, [setHeaders]);
 
-  const rawClaims: TTournamentClaim[] = useMemo(
-    () => claimRes?.data || [],
-    [claimRes]
-  );
+  const rawClaims: TTournamentClaim[] = useMemo(() => claimRes?.data || [], [claimRes]);
 
   // Backend-driven metrics (accurately aggregated on database)
   const totalClaimsCount = overview?.totalClaims ?? claimRes?.pagination?.total ?? rawClaims.length;
@@ -98,8 +85,7 @@ export default function TournamentClaim() {
         proofNotes.toLowerCase().includes(query);
 
       const claimStatus = (claim.status || "pending").toLowerCase();
-      const matchesStatus =
-        statusFilter === "ALL" || claimStatus === statusFilter.toLowerCase();
+      const matchesStatus = statusFilter === "ALL" || claimStatus === statusFilter.toLowerCase();
 
       return matchesSearch && matchesStatus;
     });
@@ -111,10 +97,7 @@ export default function TournamentClaim() {
     setIsViewModalOpen(true);
   };
 
-  const handleStatusUpdate = async (
-    id: string,
-    status: "approved" | "rejected" | "pending"
-  ) => {
+  const handleStatusUpdate = async (id: string, status: "approved" | "rejected" | "pending") => {
     try {
       setUpdatingId(id);
       const res = await updateTournamentClaimStatus({
@@ -123,15 +106,11 @@ export default function TournamentClaim() {
       }).unwrap();
 
       if (res?.success !== false) {
-        toast.success(
-          res?.message || `Tournament claim updated to ${status}`
-        );
+        toast.success(res?.message || `Tournament claim updated to ${status}`);
         refetchOverview();
       }
     } catch (err: any) {
-      toast.error(
-        getErrorMessage(err, `Failed to update claim status to ${status}`)
-      );
+      toast.error(getErrorMessage(err, `Failed to update claim status to ${status}`));
     } finally {
       setUpdatingId(null);
     }
@@ -171,9 +150,7 @@ export default function TournamentClaim() {
             title="Refresh claim records and backend analytics"
           >
             <RefreshCw
-              className={`w-3.5 h-3.5 text-slate-500 ${
-                isRefreshing ? "animate-spin" : ""
-              }`}
+              className={`w-3.5 h-3.5 text-slate-500 ${isRefreshing ? "animate-spin" : ""}`}
             />
             <span className="hidden sm:inline">Refresh</span>
           </button>
@@ -196,9 +173,7 @@ export default function TournamentClaim() {
             </span>
             <span className="text-xs text-slate-500">submissions</span>
           </div>
-          <p className="text-[11px] text-slate-400 mt-1">
-            All-time tournament rank submissions
-          </p>
+          <p className="text-[11px] text-slate-400 mt-1">All-time tournament rank submissions</p>
         </div>
 
         {/* Pending Claims */}
@@ -215,9 +190,7 @@ export default function TournamentClaim() {
             </span>
             <span className="text-xs text-slate-500">awaiting check</span>
           </div>
-          <p className="text-[11px] text-slate-400 mt-1">
-            Requires verification by administrator
-          </p>
+          <p className="text-[11px] text-slate-400 mt-1">Requires verification by administrator</p>
         </div>
 
         {/* Approved Claims */}
@@ -234,9 +207,7 @@ export default function TournamentClaim() {
             </span>
             <span className="text-xs text-slate-500">verified</span>
           </div>
-          <p className="text-[11px] text-slate-400 mt-1">
-            Ranks confirmed and points credited
-          </p>
+          <p className="text-[11px] text-slate-400 mt-1">Ranks confirmed and points credited</p>
         </div>
 
         {/* Rejected Claims */}
@@ -253,9 +224,7 @@ export default function TournamentClaim() {
             </span>
             <span className="text-xs text-slate-500">declined</span>
           </div>
-          <p className="text-[11px] text-slate-400 mt-1">
-            Submissions disqualified or invalid
-          </p>
+          <p className="text-[11px] text-slate-400 mt-1">Submissions disqualified or invalid</p>
         </div>
       </div>
 
@@ -281,9 +250,7 @@ export default function TournamentClaim() {
                   <span>{tab.label}</span>
                   <span
                     className={`px-1.5 py-0.2 rounded-full text-[10px] font-mono ${
-                      isActive
-                        ? "bg-slate-800 text-slate-200"
-                        : "bg-slate-100 text-slate-600"
+                      isActive ? "bg-slate-800 text-slate-200" : "bg-slate-100 text-slate-600"
                     }`}
                   >
                     {isOverviewLoading ? "—" : tab.count}
@@ -334,11 +301,7 @@ export default function TournamentClaim() {
         {filteredClaims.length > 0 || isClaimsLoading ? (
           <div className="w-full overflow-x-auto">
             <CustomTable<TTournamentClaim>
-              columns={getTournamentClaimColumns(
-                handleView,
-                handleStatusUpdate,
-                updatingId
-              )}
+              columns={getTournamentClaimColumns(handleView, handleStatusUpdate, updatingId)}
               data={filteredClaims}
               isLoading={isClaimsLoading}
             />
@@ -348,9 +311,7 @@ export default function TournamentClaim() {
             <div className="w-10 h-10 rounded-full bg-slate-100 text-slate-400 flex items-center justify-center mx-auto mb-3">
               <Filter className="w-5 h-5" />
             </div>
-            <h3 className="text-sm font-semibold text-slate-800">
-              No tournament claims found
-            </h3>
+            <h3 className="text-sm font-semibold text-slate-800">No tournament claims found</h3>
             <p className="text-xs text-slate-500 mt-1 max-w-sm mx-auto">
               {searchTerm || statusFilter !== "ALL"
                 ? "No claims match your search criteria. Try adjusting filters or search term."
@@ -377,10 +338,7 @@ export default function TournamentClaim() {
             Showing <strong className="text-slate-700">{filteredClaims.length}</strong> of{" "}
             <strong className="text-slate-700">{totalClaimsCount}</strong> total claims
           </span>
-          <CustomPagination
-            TOTAL_PAGES={claimRes?.pagination?.totalPage || 1}
-            qryName="page"
-          />
+          <CustomPagination TOTAL_PAGES={claimRes?.pagination?.totalPage || 1} qryName="page" />
         </div>
       </div>
 

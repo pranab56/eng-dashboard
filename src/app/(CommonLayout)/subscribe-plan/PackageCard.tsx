@@ -1,45 +1,41 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-"use client"
+"use client";
 
-import React, { useState } from 'react'
-import { CustomModal } from '@/components/modals/CustomModal'
-import { useTogglePackageStatusMutation } from '@/features/package/packageApi'
-import { 
-  Edit2, 
-  Coins, 
-  Check, 
-  X, 
-  Power,
-} from 'lucide-react'
-import toast from 'react-hot-toast'
-import CreatePackage from './CreatePackage'
+import React, { useState } from "react";
+import { CustomModal } from "@/components/modals/CustomModal";
+import { useTogglePackageStatusMutation } from "@/features/package/packageApi";
+import { Edit2, Coins, Check, X, Power } from "lucide-react";
+import toast from "react-hot-toast";
+import CreatePackage from "./CreatePackage";
 
 interface PackageCardProps {
-  packageData: any
+  packageData: any;
 }
 
 const PackageCard = ({ packageData }: PackageCardProps) => {
-  const [toggleStatus, { isLoading: isToggling }] = useTogglePackageStatusMutation()
-  const [isEditModalOpen, setIsEditModalOpen] = useState(false)
+  const [toggleStatus, { isLoading: isToggling }] = useTogglePackageStatusMutation();
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
   const handleToggle = async () => {
     try {
-      const res = await toggleStatus({ id: packageData._id }).unwrap()
-      toast.success(res.message || "Status toggled successfully")
+      const res = await toggleStatus({ id: packageData._id }).unwrap();
+      toast.success(res.message || "Status toggled successfully");
     } catch (error: any) {
-      toast.error(error?.data?.message || "Failed to toggle status")
+      toast.error(error?.data?.message || "Failed to toggle status");
     }
-  }
+  };
 
-  const isActive = packageData.status === 'Active'
-  const featuresList = Array.isArray(packageData.features) ? packageData.features : []
+  const isActive = packageData.status === "Active";
+  const featuresList = Array.isArray(packageData.features) ? packageData.features : [];
 
   return (
-    <div className={`bg-white border rounded-lg transition-colors flex flex-col justify-between overflow-hidden ${
-      isActive 
-        ? 'border-slate-200 hover:border-slate-300' 
-        : 'border-slate-200 bg-slate-50/50 opacity-80 hover:opacity-100'
-    }`}>
+    <div
+      className={`bg-white border rounded-lg transition-colors flex flex-col justify-between overflow-hidden ${
+        isActive
+          ? "border-slate-200 hover:border-slate-300"
+          : "border-slate-200 bg-slate-50/50 opacity-80 hover:opacity-100"
+      }`}
+    >
       {/* Top Body Section */}
       <div className="p-4 sm:p-5 space-y-3.5">
         {/* Tier Tags & Status */}
@@ -58,14 +54,12 @@ const PackageCard = ({ packageData }: PackageCardProps) => {
           <span
             className={`inline-flex items-center gap-1.5 text-[11px] font-medium px-2 py-0.5 rounded border ${
               isActive
-                ? 'bg-emerald-50 text-emerald-700 border-emerald-200/80'
-                : 'bg-slate-100 text-slate-600 border-slate-200'
+                ? "bg-emerald-50 text-emerald-700 border-emerald-200/80"
+                : "bg-slate-100 text-slate-600 border-slate-200"
             }`}
           >
             <span
-              className={`w-1.5 h-1.5 rounded-full ${
-                isActive ? 'bg-emerald-500' : 'bg-slate-400'
-              }`}
+              className={`w-1.5 h-1.5 rounded-full ${isActive ? "bg-emerald-500" : "bg-slate-400"}`}
             />
             {packageData.status}
           </span>
@@ -87,9 +81,7 @@ const PackageCard = ({ packageData }: PackageCardProps) => {
             <span className="text-xl sm:text-2xl font-bold font-mono text-slate-900 tracking-tight">
               £{packageData.price}
             </span>
-            <span className="text-xs text-slate-500">
-              / {packageData.duration || 'period'}
-            </span>
+            <span className="text-xs text-slate-500">/ {packageData.duration || "period"}</span>
           </div>
 
           <span className="text-[11px] font-medium text-slate-500 bg-slate-50 px-2 py-0.5 rounded border border-slate-200/60">
@@ -118,8 +110,8 @@ const PackageCard = ({ packageData }: PackageCardProps) => {
           {featuresList.length > 0 ? (
             <ul className="space-y-1.5 max-h-36 overflow-y-auto pr-1">
               {featuresList.map((feat: any, idx: number) => {
-                const isIncluded = typeof feat === 'object' ? (feat.isIncluded ?? true) : true
-                const title = typeof feat === 'object' ? feat.title : feat
+                const isIncluded = typeof feat === "object" ? (feat.isIncluded ?? true) : true;
+                const title = typeof feat === "object" ? feat.title : feat;
                 return (
                   <li key={idx} className="flex items-start gap-2 text-xs leading-tight">
                     {isIncluded ? (
@@ -127,17 +119,15 @@ const PackageCard = ({ packageData }: PackageCardProps) => {
                     ) : (
                       <X className="w-3.5 h-3.5 text-slate-400 mt-0.5 shrink-0 stroke-[2]" />
                     )}
-                    <span className={isIncluded ? 'text-slate-700' : 'text-slate-400 line-through'}>
+                    <span className={isIncluded ? "text-slate-700" : "text-slate-400 line-through"}>
                       {title}
                     </span>
                   </li>
-                )
+                );
               })}
             </ul>
           ) : (
-            <div className="text-xs text-slate-400 italic py-1">
-              No specific benefits declared
-            </div>
+            <div className="text-xs text-slate-400 italic py-1">No specific benefits declared</div>
           )}
         </div>
       </div>
@@ -168,17 +158,17 @@ const PackageCard = ({ packageData }: PackageCardProps) => {
           disabled={isToggling}
           className={`flex-1 inline-flex items-center justify-center gap-1.5 h-8 px-3 text-xs font-medium rounded-md transition-colors cursor-pointer border disabled:opacity-50 ${
             isActive
-              ? 'text-slate-700 bg-white hover:bg-rose-50 hover:text-rose-700 hover:border-rose-200 border-slate-300'
-              : 'text-emerald-700 bg-white hover:bg-emerald-50 border-emerald-300'
+              ? "text-slate-700 bg-white hover:bg-rose-50 hover:text-rose-700 hover:border-rose-200 border-slate-300"
+              : "text-emerald-700 bg-white hover:bg-emerald-50 border-emerald-300"
           }`}
           title={isActive ? "Deactivate this plan" : "Reactivate this plan"}
         >
-          <Power className={`w-3 h-3 ${isActive ? 'text-slate-500' : 'text-emerald-600'}`} />
-          <span>{isActive ? 'Deactivate' : 'Activate'}</span>
+          <Power className={`w-3 h-3 ${isActive ? "text-slate-500" : "text-emerald-600"}`} />
+          <span>{isActive ? "Deactivate" : "Activate"}</span>
         </button>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default PackageCard
+export default PackageCard;

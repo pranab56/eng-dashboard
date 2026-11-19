@@ -80,11 +80,7 @@ const presetOptions = [
   },
 ];
 
-const UpdateStatusModal: React.FC<UpdateStatusModalProps> = ({
-  isOpen,
-  onClose,
-  match,
-}) => {
+const UpdateStatusModal: React.FC<UpdateStatusModalProps> = ({ isOpen, onClose, match }) => {
   const [selectedStatus, setSelectedStatus] = useState<string>("scheduled");
   const [selectedPeriod, setSelectedPeriod] = useState<string>("first_half");
 
@@ -100,16 +96,15 @@ const UpdateStatusModal: React.FC<UpdateStatusModalProps> = ({
 
   useEffect(() => {
     if (match) {
-      const currentStatus =
-        match.status === "upcoming" ? "scheduled" : match.status || "scheduled";
+      const currentStatus = match.status === "upcoming" ? "scheduled" : match.status || "scheduled";
       setSelectedStatus(currentStatus);
       setSelectedPeriod(
         match.period ||
           (currentStatus === "half_time"
             ? "first_half"
             : currentStatus === "finished"
-            ? "second_half"
-            : "first_half")
+              ? "second_half"
+              : "first_half")
       );
 
       setScheduledAt(formatForInput(match.scheduledAt || match.matchDate));
@@ -127,14 +122,14 @@ const UpdateStatusModal: React.FC<UpdateStatusModalProps> = ({
     selectedStatus === "upcoming" || selectedStatus === "scheduled"
       ? "upcoming"
       : selectedStatus === "half_time"
-      ? "half_time"
-      : selectedStatus === "finished"
-      ? "finished"
-      : selectedStatus === "cancelled"
-      ? "cancelled"
-      : selectedPeriod === "second_half"
-      ? "live_2nd_half"
-      : "live_1st_half";
+        ? "half_time"
+        : selectedStatus === "finished"
+          ? "finished"
+          : selectedStatus === "cancelled"
+            ? "cancelled"
+            : selectedPeriod === "second_half"
+              ? "live_2nd_half"
+              : "live_1st_half";
 
   const handleSaveStatus = async () => {
     try {
@@ -252,7 +247,9 @@ const UpdateStatusModal: React.FC<UpdateStatusModalProps> = ({
               onClick={() => setShowAdvancedTimestamps(!showAdvancedTimestamps)}
               className="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-700 hover:text-slate-900 cursor-pointer"
             >
-              <span>{showAdvancedTimestamps ? "Hide" : "Show"} Advanced Match Timestamps (UK Time)</span>
+              <span>
+                {showAdvancedTimestamps ? "Hide" : "Show"} Advanced Match Timestamps (UK Time)
+              </span>
               {showAdvancedTimestamps ? (
                 <ChevronUp className="w-3.5 h-3.5" />
               ) : (

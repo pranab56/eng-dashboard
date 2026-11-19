@@ -70,7 +70,11 @@ export default function AppPopupManagement() {
   }, [setHeaders]);
 
   // Fetch modals
-  const { data: apiResponse, isLoading, refetch } = useGetAllAppModalsQuery(
+  const {
+    data: apiResponse,
+    isLoading,
+    refetch,
+  } = useGetAllAppModalsQuery(
     {
       pageNumber: Number(page) || 1,
       limit: 10,
@@ -187,7 +191,8 @@ export default function AppPopupManagement() {
             App Open Popups
           </h1>
           <p className="text-xs sm:text-sm text-slate-500 mt-1">
-            Configure promotional announcements and startup ads shown when users launch the mobile app.
+            Configure promotional announcements and startup ads shown when users launch the mobile
+            app.
           </p>
         </div>
 
@@ -212,9 +217,7 @@ export default function AppPopupManagement() {
             <Layers className="w-4 h-4 text-slate-400" />
           </div>
           <div className="mt-2 flex items-baseline gap-2">
-            <span className="text-xl font-bold font-mono text-slate-900">
-              {metrics.total}
-            </span>
+            <span className="text-xl font-bold font-mono text-slate-900">{metrics.total}</span>
             <span className="text-xs text-slate-500">popups</span>
           </div>
           <p className="text-[11px] text-slate-400 mt-1">Configured in registry</p>
@@ -300,11 +303,10 @@ export default function AppPopupManagement() {
 
             {/* Destination Type Filter */}
             <div className="flex items-center gap-2">
-              <span className="text-xs text-slate-500 font-medium hidden sm:inline">Destination:</span>
-              <Select
-                value={actionTypeFilter}
-                onValueChange={(val) => setActionTypeFilter(val)}
-              >
+              <span className="text-xs text-slate-500 font-medium hidden sm:inline">
+                Destination:
+              </span>
+              <Select value={actionTypeFilter} onValueChange={(val) => setActionTypeFilter(val)}>
                 <SelectTrigger className="w-[180px] h-9 px-3 rounded-lg border border-slate-200 text-xs text-slate-700 bg-white hover:border-slate-300 focus:ring-1 focus:ring-slate-900">
                   <SelectValue placeholder="All Destinations" />
                 </SelectTrigger>
@@ -354,11 +356,7 @@ export default function AppPopupManagement() {
         </div>
 
         {/* Data Table */}
-        <CustomTable
-          columns={columns}
-          data={rawModals}
-          isLoading={isLoading}
-        />
+        <CustomTable columns={columns} data={rawModals} isLoading={isLoading} />
 
         {/* Pagination Bar */}
         <div className="p-4 border-t border-slate-200 bg-slate-50/50 flex items-center justify-between">
@@ -366,10 +364,7 @@ export default function AppPopupManagement() {
             Showing <span className="font-semibold text-slate-700">{rawModals.length}</span> of{" "}
             <span className="font-semibold text-slate-700">{paginationMeta.total}</span> popups
           </p>
-          <CustomPagination
-            TOTAL_PAGES={paginationMeta.totalPage}
-            showPageInfo={false}
-          />
+          <CustomPagination TOTAL_PAGES={paginationMeta.totalPage} showPageInfo={false} />
         </div>
       </div>
 

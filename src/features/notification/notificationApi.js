@@ -7,7 +7,7 @@ export const notificationApi = baseApi.injectEndpoints({
         url: page ? `/notification/my?page=${page}` : "/notification/my?page=1",
         method: "GET",
       }),
-      providesTags: ["notification"]
+      providesTags: ["notification"],
     }),
 
     notificationUnReadCount: builder.query({
@@ -15,7 +15,7 @@ export const notificationApi = baseApi.injectEndpoints({
         url: "/notification/unread-count",
         method: "GET",
       }),
-      providesTags: ["notification"]
+      providesTags: ["notification"],
     }),
 
     readAllNotification: builder.mutation({
@@ -23,7 +23,7 @@ export const notificationApi = baseApi.injectEndpoints({
         url: "/notification/read-all",
         method: "PATCH",
       }),
-      invalidatesTags: ["notification"]
+      invalidatesTags: ["notification"],
     }),
 
     readSingleNotification: builder.mutation({
@@ -31,7 +31,7 @@ export const notificationApi = baseApi.injectEndpoints({
         url: `/notification/${id}/read`,
         method: "PATCH",
       }),
-      invalidatesTags: ["notification"]
+      invalidatesTags: ["notification"],
     }),
 
     deleteNotification: builder.mutation({
@@ -39,7 +39,7 @@ export const notificationApi = baseApi.injectEndpoints({
         url: "/notification/clear-all",
         method: "DELETE",
       }),
-      invalidatesTags: ["notification"]
+      invalidatesTags: ["notification"],
     }),
 
     singleDeleteNotification: builder.mutation({
@@ -47,16 +47,16 @@ export const notificationApi = baseApi.injectEndpoints({
         url: `/notification/delete/${id}`,
         method: "DELETE",
       }),
-      invalidatesTags: ["notification"]
+      invalidatesTags: ["notification"],
     }),
 
     createNotification: builder.mutation({
       query: (data) => ({
         url: "/push-notification/send",
         method: "POST",
-        body: data
+        body: data,
       }),
-      invalidatesTags: ["notification"]
+      invalidatesTags: ["notification"],
     }),
   }),
 });

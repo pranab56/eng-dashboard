@@ -4,11 +4,7 @@
 import { useState, useMemo, useEffect } from "react";
 import { useCreatePushNotificationMutation } from "@/features/pushNotification/pushNotificationApi";
 import { useGetUserQuery } from "@/features/userManagement/userApi";
-import {
-  Dialog,
-  DialogContent,
-  DialogTitle,
-} from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import {
   Clock,
   Send,
@@ -56,37 +52,43 @@ const TEMPLATES = [
     label: "System Maintenance",
     icon: Wrench,
     title: "Scheduled System Maintenance Notice",
-    message: "Platform maintenance is scheduled tonight from 02:00 to 03:00 UTC. The app may experience brief interruptions during this period.",
+    message:
+      "Platform maintenance is scheduled tonight from 02:00 to 03:00 UTC. The app may experience brief interruptions during this period.",
   },
   {
     label: "App Update Available",
     icon: RefreshCw,
     title: "New App Update Available (v2.4)",
-    message: "A new version with faster live match tracking, improved player statistics, and performance fixes is now available. Please update your app.",
+    message:
+      "A new version with faster live match tracking, improved player statistics, and performance fixes is now available. Please update your app.",
   },
   {
     label: "Critical App Update",
     icon: AlertTriangle,
     title: "Critical App Update Required",
-    message: "An essential update has been released to ensure system security and smooth performance. Please update your app from the store.",
+    message:
+      "An essential update has been released to ensure system security and smooth performance. Please update your app from the store.",
   },
   {
     label: "Match Day Notice",
     icon: Trophy,
     title: "Upcoming Match Schedule Reminder",
-    message: "Please review your team lineup and fixture schedule for today's upcoming matches. Good luck to all participating teams!",
+    message:
+      "Please review your team lineup and fixture schedule for today's upcoming matches. Good luck to all participating teams!",
   },
   {
     label: "League Announcement",
     icon: Bell,
     title: "Important League Announcement",
-    message: "New tournament fixtures, team rosters, and league table standings have been updated. Open the app to view full details.",
+    message:
+      "New tournament fixtures, team rosters, and league table standings have been updated. Open the app to view full details.",
   },
   {
     label: "Special Promotion",
     icon: Sparkles,
     title: "Special Weekend Event & Coin Rewards",
-    message: "Earn bonus coins and exclusive rewards for active participation this weekend. Check the app for complete event guidelines.",
+    message:
+      "Earn bonus coins and exclusive rewards for active participation this weekend. Check the app for complete event guidelines.",
   },
 ];
 
@@ -98,14 +100,22 @@ export default function CreatePushNotificationModal({
   const [deliveryMode, setDeliveryMode] = useState<"IMMEDIATE" | "SCHEDULED">("IMMEDIATE");
 
   // Target audience: "ALL" | "PLAYER" | "MANAGER" | "REFEREE" | "SINGLE"
-  const [audienceType, setAudienceType] = useState<"ALL" | "PLAYER" | "MANAGER" | "REFEREE" | "SINGLE">("ALL");
-  const [category, setCategory] = useState<"GENERAL_NEWS" | "TRANSFERS_GOSSIP" | "PLAYER_OF_THE_WEEK" | "MATCH_UPDATE">("GENERAL_NEWS");
+  const [audienceType, setAudienceType] = useState<
+    "ALL" | "PLAYER" | "MANAGER" | "REFEREE" | "SINGLE"
+  >("ALL");
+  const [category, setCategory] = useState<
+    "GENERAL_NEWS" | "TRANSFERS_GOSSIP" | "PLAYER_OF_THE_WEEK" | "MATCH_UPDATE"
+  >("GENERAL_NEWS");
 
   const [title, setTitle] = useState("");
   const [message, setMessage] = useState("");
   const [scheduledDate, setScheduledDate] = useState("");
   const [scheduledTime, setScheduledTime] = useState("");
-  const [selectedUser, setSelectedUser] = useState<{ id: string; name: string; email?: string } | null>(null);
+  const [selectedUser, setSelectedUser] = useState<{
+    id: string;
+    name: string;
+    email?: string;
+  } | null>(null);
 
   // Preview Mode: "LOCK_SCREEN" vs "BANNER"
   const [previewMode, setPreviewMode] = useState<"LOCK_SCREEN" | "BANNER">("LOCK_SCREEN");
@@ -278,10 +288,8 @@ export default function CreatePushNotificationModal({
         {/* Form Body - 2 Columns */}
         <form onSubmit={handleSubmit} className="flex-1 overflow-y-auto p-6 bg-white slim-scroll">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-            
             {/* Left Column (7 cols): Controls & Inputs */}
             <div className="lg:col-span-7 space-y-4">
-              
               {/* Delivery Schedule Segmented Control */}
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2.5 p-3 bg-slate-50/80 rounded-xl border border-slate-200">
                 <div>
@@ -302,7 +310,9 @@ export default function CreatePushNotificationModal({
                         : "text-slate-600 hover:text-slate-900"
                     }`}
                   >
-                    <Send className={`w-3.5 h-3.5 ${deliveryMode === "IMMEDIATE" ? "text-amber-600" : "text-slate-400"}`} />
+                    <Send
+                      className={`w-3.5 h-3.5 ${deliveryMode === "IMMEDIATE" ? "text-amber-600" : "text-slate-400"}`}
+                    />
                     <span>Send Now</span>
                   </button>
 
@@ -315,7 +325,9 @@ export default function CreatePushNotificationModal({
                         : "text-slate-600 hover:text-slate-900"
                     }`}
                   >
-                    <Clock className={`w-3.5 h-3.5 ${deliveryMode === "SCHEDULED" ? "text-amber-600" : "text-slate-400"}`} />
+                    <Clock
+                      className={`w-3.5 h-3.5 ${deliveryMode === "SCHEDULED" ? "text-amber-600" : "text-slate-400"}`}
+                    />
                     <span>Schedule</span>
                   </button>
                 </div>
@@ -423,7 +435,9 @@ export default function CreatePushNotificationModal({
                             : "text-slate-600 hover:text-slate-900 hover:bg-slate-200/50"
                         }`}
                       >
-                        <IconComp className={`w-3 h-3 ${isSelected ? "text-amber-600" : "text-slate-400"}`} />
+                        <IconComp
+                          className={`w-3 h-3 ${isSelected ? "text-amber-600" : "text-slate-400"}`}
+                        />
                         <span className="truncate">{t.label}</span>
                       </button>
                     );
@@ -447,7 +461,8 @@ export default function CreatePushNotificationModal({
                       <span className="truncate">
                         {selectedUser ? (
                           <span className="text-slate-900 font-semibold">
-                            {selectedUser.name} {selectedUser.email ? `(${selectedUser.email})` : ""}
+                            {selectedUser.name}{" "}
+                            {selectedUser.email ? `(${selectedUser.email})` : ""}
                           </span>
                         ) : (
                           <span className="text-slate-400">Search & select user...</span>
@@ -471,12 +486,19 @@ export default function CreatePushNotificationModal({
                         </div>
                         <div className="overflow-y-auto flex-1 p-1 space-y-0.5 slim-scroll">
                           {isUsersLoading ? (
-                            <div className="py-3 text-center text-xs text-slate-400">Loading users...</div>
+                            <div className="py-3 text-center text-xs text-slate-400">
+                              Loading users...
+                            </div>
                           ) : filteredUsers.length === 0 ? (
-                            <div className="py-3 text-center text-xs text-slate-400">No users found</div>
+                            <div className="py-3 text-center text-xs text-slate-400">
+                              No users found
+                            </div>
                           ) : (
                             filteredUsers.map((u: any) => {
-                              const name = u.userName || `${u.firstName || ""} ${u.lastName || ""}`.trim() || "User";
+                              const name =
+                                u.userName ||
+                                `${u.firstName || ""} ${u.lastName || ""}`.trim() ||
+                                "User";
                               const isSelected = selectedUser?.id === u._id;
                               return (
                                 <button
@@ -487,16 +509,28 @@ export default function CreatePushNotificationModal({
                                     setIsUserDropdownOpen(false);
                                   }}
                                   className={`w-full flex items-center justify-between px-3 py-1.5 text-xs rounded-md transition-colors cursor-pointer text-left ${
-                                    isSelected ? "bg-amber-500 text-white font-semibold" : "text-slate-700 hover:bg-slate-100"
+                                    isSelected
+                                      ? "bg-amber-500 text-white font-semibold"
+                                      : "text-slate-700 hover:bg-slate-100"
                                   }`}
                                 >
                                   <div className="flex flex-col min-w-0 pr-2">
                                     <span className="font-medium truncate">{name}</span>
-                                    <span className={isSelected ? "text-slate-200 text-[10px]" : "text-slate-500 text-[10px]"}>
-                                      {u.parentId ? "Child Player (routes to parent device)" : (u.email || "User Account")}
+                                    <span
+                                      className={
+                                        isSelected
+                                          ? "text-slate-200 text-[10px]"
+                                          : "text-slate-500 text-[10px]"
+                                      }
+                                    >
+                                      {u.parentId
+                                        ? "Child Player (routes to parent device)"
+                                        : u.email || "User Account"}
                                     </span>
                                   </div>
-                                  {isSelected && <Check className="w-3.5 h-3.5 text-white shrink-0" />}
+                                  {isSelected && (
+                                    <Check className="w-3.5 h-3.5 text-white shrink-0" />
+                                  )}
                                 </button>
                               );
                             })
@@ -549,9 +583,7 @@ export default function CreatePushNotificationModal({
               {/* Redefined Quick Templates */}
               <div>
                 <div className="flex items-center justify-between mb-1.5">
-                  <span className="text-[11px] font-semibold text-slate-700">
-                    Quick Templates:
-                  </span>
+                  <span className="text-[11px] font-semibold text-slate-700">Quick Templates:</span>
                   <span className="text-[10px] text-slate-400">Click to apply content</span>
                 </div>
                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-1.5">
@@ -575,7 +607,6 @@ export default function CreatePushNotificationModal({
                   })}
                 </div>
               </div>
-
             </div>
 
             {/* Right Column (5 cols): Interactive Mobile Phone Mockup Preview (Clean White/Silver Theme) */}
@@ -591,7 +622,9 @@ export default function CreatePushNotificationModal({
                     type="button"
                     onClick={() => setPreviewMode("LOCK_SCREEN")}
                     className={`px-2.5 py-0.5 rounded-md font-medium transition-colors cursor-pointer ${
-                      previewMode === "LOCK_SCREEN" ? "bg-white text-slate-900 shadow-xs font-semibold" : "text-slate-600 hover:text-slate-900"
+                      previewMode === "LOCK_SCREEN"
+                        ? "bg-white text-slate-900 shadow-xs font-semibold"
+                        : "text-slate-600 hover:text-slate-900"
                     }`}
                   >
                     Lock Screen
@@ -600,7 +633,9 @@ export default function CreatePushNotificationModal({
                     type="button"
                     onClick={() => setPreviewMode("BANNER")}
                     className={`px-2.5 py-0.5 rounded-md font-medium transition-colors cursor-pointer ${
-                      previewMode === "BANNER" ? "bg-white text-slate-900 shadow-xs font-semibold" : "text-slate-600 hover:text-slate-900"
+                      previewMode === "BANNER"
+                        ? "bg-white text-slate-900 shadow-xs font-semibold"
+                        : "text-slate-600 hover:text-slate-900"
                     }`}
                   >
                     In-App Banner
@@ -610,10 +645,8 @@ export default function CreatePushNotificationModal({
 
               {/* Smartphone Chassis - Sleek Silver / Clean Aesthetic Bezel */}
               <div className="bg-gradient-to-b from-slate-200 via-slate-100 to-slate-200 rounded-[32px] p-2.5 border border-slate-300/80 shadow-xl shadow-slate-200/60 select-none">
-                
                 {/* Smartphone Screen - Light Modern Palette */}
                 <div className="rounded-[24px] overflow-hidden border border-slate-200/90 bg-gradient-to-b from-slate-50 via-white to-amber-50/30 relative flex flex-col min-h-[350px]">
-                  
                   {/* Status Bar / Dynamic Island */}
                   <div className="flex items-center justify-between px-3.5 pt-2 pb-1.5 text-[11px] font-semibold text-slate-800">
                     <span className="font-sans">09:41</span>
@@ -631,7 +664,6 @@ export default function CreatePushNotificationModal({
                   {previewMode === "LOCK_SCREEN" ? (
                     /* Clean Lock Screen View */
                     <div className="flex-1 flex flex-col justify-between p-3.5 pt-2">
-                      
                       {/* Top Clock Section */}
                       <div className="text-center pt-1">
                         <div className="inline-flex items-center justify-center w-5 h-5 rounded-full bg-slate-100 text-slate-500 mb-1 border border-slate-200/60">
@@ -677,7 +709,9 @@ export default function CreatePushNotificationModal({
                           <div className="w-7 h-7 rounded-full bg-slate-100/90 border border-slate-200 flex items-center justify-center text-slate-500 shadow-xs">
                             <Zap className="w-3.5 h-3.5" />
                           </div>
-                          <span className="text-[10px] text-slate-400 font-medium">Swipe up to unlock</span>
+                          <span className="text-[10px] text-slate-400 font-medium">
+                            Swipe up to unlock
+                          </span>
                           <div className="w-7 h-7 rounded-full bg-slate-100/90 border border-slate-200 flex items-center justify-center text-slate-500 shadow-xs">
                             <Camera className="w-3.5 h-3.5" />
                           </div>
@@ -686,12 +720,10 @@ export default function CreatePushNotificationModal({
                         {/* Home Bar Indicator */}
                         <div className="h-1 w-24 bg-slate-300 rounded-full mx-auto mt-2" />
                       </div>
-
                     </div>
                   ) : (
                     /* Clean In-App Banner View */
                     <div className="flex-1 flex flex-col justify-between p-3 pt-1">
-                      
                       {/* Top Drop-down Push Banner */}
                       <div className="w-full bg-white rounded-xl p-3 shadow-lg shadow-slate-200/80 border border-amber-200/80 text-left relative z-10">
                         <div className="flex items-center justify-between mb-1">
@@ -724,12 +756,18 @@ export default function CreatePushNotificationModal({
                       <div className="my-2 p-2.5 rounded-xl bg-slate-50 border border-slate-200 text-left space-y-2">
                         <div className="flex items-center justify-between text-[11px] font-semibold text-slate-700">
                           <span>Live Match Center</span>
-                          <span className="px-1.5 py-0.2 bg-emerald-100 text-emerald-700 rounded text-[9px] font-bold">LIVE 68&apos;</span>
+                          <span className="px-1.5 py-0.2 bg-emerald-100 text-emerald-700 rounded text-[9px] font-bold">
+                            LIVE 68&apos;
+                          </span>
                         </div>
                         <div className="p-2 bg-white rounded-lg border border-slate-200 flex items-center justify-between text-xs">
-                          <span className="font-semibold text-slate-800 truncate max-w-[80px]">Chelsea</span>
+                          <span className="font-semibold text-slate-800 truncate max-w-[80px]">
+                            Chelsea
+                          </span>
                           <span className="font-bold text-amber-600 px-2">2 - 1</span>
-                          <span className="font-semibold text-slate-800 truncate max-w-[80px]">Arsenal</span>
+                          <span className="font-semibold text-slate-800 truncate max-w-[80px]">
+                            Arsenal
+                          </span>
                         </div>
                       </div>
 
@@ -744,10 +782,8 @@ export default function CreatePushNotificationModal({
                         {/* Home Bar Indicator */}
                         <div className="h-1 w-24 bg-slate-300 rounded-full mx-auto mt-2" />
                       </div>
-
                     </div>
                   )}
-
                 </div>
               </div>
 
@@ -769,23 +805,26 @@ export default function CreatePushNotificationModal({
                     {audienceType === "PLAYER" && "Registered Players"}
                     {audienceType === "MANAGER" && "Team Managers"}
                     {audienceType === "REFEREE" && "Official Referees"}
-                    {audienceType === "SINGLE" && (selectedUser ? selectedUser.name : "Single User")}
+                    {audienceType === "SINGLE" &&
+                      (selectedUser ? selectedUser.name : "Single User")}
                   </span>
                 </div>
                 <div className="flex justify-between items-center">
                   <span className="text-slate-500">Delivery Timing:</span>
                   <span className="font-medium text-slate-700">
-                    {deliveryMode === "IMMEDIATE" ? "Immediate Dispatch" : `Scheduled: ${scheduledDate} ${scheduledTime} UK`}
+                    {deliveryMode === "IMMEDIATE"
+                      ? "Immediate Dispatch"
+                      : `Scheduled: ${scheduledDate} ${scheduledTime} UK`}
                   </span>
                 </div>
                 <div className="flex justify-between items-center">
                   <span className="text-slate-500">Priority & Engine:</span>
-                  <span className="text-emerald-700 font-medium">High (Firebase Cloud Messaging)</span>
+                  <span className="text-emerald-700 font-medium">
+                    High (Firebase Cloud Messaging)
+                  </span>
                 </div>
               </div>
-
             </div>
-
           </div>
 
           {/* Footer Submit Actions */}

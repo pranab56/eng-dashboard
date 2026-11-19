@@ -1,12 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 import React, { useState, useMemo } from "react";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import Image from "next/image";
 import { TUserManagement } from "@/types/columnTypes";
 import { formatImagePath } from "@/utils/formatImagePath";
@@ -61,10 +56,9 @@ const BirthDatePicker: React.FC<BirthDatePickerProps> = ({
   onCancel,
   isLoading = false,
 }) => {
-  const initialDate =
-    value && dayjs(value).isValid() ? dayjs(value) : dayjs("2012-01-01");
+  const initialDate = value && dayjs(value).isValid() ? dayjs(value) : dayjs("2012-01-01");
   const [selectedDate, setSelectedDate] = useState<string>(
-    value && dayjs(value).isValid() ? dayjs(value).format("YYYY-MM-DD") : "",
+    value && dayjs(value).isValid() ? dayjs(value).format("YYYY-MM-DD") : ""
   );
 
   const [viewYear, setViewYear] = useState<number>(initialDate.year());
@@ -120,11 +114,7 @@ const BirthDatePicker: React.FC<BirthDatePickerProps> = ({
   };
 
   const handleSelectDay = (day: number) => {
-    const formatted = dayjs()
-      .year(viewYear)
-      .month(viewMonth)
-      .date(day)
-      .format("YYYY-MM-DD");
+    const formatted = dayjs().year(viewYear).month(viewMonth).date(day).format("YYYY-MM-DD");
     setSelectedDate(formatted);
   };
 
@@ -202,11 +192,7 @@ const BirthDatePicker: React.FC<BirthDatePickerProps> = ({
 
         {Array.from({ length: daysInMonth }).map((_, idx) => {
           const dayNum = idx + 1;
-          const dateStr = dayjs()
-            .year(viewYear)
-            .month(viewMonth)
-            .date(dayNum)
-            .format("YYYY-MM-DD");
+          const dateStr = dayjs().year(viewYear).month(viewMonth).date(dayNum).format("YYYY-MM-DD");
           const isSelected = selectedDate === dateStr;
 
           return (
@@ -230,9 +216,7 @@ const BirthDatePicker: React.FC<BirthDatePickerProps> = ({
       {/* Bottom Info & Action Buttons */}
       <div className="pt-2.5 border-t border-slate-100 flex items-center justify-between">
         <div className="text-[11px] font-bold text-slate-700">
-          {selectedDate
-            ? dayjs(selectedDate).format("DD MMM YYYY")
-            : "Select date"}
+          {selectedDate ? dayjs(selectedDate).format("DD MMM YYYY") : "Select date"}
         </div>
 
         <div className="flex items-center gap-1.5">
@@ -317,11 +301,8 @@ const UserVerificationModal: React.FC<UserVerificationModalProps> = ({
   React.useEffect(() => {
     if (user) {
       const initialCoins =
-        Number(
-          (user as any).engCoine ?? (user as any).coin ?? (user as any).coins,
-        ) || 0;
-      const initialMarketValue =
-        Number((user as any).marketValue) || initialCoins * 100;
+        Number((user as any).engCoine ?? (user as any).coin ?? (user as any).coins) || 0;
+      const initialMarketValue = Number((user as any).marketValue) || initialCoins * 100;
 
       setCurrentCoins(initialCoins);
       setCurrentMarketValue(initialMarketValue);
@@ -329,9 +310,7 @@ const UserVerificationModal: React.FC<UserVerificationModalProps> = ({
 
       const curTeamId = (user.selectTeam as any)?._id || user.selectTeam || "";
       setSelectedTeamIdInput(
-        typeof curTeamId === "string"
-          ? curTeamId
-          : (curTeamId as any)?._id || "",
+        typeof curTeamId === "string" ? curTeamId : (curTeamId as any)?._id || ""
       );
 
       setCurrentDob(user.dateOfBirth ? user.dateOfBirth.toString() : null);
@@ -347,17 +326,13 @@ const UserVerificationModal: React.FC<UserVerificationModalProps> = ({
       const res = await updateUserProfileByAdmin({
         id: (user as any)._id || (user as any).id,
         data: {
-          dateOfBirth: selectedDateStr
-            ? new Date(selectedDateStr).toISOString()
-            : null,
+          dateOfBirth: selectedDateStr ? new Date(selectedDateStr).toISOString() : null,
         },
       }).unwrap();
 
       if (res.success) {
         toast.success(res.message || "Date of Birth updated successfully");
-        setCurrentDob(
-          selectedDateStr ? new Date(selectedDateStr).toISOString() : null,
-        );
+        setCurrentDob(selectedDateStr ? new Date(selectedDateStr).toISOString() : null);
         setIsEditingDob(false);
       }
     } catch (err: any) {
@@ -378,17 +353,11 @@ const UserVerificationModal: React.FC<UserVerificationModalProps> = ({
       }).unwrap();
 
       if (res.success) {
-        toast.success(
-          res.message || "ENG Coins & Market Value updated successfully",
-        );
+        toast.success(res.message || "ENG Coins & Market Value updated successfully");
         const updatedCoins =
-          res?.data?.engCoine !== undefined
-            ? Number(res.data.engCoine)
-            : newCoins;
+          res?.data?.engCoine !== undefined ? Number(res.data.engCoine) : newCoins;
         const updatedMarketValue =
-          res?.data?.marketValue !== undefined
-            ? Number(res.data.marketValue)
-            : currentMarketValue;
+          res?.data?.marketValue !== undefined ? Number(res.data.marketValue) : currentMarketValue;
 
         setCurrentCoins(updatedCoins);
         setCurrentMarketValue(updatedMarketValue);
@@ -430,18 +399,12 @@ const UserVerificationModal: React.FC<UserVerificationModalProps> = ({
     : user.userName || user.name || "Member Profile";
 
   const initials = fullName.charAt(0).toUpperCase();
-  const isPlayer =
-    !!user.parentId ||
-    user.role === "PLAYER" ||
-    !!user.position ||
-    !!user.ageGroup;
+  const isPlayer = !!user.parentId || user.role === "PLAYER" || !!user.position || !!user.ageGroup;
   const currentStatus = (user.status || "PENDING").toUpperCase();
 
   // Parent Info Extraction
   const parentObj =
-    typeof user.parentId === "object" && user.parentId
-      ? (user.parentId as any)
-      : null;
+    typeof user.parentId === "object" && user.parentId ? (user.parentId as any) : null;
   const parentName = parentObj
     ? `${parentObj.firstName || ""} ${parentObj.lastName || ""}`.trim() ||
       parentObj.userName ||
@@ -555,8 +518,7 @@ const UserVerificationModal: React.FC<UserVerificationModalProps> = ({
       setIsSubmittingReject(true);
       await onReject(
         user._id,
-        rejectionReasonInput.trim() ||
-          "Profile did not meet verification criteria.",
+        rejectionReasonInput.trim() || "Profile did not meet verification criteria."
       );
       setIsRejectReasonModalOpen(false);
       onClose();
@@ -588,37 +550,23 @@ const UserVerificationModal: React.FC<UserVerificationModalProps> = ({
             <div className="flex items-center gap-4">
               <div className="relative w-16 h-16 rounded-2xl bg-slate-100 border border-slate-200 overflow-hidden flex items-center justify-center shrink-0 shadow-sm">
                 {profileUrl ? (
-                  <Image
-                    src={profileUrl}
-                    alt={fullName}
-                    fill
-                    className="object-cover"
-                  />
+                  <Image src={profileUrl} alt={fullName} fill className="object-cover" />
                 ) : (
-                  <span className="text-2xl font-bold text-slate-700">
-                    {initials}
-                  </span>
+                  <span className="text-2xl font-bold text-slate-700">{initials}</span>
                 )}
               </div>
 
               <div>
                 <DialogTitle className="text-xl font-bold text-slate-900 flex items-center gap-2">
                   {fullName}
-                  {user.verified && (
-                    <ShieldCheck className="w-5 h-5 text-emerald-600 shrink-0" />
-                  )}
+                  {user.verified && <ShieldCheck className="w-5 h-5 text-emerald-600 shrink-0" />}
                 </DialogTitle>
                 <p className="text-xs text-slate-500 font-medium mt-0.5 flex items-center gap-2">
-                  <span>
-                    {user.email || parentEmail || "Managed Player Profile"}
-                  </span>
+                  <span>{user.email || parentEmail || "Managed Player Profile"}</span>
                   {user.createdAt && (
                     <>
                       <span>•</span>
-                      <span>
-                        Registered{" "}
-                        {dayjs(user.createdAt).format("MMM DD, YYYY")}
-                      </span>
+                      <span>Registered {dayjs(user.createdAt).format("MMM DD, YYYY")}</span>
                     </>
                   )}
                 </p>
@@ -662,8 +610,7 @@ const UserVerificationModal: React.FC<UserVerificationModalProps> = ({
                   </h4>
                   <p className="text-xs text-rose-700 font-medium mt-0.5">
                     Reason:{" "}
-                    {user.rejectionReason ||
-                      "Profile did not meet required verification criteria."}
+                    {user.rejectionReason || "Profile did not meet required verification criteria."}
                   </p>
                 </div>
               </div>
@@ -674,8 +621,7 @@ const UserVerificationModal: React.FC<UserVerificationModalProps> = ({
               <div className="bg-indigo-50/40 border border-indigo-100 rounded-2xl p-4 space-y-2.5">
                 <div className="flex items-center justify-between">
                   <h3 className="text-xs font-bold text-indigo-900 uppercase tracking-wider flex items-center gap-1.5">
-                    <Users className="w-4 h-4 text-indigo-600" /> Parent /
-                    Account Owner Information
+                    <Users className="w-4 h-4 text-indigo-600" /> Parent / Account Owner Information
                   </h3>
                   <span className="px-2 py-0.5 rounded-md text-[10px] font-semibold bg-indigo-100 text-indigo-700 border border-indigo-200">
                     Account Owner
@@ -684,18 +630,12 @@ const UserVerificationModal: React.FC<UserVerificationModalProps> = ({
 
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-1">
                   <div>
-                    <p className="text-[11px] font-semibold text-slate-500">
-                      Parent Name
-                    </p>
-                    <p className="text-xs font-bold text-slate-900">
-                      {parentName || "N/A"}
-                    </p>
+                    <p className="text-[11px] font-semibold text-slate-500">Parent Name</p>
+                    <p className="text-xs font-bold text-slate-900">{parentName || "N/A"}</p>
                   </div>
 
                   <div>
-                    <p className="text-[11px] font-semibold text-slate-500">
-                      Parent Email
-                    </p>
+                    <p className="text-[11px] font-semibold text-slate-500">Parent Email</p>
                     <div className="flex items-center gap-1">
                       <p className="text-xs font-semibold text-slate-800 truncate flex items-center gap-1">
                         <Mail className="w-3.5 h-3.5 text-indigo-600 shrink-0" />
@@ -704,9 +644,7 @@ const UserVerificationModal: React.FC<UserVerificationModalProps> = ({
                       {parentEmail && (
                         <button
                           type="button"
-                          onClick={() =>
-                            handleCopyText(parentEmail, "Parent Email")
-                          }
+                          onClick={() => handleCopyText(parentEmail, "Parent Email")}
                           className="p-1 text-slate-400 hover:text-slate-700 transition-colors cursor-pointer"
                           title="Copy Email"
                         >
@@ -721,9 +659,7 @@ const UserVerificationModal: React.FC<UserVerificationModalProps> = ({
                   </div>
 
                   <div>
-                    <p className="text-[11px] font-semibold text-slate-500">
-                      Parent Contact Phone
-                    </p>
+                    <p className="text-[11px] font-semibold text-slate-500">Parent Contact Phone</p>
                     <div className="flex items-center gap-1">
                       <p className="text-xs font-semibold text-slate-800 flex items-center gap-1">
                         <Phone className="w-3.5 h-3.5 text-indigo-600 shrink-0" />
@@ -732,9 +668,7 @@ const UserVerificationModal: React.FC<UserVerificationModalProps> = ({
                       {parentPhone && (
                         <button
                           type="button"
-                          onClick={() =>
-                            handleCopyText(parentPhone, "Parent Phone")
-                          }
+                          onClick={() => handleCopyText(parentPhone, "Parent Phone")}
                           className="p-1 text-slate-400 hover:text-slate-700 transition-colors cursor-pointer"
                           title="Copy Phone"
                         >
@@ -755,8 +689,7 @@ const UserVerificationModal: React.FC<UserVerificationModalProps> = ({
             <div className="bg-emerald-50/50 border border-emerald-200/80 rounded-2xl p-4 space-y-2.5">
               <div className="flex items-center justify-between">
                 <h3 className="text-xs font-bold text-emerald-950 uppercase tracking-wider flex items-center gap-1.5">
-                  <CreditCard className="w-4 h-4 text-emerald-600" /> Active
-                  Subscription Plan
+                  <CreditCard className="w-4 h-4 text-emerald-600" /> Active Subscription Plan
                 </h3>
                 <span
                   className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase border ${sub ? "bg-emerald-100 text-emerald-800 border-emerald-300" : "bg-slate-100 text-slate-600 border-slate-200"}`}
@@ -768,34 +701,24 @@ const UserVerificationModal: React.FC<UserVerificationModalProps> = ({
               {sub ? (
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-1">
                   <div>
-                    <p className="text-[11px] font-semibold text-slate-500">
-                      Package
-                    </p>
+                    <p className="text-[11px] font-semibold text-slate-500">Package</p>
                     <p className="text-xs font-bold text-slate-900 flex items-center gap-1">
                       <Sparkles className="w-3.5 h-3.5 text-emerald-600" />
                       {sub.packageName || "ENG Plan"}
                     </p>
                   </div>
                   <div>
-                    <p className="text-[11px] font-semibold text-slate-500">
-                      Price Paid
-                    </p>
-                    <p className="text-xs font-bold text-slate-900">
-                      £{sub.price}
-                    </p>
+                    <p className="text-[11px] font-semibold text-slate-500">Price Paid</p>
+                    <p className="text-xs font-bold text-slate-900">£{sub.price}</p>
                   </div>
                   <div>
-                    <p className="text-[11px] font-semibold text-slate-500">
-                      Status
-                    </p>
+                    <p className="text-[11px] font-semibold text-slate-500">Status</p>
                     <p className="text-xs font-bold text-emerald-700 uppercase">
                       {sub.status || "Active"}
                     </p>
                   </div>
                   <div>
-                    <p className="text-[11px] font-semibold text-slate-500">
-                      Valid Until
-                    </p>
+                    <p className="text-[11px] font-semibold text-slate-500">Valid Until</p>
                     <p className="text-xs font-bold text-slate-800 flex items-center gap-1">
                       <Calendar className="w-3.5 h-3.5 text-slate-500 shrink-0" />
                       {sub.currentPeriodEnd
@@ -819,42 +742,28 @@ const UserVerificationModal: React.FC<UserVerificationModalProps> = ({
 
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                 <div>
-                  <p className="text-[11px] font-semibold text-slate-500">
-                    First Name
-                  </p>
+                  <p className="text-[11px] font-semibold text-slate-500">First Name</p>
                   <p className="text-xs font-bold text-slate-900">
                     {user.firstName || user.userName || "N/A"}
                   </p>
                 </div>
 
                 <div>
-                  <p className="text-[11px] font-semibold text-slate-500">
-                    Last Name
-                  </p>
-                  <p className="text-xs font-bold text-slate-900">
-                    {user.lastName || "N/A"}
-                  </p>
+                  <p className="text-[11px] font-semibold text-slate-500">Last Name</p>
+                  <p className="text-xs font-bold text-slate-900">{user.lastName || "N/A"}</p>
                 </div>
 
                 {user.email && (
                   <div>
-                    <p className="text-[11px] font-semibold text-slate-500">
-                      Email Address
-                    </p>
-                    <p className="text-xs font-bold text-slate-900 truncate">
-                      {user.email}
-                    </p>
+                    <p className="text-[11px] font-semibold text-slate-500">Email Address</p>
+                    <p className="text-xs font-bold text-slate-900 truncate">{user.email}</p>
                   </div>
                 )}
 
                 {user.phone && (
                   <div>
-                    <p className="text-[11px] font-semibold text-slate-500">
-                      Phone Number
-                    </p>
-                    <p className="text-xs font-bold text-slate-900">
-                      {user.phone}
-                    </p>
+                    <p className="text-[11px] font-semibold text-slate-500">Phone Number</p>
+                    <p className="text-xs font-bold text-slate-900">{user.phone}</p>
                   </div>
                 )}
 
@@ -866,9 +775,7 @@ const UserVerificationModal: React.FC<UserVerificationModalProps> = ({
                   user.dateOfBirth) && (
                   <div className="relative">
                     <div className="flex items-center justify-between">
-                      <p className="text-[11px] font-semibold text-slate-500">
-                        Date of Birth
-                      </p>
+                      <p className="text-[11px] font-semibold text-slate-500">Date of Birth</p>
                       {!isEditingDob && (
                         <button
                           type="button"
@@ -882,9 +789,7 @@ const UserVerificationModal: React.FC<UserVerificationModalProps> = ({
 
                     <p className="text-xs font-bold text-slate-800 flex items-center gap-1 mt-0.5">
                       <Calendar className="w-3.5 h-3.5 text-slate-500 shrink-0" />
-                      {currentDob
-                        ? dayjs(currentDob).format("DD MMM YYYY")
-                        : "N/A"}
+                      {currentDob ? dayjs(currentDob).format("DD MMM YYYY") : "N/A"}
                     </p>
 
                     {isEditingDob && (
@@ -897,9 +802,7 @@ const UserVerificationModal: React.FC<UserVerificationModalProps> = ({
                         {/* Floating Popup Calendar */}
                         <div className="absolute left-0 top-full mt-2 z-50 shadow-2xl">
                           <BirthDatePicker
-                            value={
-                              currentDob || user.dateOfBirth?.toString() || ""
-                            }
+                            value={currentDob || user.dateOfBirth?.toString() || ""}
                             onSave={handleSaveDob}
                             onCancel={() => setIsEditingDob(false)}
                             isLoading={isSavingDob}
@@ -914,37 +817,25 @@ const UserVerificationModal: React.FC<UserVerificationModalProps> = ({
                 {isPlayer && (
                   <>
                     <div>
-                      <p className="text-[11px] font-semibold text-slate-500">
-                        Age Group
-                      </p>
+                      <p className="text-[11px] font-semibold text-slate-500">Age Group</p>
                       <p className="text-xs font-bold text-blue-700 bg-blue-50 px-2 py-0.5 rounded-md border border-blue-200 inline-block">
                         {user.ageGroup || "N/A"}
                       </p>
                     </div>
 
                     <div>
-                      <p className="text-[11px] font-semibold text-slate-500">
-                        Position
-                      </p>
-                      <p className="text-xs font-bold text-slate-900">
-                        {user.position || "N/A"}
-                      </p>
+                      <p className="text-[11px] font-semibold text-slate-500">Position</p>
+                      <p className="text-xs font-bold text-slate-900">{user.position || "N/A"}</p>
                     </div>
 
                     <div>
-                      <p className="text-[11px] font-semibold text-slate-500">
-                        Preferred Foot
-                      </p>
-                      <p className="text-xs font-bold text-slate-900">
-                        {user.strongFoot || "N/A"}
-                      </p>
+                      <p className="text-[11px] font-semibold text-slate-500">Preferred Foot</p>
+                      <p className="text-xs font-bold text-slate-900">{user.strongFoot || "N/A"}</p>
                     </div>
 
                     <div>
                       <div className="flex items-center justify-between">
-                        <p className="text-[11px] font-semibold text-slate-500">
-                          ENG Coin
-                        </p>
+                        <p className="text-[11px] font-semibold text-slate-500">ENG Coin</p>
                         {!isEditingEconomy && (
                           <button
                             type="button"
@@ -972,9 +863,7 @@ const UserVerificationModal: React.FC<UserVerificationModalProps> = ({
                             disabled={isSavingEconomy}
                             className="px-2 py-1 bg-amber-500 text-white font-bold text-[10px] rounded-lg hover:bg-amber-600 disabled:opacity-50 cursor-pointer shadow-xs flex items-center gap-1"
                           >
-                            {isSavingEconomy && (
-                              <Loader2 className="w-3 h-3 animate-spin" />
-                            )}
+                            {isSavingEconomy && <Loader2 className="w-3 h-3 animate-spin" />}
                             Save
                           </button>
                           <button
@@ -998,15 +887,11 @@ const UserVerificationModal: React.FC<UserVerificationModalProps> = ({
                     </div>
 
                     <div>
-                      <p className="text-[11px] font-semibold text-slate-500">
-                        Market Value
-                      </p>
+                      <p className="text-[11px] font-semibold text-slate-500">Market Value</p>
                       <p className="text-xs font-bold text-emerald-600">
                         £
                         {isEditingEconomy
-                          ? (
-                              Math.max(0, Number(editCoinsInput) || 0) * 100
-                            ).toLocaleString()
+                          ? (Math.max(0, Number(editCoinsInput) || 0) * 100).toLocaleString()
                           : currentMarketValue.toLocaleString()}
                       </p>
                     </div>
@@ -1015,12 +900,8 @@ const UserVerificationModal: React.FC<UserVerificationModalProps> = ({
 
                 {isPlayer && user.previousClub && (
                   <div className="col-span-2 sm:col-span-4 pt-2 border-t border-slate-200/60">
-                    <p className="text-[11px] font-semibold text-slate-500">
-                      Previous Club / Team
-                    </p>
-                    <p className="text-xs font-bold text-slate-900">
-                      {user.previousClub}
-                    </p>
+                    <p className="text-[11px] font-semibold text-slate-500">Previous Club / Team</p>
+                    <p className="text-xs font-bold text-slate-900">{user.previousClub}</p>
                   </div>
                 )}
               </div>
@@ -1031,8 +912,8 @@ const UserVerificationModal: React.FC<UserVerificationModalProps> = ({
               <div className="col-span-1 sm:col-span-2 bg-slate-50/80 border border-slate-200/90 rounded-2xl p-4 space-y-3">
                 <div className="flex items-center justify-between">
                   <h3 className="text-xs font-bold text-slate-900 uppercase tracking-wider flex items-center gap-1.5">
-                    <Building2 className="w-4 h-4 text-indigo-600" /> Assigned
-                    Squads & Teams Managed
+                    <Building2 className="w-4 h-4 text-indigo-600" /> Assigned Squads & Teams
+                    Managed
                   </h3>
                   {onAssignTeams && (
                     <button
@@ -1090,8 +971,7 @@ const UserVerificationModal: React.FC<UserVerificationModalProps> = ({
                         </div>
                       </div>
                     ))
-                  ) : selectedTeam &&
-                    (selectedTeam.teamName || selectedTeam.shortName) ? (
+                  ) : selectedTeam && (selectedTeam.teamName || selectedTeam.shortName) ? (
                     <div className="flex items-center justify-between p-2.5 bg-white border border-slate-200 rounded-xl shadow-2xs">
                       <div className="flex items-center gap-2.5">
                         <div className="relative w-9 h-9 rounded-lg bg-slate-50 border border-slate-200 flex items-center justify-center overflow-hidden shrink-0">
@@ -1145,8 +1025,7 @@ const UserVerificationModal: React.FC<UserVerificationModalProps> = ({
                 <div className="bg-slate-50/60 border border-slate-200/80 rounded-2xl p-4 space-y-2.5">
                   <div className="flex items-center justify-between">
                     <h3 className="text-xs font-bold text-slate-900 uppercase tracking-wider flex items-center gap-1.5">
-                      <Building2 className="w-4 h-4 text-slate-600" />{" "}
-                      Associated Team / Club
+                      <Building2 className="w-4 h-4 text-slate-600" /> Associated Team / Club
                     </h3>
                     <button
                       type="button"
@@ -1183,15 +1062,12 @@ const UserVerificationModal: React.FC<UserVerificationModalProps> = ({
                           disabled={isSavingTeam}
                           className="px-3 py-1 bg-indigo-600 text-white text-xs font-bold rounded-lg hover:bg-indigo-700 disabled:opacity-50 cursor-pointer flex items-center gap-1 shadow-xs"
                         >
-                          {isSavingTeam && (
-                            <Loader2 className="w-3 h-3 animate-spin" />
-                          )}
+                          {isSavingTeam && <Loader2 className="w-3 h-3 animate-spin" />}
                           Save Team
                         </button>
                       </div>
                     </div>
-                  ) : selectedTeam &&
-                    (selectedTeam.teamName || selectedTeam.shortName) ? (
+                  ) : selectedTeam && (selectedTeam.teamName || selectedTeam.shortName) ? (
                     <div className="flex items-center gap-3 p-2.5 bg-white border border-slate-200 rounded-xl">
                       <div className="relative w-10 h-10 rounded-lg bg-slate-50 border border-slate-200 flex items-center justify-center overflow-hidden shrink-0">
                         {selectedTeam.teamLogo ? (
@@ -1218,9 +1094,7 @@ const UserVerificationModal: React.FC<UserVerificationModalProps> = ({
                       </div>
                     </div>
                   ) : (
-                    <p className="text-xs text-slate-400 italic">
-                      No associated club assigned yet
-                    </p>
+                    <p className="text-xs text-slate-400 italic">No associated club assigned yet</p>
                   )}
                 </div>
 
@@ -1228,8 +1102,7 @@ const UserVerificationModal: React.FC<UserVerificationModalProps> = ({
                 {isPlayer && (
                   <div className="bg-slate-50/60 border border-slate-200/80 rounded-2xl p-4 space-y-2.5">
                     <h3 className="text-xs font-bold text-slate-900 uppercase tracking-wider flex items-center gap-1.5">
-                      <Sparkles className="w-4 h-4 text-amber-500" /> Academy &
-                      Consent Status
+                      <Sparkles className="w-4 h-4 text-amber-500" /> Academy & Consent Status
                     </h3>
 
                     <div className="space-y-1.5 text-xs">
@@ -1240,16 +1113,12 @@ const UserVerificationModal: React.FC<UserVerificationModalProps> = ({
                         <span
                           className={`px-2 py-0.5 rounded text-[10px] font-semibold ${user.playForAcademy ? "bg-amber-50 text-amber-700 border border-amber-200" : "bg-slate-100 text-slate-500"}`}
                         >
-                          {user.playForAcademy
-                            ? `Yes (${user.academyClubName || "Club"})`
-                            : "No"}
+                          {user.playForAcademy ? `Yes (${user.academyClubName || "Club"})` : "No"}
                         </span>
                       </div>
 
                       <div className="flex justify-between items-center bg-white p-2 rounded-lg border border-slate-200">
-                        <span className="font-medium text-slate-600">
-                          Development Player?
-                        </span>
+                        <span className="font-medium text-slate-600">Development Player?</span>
                         <span
                           className={`px-2 py-0.5 rounded text-[10px] font-semibold ${user.isDevelopmentPlayer ? "bg-amber-50 text-amber-700 border border-amber-200" : "bg-slate-100 text-slate-500"}`}
                         >
@@ -1258,9 +1127,7 @@ const UserVerificationModal: React.FC<UserVerificationModalProps> = ({
                       </div>
 
                       <div className="flex justify-between items-center bg-white p-2 rounded-lg border border-slate-200">
-                        <span className="font-medium text-slate-600">
-                          Filming & Media Consent?
-                        </span>
+                        <span className="font-medium text-slate-600">Filming & Media Consent?</span>
                         <span
                           className={`px-2 py-0.5 rounded text-[10px] font-semibold ${user.mediaConsent ? "bg-emerald-50 text-emerald-700 border border-emerald-200" : "bg-rose-50 text-rose-700 border border-rose-200"}`}
                         >
@@ -1277,30 +1144,21 @@ const UserVerificationModal: React.FC<UserVerificationModalProps> = ({
             {(user.emergencyEmail || user.emergencyPhone) && (
               <div className="bg-slate-50/60 border border-slate-200/80 rounded-2xl p-4 space-y-2.5">
                 <h3 className="text-xs font-bold text-slate-900 uppercase tracking-wider flex items-center gap-1.5">
-                  <Phone className="w-4 h-4 text-rose-500" /> Emergency Contact
-                  Details
+                  <Phone className="w-4 h-4 text-rose-500" /> Emergency Contact Details
                 </h3>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
                   {user.emergencyEmail && (
                     <div>
-                      <p className="text-[11px] font-semibold text-slate-500">
-                        Emergency Email
-                      </p>
-                      <p className="font-bold text-slate-800">
-                        {user.emergencyEmail}
-                      </p>
+                      <p className="text-[11px] font-semibold text-slate-500">Emergency Email</p>
+                      <p className="font-bold text-slate-800">{user.emergencyEmail}</p>
                     </div>
                   )}
 
                   {user.emergencyPhone && (
                     <div>
-                      <p className="text-[11px] font-semibold text-slate-500">
-                        Emergency Phone
-                      </p>
-                      <p className="font-bold text-slate-800">
-                        {user.emergencyPhone}
-                      </p>
+                      <p className="text-[11px] font-semibold text-slate-500">Emergency Phone</p>
+                      <p className="font-bold text-slate-800">{user.emergencyPhone}</p>
                     </div>
                   )}
                 </div>
@@ -1311,12 +1169,10 @@ const UserVerificationModal: React.FC<UserVerificationModalProps> = ({
             <div className="space-y-3">
               <div className="flex items-center justify-between">
                 <h3 className="text-xs font-bold text-slate-900 uppercase tracking-wider flex items-center gap-1.5">
-                  <FileText className="w-4 h-4 text-slate-600" /> Uploaded
-                  Verification Documents
+                  <FileText className="w-4 h-4 text-slate-600" /> Uploaded Verification Documents
                 </h3>
                 <span className="text-xs font-semibold text-slate-500">
-                  {documentList.length}{" "}
-                  {documentList.length === 1 ? "file" : "files"} attached
+                  {documentList.length} {documentList.length === 1 ? "file" : "files"} attached
                 </span>
               </div>
 
@@ -1330,10 +1186,7 @@ const UserVerificationModal: React.FC<UserVerificationModalProps> = ({
               ) : (
                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
                   {documentList.map((docUrl, idx) => {
-                    const isPdf = docUrl
-                      ?.toLowerCase()
-                      .split("?")[0]
-                      .endsWith(".pdf");
+                    const isPdf = docUrl?.toLowerCase().split("?")[0].endsWith(".pdf");
                     return (
                       <div
                         key={idx}
@@ -1432,9 +1285,7 @@ const UserVerificationModal: React.FC<UserVerificationModalProps> = ({
                       : "bg-rose-50 text-rose-700 border-rose-200"
                   }`}
                 >
-                  {currentStatus === "APPROVED"
-                    ? "Profile Approved"
-                    : "Profile Rejected"}
+                  {currentStatus === "APPROVED" ? "Profile Approved" : "Profile Rejected"}
                 </span>
               </div>
             )}
@@ -1443,10 +1294,7 @@ const UserVerificationModal: React.FC<UserVerificationModalProps> = ({
       </Dialog>
 
       {/* Reject Reason Input Dialog */}
-      <Dialog
-        open={isRejectReasonModalOpen}
-        onOpenChange={() => setIsRejectReasonModalOpen(false)}
-      >
+      <Dialog open={isRejectReasonModalOpen} onOpenChange={() => setIsRejectReasonModalOpen(false)}>
         <DialogContent className="sm:max-w-md bg-white rounded-3xl p-6 border-none shadow-2xl z-[110]">
           <DialogHeader className="pb-2 border-b border-slate-100">
             <DialogTitle className="text-base font-bold text-slate-900 flex items-center gap-2 text-rose-600">
@@ -1457,8 +1305,8 @@ const UserVerificationModal: React.FC<UserVerificationModalProps> = ({
           <div className="space-y-3 py-2">
             <p className="text-xs text-slate-600 font-medium">
               Please enter the reason for rejecting{" "}
-              <strong className="text-slate-900">{fullName}</strong>. This
-              reason will be recorded and communicated to the user.
+              <strong className="text-slate-900">{fullName}</strong>. This reason will be recorded
+              and communicated to the user.
             </p>
 
             <textarea
@@ -1485,9 +1333,7 @@ const UserVerificationModal: React.FC<UserVerificationModalProps> = ({
               disabled={isSubmittingReject}
               className="px-5 py-2 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold transition-colors cursor-pointer disabled:opacity-50 flex items-center gap-1.5 shadow-xs"
             >
-              {isSubmittingReject && (
-                <Loader2 className="w-3.5 h-3.5 animate-spin" />
-              )}
+              {isSubmittingReject && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
               Confirm Rejection
             </button>
           </div>
@@ -1512,12 +1358,7 @@ const UserVerificationModal: React.FC<UserVerificationModalProps> = ({
                   title="Document PDF Preview"
                 />
               ) : (
-                <Image
-                  src={previewImage}
-                  alt="Document Preview"
-                  fill
-                  className="object-contain"
-                />
+                <Image src={previewImage} alt="Document Preview" fill className="object-contain" />
               )}
             </div>
           )}

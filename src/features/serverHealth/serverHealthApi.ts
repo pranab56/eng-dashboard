@@ -1,9 +1,9 @@
 import { baseApi } from "../../utils/apiBaseQuery";
 
 export interface LoadAverage {
-  '1min': number;
-  '5min': number;
-  '15min': number;
+  "1min": number;
+  "5min": number;
+  "15min": number;
 }
 
 export interface MemoryBytes {
@@ -26,9 +26,9 @@ export interface ServerUptime {
 }
 
 export interface ServerHealthData {
-  status?: 'healthy' | 'moderate' | 'critical';
+  status?: "healthy" | "moderate" | "critical";
   database?: {
-    status: 'connected' | 'disconnected';
+    status: "connected" | "disconnected";
     readyState: number;
   };
   cpuCores: number;
@@ -98,7 +98,7 @@ export interface FlushCacheResponse {
   statusCode: number;
   message: string;
   data: {
-    type: 'cache-only' | 'all';
+    type: "cache-only" | "all";
     deletedCount?: number;
     totalScanned?: number;
     message: string;
@@ -123,7 +123,10 @@ export const serverHealthApi = baseApi.injectEndpoints({
     }),
     executeQueueAction: builder.mutation<
       QueueActionResponse,
-      { queueName: string; action: 'retry-failed' | 'clean-completed' | 'clean-failed' | 'pause' | 'resume' }
+      {
+        queueName: string;
+        action: "retry-failed" | "clean-completed" | "clean-failed" | "pause" | "resume";
+      }
     >({
       query: (body) => ({
         url: "/server-health/queue-action",
@@ -132,7 +135,7 @@ export const serverHealthApi = baseApi.injectEndpoints({
       }),
       invalidatesTags: ["QueueAndCache"],
     }),
-    flushCache: builder.mutation<FlushCacheResponse, { type: 'cache-only' | 'all' }>({
+    flushCache: builder.mutation<FlushCacheResponse, { type: "cache-only" | "all" }>({
       query: (body) => ({
         url: "/server-health/flush-cache",
         method: "POST",

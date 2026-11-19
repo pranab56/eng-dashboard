@@ -1,12 +1,7 @@
 "use client";
 
 import React from "react";
-import {
-  Dialog,
-  DialogContent,
-  DialogTitle,
-  DialogDescription,
-} from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Trash2 } from "lucide-react";
 import { TUserManagement } from "@/types/columnTypes";
 
@@ -65,9 +60,7 @@ const DeleteConfirmationModal: React.FC<DeleteConfirmationModalProps> = ({
 
             {user && (
               <div className="mt-2.5 p-2 rounded-md bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 text-xs font-medium text-slate-800 dark:text-slate-200 truncate max-w-xs mx-auto">
-                <span className="font-semibold text-slate-900 dark:text-slate-100">
-                  {userName}
-                </span>
+                <span className="font-semibold text-slate-900 dark:text-slate-100">{userName}</span>
                 {user.email && (
                   <span className="text-slate-500 dark:text-slate-400 font-normal">
                     {" "}

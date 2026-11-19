@@ -47,12 +47,11 @@ export default function RefereeVotingResultsModal({
                 {poll.status}
               </span>
             </div>
-            <h2 className="text-sm font-semibold text-slate-900 line-clamp-1">
-              {poll.title}
-            </h2>
+            <h2 className="text-sm font-semibold text-slate-900 line-clamp-1">{poll.title}</h2>
             <div className="flex items-center gap-3 text-xs text-slate-500 font-mono">
               <span>
-                {dayjs(poll.startDate).format("DD MMM")} – {dayjs(poll.endDate).format("DD MMM YYYY")}
+                {dayjs(poll.startDate).format("DD MMM")} –{" "}
+                {dayjs(poll.endDate).format("DD MMM YYYY")}
               </span>
               <span>•</span>
               <span className="font-semibold text-slate-800">
@@ -93,8 +92,8 @@ export default function RefereeVotingResultsModal({
                   nom.votePercentage !== undefined
                     ? nom.votePercentage
                     : totalVotes > 0
-                    ? Number(((nom.votesCount / totalVotes) * 100).toFixed(1))
-                    : 0;
+                      ? Number(((nom.votesCount / totalVotes) * 100).toFixed(1))
+                      : 0;
                 const isWinner =
                   poll.status === "completed" &&
                   poll.winner &&
@@ -104,9 +103,7 @@ export default function RefereeVotingResultsModal({
                   <div
                     key={nom._id || idx}
                     className={`p-3 rounded border transition-colors ${
-                      isWinner
-                        ? "bg-amber-50/60 border-amber-300"
-                        : "bg-white border-slate-200"
+                      isWinner ? "bg-amber-50/60 border-amber-300" : "bg-white border-slate-200"
                     }`}
                   >
                     <div className="flex items-center justify-between gap-3 mb-2">
@@ -143,9 +140,7 @@ export default function RefereeVotingResultsModal({
                             {nom.statsHighlight && (
                               <>
                                 <span>•</span>
-                                <span className="text-slate-700">
-                                  {nom.statsHighlight}
-                                </span>
+                                <span className="text-slate-700">{nom.statsHighlight}</span>
                               </>
                             )}
                           </div>
@@ -156,9 +151,7 @@ export default function RefereeVotingResultsModal({
                         <div className="font-mono font-semibold text-xs text-slate-900">
                           {Number(nom.votesCount || 0).toLocaleString()} votes
                         </div>
-                        <span className="text-[11px] font-mono text-slate-500">
-                          {percentage}%
-                        </span>
+                        <span className="text-[11px] font-mono text-slate-500">{percentage}%</span>
                       </div>
                     </div>
 

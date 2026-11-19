@@ -87,9 +87,12 @@ export default function Home() {
   const { data: profileData } = useGetProfileQuery({});
   const profileUser = profileData?.data;
   const isSuperAdmin = profileUser?.role === "SUPER_ADMIN";
-  const hasHealthPerm = isSuperAdmin || (profileUser?.role === "ADMIN" && (
-    !profileUser?.permissions || profileUser?.permissions?.length === 0 || profileUser?.permissions?.includes("SERVER_HEALTH")
-  ));
+  const hasHealthPerm =
+    isSuperAdmin ||
+    (profileUser?.role === "ADMIN" &&
+      (!profileUser?.permissions ||
+        profileUser?.permissions?.length === 0 ||
+        profileUser?.permissions?.includes("SERVER_HEALTH")));
 
   useEffect(() => {
     setHeaders({
@@ -245,9 +248,15 @@ export default function Home() {
             >
               <Activity className="w-3.5 h-3.5 text-emerald-500" />
               <span>
-                Server: <strong className={stats.serverHealth.status === "critical" ? "text-amber-600" : "text-emerald-600"}>
+                Server:{" "}
+                <strong
+                  className={
+                    stats.serverHealth.status === "critical" ? "text-amber-600" : "text-emerald-600"
+                  }
+                >
                   {stats.serverHealth.status === "critical" ? "High RAM" : "Healthy"}
-                </strong> ({stats.serverHealth.memory?.usedMemoryPercentage}%)
+                </strong>{" "}
+                ({stats.serverHealth.memory?.usedMemoryPercentage}%)
               </span>
             </Link>
           )}

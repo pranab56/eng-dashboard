@@ -150,9 +150,7 @@ export const TeamCard = ({
                 {/* Team Options */}
                 <div className="max-h-52 overflow-y-auto space-y-0.5 pr-0.5">
                   {filteredTeams.length === 0 ? (
-                    <div className="py-4 text-center text-xs text-slate-400">
-                      No matching teams
-                    </div>
+                    <div className="py-4 text-center text-xs text-slate-400">No matching teams</div>
                   ) : (
                     filteredTeams.map((team) => {
                       const isSelected = selectedTeam?.value === team.value;

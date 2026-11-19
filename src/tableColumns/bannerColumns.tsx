@@ -38,7 +38,10 @@ export const getBannerColumns = (
             )}
           </div>
           <div className="min-w-0 flex-1">
-            <p className="text-xs font-semibold text-slate-900 truncate" title={item.title || item.name}>
+            <p
+              className="text-xs font-semibold text-slate-900 truncate"
+              title={item.title || item.name}
+            >
               {item.title || item.name || "Untitled Banner"}
             </p>
             {item.subtitle ? (
@@ -97,9 +100,7 @@ export const getBannerColumns = (
           title="Click to toggle status"
         >
           <span
-            className={`w-1.5 h-1.5 rounded-full ${
-              isActive ? "bg-emerald-500" : "bg-slate-400"
-            }`}
+            className={`w-1.5 h-1.5 rounded-full ${isActive ? "bg-emerald-500" : "bg-slate-400"}`}
           />
           {isActive ? "Active" : "Inactive"}
         </button>
@@ -116,9 +117,7 @@ export const getBannerColumns = (
     cell: ({ row }) => {
       const d = row.original.createdAt;
       return (
-        <span className="text-xs text-slate-600">
-          {d ? dayjs(d).format("MMM DD, YYYY") : "—"}
-        </span>
+        <span className="text-xs text-slate-600">{d ? dayjs(d).format("MMM DD, YYYY") : "—"}</span>
       );
     },
   },

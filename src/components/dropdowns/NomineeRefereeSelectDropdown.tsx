@@ -28,10 +28,7 @@ export const NomineeRefereeSelectDropdown: React.FC<NomineeRefereeSelectDropdown
   // Close dropdown on click outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (
-        dropdownRef.current &&
-        !dropdownRef.current.contains(event.target as Node)
-      ) {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
         setIsOpen(false);
       }
     };
@@ -43,9 +40,7 @@ export const NomineeRefereeSelectDropdown: React.FC<NomineeRefereeSelectDropdown
 
   // Find selected referee object
   const selectedReferee = useMemo(() => {
-    return referees.find(
-      (r) => String(r._id || r.id) === String(selectedRefereeId)
-    );
+    return referees.find((r) => String(r._id || r.id) === String(selectedRefereeId));
   }, [referees, selectedRefereeId]);
 
   // Filter referees by name, username, or email
@@ -100,9 +95,7 @@ export const NomineeRefereeSelectDropdown: React.FC<NomineeRefereeSelectDropdown
                   displayName.slice(0, 2).toUpperCase()
                 )}
               </div>
-              <span className="font-medium text-slate-900 truncate">
-                {displayName}
-              </span>
+              <span className="font-medium text-slate-900 truncate">{displayName}</span>
               {selectedReferee.matchesOfficiatedCount !== undefined && (
                 <span className="text-[10px] text-slate-500 bg-slate-100 px-1 py-0.2 rounded font-mono">
                   {selectedReferee.matchesOfficiatedCount} matches
@@ -216,9 +209,7 @@ export const NomineeRefereeSelectDropdown: React.FC<NomineeRefereeSelectDropdown
                           {r.matchesOfficiatedCount} matches
                         </span>
                       )}
-                      {isSelected && (
-                        <Check className="w-3.5 h-3.5 text-slate-900 shrink-0" />
-                      )}
+                      {isSelected && <Check className="w-3.5 h-3.5 text-slate-900 shrink-0" />}
                     </div>
                   </button>
                 );

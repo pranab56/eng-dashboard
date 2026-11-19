@@ -73,25 +73,19 @@ export default function Tournaments() {
     status: statusFilter === "ALL" ? "" : statusFilter,
   });
 
-  const [createTourNaments, { isLoading: isCreating }] =
-    useCreateTourNamentsMutation();
-  const [updateTourNaments, { isLoading: isUpdating }] =
-    useUpdateTourNamentsMutation();
-  const [deleteTourNaments, { isLoading: isDeleting }] =
-    useDeleteTourNamentsMutation();
+  const [createTourNaments, { isLoading: isCreating }] = useCreateTourNamentsMutation();
+  const [updateTourNaments, { isLoading: isUpdating }] = useUpdateTourNamentsMutation();
+  const [deleteTourNaments, { isLoading: isDeleting }] = useDeleteTourNamentsMutation();
 
   // Modals & Selection States
-  const [selectedTournament, setSelectedTournament] =
-    useState<TTournament | null>(null);
+  const [selectedTournament, setSelectedTournament] = useState<TTournament | null>(null);
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
 
-  const [winnersTournament, setWinnersTournament] =
-    useState<TTournament | null>(null);
+  const [winnersTournament, setWinnersTournament] = useState<TTournament | null>(null);
   const [isWinnersModalOpen, setIsWinnersModalOpen] = useState(false);
 
   const [isFormModalOpen, setIsFormModalOpen] = useState(false);
-  const [editingTournament, setEditingTournament] =
-    useState<TTournament | null>(null);
+  const [editingTournament, setEditingTournament] = useState<TTournament | null>(null);
 
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [deletingId, setDeletingId] = useState<string | null>(null);
@@ -131,9 +125,7 @@ export default function Tournaments() {
   };
 
   const handleToggleExpandAll = () => {
-    const allExpanded = rawTournaments.every(
-      (t) => expandedNodes[t._id || (t as any).id || ""]
-    );
+    const allExpanded = rawTournaments.every((t) => expandedNodes[t._id || (t as any).id || ""]);
     const nextState: Record<string, boolean> = {};
     rawTournaments.forEach((t) => {
       const id = t._id || (t as any).id || "";
@@ -253,17 +245,12 @@ export default function Tournaments() {
   };
 
   const totalPages =
-    tournamentRes?.pagination?.totalPage ||
-    tournamentRes?.data?.meta?.totalPage ||
-    1;
+    tournamentRes?.pagination?.totalPage || tournamentRes?.data?.meta?.totalPage || 1;
 
   const totalRecords =
-    tournamentRes?.pagination?.total ||
-    tournamentRes?.data?.meta?.total ||
-    backendStats.total;
+    tournamentRes?.pagination?.total || tournamentRes?.data?.meta?.total || backendStats.total;
 
-  const hasActiveFilters =
-    statusFilter !== "ALL" || searchTerm.trim().length > 0;
+  const hasActiveFilters = statusFilter !== "ALL" || searchTerm.trim().length > 0;
 
   const allExpanded =
     rawTournaments.length > 0 &&
@@ -516,9 +503,7 @@ export default function Tournaments() {
                   Search: &ldquo;{searchTerm}&rdquo;
                 </span>
               )}
-              <span className="text-slate-400">
-                ({totalRecords} total matching)
-              </span>
+              <span className="text-slate-400">({totalRecords} total matching)</span>
             </div>
             <button
               type="button"
@@ -543,9 +528,7 @@ export default function Tournaments() {
             <div className="w-10 h-10 rounded-full bg-slate-100 text-slate-400 flex items-center justify-center mx-auto mb-3">
               <Trophy className="w-5 h-5" />
             </div>
-            <h3 className="text-sm font-semibold text-slate-900">
-              No tournaments found
-            </h3>
+            <h3 className="text-sm font-semibold text-slate-900">No tournaments found</h3>
             <p className="text-xs text-slate-500 mt-1 max-w-sm mx-auto">
               {hasActiveFilters
                 ? "No tournament matches your selected search or status criteria. Try resetting filters."
@@ -621,9 +604,7 @@ export default function Tournaments() {
                         type="button"
                         onClick={() => toggleNodeExpand(nodeKey)}
                         className={`mt-0.5 p-1 rounded-md text-slate-500 hover:text-slate-900 transition-colors cursor-pointer shrink-0 ${
-                          isExpanded
-                            ? "bg-slate-100 text-slate-900"
-                            : "hover:bg-slate-100"
+                          isExpanded ? "bg-slate-100 text-slate-900" : "hover:bg-slate-100"
                         }`}
                         title={isExpanded ? "Collapse Branches" : "Expand Branches"}
                       >
@@ -826,10 +807,9 @@ export default function Tournaments() {
         {/* Custom Pagination Footer */}
         <div className="px-5 py-3.5 border-t border-slate-200/80 flex flex-col sm:flex-row items-center justify-between gap-4 bg-slate-50/40">
           <div className="text-xs text-slate-500 font-medium">
-            Showing <span className="font-semibold text-slate-800">{rawTournaments.length}</span>{" "}
-            on this page of{" "}
-            <span className="font-semibold text-slate-800">{totalRecords}</span>{" "}
-            total {statusFilter !== "ALL" ? `${statusFilter} ` : ""}tournaments
+            Showing <span className="font-semibold text-slate-800">{rawTournaments.length}</span> on
+            this page of <span className="font-semibold text-slate-800">{totalRecords}</span> total{" "}
+            {statusFilter !== "ALL" ? `${statusFilter} ` : ""}tournaments
           </div>
           <CustomPagination TOTAL_PAGES={totalPages} qryName="page" />
         </div>

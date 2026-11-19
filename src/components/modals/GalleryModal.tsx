@@ -1,22 +1,11 @@
 /* eslint-disable @next/next/no-img-element */
 "use client";
 
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { useGetAllCategoryQuery } from "@/features/gallery/galleryApi";
 import { TCategory, TGallery, TSubCategory } from "@/types/columnTypes";
 import { formatImagePath } from "@/utils/formatImagePath";
-import {
-  X,
-  Upload,
-  Loader2,
-  Check,
-  ChevronsUpDown,
-  Search,
-} from "lucide-react";
+import { X, Upload, Loader2, Check, ChevronsUpDown, Search } from "lucide-react";
 import React, { useEffect, useState } from "react";
 
 interface GalleryModalProps {
@@ -58,12 +47,14 @@ export default function GalleryModal({
 
   useEffect(() => {
     if (editingItem) {
-      const catVal = typeof editingItem.category === 'object' && editingItem.category 
-        ? (editingItem.category as any)._id || (editingItem.category as any).id
-        : editingItem.category || "";
-      const subVal = typeof editingItem.subCategory === 'object' && editingItem.subCategory 
-        ? (editingItem.subCategory as any)._id || (editingItem.subCategory as any).id
-        : editingItem.subCategory || "";
+      const catVal =
+        typeof editingItem.category === "object" && editingItem.category
+          ? (editingItem.category as any)._id || (editingItem.category as any).id
+          : editingItem.category || "";
+      const subVal =
+        typeof editingItem.subCategory === "object" && editingItem.subCategory
+          ? (editingItem.subCategory as any)._id || (editingItem.subCategory as any).id
+          : editingItem.subCategory || "";
 
       setSelectedCategory(catVal);
       setSelectedSubCategory(subVal);
@@ -103,13 +94,11 @@ export default function GalleryModal({
   );
 
   // Subcategories array for selected parent category
-  const subCategoriesList: TSubCategory[] =
-    selectedParentObj?.subCategories || [];
+  const subCategoriesList: TSubCategory[] = selectedParentObj?.subCategories || [];
 
   // Find selected subcategory object
   const selectedSubObj = subCategoriesList.find(
-    (s) =>
-      (s._id || s.id) === selectedSubCategory || s.name === selectedSubCategory
+    (s) => (s._id || s.id) === selectedSubCategory || s.name === selectedSubCategory
   );
 
   // Filtered lists for search
@@ -189,11 +178,7 @@ export default function GalleryModal({
               >
                 {previewUrl ? (
                   <div className="relative w-full h-44 group-hover:opacity-95 transition-opacity">
-                    <img
-                      src={previewUrl}
-                      alt="Preview"
-                      className="w-full h-full object-cover"
-                    />
+                    <img src={previewUrl} alt="Preview" className="w-full h-full object-cover" />
                     <div className="absolute inset-0 bg-slate-900/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white gap-2">
                       <Upload className="w-4 h-4" />
                       <span className="text-xs font-semibold">Change Photo</span>
@@ -207,9 +192,7 @@ export default function GalleryModal({
                     <p className="text-xs font-semibold text-slate-800">
                       Click to choose an image file
                     </p>
-                    <p className="text-[11px] text-slate-400 mt-0.5">
-                      PNG, JPG, WEBP up to 10MB
-                    </p>
+                    <p className="text-[11px] text-slate-400 mt-0.5">PNG, JPG, WEBP up to 10MB</p>
                   </div>
                 )}
               </label>
@@ -282,9 +265,7 @@ export default function GalleryModal({
                   })}
 
                   {filteredParentCategories.length === 0 && (
-                    <p className="p-3 text-center text-xs text-slate-400">
-                      No categories found
-                    </p>
+                    <p className="p-3 text-center text-xs text-slate-400">No categories found</p>
                   )}
                 </div>
               </PopoverContent>
@@ -347,7 +328,9 @@ export default function GalleryModal({
                           }`}
                         >
                           <span className="truncate">{sub.name}</span>
-                          {isSelected && <Check className="w-3.5 h-3.5 text-white shrink-0 ml-1.5" />}
+                          {isSelected && (
+                            <Check className="w-3.5 h-3.5 text-white shrink-0 ml-1.5" />
+                          )}
                         </button>
                       );
                     })}

@@ -1,6 +1,5 @@
 import { baseApi } from "../../utils/apiBaseQuery";
 
-
 export const playerApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
     getPlayerOverview: builder.query({
@@ -13,14 +12,19 @@ export const playerApi = baseApi.injectEndpoints({
     getAllPlayer: builder.query({
       query: (params = {}) => {
         const queryParams = new URLSearchParams();
-        if (params.pageNumber || params.page) queryParams.append("page", params.pageNumber || params.page);
+        if (params.pageNumber || params.page)
+          queryParams.append("page", params.pageNumber || params.page);
         if (params.limit) queryParams.append("limit", params.limit);
-        if (params.searchValue || params.searchTerm) queryParams.append("searchTerm", params.searchValue || params.searchTerm);
+        if (params.searchValue || params.searchTerm)
+          queryParams.append("searchTerm", params.searchValue || params.searchTerm);
         if (params.role && params.role !== "ALL") queryParams.append("role", params.role);
         if (params.status && params.status !== "ALL") queryParams.append("status", params.status);
-        if (params.ageGroup && params.ageGroup !== "ALL") queryParams.append("ageGroup", params.ageGroup);
-        if (params.position && params.position !== "ALL") queryParams.append("position", params.position);
-        if (params.selectTeam && params.selectTeam !== "ALL") queryParams.append("selectTeam", params.selectTeam);
+        if (params.ageGroup && params.ageGroup !== "ALL")
+          queryParams.append("ageGroup", params.ageGroup);
+        if (params.position && params.position !== "ALL")
+          queryParams.append("position", params.position);
+        if (params.selectTeam && params.selectTeam !== "ALL")
+          queryParams.append("selectTeam", params.selectTeam);
         if (params.sort || params.sortBy) queryParams.append("sort", params.sort || params.sortBy);
 
         const qStr = queryParams.toString();
@@ -29,7 +33,7 @@ export const playerApi = baseApi.injectEndpoints({
           method: "GET",
         };
       },
-      providesTags: ["player"]
+      providesTags: ["player"],
     }),
 
     createPlayerEconomy: builder.mutation({
@@ -38,7 +42,7 @@ export const playerApi = baseApi.injectEndpoints({
         method: "POST",
         body: data,
       }),
-      invalidatesTags: ["player"]
+      invalidatesTags: ["player"],
     }),
 
     getPlayerEconomy: builder.query({
@@ -46,7 +50,7 @@ export const playerApi = baseApi.injectEndpoints({
         url: `/coin-budget/player-economy`,
         method: "GET",
       }),
-      providesTags: ["player"]
+      providesTags: ["player"],
     }),
 
     updateEngCoinBudget: builder.mutation({
@@ -55,7 +59,7 @@ export const playerApi = baseApi.injectEndpoints({
         method: "PATCH",
         body: data,
       }),
-      invalidatesTags: ["player", "user"]
+      invalidatesTags: ["player", "user"],
     }),
 
     updatePlayer: builder.mutation({
@@ -64,10 +68,9 @@ export const playerApi = baseApi.injectEndpoints({
         method: "PATCH",
         body: data,
       }),
-      invalidatesTags: ["player"]
+      invalidatesTags: ["player"],
     }),
 
-  
     getPlayerStats: builder.query({
       query: (playerId) => ({
         url: `/playerStats/${playerId}`,
@@ -115,7 +118,7 @@ export const playerApi = baseApi.injectEndpoints({
         url: `/player/${id}`,
         method: "DELETE",
       }),
-      invalidatesTags: ["player", "user"]
+      invalidatesTags: ["player", "user"],
     }),
   }),
 });
@@ -134,5 +137,4 @@ export const {
   useAdjustPlayerCoinsMutation,
   useEditPlayerStatsMutation,
   useGetPlayerStatsAuditLogsQuery,
-
 } = playerApi;

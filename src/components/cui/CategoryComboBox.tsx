@@ -2,11 +2,7 @@
 
 import React, { useState } from "react";
 import { Check, ChevronsUpDown, Search, Plus } from "lucide-react";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 
 interface CategoryComboBoxProps {
   value: string;
@@ -30,9 +26,7 @@ export default function CategoryComboBox({
 
   const isCustomOption =
     searchQuery.trim().length > 0 &&
-    !options.some(
-      (opt) => opt.toLowerCase() === searchQuery.trim().toLowerCase()
-    );
+    !options.some((opt) => opt.toLowerCase() === searchQuery.trim().toLowerCase());
 
   const handleSelect = (val: string) => {
     onChange(val);
@@ -52,8 +46,8 @@ export default function CategoryComboBox({
             {value
               ? value
               : options.length === 0
-              ? "No category available"
-              : "Select or type category..."}
+                ? "No category available"
+                : "Select or type category..."}
           </span>
           <ChevronsUpDown className="w-4 h-4 text-gray-400 shrink-0 ml-2" />
         </button>
@@ -106,9 +100,7 @@ export default function CategoryComboBox({
 
           {filteredOptions.length === 0 && !isCustomOption && (
             <p className="p-3 text-center text-xs text-gray-400 font-medium">
-              {options.length === 0
-                ? "No category available"
-                : "No matching categories found"}
+              {options.length === 0 ? "No category available" : "No matching categories found"}
             </p>
           )}
         </div>

@@ -107,9 +107,7 @@ const CustomSearchableSelect = ({
   return (
     <div className={`relative ${className}`} ref={dropdownRef}>
       {label && (
-        <label className="text-[11px] font-semibold text-slate-600 block mb-1">
-          {label}
-        </label>
+        <label className="text-[11px] font-semibold text-slate-600 block mb-1">{label}</label>
       )}
 
       {/* Trigger Button */}
@@ -209,9 +207,7 @@ const CustomSearchableSelect = ({
                 })}
               </>
             ) : (
-              <div className="py-2.5 text-center text-xs text-slate-400">
-                No matching options
-              </div>
+              <div className="py-2.5 text-center text-xs text-slate-400">No matching options</div>
             )}
           </div>
         </div>
@@ -673,7 +669,8 @@ const MatchManagement = () => {
             Match Management
           </h1>
           <p className="text-xs sm:text-sm text-slate-500 mt-1">
-            Configure schedules, manage live match states, track pitch formations, and record final scores.
+            Configure schedules, manage live match states, track pitch formations, and record final
+            scores.
           </p>
         </div>
 
@@ -750,9 +747,7 @@ const MatchManagement = () => {
             </span>
             <span className="text-xs text-slate-500">active now</span>
           </div>
-          <p className="text-[11px] text-slate-400 mt-1">
-            Matches in 1st half, 2nd half, or break
-          </p>
+          <p className="text-[11px] text-slate-400 mt-1">Matches in 1st half, 2nd half, or break</p>
         </div>
 
         {/* Upcoming Matches */}
@@ -769,9 +764,7 @@ const MatchManagement = () => {
             </span>
             <span className="text-xs text-slate-500">upcoming</span>
           </div>
-          <p className="text-[11px] text-slate-400 mt-1">
-            Fixtures scheduled awaiting kickoff
-          </p>
+          <p className="text-[11px] text-slate-400 mt-1">Fixtures scheduled awaiting kickoff</p>
         </div>
 
         {/* Finished Matches */}
@@ -788,9 +781,7 @@ const MatchManagement = () => {
             </span>
             <span className="text-xs text-slate-500">finalized</span>
           </div>
-          <p className="text-[11px] text-slate-400 mt-1">
-            Full-time matches with recorded scores
-          </p>
+          <p className="text-[11px] text-slate-400 mt-1">Full-time matches with recorded scores</p>
         </div>
       </div>
 

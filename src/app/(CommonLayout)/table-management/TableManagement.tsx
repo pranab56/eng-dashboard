@@ -8,10 +8,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import {
-  useGetAllTableQuery,
-  useGetTableOverviewQuery,
-} from "@/features/tableManagement/tableApi";
+import { useGetAllTableQuery, useGetTableOverviewQuery } from "@/features/tableManagement/tableApi";
 import { useHeaders } from "@/hooks/useHeaders";
 import { getTableColumns } from "@/tableColumns/tableColumns";
 import {
@@ -29,8 +26,12 @@ import { EditTableStandingModal } from "./EditTableStandingModal";
 
 const TableManagement = () => {
   const { setHeaders } = useHeaders();
-  const { data: tableData, isLoading: isTableLoading, refetch: refetchTable, isFetching: isTableFetching } =
-    useGetAllTableQuery({});
+  const {
+    data: tableData,
+    isLoading: isTableLoading,
+    refetch: refetchTable,
+    isFetching: isTableFetching,
+  } = useGetAllTableQuery({});
 
   const allEntries: any[] = tableData?.data || [];
 
@@ -44,9 +45,7 @@ const TableManagement = () => {
     data: overviewRes,
     isLoading: isOverviewLoading,
     refetch: refetchOverview,
-  } = useGetTableOverviewQuery(
-    selectedLeagueId ? { leagueId: selectedLeagueId } : {}
-  );
+  } = useGetTableOverviewQuery(selectedLeagueId ? { leagueId: selectedLeagueId } : {});
   const overview = overviewRes?.data;
 
   useEffect(() => {
@@ -63,9 +62,7 @@ const TableManagement = () => {
   }, []);
 
   // Find selected league
-  const selectedLeague = allEntries.find(
-    (entry) => entry.league._id === selectedLeagueId
-  );
+  const selectedLeague = allEntries.find((entry) => entry.league._id === selectedLeagueId);
   const rawStandings: any[] = selectedLeague?.standings || [];
 
   // Filter standings by search term (team name or short name)
@@ -274,9 +271,12 @@ const TableManagement = () => {
                           }`}
                         >
                           <div className="min-w-0 pr-2">
-                            <p className="truncate text-sm font-medium">{entry.league.leagueName}</p>
+                            <p className="truncate text-sm font-medium">
+                              {entry.league.leagueName}
+                            </p>
                             <p className="text-xs text-slate-400 font-mono">
-                              {entry.league.season || "Active"} • {entry.standings?.length || 0} clubs
+                              {entry.league.season || "Active"} • {entry.standings?.length || 0}{" "}
+                              clubs
                             </p>
                           </div>
                           {isSelected && (
@@ -330,9 +330,7 @@ const TableManagement = () => {
                 className="p-1.5 text-slate-500 hover:text-slate-800 bg-white hover:bg-slate-50 border border-slate-200 rounded-lg transition-colors cursor-pointer disabled:opacity-50"
                 title="Refresh table and overview"
               >
-                <RefreshCw
-                  className={`w-3.5 h-3.5 ${isTableFetching ? "animate-spin" : ""}`}
-                />
+                <RefreshCw className={`w-3.5 h-3.5 ${isTableFetching ? "animate-spin" : ""}`} />
               </button>
             </div>
           </div>

@@ -73,13 +73,7 @@ import React, { useState, useMemo, useRef, useCallback } from "react";
 import toast from "react-hot-toast";
 import { FiEdit, FiTrash2 } from "react-icons/fi";
 
-type CategoryDomainKey =
-  | "gallery"
-  | "video"
-  | "venue"
-  | "time"
-  | "ageGroup"
-  | "news";
+type CategoryDomainKey = "gallery" | "video" | "venue" | "time" | "ageGroup" | "news";
 
 interface DomainConfig {
   key: CategoryDomainKey;
@@ -202,8 +196,7 @@ export default function CategoryManagement() {
   const [activeTab, setActiveTab] = useState<"all" | CategoryDomainKey>("all");
 
   // 1. Gallery API Hooks
-  const { data: galleryRes, isLoading: isGalleryLoading } =
-    useGetAllGalleryCategoryQuery({});
+  const { data: galleryRes, isLoading: isGalleryLoading } = useGetAllGalleryCategoryQuery({});
   const [createGalleryCategory, { isLoading: isCreatingGalleryCat }] =
     useCreateGalleryCategoryMutation();
   const [createGallerySubCategory, { isLoading: isCreatingGallerySub }] =
@@ -218,18 +211,14 @@ export default function CategoryManagement() {
     useDeleteGallerySubCategoryMutation();
 
   // 2. Video (ENG TV) API Hooks
-  const { data: videoRes, isLoading: isVideoLoading } =
-    useGetAllVideoCategoryQuery({});
-  const [createVideoCategory, { isLoading: isCreatingVideoCat }] =
-    useCreateVideoCategoryMutation();
+  const { data: videoRes, isLoading: isVideoLoading } = useGetAllVideoCategoryQuery({});
+  const [createVideoCategory, { isLoading: isCreatingVideoCat }] = useCreateVideoCategoryMutation();
   const [createVideoSubCategory, { isLoading: isCreatingVideoSub }] =
     useCreateVideoSubCategoryMutation();
-  const [updateVideoCategory, { isLoading: isUpdatingVideoCat }] =
-    useUpdateVideoCategoryMutation();
+  const [updateVideoCategory, { isLoading: isUpdatingVideoCat }] = useUpdateVideoCategoryMutation();
   const [updateVideoSubCategory, { isLoading: isUpdatingVideoSub }] =
     useUpdateVideoSubCategoryMutation();
-  const [deleteVideoCategory, { isLoading: isDeletingVideoCat }] =
-    useDeleteVideoCategoryMutation();
+  const [deleteVideoCategory, { isLoading: isDeletingVideoCat }] = useDeleteVideoCategoryMutation();
   const [deleteVideoSubCategory, { isLoading: isDeletingVideoSub }] =
     useDeleteVideoSubCategoryMutation();
   const [rearrangeVideoCategories, { isLoading: isRearrangingVideo }] =
@@ -240,63 +229,39 @@ export default function CategoryManagement() {
   const dragIndexRef = useRef<number | null>(null);
 
   // 3. Venue API Hooks
-  const { data: venueRes, isLoading: isVenueLoading } =
-    useGetAllVenueCategoryQuery({});
-  const [createVenueCategory, { isLoading: isCreatingVenueCat }] =
-    useCreateVenueCategoryMutation();
+  const { data: venueRes, isLoading: isVenueLoading } = useGetAllVenueCategoryQuery({});
+  const [createVenueCategory, { isLoading: isCreatingVenueCat }] = useCreateVenueCategoryMutation();
   const [createVenueSubCategory, { isLoading: isCreatingVenueSub }] =
     useCreateVenueSubCategoryMutation();
-  const [updateVenueCategory, { isLoading: isUpdatingVenueCat }] =
-    useUpdateVenueCategoryMutation();
+  const [updateVenueCategory, { isLoading: isUpdatingVenueCat }] = useUpdateVenueCategoryMutation();
   const [updateVenueSubCategory, { isLoading: isUpdatingVenueSub }] =
     useUpdateVenueSubCategoryMutation();
-  const [deleteVenueCategory, { isLoading: isDeletingVenueCat }] =
-    useDeleteVenueCategoryMutation();
+  const [deleteVenueCategory, { isLoading: isDeletingVenueCat }] = useDeleteVenueCategoryMutation();
   const [deleteVenueSubCategory, { isLoading: isDeletingVenueSub }] =
     useDeleteVenueSubCategoryMutation();
 
   // 4. Time Management API Hooks
-  const { data: timeRes, isLoading: isTimeLoading } = useGetAllPlayTimeQuery(
-    {}
-  );
-  const [createPlayTime, { isLoading: isCreatingTimeCat }] =
-    useCreatePlayTimeMutation();
-  const [updatePlayTime, { isLoading: isUpdatingTimeCat }] =
-    useUpdatePlayTimeMutation();
-  const [deletePlayTime, { isLoading: isDeletingTimeCat }] =
-    useDeletePlayTimeMutation();
+  const { data: timeRes, isLoading: isTimeLoading } = useGetAllPlayTimeQuery({});
+  const [createPlayTime, { isLoading: isCreatingTimeCat }] = useCreatePlayTimeMutation();
+  const [updatePlayTime, { isLoading: isUpdatingTimeCat }] = useUpdatePlayTimeMutation();
+  const [deletePlayTime, { isLoading: isDeletingTimeCat }] = useDeletePlayTimeMutation();
 
   // 5. Age Group API Hooks
-  const { data: ageGroupRes, isLoading: isAgeGroupLoading } =
-    useGetAllAgeGroupQuery({});
-  const [createAgeGroup, { isLoading: isCreatingAgeGroupCat }] =
-    useCreateAgeGroupMutation();
-  const [createAgeGroupSubCategory] =
-    useCreateAgeGroupSubCategoryMutation();
-  const [updateAgeGroup, { isLoading: isUpdatingAgeGroupCat }] =
-    useUpdateAgeGroupMutation();
-  const [deleteAgeGroup, { isLoading: isDeletingAgeGroupCat }] =
-    useDeleteAgeGroupMutation();
+  const { data: ageGroupRes, isLoading: isAgeGroupLoading } = useGetAllAgeGroupQuery({});
+  const [createAgeGroup, { isLoading: isCreatingAgeGroupCat }] = useCreateAgeGroupMutation();
+  const [createAgeGroupSubCategory] = useCreateAgeGroupSubCategoryMutation();
+  const [updateAgeGroup, { isLoading: isUpdatingAgeGroupCat }] = useUpdateAgeGroupMutation();
+  const [deleteAgeGroup, { isLoading: isDeletingAgeGroupCat }] = useDeleteAgeGroupMutation();
 
   // 6. News API Hooks
-  const { data: newsRes, isLoading: isNewsLoading } =
-    useGetAllNewsCategoryQuery({});
-  const [createNewsCategory, { isLoading: isCreatingNewsCat }] =
-    useCreateNewsCategoryMutation();
-  const [updateNewsCategory, { isLoading: isUpdatingNewsCat }] =
-    useUpdateNewsCategoryMutation();
-  const [deleteNewsCategory, { isLoading: isDeletingNewsCat }] =
-    useDeleteNewsCategoryMutation();
+  const { data: newsRes, isLoading: isNewsLoading } = useGetAllNewsCategoryQuery({});
+  const [createNewsCategory, { isLoading: isCreatingNewsCat }] = useCreateNewsCategoryMutation();
+  const [updateNewsCategory, { isLoading: isUpdatingNewsCat }] = useUpdateNewsCategoryMutation();
+  const [deleteNewsCategory, { isLoading: isDeletingNewsCat }] = useDeleteNewsCategoryMutation();
 
   // Category Lists
-  const galleryCategories: TCategory[] = useMemo(
-    () => galleryRes?.data || [],
-    [galleryRes]
-  );
-  const videoCategories: TCategory[] = useMemo(
-    () => videoRes?.data || [],
-    [videoRes]
-  );
+  const galleryCategories: TCategory[] = useMemo(() => galleryRes?.data || [], [galleryRes]);
+  const videoCategories: TCategory[] = useMemo(() => videoRes?.data || [], [videoRes]);
 
   // Sync server data into local drag state whenever server data changes
   const prevVideoRef = useRef<string>("");
@@ -306,22 +271,10 @@ export default function CategoryManagement() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
     setVideoCategoriesLocal(videoCategories);
   }
-  const venueCategories: TCategory[] = useMemo(
-    () => venueRes?.data || [],
-    [venueRes]
-  );
-  const timeCategories: TCategory[] = useMemo(
-    () => timeRes?.data || [],
-    [timeRes]
-  );
-  const ageGroupCategories: TCategory[] = useMemo(
-    () => ageGroupRes?.data || [],
-    [ageGroupRes]
-  );
-  const newsCategories: TCategory[] = useMemo(
-    () => newsRes?.data || [],
-    [newsRes]
-  );
+  const venueCategories: TCategory[] = useMemo(() => venueRes?.data || [], [venueRes]);
+  const timeCategories: TCategory[] = useMemo(() => timeRes?.data || [], [timeRes]);
+  const ageGroupCategories: TCategory[] = useMemo(() => ageGroupRes?.data || [], [ageGroupRes]);
+  const newsCategories: TCategory[] = useMemo(() => newsRes?.data || [], [newsRes]);
 
   // Map category data by domain key
   const domainDataMap: Record<CategoryDomainKey, TCategory[]> = useMemo(
@@ -354,15 +307,10 @@ export default function CategoryManagement() {
   };
 
   // Modal Control States
-  const [modalTargetDomain, setModalTargetDomain] =
-    useState<CategoryDomainKey>("gallery");
+  const [modalTargetDomain, setModalTargetDomain] = useState<CategoryDomainKey>("gallery");
   const [isCategoryModalOpen, setIsCategoryModalOpen] = useState(false);
-  const [editingCategory, setEditingCategory] = useState<TCategory | null>(
-    null
-  );
-  const [parentCategoryIdForSub, setParentCategoryIdForSub] = useState<
-    string | null
-  >(null);
+  const [editingCategory, setEditingCategory] = useState<TCategory | null>(null);
+  const [parentCategoryIdForSub, setParentCategoryIdForSub] = useState<string | null>(null);
 
   // Delete Confirm Modal State
   const [deleteTarget, setDeleteTarget] = useState<{
@@ -371,8 +319,6 @@ export default function CategoryManagement() {
     isSub: boolean;
     domain: CategoryDomainKey;
   } | null>(null);
-
-
 
   // Drag-and-drop handlers for Video categories
   const handleVideoDragStart = useCallback((index: number) => {
@@ -414,20 +360,14 @@ export default function CategoryManagement() {
     setIsCategoryModalOpen(true);
   };
 
-  const handleOpenAddSubCategoryModal = (
-    domainKey: CategoryDomainKey,
-    parentId: string
-  ) => {
+  const handleOpenAddSubCategoryModal = (domainKey: CategoryDomainKey, parentId: string) => {
     setModalTargetDomain(domainKey);
     setEditingCategory(null);
     setParentCategoryIdForSub(parentId);
     setIsCategoryModalOpen(true);
   };
 
-  const handleOpenEditCategoryModal = (
-    domainKey: CategoryDomainKey,
-    cat: TCategory
-  ) => {
+  const handleOpenEditCategoryModal = (domainKey: CategoryDomainKey, cat: TCategory) => {
     setModalTargetDomain(domainKey);
     setEditingCategory(cat);
     setParentCategoryIdForSub(null);
@@ -592,9 +532,7 @@ export default function CategoryManagement() {
         await deleteNewsCategory(id).unwrap();
       }
 
-      toast.success(
-        `${isSub ? "Subcategory" : "Category"} deleted successfully!`
-      );
+      toast.success(`${isSub ? "Subcategory" : "Category"} deleted successfully!`);
     } catch (err: any) {
       toast.error(getErrorMessage(err, "Failed to delete category"));
     } finally {
@@ -639,9 +577,7 @@ export default function CategoryManagement() {
     isUpdatingNewsCat ||
     isDeletingNewsCat;
 
-  const currentDomainConfig = DOMAIN_CONFIGS.find(
-    (cfg) => cfg.key === modalTargetDomain
-  );
+  const currentDomainConfig = DOMAIN_CONFIGS.find((cfg) => cfg.key === modalTargetDomain);
 
   return (
     <div className="w-full p-4 sm:p-6 lg:p-8 space-y-6 pb-16">
@@ -662,26 +598,21 @@ export default function CategoryManagement() {
         </div>
       </div>
 
-
-
       {/* Module Selector Navigation Tabs */}
       <div className="bg-white p-2 rounded-2xl border border-gray-100 shadow-sm flex items-center gap-1.5 overflow-x-auto no-scrollbar">
         <button
           type="button"
           onClick={() => setActiveTab("all")}
-          className={`px-4 py-2.5 rounded-xl text-xs font-medium transition-all flex items-center gap-2 cursor-pointer shrink-0 ${activeTab === "all"
-            ? "bg-black text-white shadow-sm"
-            : "text-gray-600 hover:bg-gray-100"
-            }`}
+          className={`px-4 py-2.5 rounded-xl text-xs font-medium transition-all flex items-center gap-2 cursor-pointer shrink-0 ${
+            activeTab === "all"
+              ? "bg-black text-white shadow-sm"
+              : "text-gray-600 hover:bg-gray-100"
+          }`}
         >
           <Layers className="w-4 h-4" />
           <span>
             All Overview (
-            {Object.values(domainDataMap).reduce(
-              (acc, list) => acc + (list?.length || 0),
-              0
-            )}
-            )
+            {Object.values(domainDataMap).reduce((acc, list) => acc + (list?.length || 0), 0)})
           </span>
         </button>
 
@@ -695,13 +626,14 @@ export default function CategoryManagement() {
               key={cfg.key}
               type="button"
               onClick={() => setActiveTab(cfg.key)}
-              className={`px-4 py-2.5 rounded-xl text-xs font-medium transition-all flex items-center gap-2 cursor-pointer shrink-0 ${isActive
-                ? "bg-black text-white shadow-sm"
-                : "text-gray-600 hover:bg-gray-100"
-                }`}
+              className={`px-4 py-2.5 rounded-xl text-xs font-medium transition-all flex items-center gap-2 cursor-pointer shrink-0 ${
+                isActive ? "bg-black text-white shadow-sm" : "text-gray-600 hover:bg-gray-100"
+              }`}
             >
               <Icon className={`w-4 h-4 ${isActive ? "text-white" : cfg.color.text}`} />
-              <span>{cfg.badgeLabel} ({catCount})</span>
+              <span>
+                {cfg.badgeLabel} ({catCount})
+              </span>
             </button>
           );
         })}
@@ -729,7 +661,9 @@ export default function CategoryManagement() {
                   <div>
                     <h2 className="text-lg font-medium text-gray-900 flex items-center gap-2">
                       <span>{config.label}</span>
-                      <span className={`text-[10px] font-medium px-2 py-0.5 rounded-full ${config.color.badgeBg}`}>
+                      <span
+                        className={`text-[10px] font-medium px-2 py-0.5 rounded-full ${config.color.badgeBg}`}
+                      >
                         {filteredCategories.length} Categories
                       </span>
                     </h2>
@@ -755,13 +689,13 @@ export default function CategoryManagement() {
               {isLoading ? (
                 <div className="bg-white rounded-2xl border border-gray-100 p-10 text-center flex flex-col items-center justify-center gap-2">
                   <Loader2 className="w-7 h-7 text-gray-400 animate-spin" />
-                  <p className="text-xs font-semibold text-gray-500">
-                    Loading {config.label}...
-                  </p>
+                  <p className="text-xs font-semibold text-gray-500">Loading {config.label}...</p>
                 </div>
               ) : filteredCategories.length === 0 ? (
                 <div className="bg-white rounded-2xl border border-gray-100 p-8 text-center flex flex-col items-center justify-center gap-2">
-                  <div className={`w-10 h-10 rounded-full ${config.color.bg} ${config.color.text} flex items-center justify-center`}>
+                  <div
+                    className={`w-10 h-10 rounded-full ${config.color.bg} ${config.color.text} flex items-center justify-center`}
+                  >
                     <FolderPlus className="w-5 h-5" />
                   </div>
                   <h4 className="text-sm font-medium text-gray-800">
@@ -805,9 +739,7 @@ export default function CategoryManagement() {
                           }`}
                         >
                           {/* Top Decorative Indicator */}
-                          <div
-                            className={`absolute top-0 left-0 right-0 h-1 ${config.color.bg}`}
-                          />
+                          <div className={`absolute top-0 left-0 right-0 h-1 ${config.color.bg}`} />
 
                           {/* Category Card Header */}
                           <div className="space-y-2">
@@ -852,9 +784,7 @@ export default function CategoryManagement() {
                               <div className="flex items-center gap-0.5 opacity-90 group-hover:opacity-100 transition-opacity shrink-0">
                                 <button
                                   type="button"
-                                  onClick={() =>
-                                    handleOpenEditCategoryModal(config.key, cat)
-                                  }
+                                  onClick={() => handleOpenEditCategoryModal(config.key, cat)}
                                   className="p-1.5 rounded-lg text-gray-400 hover:text-blue-600 hover:bg-blue-50 transition-colors cursor-pointer"
                                   title="Edit Category"
                                 >
@@ -890,12 +820,7 @@ export default function CategoryManagement() {
 
                                 <button
                                   type="button"
-                                  onClick={() =>
-                                    handleOpenAddSubCategoryModal(
-                                      config.key,
-                                      catId
-                                    )
-                                  }
+                                  onClick={() => handleOpenAddSubCategoryModal(config.key, catId)}
                                   className="text-[11px] font-medium text-blue-600 hover:text-blue-700 hover:underline cursor-pointer"
                                 >
                                   + Add Sub
@@ -970,7 +895,6 @@ export default function CategoryManagement() {
                   )}
                 </div>
               )}
-
             </div>
           );
         })}
@@ -995,11 +919,10 @@ export default function CategoryManagement() {
         isOpen={Boolean(deleteTarget)}
         onClose={() => setDeleteTarget(null)}
         onConfirm={handleConfirmDelete}
-        title={`Delete ${deleteTarget?.isSub ? "Subcategory" : "Category"
-          }`}
-        description={`Are you sure you want to delete "${deleteTarget?.name}" from ${DOMAIN_CONFIGS.find((c) => c.key === deleteTarget?.domain)?.label ||
-          "Category"
-          }? This action cannot be undone.`}
+        title={`Delete ${deleteTarget?.isSub ? "Subcategory" : "Category"}`}
+        description={`Are you sure you want to delete "${deleteTarget?.name}" from ${
+          DOMAIN_CONFIGS.find((c) => c.key === deleteTarget?.domain)?.label || "Category"
+        }? This action cannot be undone.`}
         isLoading={isAnyMutationLoading}
       />
     </div>

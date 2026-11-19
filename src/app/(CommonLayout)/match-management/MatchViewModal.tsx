@@ -2,11 +2,7 @@
 "use client";
 
 import React, { useState, useMemo, useRef, useEffect } from "react";
-import {
-  Dialog,
-  DialogContent,
-  DialogTitle,
-} from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
 import timezone from "dayjs/plugin/timezone";
@@ -25,16 +21,7 @@ import {
 } from "@/features/match/matchApi";
 import { useGetSingleTeamQuery } from "@/features/teamManagement/teamApi";
 import { toast } from "sonner";
-import {
-  X,
-  Loader2,
-  ShieldCheck,
-  ChevronDown,
-  Search,
-  Check,
-  Trash2,
-  Plus,
-} from "lucide-react";
+import { X, Loader2, ShieldCheck, ChevronDown, Search, Check, Trash2, Plus } from "lucide-react";
 
 interface MatchViewModalProps {
   match: any;
@@ -65,15 +52,35 @@ const EVENT_TYPE_OPTIONS: EventTypeOption[] = [
   { value: "yellow_card", label: "Yellow Card", category: "Discipline", indicator: "yellow_card" },
   { value: "red_card", label: "Red Card", category: "Discipline", indicator: "red_card" },
   { value: "foul", label: "Foul Committed", category: "Discipline", indicator: "none" },
-  { value: "sin_bin", label: "Sin Bin (10 Min Penalty)", category: "Discipline", indicator: "sin_bin" },
-  { value: "disrespect_to_referee", label: "Disrespect to Referee", category: "Discipline", indicator: "none" },
-  { value: "gross_misconduct", label: "Gross Misconduct", category: "Discipline", indicator: "red_card" },
+  {
+    value: "sin_bin",
+    label: "Sin Bin (10 Min Penalty)",
+    category: "Discipline",
+    indicator: "sin_bin",
+  },
+  {
+    value: "disrespect_to_referee",
+    label: "Disrespect to Referee",
+    category: "Discipline",
+    indicator: "none",
+  },
+  {
+    value: "gross_misconduct",
+    label: "Gross Misconduct",
+    category: "Discipline",
+    indicator: "red_card",
+  },
 
   // Squad Management
   { value: "substitution", label: "Substitution", category: "Squad", indicator: "none" },
 
   // Ratings & Accolades
-  { value: "player_of_the_day", label: "Player of the Match (POTD)", category: "Accolades", indicator: "rating" },
+  {
+    value: "player_of_the_day",
+    label: "Player of the Match (POTD)",
+    category: "Accolades",
+    indicator: "rating",
+  },
   { value: "good_rating", label: "Good Rating", category: "Accolades", indicator: "rating" },
   { value: "great_rating", label: "Great Rating", category: "Accolades", indicator: "rating" },
   { value: "elite_rating", label: "Elite Rating", category: "Accolades", indicator: "rating" },
@@ -106,7 +113,9 @@ const CustomEventDropdown = ({
 
   const renderIndicator = (indicator?: string) => {
     if (indicator === "yellow_card") {
-      return <span className="w-2 h-2.5 rounded-[1px] bg-amber-400 border border-amber-500/60 shrink-0 inline-block" />;
+      return (
+        <span className="w-2 h-2.5 rounded-[1px] bg-amber-400 border border-amber-500/60 shrink-0 inline-block" />
+      );
     }
     if (indicator === "red_card") {
       return <span className="w-2 h-2.5 rounded-[1px] bg-rose-600 shrink-0 inline-block" />;
@@ -137,7 +146,9 @@ const CustomEventDropdown = ({
           {renderIndicator(selectedOpt.indicator)}
           <span className="font-medium text-slate-800 truncate">{selectedOpt.label}</span>
         </div>
-        <ChevronDown className={`w-3.5 h-3.5 text-slate-400 transition-transform duration-150 ${isOpen ? "rotate-180" : ""}`} />
+        <ChevronDown
+          className={`w-3.5 h-3.5 text-slate-400 transition-transform duration-150 ${isOpen ? "rotate-180" : ""}`}
+        />
       </button>
 
       {isOpen && (
@@ -153,7 +164,9 @@ const CustomEventDropdown = ({
                   setIsOpen(false);
                 }}
                 className={`w-full px-3 py-2 text-xs flex items-center justify-between text-left transition-colors cursor-pointer ${
-                  isSelected ? "bg-slate-50 text-slate-900 font-semibold" : "text-slate-700 hover:bg-slate-50"
+                  isSelected
+                    ? "bg-slate-50 text-slate-900 font-semibold"
+                    : "text-slate-700 hover:bg-slate-50"
                 }`}
               >
                 <div className="flex items-center gap-2">
@@ -232,10 +245,14 @@ const SearchablePlayerDropdown = ({
         }}
         className="w-full h-9 px-3 text-xs bg-white border border-slate-200 rounded-lg flex items-center justify-between hover:border-slate-300 focus:outline-none focus:border-slate-400 focus:ring-1 focus:ring-slate-400 transition-colors text-left"
       >
-        <span className={`truncate ${selectedPlayerName ? "font-medium text-slate-800" : "text-slate-400"}`}>
+        <span
+          className={`truncate ${selectedPlayerName ? "font-medium text-slate-800" : "text-slate-400"}`}
+        >
           {selectedPlayerName || placeholder}
         </span>
-        <ChevronDown className={`w-3.5 h-3.5 text-slate-400 transition-transform duration-150 ${isOpen ? "rotate-180" : ""}`} />
+        <ChevronDown
+          className={`w-3.5 h-3.5 text-slate-400 transition-transform duration-150 ${isOpen ? "rotate-180" : ""}`}
+        />
       </button>
 
       {isOpen && (
@@ -272,7 +289,9 @@ const SearchablePlayerDropdown = ({
                       setIsOpen(false);
                     }}
                     className={`w-full px-2.5 py-1.5 text-xs flex items-center justify-between text-left rounded-md transition-colors cursor-pointer ${
-                      isSelected ? "bg-slate-100 font-semibold text-slate-900" : "text-slate-700 hover:bg-slate-50"
+                      isSelected
+                        ? "bg-slate-100 font-semibold text-slate-900"
+                        : "text-slate-700 hover:bg-slate-50"
                     }`}
                   >
                     <div className="flex items-center gap-2 truncate">
@@ -370,9 +389,13 @@ const MatchViewModal = ({
   const awayScore = match.awayScore ?? 0;
 
   const homeCleanSheet =
-    homeScore >= 0 && awayScore === 0 && (matchStatus === "COMPLETED" || matchStatus === "FINISHED");
+    homeScore >= 0 &&
+    awayScore === 0 &&
+    (matchStatus === "COMPLETED" || matchStatus === "FINISHED");
   const awayCleanSheet =
-    awayScore >= 0 && homeScore === 0 && (matchStatus === "COMPLETED" || matchStatus === "FINISHED");
+    awayScore >= 0 &&
+    homeScore === 0 &&
+    (matchStatus === "COMPLETED" || matchStatus === "FINISHED");
 
   const currentMembers = eventTeam === "home" ? homeMembers : awayMembers;
   const currentTeamId = eventTeam === "home" ? homeTeamId : awayTeamId;
@@ -380,8 +403,8 @@ const MatchViewModal = ({
   const rawEventsList: any[] = Array.isArray(eventsData?.data)
     ? eventsData.data
     : Array.isArray(eventsData?.result)
-    ? eventsData.result
-    : [];
+      ? eventsData.result
+      : [];
 
   const handleCreateEvent = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -487,7 +510,9 @@ const MatchViewModal = ({
                 Match Administration
               </DialogTitle>
               <span className="px-2 py-0.5 rounded text-[11px] font-medium bg-slate-100 text-slate-600 border border-slate-200">
-                {matchType === "league" ? match.league?.leagueName || "League Match" : `${matchType.toUpperCase()} Match`}
+                {matchType === "league"
+                  ? match.league?.leagueName || "League Match"
+                  : `${matchType.toUpperCase()} Match`}
               </span>
               {match.ageGroup && (
                 <span className="px-2 py-0.5 rounded text-[11px] font-medium bg-slate-100 text-slate-700">
@@ -495,9 +520,7 @@ const MatchViewModal = ({
                 </span>
               )}
             </div>
-            <p className="text-xs text-slate-400 mt-0.5 font-mono">
-              ID: {match._id || match.id}
-            </p>
+            <p className="text-xs text-slate-400 mt-0.5 font-mono">ID: {match._id || match.id}</p>
           </div>
 
           <div className="flex items-center gap-3">
@@ -622,15 +645,17 @@ const MatchViewModal = ({
               {/* Clean Sheet Bar */}
               <div className="border border-slate-200 rounded-lg p-3.5 flex items-center justify-between text-xs bg-slate-50/50">
                 <div className="flex items-center gap-2.5">
-                  <ShieldCheck className={`w-4 h-4 ${homeCleanSheet || awayCleanSheet ? "text-teal-600" : "text-slate-400"}`} />
+                  <ShieldCheck
+                    className={`w-4 h-4 ${homeCleanSheet || awayCleanSheet ? "text-teal-600" : "text-slate-400"}`}
+                  />
                   <span className="text-slate-700">
                     {homeCleanSheet && awayCleanSheet
                       ? "Clean sheet recorded for both teams (0-0)."
                       : homeCleanSheet
-                      ? `Clean sheet recorded for ${match.homeTeam?.teamName || "Home"}.`
-                      : awayCleanSheet
-                      ? `Clean sheet recorded for ${match.awayTeam?.teamName || "Away"}.`
-                      : "No clean sheet awarded."}
+                        ? `Clean sheet recorded for ${match.homeTeam?.teamName || "Home"}.`
+                        : awayCleanSheet
+                          ? `Clean sheet recorded for ${match.awayTeam?.teamName || "Away"}.`
+                          : "No clean sheet awarded."}
                   </span>
                 </div>
                 {onManageCleanSheet && (
@@ -651,23 +676,32 @@ const MatchViewModal = ({
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-xs">
                 <div>
                   <span className="text-slate-400 block mb-1">Venue</span>
-                  <p className="font-medium text-slate-800 line-clamp-1" title={match.venueName || "Unassigned"}>
+                  <p
+                    className="font-medium text-slate-800 line-clamp-1"
+                    title={match.venueName || "Unassigned"}
+                  >
                     {match.venueName || "Unassigned"}
                   </p>
                 </div>
                 <div>
                   <span className="text-slate-400 block mb-1">Formation</span>
-                  <p className="font-medium text-slate-800">{match.formation || "Standard Pitch"}</p>
+                  <p className="font-medium text-slate-800">
+                    {match.formation || "Standard Pitch"}
+                  </p>
                 </div>
                 <div>
                   <span className="text-slate-400 block mb-1">Kickoff Time</span>
                   <p className="font-medium text-slate-800">
-                    {match.matchDate ? dayjs(match.matchDate).tz("Europe/London").format("DD MMM, HH:mm") : "N/A"}
+                    {match.matchDate
+                      ? dayjs(match.matchDate).tz("Europe/London").format("DD MMM, HH:mm")
+                      : "N/A"}
                   </p>
                 </div>
                 <div>
                   <span className="text-slate-400 block mb-1">Duration</span>
-                  <p className="font-medium text-slate-800">{match.durationMinutes ? `${match.durationMinutes} min` : "90 min"}</p>
+                  <p className="font-medium text-slate-800">
+                    {match.durationMinutes ? `${match.durationMinutes} min` : "90 min"}
+                  </p>
                 </div>
               </div>
 
@@ -676,8 +710,12 @@ const MatchViewModal = ({
                 <div className="flex items-center justify-between">
                   <div>
                     <span className="text-xs text-slate-400 block mb-1">Match Referee</span>
-                    <p className="text-xs font-medium text-slate-900">{refereeName || "No referee assigned"}</p>
-                    {match.referee?.email && <p className="text-xs text-slate-500 mt-0.5">{match.referee.email}</p>}
+                    <p className="text-xs font-medium text-slate-900">
+                      {refereeName || "No referee assigned"}
+                    </p>
+                    {match.referee?.email && (
+                      <p className="text-xs text-slate-500 mt-0.5">{match.referee.email}</p>
+                    )}
                   </div>
                   {refereeName && (
                     <button
@@ -793,7 +831,9 @@ const MatchViewModal = ({
                           min={1}
                           max={120}
                           value={eventMinute}
-                          onChange={(e) => setEventMinute(Math.max(1, Math.min(120, Number(e.target.value) || 1)))}
+                          onChange={(e) =>
+                            setEventMinute(Math.max(1, Math.min(120, Number(e.target.value) || 1)))
+                          }
                           className="w-full h-9 pl-3 pr-9 text-xs bg-white border border-slate-200 rounded-lg text-slate-900 font-medium focus:outline-none focus:border-slate-400 focus:ring-1 focus:ring-slate-400"
                         />
                         <span className="absolute right-3 text-[11px] text-slate-400 font-medium pointer-events-none">
@@ -1005,7 +1045,8 @@ const MatchViewModal = ({
                               );
                             }
                             if (ev.eventType === "substitution") {
-                              const subDir = ev.eventMeta?.substitutionType === "out" ? "Out" : "In";
+                              const subDir =
+                                ev.eventMeta?.substitutionType === "out" ? "Out" : "In";
                               return (
                                 <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-slate-100 text-slate-700 border border-slate-200">
                                   Sub {subDir}
@@ -1076,8 +1117,12 @@ const MatchViewModal = ({
                                 {tName}
                               </td>
                               <td className="py-2.5 px-4 text-slate-500 text-xs">
-                                {isOwn && <span className="text-rose-600 font-medium mr-1.5">Own Goal</span>}
-                                {assistObj && <span>Assist: {assistObj.name || assistObj.displayName}</span>}
+                                {isOwn && (
+                                  <span className="text-rose-600 font-medium mr-1.5">Own Goal</span>
+                                )}
+                                {assistObj && (
+                                  <span>Assist: {assistObj.name || assistObj.displayName}</span>
+                                )}
                                 {note && <span>{note}</span>}
                                 {!isOwn && !assistObj && !note && "-"}
                               </td>

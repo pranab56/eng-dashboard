@@ -1,6 +1,5 @@
 import { baseApi } from "../../utils/apiBaseQuery";
 
-
 export const authApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
     // Login
@@ -42,7 +41,7 @@ export const authApi = baseApi.injectEndpoints({
         method: "POST",
         headers: {
           Authorization: `${token}`,
-          "Content-Type": "application/json"
+          "Content-Type": "application/json",
         },
         body: {
           newPassword: newPassword,
@@ -62,7 +61,6 @@ export const authApi = baseApi.injectEndpoints({
         body: { refreshToken },
       }),
     }),
-
   }),
 });
 

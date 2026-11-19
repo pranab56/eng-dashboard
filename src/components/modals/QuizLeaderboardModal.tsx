@@ -41,9 +41,7 @@ export default function QuizLeaderboardModal({
                 Quiz Leaderboard & Participants
               </span>
             </div>
-            <span className="text-xs text-slate-500 block mt-0.5">
-              {quizItem.title}
-            </span>
+            <span className="text-xs text-slate-500 block mt-0.5">{quizItem.title}</span>
           </div>
           <button
             type="button"
@@ -107,10 +105,10 @@ export default function QuizLeaderboardModal({
                           idx === 0
                             ? "bg-amber-100 text-amber-800"
                             : idx === 1
-                            ? "bg-slate-200 text-slate-700"
-                            : idx === 2
-                            ? "bg-amber-50 text-amber-900 border border-amber-200"
-                            : "text-slate-400"
+                              ? "bg-slate-200 text-slate-700"
+                              : idx === 2
+                                ? "bg-amber-50 text-amber-900 border border-amber-200"
+                                : "text-slate-400"
                         }`}
                       >
                         #{idx + 1}
@@ -118,11 +116,7 @@ export default function QuizLeaderboardModal({
 
                       <div className="w-7 h-7 rounded-full overflow-hidden bg-slate-100 border border-slate-200 shrink-0 flex items-center justify-center text-[10px] font-semibold text-slate-600">
                         {profileImg ? (
-                          <img
-                            src={profileImg}
-                            alt={name}
-                            className="w-full h-full object-cover"
-                          />
+                          <img src={profileImg} alt={name} className="w-full h-full object-cover" />
                         ) : (
                           name.slice(0, 2).toUpperCase()
                         )}
@@ -138,9 +132,7 @@ export default function QuizLeaderboardModal({
                             {att.timeTakenSeconds || 0}s
                           </span>
                           <span>?</span>
-                          <span>
-                            {dayjs(att.completedAt).format("DD MMM, HH:mm")}
-                          </span>
+                          <span>{dayjs(att.completedAt).format("DD MMM, HH:mm")}</span>
                         </div>
                       </div>
                     </div>
@@ -157,13 +149,10 @@ export default function QuizLeaderboardModal({
 
                       {att.rewardEarned > 0 ? (
                         <span className="inline-flex items-center gap-1 text-[11px] font-medium text-amber-700 bg-amber-50 border border-amber-200 px-2 py-0.5 rounded font-mono">
-                          <Award className="w-3 h-3 text-amber-600" />
-                          +{att.rewardEarned}
+                          <Award className="w-3 h-3 text-amber-600" />+{att.rewardEarned}
                         </span>
                       ) : (
-                        <span className="text-[10px] text-slate-400">
-                          Completed
-                        </span>
+                        <span className="text-[10px] text-slate-400">Completed</span>
                       )}
                     </div>
                   </div>

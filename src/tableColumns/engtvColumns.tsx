@@ -35,8 +35,8 @@ export const getEngtvColumns = (
         typeof catVal === "object" && catVal
           ? catVal.name
           : typeof catVal === "string"
-          ? catVal
-          : "";
+            ? catVal
+            : "";
 
       return (
         <div className="flex items-center gap-3">
@@ -67,9 +67,7 @@ export const getEngtvColumns = (
               )}
             </div>
             {catName && (
-              <span className="text-xs text-slate-500 dark:text-slate-400 truncate">
-                {catName}
-              </span>
+              <span className="text-xs text-slate-500 dark:text-slate-400 truncate">{catName}</span>
             )}
           </div>
         </div>

@@ -1,11 +1,11 @@
 export type TUser = {
-  id: string
-  profilePic: string
-  name: string
-  email: string
-  role: string
-  status: string
-}
+  id: string;
+  profilePic: string;
+  name: string;
+  email: string;
+  role: string;
+  status: string;
+};
 
 export type TUserManagement = {
   _id: string;
@@ -55,7 +55,7 @@ export type TUserManagement = {
   children?: any[];
   createdAt?: string;
   updatedAt?: string;
-}
+};
 
 export type MatchStatus = "Completed" | "Scheduled" | "On Going";
 
@@ -70,14 +70,14 @@ export type TMatch = {
   time?: string;
   score?: string;
   status?: string;
-  period?: 'first_half' | 'second_half' | null;
+  period?: "first_half" | "second_half" | null;
   scheduledAt?: string | Date | null;
   startedAt?: string | Date | null;
   firstHalfStartedAt?: string | Date | null;
   halfTimeAt?: string | Date | null;
   secondHalfStartedAt?: string | Date | null;
   finishedAt?: string | Date | null;
-}
+};
 
 export type TTable = {
   id: number;
@@ -89,7 +89,7 @@ export type TTable = {
   drawn: number;
   lost: number;
   points: number;
-}
+};
 
 export type TTeam = {
   id: number;
@@ -99,7 +99,7 @@ export type TTeam = {
   total_player: number;
   player_imgs: string[];
   status: string;
-}
+};
 
 export type TPlayer = {
   _id?: string;
@@ -129,7 +129,7 @@ export type TPlayer = {
   verified?: boolean;
   subscription?: any;
   isPaid?: boolean;
-}
+};
 
 export type TTransfer = {
   id: string;
@@ -145,11 +145,11 @@ export type TTransfer = {
   approvedByFirstName: string | null;
   approvedByLastName: string | null;
   transferType: string;
-  status: 'PENDING' | 'MANAGER_APPROVED' | 'APPROVED' | 'REJECTED' | string;
+  status: "PENDING" | "MANAGER_APPROVED" | "APPROVED" | "REJECTED" | string;
   rejectReason: string | null;
   createdAt: string;
   updatedAt: string;
-}
+};
 
 export type TEngtv = {
   _id: string;
@@ -165,7 +165,7 @@ export type TEngtv = {
   updatedAt: string;
   isHighlight?: boolean;
   order?: number;
-}
+};
 
 export type TNews = {
   id: number;
@@ -174,7 +174,7 @@ export type TNews = {
   category: string;
   author: string;
   publishDate: string;
-}
+};
 
 export type TNotification = {
   _id: string;
@@ -191,7 +191,7 @@ export type TNotification = {
     userName?: string;
     email?: string;
   };
-}
+};
 
 export type TReward = {
   id: number;
@@ -201,7 +201,7 @@ export type TReward = {
   pointsRequired: string;
   status: string;
   usage: number;
-}
+};
 
 export type TOrder = {
   id: string;
@@ -216,7 +216,7 @@ export type TOrder = {
   status: string;
   updatedAt: string;
   createdAt?: string;
-}
+};
 
 export type TGallery = {
   _id: string;
@@ -227,7 +227,7 @@ export type TGallery = {
   createdBy?: string;
   createdAt: string;
   updatedAt: string;
-}
+};
 
 export type TSocialMedia = {
   _id: string;
@@ -238,7 +238,7 @@ export type TSocialMedia = {
   order: number;
   createdAt?: string;
   updatedAt?: string;
-}
+};
 
 export type TSubCategory = {
   _id: string;
@@ -250,7 +250,7 @@ export type TSubCategory = {
   slug?: string;
   createdAt?: string;
   updatedAt?: string;
-}
+};
 
 export type TCategory = {
   _id: string;
@@ -263,7 +263,7 @@ export type TCategory = {
   subCategories?: TSubCategory[];
   createdAt?: string;
   updatedAt?: string;
-}
+};
 
 export type TPositionReward = {
   position: number;
@@ -315,17 +315,17 @@ export type TSponsorship = {
   id?: string;
   name: string;
   title?: string;
-  type: 'sponsor' | 'partner' | 'brand_collaboration';
+  type: "sponsor" | "partner" | "brand_collaboration";
   tier:
-    | 'title'
-    | 'platinum'
-    | 'gold'
-    | 'silver'
-    | 'bronze'
-    | 'official'
-    | 'community'
-    | 'media'
-    | 'other';
+    | "title"
+    | "platinum"
+    | "gold"
+    | "silver"
+    | "bronze"
+    | "official"
+    | "community"
+    | "media"
+    | "other";
   logo: string;
   banner?: string;
   websiteUrl?: string;
@@ -334,7 +334,7 @@ export type TSponsorship = {
   startDate?: string;
   endDate?: string;
   order?: number;
-  status: 'active' | 'inactive';
+  status: "active" | "inactive";
   clickCount?: number;
   impressionCount?: number;
   contactEmail?: string;
@@ -369,7 +369,7 @@ export type TPlayerVoting = {
   _id: string;
   id?: string;
   title: string;
-  votingType: 'WEEK' | 'MONTH' | 'OVERALL';
+  votingType: "WEEK" | "MONTH" | "OVERALL";
   league?: {
     _id: string;
     leagueName?: string;
@@ -383,7 +383,7 @@ export type TPlayerVoting = {
   month?: string;
   startDate: string;
   endDate: string;
-  status: 'upcoming' | 'active' | 'completed' | 'cancelled';
+  status: "upcoming" | "active" | "completed" | "cancelled";
   nominees: TPlayerNominee[];
   totalVotes: number;
   winner?: {
@@ -425,7 +425,7 @@ export type TRefereeVoting = {
   _id: string;
   id?: string;
   title: string;
-  votingType: 'WEEK' | 'MONTH';
+  votingType: "WEEK" | "MONTH";
   league?: {
     _id: string;
     leagueName?: string;
@@ -437,7 +437,7 @@ export type TRefereeVoting = {
   month?: string;
   startDate: string;
   endDate: string;
-  status: 'upcoming' | 'active' | 'completed' | 'cancelled';
+  status: "upcoming" | "active" | "completed" | "cancelled";
   nominees: TRefereeNominee[];
   totalVotes: number;
   winner?: {

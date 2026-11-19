@@ -1,12 +1,7 @@
 "use client";
 
 import React from "react";
-import {
-  Dialog,
-  DialogContent,
-  DialogTitle,
-  DialogDescription,
-} from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Check, X, AlertTriangle } from "lucide-react";
 
 interface TransferConfirmModalProps {
@@ -98,9 +93,7 @@ const TransferConfirmModal: React.FC<TransferConfirmModalProps> = ({
             onClick={onConfirm}
             disabled={isLoading}
             className={`h-8 px-4 rounded-md text-xs font-medium text-white transition-colors flex items-center gap-1.5 disabled:opacity-50 cursor-pointer ${
-              isApprove
-                ? "bg-emerald-600 hover:bg-emerald-700"
-                : "bg-rose-600 hover:bg-rose-700"
+              isApprove ? "bg-emerald-600 hover:bg-emerald-700" : "bg-rose-600 hover:bg-rose-700"
             }`}
           >
             {isLoading ? (

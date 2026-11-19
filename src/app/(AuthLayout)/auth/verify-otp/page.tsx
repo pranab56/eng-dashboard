@@ -11,13 +11,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import toast from "react-hot-toast";
 import { logo } from "@/assets/assets";
 
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormMessage,
-} from "@/components/ui/form";
+import { Form, FormControl, FormField, FormItem, FormMessage } from "@/components/ui/form";
 import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp";
 import { useResendOTPMutation, useVerifyEmailMutation } from "../../../../features/auth/authApi";
 
@@ -98,7 +92,9 @@ const VerifyOtp = () => {
             <ShieldCheck className="w-3.5 h-3.5 text-slate-600" />
             <span>Verification</span>
           </div>
-          <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-slate-900">Verify Code</h1>
+          <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-slate-900">
+            Verify Code
+          </h1>
           <p className="text-xs text-slate-500 mt-1.5 leading-relaxed">
             Enter the 6-digit verification code sent to{" "}
             <strong className="text-slate-800 font-semibold">{email || "your email"}</strong>
@@ -115,12 +111,30 @@ const VerifyOtp = () => {
                   <FormControl>
                     <InputOTP maxLength={6} {...field}>
                       <InputOTPGroup className="gap-1.5 sm:gap-2 justify-center">
-                        <InputOTPSlot index={0} className="w-9 h-11 sm:w-11 sm:h-12 text-base sm:text-lg rounded-md border-slate-200" />
-                        <InputOTPSlot index={1} className="w-9 h-11 sm:w-11 sm:h-12 text-base sm:text-lg rounded-md border-slate-200" />
-                        <InputOTPSlot index={2} className="w-9 h-11 sm:w-11 sm:h-12 text-base sm:text-lg rounded-md border-slate-200" />
-                        <InputOTPSlot index={3} className="w-9 h-11 sm:w-11 sm:h-12 text-base sm:text-lg rounded-md border-slate-200" />
-                        <InputOTPSlot index={4} className="w-9 h-11 sm:w-11 sm:h-12 text-base sm:text-lg rounded-md border-slate-200" />
-                        <InputOTPSlot index={5} className="w-9 h-11 sm:w-11 sm:h-12 text-base sm:text-lg rounded-md border-slate-200" />
+                        <InputOTPSlot
+                          index={0}
+                          className="w-9 h-11 sm:w-11 sm:h-12 text-base sm:text-lg rounded-md border-slate-200"
+                        />
+                        <InputOTPSlot
+                          index={1}
+                          className="w-9 h-11 sm:w-11 sm:h-12 text-base sm:text-lg rounded-md border-slate-200"
+                        />
+                        <InputOTPSlot
+                          index={2}
+                          className="w-9 h-11 sm:w-11 sm:h-12 text-base sm:text-lg rounded-md border-slate-200"
+                        />
+                        <InputOTPSlot
+                          index={3}
+                          className="w-9 h-11 sm:w-11 sm:h-12 text-base sm:text-lg rounded-md border-slate-200"
+                        />
+                        <InputOTPSlot
+                          index={4}
+                          className="w-9 h-11 sm:w-11 sm:h-12 text-base sm:text-lg rounded-md border-slate-200"
+                        />
+                        <InputOTPSlot
+                          index={5}
+                          className="w-9 h-11 sm:w-11 sm:h-12 text-base sm:text-lg rounded-md border-slate-200"
+                        />
                       </InputOTPGroup>
                     </InputOTP>
                   </FormControl>
@@ -180,7 +194,11 @@ const VerifyOtp = () => {
 
 export default function VerifyOtpPage() {
   return (
-    <Suspense fallback={<div className="text-center p-6 text-slate-400 text-xs">Loading verification...</div>}>
+    <Suspense
+      fallback={
+        <div className="text-center p-6 text-slate-400 text-xs">Loading verification...</div>
+      }
+    >
       <VerifyOtp />
     </Suspense>
   );

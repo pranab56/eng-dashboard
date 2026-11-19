@@ -2,11 +2,7 @@
 
 import React, { useState } from "react";
 import Image from "next/image";
-import {
-  Dialog,
-  DialogContent,
-  DialogTitle,
-} from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { formatImagePath } from "@/utils/formatImagePath";
 import { useGetLiveMarketPlayersQuery } from "@/features/transfer/transferApi";
 import {
@@ -27,10 +23,7 @@ interface LiveMarketPlayersModalProps {
   onClose: () => void;
 }
 
-const LiveMarketPlayersModal: React.FC<LiveMarketPlayersModalProps> = ({
-  isOpen,
-  onClose,
-}) => {
+const LiveMarketPlayersModal: React.FC<LiveMarketPlayersModalProps> = ({ isOpen, onClose }) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [page, setPage] = useState(1);
 
@@ -138,8 +131,10 @@ const LiveMarketPlayersModal: React.FC<LiveMarketPlayersModalProps> = ({
             playersList.map((item: any) => {
               const player = item.player || {};
               const currentTeam = item.currentTeam || {};
-              const playerName = `${player.firstName || ""} ${player.lastName || player.userName || "Player"}`.trim();
-              const initials = `${player.firstName?.[0] || ""}${player.lastName?.[0] || ""}`.toUpperCase() || "PL";
+              const playerName =
+                `${player.firstName || ""} ${player.lastName || player.userName || "Player"}`.trim();
+              const initials =
+                `${player.firstName?.[0] || ""}${player.lastName?.[0] || ""}`.toUpperCase() || "PL";
 
               return (
                 <div
@@ -184,7 +179,9 @@ const LiveMarketPlayersModal: React.FC<LiveMarketPlayersModalProps> = ({
                     {/* Preferred Positions */}
                     {item.preferredPositions && item.preferredPositions.length > 0 && (
                       <div className="hidden md:flex flex-col items-end">
-                        <span className="text-[10px] text-slate-400 uppercase font-semibold">Preferred</span>
+                        <span className="text-[10px] text-slate-400 uppercase font-semibold">
+                          Preferred
+                        </span>
                         <div className="flex items-center gap-1 mt-0.5">
                           {item.preferredPositions.map((p: string, idx: number) => (
                             <span
@@ -200,7 +197,9 @@ const LiveMarketPlayersModal: React.FC<LiveMarketPlayersModalProps> = ({
 
                     {/* Cost / Market Value */}
                     <div className="flex flex-col items-end">
-                      <span className="text-[10px] text-slate-400 uppercase font-semibold">Transfer Cost</span>
+                      <span className="text-[10px] text-slate-400 uppercase font-semibold">
+                        Transfer Cost
+                      </span>
                       <span className="font-mono font-bold text-xs text-amber-700 flex items-center gap-1 mt-0.5">
                         <Coins className="w-3 h-3 text-amber-500" />
                         {(player.engCoine || player.marketValue || 0).toLocaleString()} Coins
@@ -209,7 +208,9 @@ const LiveMarketPlayersModal: React.FC<LiveMarketPlayersModalProps> = ({
 
                     {/* Listed Date */}
                     <div className="hidden lg:flex flex-col items-end">
-                      <span className="text-[10px] text-slate-400 uppercase font-semibold">Listed Date</span>
+                      <span className="text-[10px] text-slate-400 uppercase font-semibold">
+                        Listed Date
+                      </span>
                       <span className="text-[11px] text-slate-500 mt-0.5">
                         {item.listedAt ? dayjs(item.listedAt).format("MMM D, YYYY") : "N/A"}
                       </span>

@@ -2,9 +2,9 @@
 
 // import { myFetch } from '@/utils/myFetch';
 // import { useSearchParams } from 'next/navigation';
-import React from 'react'
-import CustomSelectOption from '../cui/CustomSelectOption';
-import { selectOptionsRevenue } from '@/types/optionTypes';
+import React from "react";
+import CustomSelectOption from "../cui/CustomSelectOption";
+import { selectOptionsRevenue } from "@/types/optionTypes";
 
 const SubscriptionPie = () => {
   // const [data, setData] = useState<string>("");
@@ -31,8 +31,12 @@ const SubscriptionPie = () => {
     <div className="rounded-2xl bg-white p-4 flex flex-col items-center py-6">
       <div className="w-full flex items-center justify-between mb-12 ">
         <h2 className="text-2xl font-medium text-gray-700">Subscriptions</h2>
-        <div className='w-40'>
-          <CustomSelectOption selectOptions={selectOptionsRevenue} placeHolderValue="Select Year" queryKey="brandEngagementDuration" />
+        <div className="w-40">
+          <CustomSelectOption
+            selectOptions={selectOptionsRevenue}
+            placeHolderValue="Select Year"
+            queryKey="brandEngagementDuration"
+          />
         </div>
       </div>
 
@@ -58,21 +62,17 @@ const SubscriptionPie = () => {
             className="stroke-[#836AB1] text-primary"
             strokeWidth="6"
             strokeDasharray="100"
-            strokeDashoffset={
-              (100 * (100 - subscriptionSummary?.totalSubscribers)) / 100
-            }
+            strokeDashoffset={(100 * (100 - subscriptionSummary?.totalSubscribers)) / 100}
             strokeLinecap="round"
           ></circle>
         </svg>
 
         <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-secondary w-28 h-28 rounded-full flex flex-col items-center justify-center">
-          <span className="text-3xl font-medium">
-            {subscriptionSummary?.totalSubscribers}%
-          </span>
+          <span className="text-3xl font-medium">{subscriptionSummary?.totalSubscribers}%</span>
         </div>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default SubscriptionPie
+export default SubscriptionPie;

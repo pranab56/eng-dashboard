@@ -64,19 +64,11 @@ export const getRefereeVotingColumns = (
               {isWeek ? "Week Round" : "Month Round"}
             </span>
             {weekNumber ? (
-              <span className="text-[10px] font-mono text-slate-500">
-                Wk {weekNumber}
-              </span>
+              <span className="text-[10px] font-mono text-slate-500">Wk {weekNumber}</span>
             ) : null}
-            {month ? (
-              <span className="text-[10px] font-mono text-slate-500">
-                {month}
-              </span>
-            ) : null}
+            {month ? <span className="text-[10px] font-mono text-slate-500">{month}</span> : null}
           </div>
-          <span className="font-medium text-xs text-slate-900 truncate">
-            {title}
-          </span>
+          <span className="font-medium text-xs text-slate-900 truncate">{title}</span>
         </div>
       );
     },
@@ -84,9 +76,7 @@ export const getRefereeVotingColumns = (
   {
     accessorKey: "league",
     header: () => (
-      <span className="font-semibold text-xs text-slate-600 uppercase tracking-wider">
-        League
-      </span>
+      <span className="font-semibold text-xs text-slate-600 uppercase tracking-wider">League</span>
     ),
     cell: ({ row }) => {
       const league = row.original.league;
@@ -116,7 +106,8 @@ export const getRefereeVotingColumns = (
           <div className="flex -space-x-1.5 overflow-hidden">
             {visible.map((nom, i) => {
               const ref = nom.referee || {};
-              const name = `${ref.firstName || ""} ${ref.lastName || ""}`.trim() || ref.userName || "Referee";
+              const name =
+                `${ref.firstName || ""} ${ref.lastName || ""}`.trim() || ref.userName || "Referee";
               return (
                 <div
                   key={i}
@@ -168,7 +159,10 @@ export const getRefereeVotingColumns = (
     cell: ({ row }) => {
       const { winner, status, nominees } = row.original;
       if (status === "completed" && winner) {
-        const name = `${winner.firstName || ""} ${winner.lastName || ""}`.trim() || winner.userName || "Winner";
+        const name =
+          `${winner.firstName || ""} ${winner.lastName || ""}`.trim() ||
+          winner.userName ||
+          "Winner";
         return (
           <div className="flex items-center gap-1.5 text-xs font-medium text-slate-900">
             <Trophy className="w-3.5 h-3.5 text-amber-600 shrink-0" />
@@ -182,7 +176,8 @@ export const getRefereeVotingColumns = (
         const leader = sorted[0];
         if (leader && leader.votesCount > 0) {
           const lRef = leader.referee || {};
-          const lName = `${lRef.firstName || ""} ${lRef.lastName || ""}`.trim() || lRef.userName || "Official";
+          const lName =
+            `${lRef.firstName || ""} ${lRef.lastName || ""}`.trim() || lRef.userName || "Official";
           return (
             <div className="flex items-center gap-1 text-xs text-slate-700">
               <span className="truncate max-w-[120px]">{lName}</span>
@@ -214,9 +209,7 @@ export const getRefereeVotingColumns = (
   {
     accessorKey: "status",
     header: () => (
-      <span className="font-semibold text-xs text-slate-600 uppercase tracking-wider">
-        Status
-      </span>
+      <span className="font-semibold text-xs text-slate-600 uppercase tracking-wider">Status</span>
     ),
     cell: ({ row }) => getStatusBadge(row.original.status),
   },

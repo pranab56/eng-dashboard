@@ -58,7 +58,8 @@ export const getQuizColumns = (
       const qCount = Array.isArray(questions) ? questions.length : 0;
       const minutes = Math.floor((timeLimitSeconds || 120) / 60);
       const seconds = (timeLimitSeconds || 120) % 60;
-      const durationStr = minutes > 0 ? `${minutes}m ${seconds > 0 ? seconds + 's' : ''}` : `${seconds}s`;
+      const durationStr =
+        minutes > 0 ? `${minutes}m ${seconds > 0 ? seconds + "s" : ""}` : `${seconds}s`;
 
       return (
         <div className="flex flex-col min-w-[240px] py-1">
@@ -75,9 +76,7 @@ export const getQuizColumns = (
               {durationStr}
             </span>
           </div>
-          <span className="font-medium text-slate-900 text-xs mt-1.5 leading-snug">
-            {title}
-          </span>
+          <span className="font-medium text-slate-900 text-xs mt-1.5 leading-snug">{title}</span>
         </div>
       );
     },
@@ -97,9 +96,7 @@ export const getQuizColumns = (
             <Award className="w-3.5 h-3.5 text-amber-600" />
             <span>{rewardPoints || 0} Points</span>
           </div>
-          <span className="text-[11px] text-slate-500">
-            Passing: {passingPercentage || 70}%
-          </span>
+          <span className="text-[11px] text-slate-500">Passing: {passingPercentage || 70}%</span>
         </div>
       );
     },
@@ -150,9 +147,7 @@ export const getQuizColumns = (
   {
     accessorKey: "status",
     header: () => (
-      <span className="font-semibold text-xs text-slate-600 uppercase tracking-wider">
-        Status
-      </span>
+      <span className="font-semibold text-xs text-slate-600 uppercase tracking-wider">Status</span>
     ),
     cell: ({ row }) => {
       return getStatusBadge(row.original.status);

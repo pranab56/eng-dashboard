@@ -4,11 +4,7 @@ import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import {
-  Dialog,
-  DialogContent,
-  DialogTitle,
-} from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import InputField from "@/components/form/InputField";
 import ImageUploadField, { ImageChildrenComponent } from "@/components/form/ImageUploadField";
 import SubmitButton from "@/components/buttons/SubmitButton";
@@ -21,14 +17,7 @@ import {
 import { TPlayer } from "@/types/columnTypes";
 import { toast } from "sonner";
 import { formatImagePath } from "@/utils/formatImagePath";
-import {
-  User,
-  Activity,
-  Coins,
-  FileText,
-  Loader2,
-  X,
-} from "lucide-react";
+import { User, Activity, Coins, FileText, Loader2, X } from "lucide-react";
 
 const playerEditSchema = z.object({
   firstName: z.string().min(1, "First name is required"),
@@ -288,7 +277,10 @@ const PlayerEditModal = ({ player, isOpen, onClose }: PlayerEditModalProps) => {
 
         {/* Tab 1: Basic Info */}
         {activeTab === "details" && (
-          <form onSubmit={handleSubmit(onSaveDetails)} className="p-6 space-y-4 bg-white animate-in fade-in">
+          <form
+            onSubmit={handleSubmit(onSaveDetails)}
+            className="p-6 space-y-4 bg-white animate-in fade-in"
+          >
             <div className="grid grid-cols-2 gap-4">
               <InputField
                 name="firstName"
@@ -342,10 +334,7 @@ const PlayerEditModal = ({ player, isOpen, onClose }: PlayerEditModalProps) => {
               >
                 Cancel
               </button>
-              <SubmitButton
-                title="Update Basic Details"
-                isSubmitting={isUpdatingPlayer}
-              />
+              <SubmitButton title="Update Basic Details" isSubmitting={isUpdatingPlayer} />
             </div>
           </form>
         )}
@@ -354,7 +343,8 @@ const PlayerEditModal = ({ player, isOpen, onClose }: PlayerEditModalProps) => {
         {activeTab === "stats" && (
           <form onSubmit={onSaveStats} className="p-6 space-y-4 bg-white animate-in fade-in">
             <div className="p-3 bg-blue-50 border border-blue-200 rounded-xl text-xs text-blue-900 font-medium">
-              Modify career stats directly. Every change is logged with your admin ID and timestamp into the audit trail.
+              Modify career stats directly. Every change is logged with your admin ID and timestamp
+              into the audit trail.
             </div>
 
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
@@ -381,7 +371,9 @@ const PlayerEditModal = ({ player, isOpen, onClose }: PlayerEditModalProps) => {
               </div>
 
               <div className="bg-emerald-50/50 border border-emerald-200 rounded-xl p-3">
-                <label className="text-[11px] font-bold text-emerald-800 block mb-1">Clean Sheets</label>
+                <label className="text-[11px] font-bold text-emerald-800 block mb-1">
+                  Clean Sheets
+                </label>
                 <input
                   type="number"
                   min="0"
@@ -392,7 +384,9 @@ const PlayerEditModal = ({ player, isOpen, onClose }: PlayerEditModalProps) => {
               </div>
 
               <div className="bg-slate-50 border border-slate-200 rounded-xl p-3">
-                <label className="text-[11px] font-bold text-slate-600 block mb-1">Matches Played</label>
+                <label className="text-[11px] font-bold text-slate-600 block mb-1">
+                  Matches Played
+                </label>
                 <input
                   type="number"
                   min="0"
@@ -403,7 +397,9 @@ const PlayerEditModal = ({ player, isOpen, onClose }: PlayerEditModalProps) => {
               </div>
 
               <div className="bg-amber-50/50 border border-amber-200 rounded-xl p-3">
-                <label className="text-[11px] font-bold text-amber-800 block mb-1">Yellow Cards</label>
+                <label className="text-[11px] font-bold text-amber-800 block mb-1">
+                  Yellow Cards
+                </label>
                 <input
                   type="number"
                   min="0"
@@ -425,7 +421,9 @@ const PlayerEditModal = ({ player, isOpen, onClose }: PlayerEditModalProps) => {
               </div>
 
               <div className="bg-purple-50/50 border border-purple-200 rounded-xl p-3 col-span-2">
-                <label className="text-[11px] font-bold text-purple-800 block mb-1">Player of the Day Awards</label>
+                <label className="text-[11px] font-bold text-purple-800 block mb-1">
+                  Player of the Day Awards
+                </label>
                 <input
                   type="number"
                   min="0"
@@ -480,7 +478,9 @@ const PlayerEditModal = ({ player, isOpen, onClose }: PlayerEditModalProps) => {
                 type="button"
                 onClick={() => setCoinOp("ADD")}
                 className={`py-2 rounded-xl font-bold text-xs transition-all cursor-pointer ${
-                  coinOp === "ADD" ? "bg-emerald-600 text-white shadow-xs" : "text-slate-600 hover:text-slate-900"
+                  coinOp === "ADD"
+                    ? "bg-emerald-600 text-white shadow-xs"
+                    : "text-slate-600 hover:text-slate-900"
                 }`}
               >
                 Credit Coins (+)
@@ -489,7 +489,9 @@ const PlayerEditModal = ({ player, isOpen, onClose }: PlayerEditModalProps) => {
                 type="button"
                 onClick={() => setCoinOp("DEDUCT")}
                 className={`py-2 rounded-xl font-bold text-xs transition-all cursor-pointer ${
-                  coinOp === "DEDUCT" ? "bg-rose-600 text-white shadow-xs" : "text-slate-600 hover:text-slate-900"
+                  coinOp === "DEDUCT"
+                    ? "bg-rose-600 text-white shadow-xs"
+                    : "text-slate-600 hover:text-slate-900"
                 }`}
               >
                 Debit Coins (-)
@@ -514,11 +516,15 @@ const PlayerEditModal = ({ player, isOpen, onClose }: PlayerEditModalProps) => {
             <div className="grid grid-cols-2 gap-3 p-3 bg-slate-50 border border-slate-200 rounded-xl text-xs">
               <div>
                 <p className="text-[11px] font-semibold text-slate-500">Current Balance</p>
-                <p className="text-sm font-bold text-slate-900">{currentCoins.toLocaleString()} Coins</p>
+                <p className="text-sm font-bold text-slate-900">
+                  {currentCoins.toLocaleString()} Coins
+                </p>
               </div>
               <div className="border-l border-slate-200 pl-3">
                 <p className="text-[11px] font-semibold text-slate-500">Projected Balance</p>
-                <p className={`text-sm font-bold ${coinOp === "ADD" ? "text-emerald-600" : "text-rose-600"}`}>
+                <p
+                  className={`text-sm font-bold ${coinOp === "ADD" ? "text-emerald-600" : "text-rose-600"}`}
+                >
                   {projectedBalance.toLocaleString()} Coins
                 </p>
               </div>
@@ -552,7 +558,9 @@ const PlayerEditModal = ({ player, isOpen, onClose }: PlayerEditModalProps) => {
                 type="submit"
                 disabled={isAdjustingCoins || numCoinAmt <= 0 || !coinReason.trim()}
                 className={`px-6 py-2.5 rounded-xl text-white font-bold text-xs shadow-md transition-all cursor-pointer flex items-center gap-2 disabled:opacity-50 ${
-                  coinOp === "ADD" ? "bg-emerald-600 hover:bg-emerald-700" : "bg-rose-600 hover:bg-rose-700"
+                  coinOp === "ADD"
+                    ? "bg-emerald-600 hover:bg-emerald-700"
+                    : "bg-rose-600 hover:bg-rose-700"
                 }`}
               >
                 {isAdjustingCoins && <Loader2 className="w-4 h-4 animate-spin" />}

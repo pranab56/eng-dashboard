@@ -1,12 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 import React, { useState } from "react";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import Image from "next/image";
 import { TPlayer } from "@/types/columnTypes";
 import { formatImagePath } from "@/utils/formatImagePath";
@@ -60,7 +55,11 @@ const formatTransactionCategory = (cat: string) => {
   switch (cat) {
     case "MATCH_GOAL":
     case "GOAL":
-      return { label: "Goal Scored", icon: "", bg: "bg-emerald-50 text-emerald-700 border-emerald-200" };
+      return {
+        label: "Goal Scored",
+        icon: "",
+        bg: "bg-emerald-50 text-emerald-700 border-emerald-200",
+      };
     case "MATCH_ASSIST":
     case "ASSIST":
       return { label: "Goal Assist", icon: "", bg: "bg-blue-50 text-blue-700 border-blue-200" };
@@ -69,7 +68,11 @@ const formatTransactionCategory = (cat: string) => {
       return { label: "Clean Sheet", icon: "", bg: "bg-teal-50 text-teal-700 border-teal-200" };
     case "MATCH_POTD":
     case "PLAYER_OF_THE_DAY":
-      return { label: "Player of Day", icon: "", bg: "bg-amber-50 text-amber-700 border-amber-200" };
+      return {
+        label: "Player of Day",
+        icon: "",
+        bg: "bg-amber-50 text-amber-700 border-amber-200",
+      };
     case "PLAYING_MATCH":
     case "ATTEND_MATCH":
       return { label: "Match Appearance", icon: "", bg: "bg-sky-50 text-sky-700 border-sky-200" };
@@ -81,33 +84,57 @@ const formatTransactionCategory = (cat: string) => {
     case "PENALTY_CARD":
       return { label: "Red Card", icon: "", bg: "bg-rose-50 text-rose-700 border-rose-200" };
     case "FOUL_PENALTY":
-      return { label: "Foul Penalty", icon: "", bg: "bg-orange-50 text-orange-700 border-orange-200" };
+      return {
+        label: "Foul Penalty",
+        icon: "",
+        bg: "bg-orange-50 text-orange-700 border-orange-200",
+      };
     case "SIN_BIN_PENALTY":
       return { label: "Sin Bin", icon: "", bg: "bg-purple-50 text-purple-700 border-purple-200" };
     case "DISRESPECT_TO_REFEREE":
       return { label: "Referee Dispute", icon: "", bg: "bg-rose-50 text-rose-700 border-rose-200" };
     case "GROSS_MISCONDUCT":
-      return { label: "Gross Misconduct", icon: "", bg: "bg-rose-50 text-rose-700 border-rose-200" };
+      return {
+        label: "Gross Misconduct",
+        icon: "",
+        bg: "bg-rose-50 text-rose-700 border-rose-200",
+      };
     case "SUBSCRIPTION_BONUS":
-      return { label: "Plan Bonus", icon: "", bg: "bg-purple-50 text-purple-700 border-purple-200" };
+      return {
+        label: "Plan Bonus",
+        icon: "",
+        bg: "bg-purple-50 text-purple-700 border-purple-200",
+      };
     case "PRODUCT_PURCHASE":
       return { label: "Reward Order", icon: "", bg: "bg-rose-50 text-rose-700 border-rose-200" };
     case "ADMIN_ADJUSTMENT":
-      return { label: "Admin Adjustment", icon: "", bg: "bg-indigo-50 text-indigo-700 border-indigo-200" };
+      return {
+        label: "Admin Adjustment",
+        icon: "",
+        bg: "bg-indigo-50 text-indigo-700 border-indigo-200",
+      };
     case "REFEREE_REVIEW":
-      return { label: "Manager Review", icon: "", bg: "bg-slate-50 text-slate-700 border-slate-200" };
+      return {
+        label: "Manager Review",
+        icon: "",
+        bg: "bg-slate-50 text-slate-700 border-slate-200",
+      };
     case "ROLLBACK":
-      return { label: "Rollback Reversal", icon: "", bg: "bg-slate-50 text-slate-700 border-slate-200" };
+      return {
+        label: "Rollback Reversal",
+        icon: "",
+        bg: "bg-slate-50 text-slate-700 border-slate-200",
+      };
     default:
-      return { label: cat ? cat.replace(/_/g, " ") : "Transaction", icon: "", bg: "bg-slate-50 text-slate-700 border-slate-200" };
+      return {
+        label: cat ? cat.replace(/_/g, " ") : "Transaction",
+        icon: "",
+        bg: "bg-slate-50 text-slate-700 border-slate-200",
+      };
   }
 };
 
-const PlayerViewModal: React.FC<PlayerViewModalProps> = ({
-  player,
-  isOpen,
-  onClose,
-}) => {
+const PlayerViewModal: React.FC<PlayerViewModalProps> = ({ player, isOpen, onClose }) => {
   const [activeTab, setActiveTab] = useState<"profile" | "stats" | "ledger">("profile");
   const [previewImage, setPreviewImage] = useState<string | null>(null);
   const [copiedField, setCopiedField] = useState<string | null>(null);
@@ -169,36 +196,31 @@ const PlayerViewModal: React.FC<PlayerViewModalProps> = ({
   const auditLogs: any[] = Array.isArray(auditLogsData?.data?.data)
     ? auditLogsData.data.data
     : Array.isArray(auditLogsData?.data)
-    ? auditLogsData.data
-    : Array.isArray(auditLogsData?.data?.result)
-    ? auditLogsData.data.result
-    : [];
+      ? auditLogsData.data
+      : Array.isArray(auditLogsData?.data?.result)
+        ? auditLogsData.data.result
+        : [];
   const coinTransactions: any[] = Array.isArray(coinHistoryData?.data?.data)
     ? coinHistoryData.data.data
     : Array.isArray(coinHistoryData?.data?.transactions)
-    ? coinHistoryData.data.transactions
-    : Array.isArray(coinHistoryData?.data)
-    ? coinHistoryData.data
-    : [];
+      ? coinHistoryData.data.transactions
+      : Array.isArray(coinHistoryData?.data)
+        ? coinHistoryData.data
+        : [];
   const coinMeta = coinHistoryData?.data?.meta || { total: 0, totalPages: 1 };
 
   React.useEffect(() => {
     if (player) {
-      const initialCoins =
-        Number((player as any).engCoine ?? (player as any).coin ?? 0) || 0;
-      const initialMarketValue =
-        Number((player as any).marketValue) || initialCoins * 100;
+      const initialCoins = Number((player as any).engCoine ?? (player as any).coin ?? 0) || 0;
+      const initialMarketValue = Number((player as any).marketValue) || initialCoins * 100;
 
       setCurrentCoins(initialCoins);
       setCurrentMarketValue(initialMarketValue);
       setEditCoinsInput(initialCoins);
 
-      const curTeamId =
-        (player as any).selectTeam?._id || (player as any).selectTeam || "";
+      const curTeamId = (player as any).selectTeam?._id || (player as any).selectTeam || "";
       setSelectedTeamIdInput(
-        typeof curTeamId === "string"
-          ? curTeamId
-          : (curTeamId as any)?._id || "",
+        typeof curTeamId === "string" ? curTeamId : (curTeamId as any)?._id || ""
       );
       setIsEditingEconomy(false);
       setCoinPage(1);
@@ -217,17 +239,11 @@ const PlayerViewModal: React.FC<PlayerViewModalProps> = ({
       }).unwrap();
 
       if (res.success) {
-        toast.success(
-          res.message || "ENG Coins & Market Value updated successfully",
-        );
+        toast.success(res.message || "ENG Coins & Market Value updated successfully");
         const updatedCoins =
-          res?.data?.engCoine !== undefined
-            ? Number(res.data.engCoine)
-            : newCoins;
+          res?.data?.engCoine !== undefined ? Number(res.data.engCoine) : newCoins;
         const updatedMarketValue =
-          res?.data?.marketValue !== undefined
-            ? Number(res.data.marketValue)
-            : newMarketValue;
+          res?.data?.marketValue !== undefined ? Number(res.data.marketValue) : newMarketValue;
 
         setCurrentCoins(updatedCoins);
         setCurrentMarketValue(updatedMarketValue);
@@ -263,9 +279,7 @@ const PlayerViewModal: React.FC<PlayerViewModalProps> = ({
 
   if (!player) return null;
 
-  const profileUrl = formatImagePath(
-    player.profile || (player as any).profilePic,
-  );
+  const profileUrl = formatImagePath(player.profile || (player as any).profilePic);
   const fullName = player.firstName
     ? `${player.firstName} ${player.lastName || ""}`.trim()
     : (player as any).userName || (player as any).name || "Player Profile";
@@ -286,8 +300,7 @@ const PlayerViewModal: React.FC<PlayerViewModalProps> = ({
   const parentEmail = parentObj?.email || null;
   const parentPhone = parentObj?.phone || null;
 
-  const rawSub =
-    (player as any).subscription || (player as any).activeSubscription;
+  const rawSub = (player as any).subscription || (player as any).activeSubscription;
   const sub = rawSub
     ? {
         _id: rawSub._id,
@@ -372,16 +385,9 @@ const PlayerViewModal: React.FC<PlayerViewModalProps> = ({
               <div className="flex items-center gap-3.5">
                 <div className="relative w-14 h-14 rounded-xl bg-slate-100 border border-slate-200 overflow-hidden flex items-center justify-center shrink-0">
                   {profileUrl ? (
-                    <Image
-                      src={profileUrl}
-                      alt={fullName}
-                      fill
-                      className="object-cover"
-                    />
+                    <Image src={profileUrl} alt={fullName} fill className="object-cover" />
                   ) : (
-                    <span className="text-xl font-bold text-slate-600">
-                      {initials}
-                    </span>
+                    <span className="text-xl font-bold text-slate-600">{initials}</span>
                   )}
                 </div>
 
@@ -393,19 +399,12 @@ const PlayerViewModal: React.FC<PlayerViewModalProps> = ({
                     )}
                   </DialogTitle>
                   <p className="text-xs text-slate-500 mt-0.5 flex items-center gap-2">
-                    <span>
-                      {(player as any).email ||
-                        parentEmail ||
-                        "Managed Player Profile"}
-                    </span>
+                    <span>{(player as any).email || parentEmail || "Managed Player Profile"}</span>
                     {(player as any).createdAt && (
                       <>
                         <span>•</span>
                         <span>
-                          Joined{" "}
-                          {dayjs((player as any).createdAt).format(
-                            "MMM DD, YYYY",
-                          )}
+                          Joined {dayjs((player as any).createdAt).format("MMM DD, YYYY")}
                         </span>
                       </>
                     )}
@@ -413,9 +412,7 @@ const PlayerViewModal: React.FC<PlayerViewModalProps> = ({
 
                   <div className="flex items-center gap-2 mt-2">
                     <span className="px-2 py-0.5 rounded-md text-[11px] font-medium uppercase bg-slate-100 text-slate-700 border border-slate-200">
-                      {(player as any).role
-                        ? (player as any).role.replace(/_/g, " ")
-                        : "PLAYER"}
+                      {(player as any).role ? (player as any).role.replace(/_/g, " ") : "PLAYER"}
                     </span>
 
                     {(player as any).ageGroup && (
@@ -534,8 +531,8 @@ const PlayerViewModal: React.FC<PlayerViewModalProps> = ({
                   <div className="bg-indigo-50/40 border border-indigo-100 rounded-2xl p-4 space-y-2.5">
                     <div className="flex items-center justify-between">
                       <h3 className="text-xs font-bold text-indigo-900 uppercase tracking-wider flex items-center gap-1.5">
-                        <Users className="w-4 h-4 text-indigo-600" /> Parent /
-                        Account Owner Information
+                        <Users className="w-4 h-4 text-indigo-600" /> Parent / Account Owner
+                        Information
                       </h3>
                       <span className="px-2 py-0.5 rounded-md text-[10px] font-semibold bg-indigo-100 text-indigo-700 border border-indigo-200">
                         Account Owner
@@ -544,18 +541,12 @@ const PlayerViewModal: React.FC<PlayerViewModalProps> = ({
 
                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-1">
                       <div>
-                        <p className="text-[11px] font-semibold text-slate-500">
-                          Parent Name
-                        </p>
-                        <p className="text-xs font-bold text-slate-900">
-                          {parentName || "N/A"}
-                        </p>
+                        <p className="text-[11px] font-semibold text-slate-500">Parent Name</p>
+                        <p className="text-xs font-bold text-slate-900">{parentName || "N/A"}</p>
                       </div>
 
                       <div>
-                        <p className="text-[11px] font-semibold text-slate-500">
-                          Parent Email
-                        </p>
+                        <p className="text-[11px] font-semibold text-slate-500">Parent Email</p>
                         <div className="flex items-center gap-1">
                           <p className="text-xs font-semibold text-slate-800 truncate flex items-center gap-1">
                             <Mail className="w-3.5 h-3.5 text-indigo-600 shrink-0" />
@@ -564,9 +555,7 @@ const PlayerViewModal: React.FC<PlayerViewModalProps> = ({
                           {parentEmail && (
                             <button
                               type="button"
-                              onClick={() =>
-                                handleCopyText(parentEmail, "Parent Email")
-                              }
+                              onClick={() => handleCopyText(parentEmail, "Parent Email")}
                               className="p-1 text-slate-400 hover:text-slate-700 transition-colors cursor-pointer"
                               title="Copy Email"
                             >
@@ -592,9 +581,7 @@ const PlayerViewModal: React.FC<PlayerViewModalProps> = ({
                           {parentPhone && (
                             <button
                               type="button"
-                              onClick={() =>
-                                handleCopyText(parentPhone, "Parent Phone")
-                              }
+                              onClick={() => handleCopyText(parentPhone, "Parent Phone")}
                               className="p-1 text-slate-400 hover:text-slate-700 transition-colors cursor-pointer"
                               title="Copy Phone"
                             >
@@ -615,8 +602,7 @@ const PlayerViewModal: React.FC<PlayerViewModalProps> = ({
                 <div className="bg-emerald-50/50 border border-emerald-200/80 rounded-2xl p-4 space-y-2.5">
                   <div className="flex items-center justify-between">
                     <h3 className="text-xs font-bold text-emerald-950 uppercase tracking-wider flex items-center gap-1.5">
-                      <CreditCard className="w-4 h-4 text-emerald-600" /> Active
-                      Subscription Plan
+                      <CreditCard className="w-4 h-4 text-emerald-600" /> Active Subscription Plan
                     </h3>
                     <span
                       className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase border ${sub ? "bg-emerald-100 text-emerald-800 border-emerald-300" : "bg-slate-100 text-slate-600 border-slate-200"}`}
@@ -628,34 +614,24 @@ const PlayerViewModal: React.FC<PlayerViewModalProps> = ({
                   {sub ? (
                     <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-1">
                       <div>
-                        <p className="text-[11px] font-semibold text-slate-500">
-                          Package
-                        </p>
+                        <p className="text-[11px] font-semibold text-slate-500">Package</p>
                         <p className="text-xs font-bold text-slate-900 flex items-center gap-1">
                           <Sparkles className="w-3.5 h-3.5 text-emerald-600" />
                           {sub.packageName || "ENG Plan"}
                         </p>
                       </div>
                       <div>
-                        <p className="text-[11px] font-semibold text-slate-500">
-                          Price Paid
-                        </p>
-                        <p className="text-xs font-bold text-slate-900">
-                          £{sub.price}
-                        </p>
+                        <p className="text-[11px] font-semibold text-slate-500">Price Paid</p>
+                        <p className="text-xs font-bold text-slate-900">£{sub.price}</p>
                       </div>
                       <div>
-                        <p className="text-[11px] font-semibold text-slate-500">
-                          Status
-                        </p>
+                        <p className="text-[11px] font-semibold text-slate-500">Status</p>
                         <p className="text-xs font-bold text-emerald-700 uppercase">
                           {sub.status || "Active"}
                         </p>
                       </div>
                       <div>
-                        <p className="text-[11px] font-semibold text-slate-500">
-                          Valid Until
-                        </p>
+                        <p className="text-[11px] font-semibold text-slate-500">Valid Until</p>
                         <p className="text-xs font-bold text-slate-800 flex items-center gap-1">
                           <Calendar className="w-3.5 h-3.5 text-slate-500 shrink-0" />
                           {sub.currentPeriodEnd
@@ -674,33 +650,24 @@ const PlayerViewModal: React.FC<PlayerViewModalProps> = ({
                 {/* Primary Details Card */}
                 <div className="bg-white border border-slate-200/80 rounded-2xl p-4 space-y-3 shadow-xs">
                   <h3 className="text-xs font-bold text-slate-900 uppercase tracking-wider flex items-center gap-1.5">
-                    <User className="w-4 h-4 text-slate-600" /> Player Profile
-                    Information
+                    <User className="w-4 h-4 text-slate-600" /> Player Profile Information
                   </h3>
 
                   <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                     <div>
-                      <p className="text-[11px] font-semibold text-slate-500">
-                        First Name
-                      </p>
+                      <p className="text-[11px] font-semibold text-slate-500">First Name</p>
                       <p className="text-xs font-bold text-slate-900">
                         {player.firstName || (player as any).userName || "N/A"}
                       </p>
                     </div>
 
                     <div>
-                      <p className="text-[11px] font-semibold text-slate-500">
-                        Last Name
-                      </p>
-                      <p className="text-xs font-bold text-slate-900">
-                        {player.lastName || "N/A"}
-                      </p>
+                      <p className="text-[11px] font-semibold text-slate-500">Last Name</p>
+                      <p className="text-xs font-bold text-slate-900">{player.lastName || "N/A"}</p>
                     </div>
 
                     <div>
-                      <p className="text-[11px] font-semibold text-slate-500">
-                        Date of Birth
-                      </p>
+                      <p className="text-[11px] font-semibold text-slate-500">Date of Birth</p>
                       <p className="text-xs font-bold text-slate-800 flex items-center gap-1">
                         <Calendar className="w-3.5 h-3.5 text-slate-500 shrink-0" />
                         {player.dateOfBirth
@@ -710,27 +677,19 @@ const PlayerViewModal: React.FC<PlayerViewModalProps> = ({
                     </div>
 
                     <div>
-                      <p className="text-[11px] font-semibold text-slate-500">
-                        Age Group
-                      </p>
+                      <p className="text-[11px] font-semibold text-slate-500">Age Group</p>
                       <p className="text-xs font-bold text-blue-700 bg-blue-50 px-2 py-0.5 rounded-md border border-blue-200 inline-block">
                         {player.ageGroup || "N/A"}
                       </p>
                     </div>
 
                     <div>
-                      <p className="text-[11px] font-semibold text-slate-500">
-                        Position
-                      </p>
-                      <p className="text-xs font-bold text-slate-900">
-                        {player.position || "N/A"}
-                      </p>
+                      <p className="text-[11px] font-semibold text-slate-500">Position</p>
+                      <p className="text-xs font-bold text-slate-900">{player.position || "N/A"}</p>
                     </div>
 
                     <div>
-                      <p className="text-[11px] font-semibold text-slate-500">
-                        Preferred Foot
-                      </p>
+                      <p className="text-[11px] font-semibold text-slate-500">Preferred Foot</p>
                       <p className="text-xs font-bold text-slate-900">
                         {player.strongFoot || "N/A"}
                       </p>
@@ -738,9 +697,7 @@ const PlayerViewModal: React.FC<PlayerViewModalProps> = ({
 
                     <div>
                       <div className="flex items-center justify-between">
-                        <p className="text-[11px] font-semibold text-slate-500">
-                          ENG Coin
-                        </p>
+                        <p className="text-[11px] font-semibold text-slate-500">ENG Coin</p>
                         {!isEditingEconomy && (
                           <button
                             type="button"
@@ -768,9 +725,7 @@ const PlayerViewModal: React.FC<PlayerViewModalProps> = ({
                             disabled={isSavingEconomy}
                             className="px-2 py-1 bg-amber-500 text-white font-bold text-[10px] rounded-lg hover:bg-amber-600 disabled:opacity-50 cursor-pointer shadow-xs flex items-center gap-1"
                           >
-                            {isSavingEconomy && (
-                              <Loader2 className="w-3 h-3 animate-spin" />
-                            )}
+                            {isSavingEconomy && <Loader2 className="w-3 h-3 animate-spin" />}
                             Save
                           </button>
                           <button
@@ -794,15 +749,11 @@ const PlayerViewModal: React.FC<PlayerViewModalProps> = ({
                     </div>
 
                     <div>
-                      <p className="text-[11px] font-semibold text-slate-500">
-                        Market Value
-                      </p>
+                      <p className="text-[11px] font-semibold text-slate-500">Market Value</p>
                       <p className="text-xs font-bold text-emerald-600">
                         £
                         {isEditingEconomy
-                          ? (
-                              Math.max(0, Number(editCoinsInput) || 0) * 100
-                            ).toLocaleString()
+                          ? (Math.max(0, Number(editCoinsInput) || 0) * 100).toLocaleString()
                           : currentMarketValue.toLocaleString()}
                       </p>
                     </div>
@@ -812,9 +763,7 @@ const PlayerViewModal: React.FC<PlayerViewModalProps> = ({
                         <p className="text-[11px] font-semibold text-slate-500">
                           Previous Club / Team
                         </p>
-                        <p className="text-xs font-bold text-slate-900">
-                          {player.previousClub}
-                        </p>
+                        <p className="text-xs font-bold text-slate-900">{player.previousClub}</p>
                       </div>
                     )}
                   </div>
@@ -826,8 +775,7 @@ const PlayerViewModal: React.FC<PlayerViewModalProps> = ({
                   <div className="bg-white border border-slate-200/80 rounded-2xl p-4 space-y-2.5 shadow-xs">
                     <div className="flex items-center justify-between">
                       <h3 className="text-xs font-bold text-slate-900 uppercase tracking-wider flex items-center gap-1.5">
-                        <Building2 className="w-4 h-4 text-slate-600" /> Assigned
-                        Club / Team
+                        <Building2 className="w-4 h-4 text-slate-600" /> Assigned Club / Team
                       </h3>
                       <button
                         type="button"
@@ -864,15 +812,12 @@ const PlayerViewModal: React.FC<PlayerViewModalProps> = ({
                             disabled={isSavingTeam}
                             className="px-3 py-1 bg-indigo-600 text-white text-xs font-bold rounded-lg hover:bg-indigo-700 disabled:opacity-50 cursor-pointer flex items-center gap-1 shadow-xs"
                           >
-                            {isSavingTeam && (
-                              <Loader2 className="w-3 h-3 animate-spin" />
-                            )}
+                            {isSavingTeam && <Loader2 className="w-3 h-3 animate-spin" />}
                             Save Team
                           </button>
                         </div>
                       </div>
-                    ) : selectedTeam &&
-                      (selectedTeam.teamName || selectedTeam.shortName) ? (
+                    ) : selectedTeam && (selectedTeam.teamName || selectedTeam.shortName) ? (
                       <div className="flex items-center gap-3 p-2.5 bg-slate-50 border border-slate-200 rounded-xl">
                         <div className="relative w-10 h-10 rounded-lg bg-white border border-slate-200 flex items-center justify-center overflow-hidden shrink-0">
                           {selectedTeam.teamLogo ? (
@@ -908,8 +853,7 @@ const PlayerViewModal: React.FC<PlayerViewModalProps> = ({
                   {/* Academy & Consent Status Card */}
                   <div className="bg-white border border-slate-200/80 rounded-2xl p-4 space-y-2.5 shadow-xs">
                     <h3 className="text-xs font-bold text-slate-900 uppercase tracking-wider flex items-center gap-1.5">
-                      <Sparkles className="w-4 h-4 text-amber-500" /> Academy &
-                      Consent Status
+                      <Sparkles className="w-4 h-4 text-amber-500" /> Academy & Consent Status
                     </h3>
 
                     <div className="space-y-1.5 text-xs">
@@ -927,9 +871,7 @@ const PlayerViewModal: React.FC<PlayerViewModalProps> = ({
                       </div>
 
                       <div className="flex justify-between items-center bg-slate-50 p-2 rounded-lg border border-slate-200">
-                        <span className="font-medium text-slate-600">
-                          Development Player?
-                        </span>
+                        <span className="font-medium text-slate-600">Development Player?</span>
                         <span
                           className={`px-2 py-0.5 rounded text-[10px] font-semibold ${(player as any).isDevelopmentPlayer ? "bg-amber-50 text-amber-700 border border-amber-200" : "bg-slate-100 text-slate-500"}`}
                         >
@@ -938,9 +880,7 @@ const PlayerViewModal: React.FC<PlayerViewModalProps> = ({
                       </div>
 
                       <div className="flex justify-between items-center bg-slate-50 p-2 rounded-lg border border-slate-200">
-                        <span className="font-medium text-slate-600">
-                          Filming & Media Consent?
-                        </span>
+                        <span className="font-medium text-slate-600">Filming & Media Consent?</span>
                         <span
                           className={`px-2 py-0.5 rounded text-[10px] font-semibold ${(player as any).mediaConsent ? "bg-emerald-50 text-emerald-700 border border-emerald-200" : "bg-rose-50 text-rose-700 border border-rose-200"}`}
                         >
@@ -952,12 +892,10 @@ const PlayerViewModal: React.FC<PlayerViewModalProps> = ({
                 </div>
 
                 {/* Emergency Contacts Card */}
-                {((player as any).emergencyEmail ||
-                  (player as any).emergencyPhone) && (
+                {((player as any).emergencyEmail || (player as any).emergencyPhone) && (
                   <div className="bg-white border border-slate-200/80 rounded-2xl p-4 space-y-2.5 shadow-xs">
                     <h3 className="text-xs font-bold text-slate-900 uppercase tracking-wider flex items-center gap-1.5">
-                      <Phone className="w-4 h-4 text-rose-500" /> Emergency Contact
-                      Details
+                      <Phone className="w-4 h-4 text-rose-500" /> Emergency Contact Details
                     </h3>
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
@@ -990,12 +928,10 @@ const PlayerViewModal: React.FC<PlayerViewModalProps> = ({
                 <div className="space-y-3">
                   <div className="flex items-center justify-between">
                     <h3 className="text-xs font-bold text-slate-900 uppercase tracking-wider flex items-center gap-1.5">
-                      <FileText className="w-4 h-4 text-slate-600" /> Uploaded
-                      Player Documents
+                      <FileText className="w-4 h-4 text-slate-600" /> Uploaded Player Documents
                     </h3>
                     <span className="text-xs font-semibold text-slate-500">
-                      {documentList.length}{" "}
-                      {documentList.length === 1 ? "file" : "files"} attached
+                      {documentList.length} {documentList.length === 1 ? "file" : "files"} attached
                     </span>
                   </div>
 
@@ -1049,7 +985,8 @@ const PlayerViewModal: React.FC<PlayerViewModalProps> = ({
                       Career Performance Metrics
                     </h3>
                     <p className="text-xs text-slate-500 mt-0.5">
-                      Synced with official match summaries, clean sheet automation, and admin adjustments.
+                      Synced with official match summaries, clean sheet automation, and admin
+                      adjustments.
                     </p>
                   </div>
                   <button
@@ -1070,51 +1007,75 @@ const PlayerViewModal: React.FC<PlayerViewModalProps> = ({
                 ) : (
                   <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                     <div className="bg-white border border-slate-200 rounded-xl p-3.5 text-center shadow-2xs">
-                      
-                      <p className="text-[11px] font-medium text-slate-500 uppercase tracking-wider">Goals</p>
-                      <p className="text-xl font-bold text-slate-900 mt-0.5">{statsObj.goals ?? 0}</p>
+                      <p className="text-[11px] font-medium text-slate-500 uppercase tracking-wider">
+                        Goals
+                      </p>
+                      <p className="text-xl font-bold text-slate-900 mt-0.5">
+                        {statsObj.goals ?? 0}
+                      </p>
                     </div>
 
                     <div className="bg-white border border-slate-200 rounded-xl p-3.5 text-center shadow-2xs">
-                      
-                      <p className="text-[11px] font-medium text-slate-500 uppercase tracking-wider">Assists</p>
-                      <p className="text-xl font-bold text-slate-900 mt-0.5">{statsObj.assists ?? 0}</p>
+                      <p className="text-[11px] font-medium text-slate-500 uppercase tracking-wider">
+                        Assists
+                      </p>
+                      <p className="text-xl font-bold text-slate-900 mt-0.5">
+                        {statsObj.assists ?? 0}
+                      </p>
                     </div>
 
                     <div className="bg-white border border-slate-200 rounded-xl p-3.5 text-center shadow-2xs">
-                      
-                      <p className="text-[11px] font-medium text-slate-500 uppercase tracking-wider">Clean Sheets</p>
-                      <p className="text-xl font-bold text-emerald-700 mt-0.5">{statsObj.cleanSheets ?? 0}</p>
+                      <p className="text-[11px] font-medium text-slate-500 uppercase tracking-wider">
+                        Clean Sheets
+                      </p>
+                      <p className="text-xl font-bold text-emerald-700 mt-0.5">
+                        {statsObj.cleanSheets ?? 0}
+                      </p>
                     </div>
 
                     <div className="bg-white border border-slate-200 rounded-xl p-3.5 text-center shadow-2xs">
-                      
-                      <p className="text-[11px] font-medium text-slate-500 uppercase tracking-wider">Matches</p>
-                      <p className="text-xl font-bold text-slate-900 mt-0.5">{statsObj.matchesPlayed ?? 0}</p>
+                      <p className="text-[11px] font-medium text-slate-500 uppercase tracking-wider">
+                        Matches
+                      </p>
+                      <p className="text-xl font-bold text-slate-900 mt-0.5">
+                        {statsObj.matchesPlayed ?? 0}
+                      </p>
                     </div>
 
                     <div className="bg-white border border-slate-200 rounded-xl p-3.5 text-center shadow-2xs">
-                      
-                      <p className="text-[11px] font-medium text-slate-500 uppercase tracking-wider">Yellow Cards</p>
-                      <p className="text-xl font-bold text-amber-700 mt-0.5">{statsObj.yellowCards ?? 0}</p>
+                      <p className="text-[11px] font-medium text-slate-500 uppercase tracking-wider">
+                        Yellow Cards
+                      </p>
+                      <p className="text-xl font-bold text-amber-700 mt-0.5">
+                        {statsObj.yellowCards ?? 0}
+                      </p>
                     </div>
 
                     <div className="bg-white border border-slate-200 rounded-xl p-3.5 text-center shadow-2xs">
-                      
-                      <p className="text-[11px] font-medium text-slate-500 uppercase tracking-wider">Red Cards</p>
-                      <p className="text-xl font-bold text-rose-700 mt-0.5">{statsObj.redCards ?? 0}</p>
+                      <p className="text-[11px] font-medium text-slate-500 uppercase tracking-wider">
+                        Red Cards
+                      </p>
+                      <p className="text-xl font-bold text-rose-700 mt-0.5">
+                        {statsObj.redCards ?? 0}
+                      </p>
                     </div>
 
                     <div className="bg-white border border-slate-200 rounded-xl p-3.5 text-center shadow-2xs">
-                      
-                      <p className="text-[11px] font-medium text-slate-500 uppercase tracking-wider">POTD Awards</p>
-                      <p className="text-xl font-bold text-purple-700 mt-0.5">{statsObj.playerOfTheDay ?? 0}</p>
+                      <p className="text-[11px] font-medium text-slate-500 uppercase tracking-wider">
+                        POTD Awards
+                      </p>
+                      <p className="text-xl font-bold text-purple-700 mt-0.5">
+                        {statsObj.playerOfTheDay ?? 0}
+                      </p>
                     </div>
 
                     <div className="bg-white border border-slate-200 rounded-xl p-3.5 text-center shadow-2xs">
-                      
-                      <p className="text-[11px] font-medium text-slate-500 uppercase tracking-wider">Points</p>
-                      <p className="text-xl font-bold text-blue-700 mt-0.5">{statsObj.points ?? 0}</p>
+                      <p className="text-[11px] font-medium text-slate-500 uppercase tracking-wider">
+                        Points
+                      </p>
+                      <p className="text-xl font-bold text-blue-700 mt-0.5">
+                        {statsObj.points ?? 0}
+                      </p>
                     </div>
                   </div>
                 )}
@@ -1160,13 +1121,17 @@ const PlayerViewModal: React.FC<PlayerViewModalProps> = ({
                         <tbody className="divide-y divide-slate-100 font-medium">
                           {auditLogs.map((log: any, idx: number) => {
                             const adminName = log.modifiedBy
-                              ? `${log.modifiedBy.firstName || ""} ${log.modifiedBy.lastName || ""}`.trim() || log.modifiedBy.email || "Admin"
+                              ? `${log.modifiedBy.firstName || ""} ${log.modifiedBy.lastName || ""}`.trim() ||
+                                log.modifiedBy.email ||
+                                "Admin"
                               : "System Admin";
 
                             return (
                               <tr key={idx} className="hover:bg-slate-50/60 transition-colors">
                                 <td className="py-2.5 px-4 text-slate-500 whitespace-nowrap">
-                                  {log.createdAt ? dayjs(log.createdAt).format("DD MMM YYYY, HH:mm") : "N/A"}
+                                  {log.createdAt
+                                    ? dayjs(log.createdAt).format("DD MMM YYYY, HH:mm")
+                                    : "N/A"}
                                 </td>
                                 <td className="py-2.5 px-4 font-semibold text-slate-900 capitalize">
                                   {log.field}
@@ -1182,10 +1147,11 @@ const PlayerViewModal: React.FC<PlayerViewModalProps> = ({
                                     </span>
                                   </span>
                                 </td>
-                                <td className="py-2.5 px-4 text-slate-700">
-                                  {adminName}
-                                </td>
-                                <td className="py-2.5 px-4 text-slate-600 max-w-xs truncate" title={log.reason}>
+                                <td className="py-2.5 px-4 text-slate-700">{adminName}</td>
+                                <td
+                                  className="py-2.5 px-4 text-slate-600 max-w-xs truncate"
+                                  title={log.reason}
+                                >
                                   {log.reason || "-"}
                                 </td>
                               </tr>
@@ -1255,7 +1221,9 @@ const PlayerViewModal: React.FC<PlayerViewModalProps> = ({
                   ) : coinTransactions.length === 0 ? (
                     <div className="p-8 text-center text-slate-400">
                       <Coins className="w-8 h-8 text-slate-300 mx-auto mb-2" />
-                      <p className="text-xs font-medium">No coin transactions recorded for this player yet.</p>
+                      <p className="text-xs font-medium">
+                        No coin transactions recorded for this player yet.
+                      </p>
                     </div>
                   ) : (
                     <div className="overflow-x-auto">
@@ -1312,9 +1280,7 @@ const PlayerViewModal: React.FC<PlayerViewModalProps> = ({
                                     {tx.title || tx.description}
                                   </p>
                                   {tx.description && tx.title !== tx.description && (
-                                    <p className="text-[11px] text-slate-500">
-                                      {tx.description}
-                                    </p>
+                                    <p className="text-[11px] text-slate-500">{tx.description}</p>
                                   )}
                                   {(tx.opponentTeam?.teamName || tx.fixture) && (
                                     <div className="mt-1 flex items-center gap-1.5 flex-wrap">
@@ -1392,12 +1358,7 @@ const PlayerViewModal: React.FC<PlayerViewModalProps> = ({
 
           {previewImage && (
             <div className="relative w-full h-[65vh] bg-slate-50 rounded-xl overflow-hidden border border-slate-100 mt-2 flex items-center justify-center p-2">
-              <Image
-                src={previewImage}
-                alt="Document Preview"
-                fill
-                className="object-contain"
-              />
+              <Image src={previewImage} alt="Document Preview" fill className="object-contain" />
             </div>
           )}
         </DialogContent>

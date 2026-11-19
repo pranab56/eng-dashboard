@@ -21,8 +21,8 @@ export const getNewsColumns = (
         typeof catVal === "object" && catVal
           ? catVal.name
           : typeof catVal === "string"
-          ? catVal
-          : "";
+            ? catVal
+            : "";
       const isHexId = Boolean(rawCatName && /^[0-9a-fA-F]{24}$/.test(rawCatName));
       const catName = isHexId ? null : rawCatName;
 
@@ -58,9 +58,7 @@ export const getNewsColumns = (
                 </span>
               )}
               {row.original.order !== undefined && (
-                <span className="text-[10px] font-mono text-slate-400">
-                  #{row.original.order}
-                </span>
+                <span className="text-[10px] font-mono text-slate-400">#{row.original.order}</span>
               )}
             </div>
           </div>
@@ -74,9 +72,7 @@ export const getNewsColumns = (
     cell: ({ row }) => {
       const dateVal = row.getValue("publishDateTime");
       if (!dateVal) {
-        return (
-          <span className="text-xs text-slate-400 font-medium">Unscheduled</span>
-        );
+        return <span className="text-xs text-slate-400 font-medium">Unscheduled</span>;
       }
       return (
         <div className="flex flex-col text-xs">
@@ -94,7 +90,7 @@ export const getNewsColumns = (
     accessorKey: "status",
     header: () => <span className="font-semibold text-slate-900">Status</span>,
     cell: ({ row }) => {
-      const rawStatus = (row.getValue("status") as string || "").toLowerCase();
+      const rawStatus = ((row.getValue("status") as string) || "").toLowerCase();
       const isPublished = rawStatus === "publish" || rawStatus === "published";
       const isScheduled = rawStatus === "schedule" || rawStatus === "scheduled";
 

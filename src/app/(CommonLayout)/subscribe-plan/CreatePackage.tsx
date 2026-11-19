@@ -1,82 +1,107 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-"use client"
+"use client";
 
-import React, { useEffect, useState } from 'react'
-import { useForm, useFieldArray, Controller } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
-import * as z from 'zod'
-import { useCreatePackageMutation, useUpdatePackageMutation } from '@/features/package/packageApi'
-import toast from 'react-hot-toast'
-import { 
-  Select, 
-  SelectContent, 
-  SelectItem, 
-  SelectTrigger, 
-  SelectValue 
-} from '@/components/ui/select'
-import { Plus, Trash2, Check, X } from 'lucide-react'
+import React, { useEffect, useState } from "react";
+import { useForm, useFieldArray, Controller } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
+import { useCreatePackageMutation, useUpdatePackageMutation } from "@/features/package/packageApi";
+import toast from "react-hot-toast";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Plus, Trash2, Check, X } from "lucide-react";
 
 const featureItemSchema = z.object({
   title: z.string().min(1, "Feature title is required"),
   isIncluded: z.boolean(),
-})
+});
 
 const packageSchema = z.object({
   title: z.string().min(1, "Plan name is required"),
   description: z.string().min(1, "Description is required"),
-  userType: z.enum(['Player', 'Other', 'Manager', 'Club', 'Referee', 'Tournament Player', 'Trial Player', 'OTHER_CLUBS']),
+  userType: z.enum([
+    "Player",
+    "Other",
+    "Manager",
+    "Club",
+    "Referee",
+    "Tournament Player",
+    "Trial Player",
+    "OTHER_CLUBS",
+  ]),
   price: z.number().min(0, "Price must be at least 0"),
-  duration: z.enum(['1 month', '3 months', '6 months', '1 year']),
+  duration: z.enum(["1 month", "3 months", "6 months", "1 year"]),
   paymentType: z.string().min(1, "Payment type is required"),
-  packageType: z.enum(['Semi Pro', 'Professional']),
+  packageType: z.enum(["Semi Pro", "Professional"]),
   credit: z.number().min(0, "Credit must be at least 0"),
   features: z.array(featureItemSchema),
-})
+});
 
-type PackageFormValues = z.infer<typeof packageSchema>
+type PackageFormValues = z.infer<typeof packageSchema>;
 
 const userTypeOptions = [
   { label: "Regular Player", value: "Player" },
   { label: "Tournament Player", value: "Tournament Player" },
   { label: "Trial Player", value: "Trial Player" },
-]
+];
 
 const packageTypeOptions = [
   { label: "Semi Pro", value: "Semi Pro" },
   { label: "Professional", value: "Professional" },
-]
+];
 
 const durationOptions = [
   { label: "1 month", value: "1 month" },
   { label: "3 months", value: "3 months" },
   { label: "6 months", value: "6 months" },
   { label: "1 year", value: "1 year" },
-]
+];
 
-
-const normalizeDuration = (dur?: string): '1 month' | '3 months' | '6 months' | '1 year' => {
-  if (!dur) return '1 month';
+const normalizeDuration = (dur?: string): "1 month" | "3 months" | "6 months" | "1 year" => {
+  if (!dur) return "1 month";
   const clean = dur.trim().toLowerCase();
-  if (clean === '1 year' || clean === '1year' || clean === 'yearly' || clean === '12 months' || clean === '12 month') return '1 year';
-  if (clean === '6 months' || clean === '6months' || clean === '6 month' || clean === 'half-yearly') return '6 months';
-  if (clean === '3 months' || clean === '3months' || clean === '3 month' || clean === 'quarterly') return '3 months';
-  if (clean === '1 month' || clean === '1month' || clean === 'monthly') return '1 month';
-  return '1 month';
+  if (
+    clean === "1 year" ||
+    clean === "1year" ||
+    clean === "yearly" ||
+    clean === "12 months" ||
+    clean === "12 month"
+  )
+    return "1 year";
+  if (clean === "6 months" || clean === "6months" || clean === "6 month" || clean === "half-yearly")
+    return "6 months";
+  if (clean === "3 months" || clean === "3months" || clean === "3 month" || clean === "quarterly")
+    return "3 months";
+  if (clean === "1 month" || clean === "1month" || clean === "monthly") return "1 month";
+  return "1 month";
 };
 
 interface CreatePackageProps {
-  initialData?: any
-  onSuccess?: () => void
+  initialData?: any;
+  onSuccess?: () => void;
 }
 
 const CreatePackage = ({ initialData, onSuccess }: CreatePackageProps) => {
-  const [createPackage, { isLoading: isCreating }] = useCreatePackageMutation()
-  const [updatePackage, { isLoading: isUpdating }] = useUpdatePackageMutation()
+  const [createPackage, { isLoading: isCreating }] = useCreatePackageMutation();
+  const [updatePackage, { isLoading: isUpdating }] = useUpdatePackageMutation();
 
-  const [newFeatureTitle, setNewFeatureTitle] = useState('')
-  const [newFeatureIsIncluded, setNewFeatureIsIncluded] = useState(true)
+  const [newFeatureTitle, setNewFeatureTitle] = useState("");
+  const [newFeatureIsIncluded, setNewFeatureIsIncluded] = useState(true);
 
-  const { register, handleSubmit, control, reset, watch, setValue, formState: { errors } } = useForm<PackageFormValues>({
+  const {
+    register,
+    handleSubmit,
+    control,
+    reset,
+    watch,
+    setValue,
+    formState: { errors },
+  } = useForm<PackageFormValues>({
     resolver: zodResolver(packageSchema),
     defaultValues: {
       title: "",
@@ -88,45 +113,49 @@ const CreatePackage = ({ initialData, onSuccess }: CreatePackageProps) => {
       packageType: "Semi Pro",
       credit: 0,
       features: [],
-    }
-  })
+    },
+  });
 
-  const { fields: featureFields, append: appendFeature, remove: removeFeature } = useFieldArray({
+  const {
+    fields: featureFields,
+    append: appendFeature,
+    remove: removeFeature,
+  } = useFieldArray({
     control,
     name: "features",
-  })
+  });
 
-  const selectedDuration = watch("duration")
+  const selectedDuration = watch("duration");
 
   useEffect(() => {
     if (selectedDuration === "1 month") {
-      setValue("paymentType", "Monthly")
+      setValue("paymentType", "Monthly");
     } else if (selectedDuration === "3 months") {
-      setValue("paymentType", "Quarterly")
+      setValue("paymentType", "Quarterly");
     } else if (selectedDuration === "6 months") {
-      setValue("paymentType", "Half-Yearly")
+      setValue("paymentType", "Half-Yearly");
     } else if (selectedDuration === "1 year") {
-      setValue("paymentType", "Yearly")
+      setValue("paymentType", "Yearly");
     }
-  }, [selectedDuration, setValue])
+  }, [selectedDuration, setValue]);
 
   useEffect(() => {
     if (initialData) {
       const formattedFeatures = Array.isArray(initialData.features)
         ? initialData.features.map((f: any) =>
-          typeof f === 'string'
-            ? { title: f, isIncluded: true }
-            : { title: f?.title || "", isIncluded: f?.isIncluded ?? true }
-        )
-        : []
+            typeof f === "string"
+              ? { title: f, isIncluded: true }
+              : { title: f?.title || "", isIncluded: f?.isIncluded ?? true }
+          )
+        : [];
 
-      const dur = normalizeDuration(initialData.duration)
-      let payType = initialData.paymentType || "Monthly"
+      const dur = normalizeDuration(initialData.duration);
+      let payType = initialData.paymentType || "Monthly";
       if (payType === "One-time" || !payType) {
-        if (dur === "1 month") payType = "Monthly"
-        else if (dur === "3 months") payType = "Quarterly"
-        else if (dur === "6 months") payType = "Half-Yearly"
-        else if (dur === "1 year") payType = "Yearly"
+        if (dur === "1 month") payType = "Monthly";
+        else if (dur === "3 months") payType = "Quarterly";
+        else if (dur === "6 months") payType = "Half-Yearly";
+        else if (dur === "1 year") payType = "Yearly";
       }
 
       reset({
@@ -139,34 +168,34 @@ const CreatePackage = ({ initialData, onSuccess }: CreatePackageProps) => {
         packageType: initialData.packageType || "Semi Pro",
         credit: initialData.credit ?? 0,
         features: formattedFeatures,
-      })
+      });
     }
-  }, [initialData, reset])
+  }, [initialData, reset]);
 
   const handleAddFeature = () => {
     if (!newFeatureTitle.trim()) {
-      toast.error("Please enter a benefit title")
-      return
+      toast.error("Please enter a benefit title");
+      return;
     }
-    appendFeature({ title: newFeatureTitle.trim(), isIncluded: newFeatureIsIncluded })
-    setNewFeatureTitle('')
-    setNewFeatureIsIncluded(true)
-  }
+    appendFeature({ title: newFeatureTitle.trim(), isIncluded: newFeatureIsIncluded });
+    setNewFeatureTitle("");
+    setNewFeatureIsIncluded(true);
+  };
 
   const onSubmit = async (data: PackageFormValues) => {
     try {
       if (initialData?._id) {
-        await updatePackage({ id: initialData._id, data }).unwrap()
-        toast.success("Package updated successfully")
+        await updatePackage({ id: initialData._id, data }).unwrap();
+        toast.success("Package updated successfully");
       } else {
-        await createPackage(data).unwrap()
-        toast.success("Package created successfully")
+        await createPackage(data).unwrap();
+        toast.success("Package created successfully");
       }
-      onSuccess?.()
+      onSuccess?.();
     } catch (error: any) {
-      toast.error(error?.data?.message || "Failed to save package")
+      toast.error(error?.data?.message || "Failed to save package");
     }
-  }
+  };
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-5 pt-1">
@@ -216,19 +245,25 @@ const CreatePackage = ({ initialData, onSuccess }: CreatePackageProps) => {
                 name="userType"
                 control={control}
                 render={({ field }) => (
-                  <Select 
-                    key={`userType-select-${field.value || 'empty'}`}
-                    value={field.value} 
+                  <Select
+                    key={`userType-select-${field.value || "empty"}`}
+                    value={field.value}
                     onValueChange={field.onChange}
                   >
                     <SelectTrigger className="w-full h-9 px-3 text-xs bg-white border border-slate-300 rounded-md text-slate-900 focus:border-slate-900 focus:ring-1 focus:ring-slate-900 cursor-pointer">
                       <SelectValue placeholder="Select audience">
-                        {userTypeOptions.find(o => o.value === field.value)?.label || field.value || "Select audience"}
+                        {userTypeOptions.find((o) => o.value === field.value)?.label ||
+                          field.value ||
+                          "Select audience"}
                       </SelectValue>
                     </SelectTrigger>
                     <SelectContent className="bg-white border border-slate-200 rounded-md shadow-md z-50">
                       {userTypeOptions.map((opt) => (
-                        <SelectItem key={opt.value} value={opt.value} className="text-xs cursor-pointer">
+                        <SelectItem
+                          key={opt.value}
+                          value={opt.value}
+                          className="text-xs cursor-pointer"
+                        >
                           {opt.label}
                         </SelectItem>
                       ))}
@@ -249,19 +284,25 @@ const CreatePackage = ({ initialData, onSuccess }: CreatePackageProps) => {
                 name="packageType"
                 control={control}
                 render={({ field }) => (
-                  <Select 
-                    key={`packageType-select-${field.value || 'empty'}`}
-                    value={field.value} 
+                  <Select
+                    key={`packageType-select-${field.value || "empty"}`}
+                    value={field.value}
                     onValueChange={field.onChange}
                   >
                     <SelectTrigger className="w-full h-9 px-3 text-xs bg-white border border-slate-300 rounded-md text-slate-900 focus:border-slate-900 focus:ring-1 focus:ring-slate-900 cursor-pointer">
                       <SelectValue placeholder="Select tier">
-                        {packageTypeOptions.find(o => o.value === field.value)?.label || field.value || "Select tier"}
+                        {packageTypeOptions.find((o) => o.value === field.value)?.label ||
+                          field.value ||
+                          "Select tier"}
                       </SelectValue>
                     </SelectTrigger>
                     <SelectContent className="bg-white border border-slate-200 rounded-md shadow-md z-50">
                       {packageTypeOptions.map((opt) => (
-                        <SelectItem key={opt.value} value={opt.value} className="text-xs cursor-pointer">
+                        <SelectItem
+                          key={opt.value}
+                          value={opt.value}
+                          className="text-xs cursor-pointer"
+                        >
                           {opt.label}
                         </SelectItem>
                       ))}
@@ -314,19 +355,25 @@ const CreatePackage = ({ initialData, onSuccess }: CreatePackageProps) => {
               name="duration"
               control={control}
               render={({ field }) => (
-                <Select 
-                  key={`duration-select-${field.value || 'empty'}`} 
-                  value={field.value || '1 month'} 
+                <Select
+                  key={`duration-select-${field.value || "empty"}`}
+                  value={field.value || "1 month"}
                   onValueChange={field.onChange}
                 >
                   <SelectTrigger className="w-full h-9 px-3 text-xs bg-white border border-slate-300 rounded-md text-slate-900 focus:border-slate-900 focus:ring-1 focus:ring-slate-900 cursor-pointer">
                     <SelectValue placeholder="Select duration">
-                      {durationOptions.find(o => o.value === field.value)?.label || field.value || "Select duration"}
+                      {durationOptions.find((o) => o.value === field.value)?.label ||
+                        field.value ||
+                        "Select duration"}
                     </SelectValue>
                   </SelectTrigger>
                   <SelectContent className="bg-white border border-slate-200 rounded-md shadow-md z-50">
                     {durationOptions.map((opt) => (
-                      <SelectItem key={opt.value} value={opt.value} className="text-xs cursor-pointer">
+                      <SelectItem
+                        key={opt.value}
+                        value={opt.value}
+                        className="text-xs cursor-pointer"
+                      >
                         {opt.label}
                       </SelectItem>
                     ))}
@@ -363,9 +410,7 @@ const CreatePackage = ({ initialData, onSuccess }: CreatePackageProps) => {
           <h4 className="text-xs font-semibold text-slate-900 uppercase tracking-wider">
             Benefits & Features
           </h4>
-          <span className="text-[11px] text-slate-400">
-            {featureFields.length} configured
-          </span>
+          <span className="text-[11px] text-slate-400">{featureFields.length} configured</span>
         </div>
 
         {/* Add Feature Inline Control */}
@@ -376,9 +421,9 @@ const CreatePackage = ({ initialData, onSuccess }: CreatePackageProps) => {
             value={newFeatureTitle}
             onChange={(e) => setNewFeatureTitle(e.target.value)}
             onKeyDown={(e) => {
-              if (e.key === 'Enter') {
-                e.preventDefault()
-                handleAddFeature()
+              if (e.key === "Enter") {
+                e.preventDefault();
+                handleAddFeature();
               }
             }}
             className="flex-1 h-8.5 px-3 text-xs bg-white border border-slate-300 rounded-md text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-slate-900 focus:ring-1 focus:ring-slate-900 transition-colors"
@@ -408,7 +453,7 @@ const CreatePackage = ({ initialData, onSuccess }: CreatePackageProps) => {
         {featureFields.length > 0 ? (
           <div className="space-y-1.5 max-h-36 overflow-y-auto pr-1">
             {featureFields.map((field, index) => {
-              const isIncluded = watch(`features.${index}.isIncluded`)
+              const isIncluded = watch(`features.${index}.isIncluded`);
               return (
                 <div
                   key={field.id}
@@ -448,7 +493,7 @@ const CreatePackage = ({ initialData, onSuccess }: CreatePackageProps) => {
                     </button>
                   </div>
                 </div>
-              )
+              );
             })}
           </div>
         ) : (
@@ -476,7 +521,7 @@ const CreatePackage = ({ initialData, onSuccess }: CreatePackageProps) => {
         </button>
       </div>
     </form>
-  )
-}
+  );
+};
 
-export default CreatePackage
+export default CreatePackage;

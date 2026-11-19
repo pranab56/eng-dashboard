@@ -1,18 +1,13 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-"use client"
-import React, { useState, useEffect } from 'react';
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import Image from 'next/image';
-import { TUserManagement } from '@/types/columnTypes';
-import { formatImagePath } from '@/utils/formatImagePath';
-import { Camera, Loader2, Save, User as UserIcon } from 'lucide-react';
-import { useUpdateUserProfileByAdminMutation } from '@/features/userManagement/userApi';
-import toast from 'react-hot-toast';
+"use client";
+import React, { useState, useEffect } from "react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import Image from "next/image";
+import { TUserManagement } from "@/types/columnTypes";
+import { formatImagePath } from "@/utils/formatImagePath";
+import { Camera, Loader2, Save, User as UserIcon } from "lucide-react";
+import { useUpdateUserProfileByAdminMutation } from "@/features/userManagement/userApi";
+import toast from "react-hot-toast";
 
 interface UserEditProfileModalProps {
   user: TUserManagement | null;
@@ -20,24 +15,20 @@ interface UserEditProfileModalProps {
   onClose: () => void;
 }
 
-const UserEditProfileModal: React.FC<UserEditProfileModalProps> = ({
-  user,
-  isOpen,
-  onClose,
-}) => {
+const UserEditProfileModal: React.FC<UserEditProfileModalProps> = ({ user, isOpen, onClose }) => {
   const [updateProfile, { isLoading }] = useUpdateUserProfileByAdminMutation();
 
-  const [firstName, setFirstName] = useState('');
-  const [lastName, setLastName] = useState('');
-  const [phone, setPhone] = useState('');
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [phone, setPhone] = useState("");
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
 
   useEffect(() => {
     if (user) {
-      setFirstName(user.firstName || user.userName || '');
-      setLastName(user.lastName || '');
-      setPhone(user.phone || '');
+      setFirstName(user.firstName || user.userName || "");
+      setLastName(user.lastName || "");
+      setPhone(user.phone || "");
       setSelectedFile(null);
       setPreviewUrl(null);
     }
@@ -46,7 +37,7 @@ const UserEditProfileModal: React.FC<UserEditProfileModalProps> = ({
   if (!user) return null;
 
   const currentProfileUrl = previewUrl || formatImagePath(user.profile || user.profilePic);
-  const initials = (firstName || 'P').charAt(0).toUpperCase();
+  const initials = (firstName || "P").charAt(0).toUpperCase();
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
@@ -61,10 +52,10 @@ const UserEditProfileModal: React.FC<UserEditProfileModalProps> = ({
 
     try {
       const formData = new FormData();
-      if (firstName) formData.append('firstName', firstName);
-      if (lastName) formData.append('lastName', lastName);
-      if (phone) formData.append('phone', phone);
-      if (selectedFile) formData.append('profile', selectedFile);
+      if (firstName) formData.append("firstName", firstName);
+      if (lastName) formData.append("lastName", lastName);
+      if (phone) formData.append("phone", phone);
+      if (selectedFile) formData.append("profile", selectedFile);
 
       await updateProfile({ id: user._id, data: formData }).unwrap();
       toast.success("Player profile & picture updated successfully!");
@@ -88,12 +79,7 @@ const UserEditProfileModal: React.FC<UserEditProfileModalProps> = ({
           <div className="flex flex-col items-center justify-center gap-2 py-2">
             <div className="relative w-24 h-24 rounded-full bg-slate-100 border-2 border-indigo-100 overflow-hidden flex items-center justify-center shadow-inner group">
               {currentProfileUrl ? (
-                <Image
-                  src={currentProfileUrl}
-                  alt="Player Profile"
-                  fill
-                  className="object-cover"
-                />
+                <Image src={currentProfileUrl} alt="Player Profile" fill className="object-cover" />
               ) : (
                 <span className="text-3xl font-extrabold text-indigo-600">{initials}</span>
               )}
@@ -172,7 +158,11 @@ const UserEditProfileModal: React.FC<UserEditProfileModalProps> = ({
               disabled={isLoading}
               className="flex items-center gap-1.5 px-5 py-2 text-xs font-semibold text-white bg-indigo-600 hover:bg-indigo-700 rounded-xl shadow-md transition-colors disabled:opacity-50"
             >
-              {isLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
+              {isLoading ? (
+                <Loader2 className="w-4 h-4 animate-spin" />
+              ) : (
+                <Save className="w-4 h-4" />
+              )}
               Save Profile
             </button>
           </div>

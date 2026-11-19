@@ -2,19 +2,9 @@
 "use client";
 
 import React, { useState } from "react";
-import {
-  Dialog,
-  DialogContent,
-  DialogTitle,
-} from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import dayjs from "dayjs";
-import {
-  Clock,
-  X,
-  Trophy,
-  Copy,
-  Check,
-} from "lucide-react";
+import { Clock, X, Trophy, Copy, Check } from "lucide-react";
 import { FiEdit } from "react-icons/fi";
 import Link from "next/link";
 import { toast } from "sonner";
@@ -146,9 +136,7 @@ const LeagueViewModal = ({ league, isOpen, onClose }: LeagueViewModalProps) => {
                   Season {league.season || "1"}
                 </span>
               </div>
-              <p className="text-xs text-slate-500 mt-0.5">
-                Official Competition Season Details
-              </p>
+              <p className="text-xs text-slate-500 mt-0.5">Official Competition Season Details</p>
             </div>
           </div>
 
@@ -207,9 +195,7 @@ const LeagueViewModal = ({ league, isOpen, onClose }: LeagueViewModalProps) => {
                 <Clock className="w-3.5 h-3.5 text-slate-400" />
                 <span>Season Schedule Progress</span>
               </span>
-              <span className="font-mono font-semibold text-slate-900">
-                {progressPct}%
-              </span>
+              <span className="font-mono font-semibold text-slate-900">{progressPct}%</span>
             </div>
             <div className="w-full h-2 rounded-full bg-slate-100 overflow-hidden">
               <div
@@ -217,15 +203,13 @@ const LeagueViewModal = ({ league, isOpen, onClose }: LeagueViewModalProps) => {
                   s === "finished"
                     ? "bg-slate-400"
                     : s === "running"
-                    ? "bg-emerald-600"
-                    : "bg-blue-600"
+                      ? "bg-emerald-600"
+                      : "bg-blue-600"
                 }`}
                 style={{ width: `${progressPct}%` }}
               />
             </div>
-            <p className="text-[11px] text-slate-500 text-right font-mono">
-              {progressText}
-            </p>
+            <p className="text-[11px] text-slate-500 text-right font-mono">{progressText}</p>
           </div>
 
           {/* Metadata Specifications */}
@@ -242,12 +226,16 @@ const LeagueViewModal = ({ league, isOpen, onClose }: LeagueViewModalProps) => {
                   className="p-1 rounded text-slate-400 hover:text-slate-700 hover:bg-slate-200/60 transition-colors cursor-pointer"
                   title="Copy League ID"
                 >
-                  {isCopied ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5" />}
+                  {isCopied ? (
+                    <Check className="w-3.5 h-3.5 text-emerald-600" />
+                  ) : (
+                    <Copy className="w-3.5 h-3.5" />
+                  )}
                 </button>
               </div>
             </div>
 
-                        <div className="flex items-center justify-between">
+            <div className="flex items-center justify-between">
               <span className="text-slate-500">Age Group</span>
               <span className="font-semibold text-slate-800 text-xs px-2.5 py-0.5 rounded-full bg-violet-50 text-violet-700 border border-violet-200">
                 {league.ageGroup || "All Ages"}

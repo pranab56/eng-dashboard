@@ -71,18 +71,14 @@ const OrderManagement = () => {
 
   // Compute stat counts
   const totalOrders = pagination.total || orders.length;
-  const pendingCount = orders.filter(
-    (o) => (o.status || "").toLowerCase() === "pending"
-  ).length;
+  const pendingCount = orders.filter((o) => (o.status || "").toLowerCase() === "pending").length;
   const approvedCount = orders.filter(
     (o) =>
-      (o.status || "").toLowerCase() === "approved" ||
-      (o.status || "").toLowerCase() === "accept"
+      (o.status || "").toLowerCase() === "approved" || (o.status || "").toLowerCase() === "accept"
   ).length;
   const rejectedCount = orders.filter(
     (o) =>
-      (o.status || "").toLowerCase() === "rejected" ||
-      (o.status || "").toLowerCase() === "reject"
+      (o.status || "").toLowerCase() === "rejected" || (o.status || "").toLowerCase() === "reject"
   ).length;
 
   const tableHeaderPayload = {
@@ -91,12 +87,7 @@ const OrderManagement = () => {
     url: "",
   };
 
-  const columns = getOrderColumns(
-    handleAcceptOrder,
-    handleRejectOrder,
-    isAccepting,
-    isRejecting
-  );
+  const columns = getOrderColumns(handleAcceptOrder, handleRejectOrder, isAccepting, isRejecting);
 
   return (
     <div className="w-full p-4 sm:p-6 lg:p-8 space-y-6 pb-16">
@@ -199,11 +190,7 @@ const OrderManagement = () => {
           </div>
 
           <div className="pt-4 px-4 overflow-hidden">
-            <CustomTable<TOrder>
-              columns={columns}
-              data={orders}
-              isLoading={isLoading}
-            />
+            <CustomTable<TOrder> columns={columns} data={orders} isLoading={isLoading} />
           </div>
         </div>
 

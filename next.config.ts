@@ -2,18 +2,16 @@
 const nextConfig = {
   turbopack: {
     rules: {
-      '*.svg': {
-        loaders: ['@svgr/webpack'],
-        as: '*.js',
+      "*.svg": {
+        loaders: ["@svgr/webpack"],
+        as: "*.js",
       },
     },
   },
   experimental: {
     serverActions: {
       bodySizeLimit: "50mb",
-      allowedOrigins: [
-        "http://localhost:3000",
-      ],
+      allowedOrigins: ["http://localhost:3000"],
     },
   },
 
@@ -32,9 +30,7 @@ const nextConfig = {
 
   webpack(config: any) {
     // Find existing rule that handles SVG
-    const fileLoaderRule = config.module.rules.find((rule: any) =>
-      rule.test?.test?.(".svg")
-    );
+    const fileLoaderRule = config.module.rules.find((rule: any) => rule.test?.test?.(".svg"));
 
     // Exclude SVG from default loader
     if (fileLoaderRule) {

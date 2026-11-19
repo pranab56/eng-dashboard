@@ -1,12 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Loader2 } from "lucide-react";
 
 interface UpdateCoinModalProps {
@@ -60,9 +55,7 @@ export const UpdateCoinModal: React.FC<UpdateCoinModalProps> = ({
 
         <form onSubmit={handleSubmit} className="space-y-6 pt-2">
           <div className="space-y-2">
-            <label className="block text-sm font-semibold text-gray-700">
-              Enter Coin Amount
-            </label>
+            <label className="block text-sm font-semibold text-gray-700">Enter Coin Amount</label>
             <input
               type="number"
               value={value}

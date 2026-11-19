@@ -41,9 +41,7 @@ export default function ScorePredictionLeaderboardModal({
                 Prediction Standings & Results
               </span>
             </div>
-            <span className="text-xs text-slate-500 block mt-0.5">
-              {roundItem.title}
-            </span>
+            <span className="text-xs text-slate-500 block mt-0.5">{roundItem.title}</span>
           </div>
           <button
             type="button"
@@ -108,10 +106,10 @@ export default function ScorePredictionLeaderboardModal({
                             idx === 0
                               ? "bg-amber-100 text-amber-800"
                               : idx === 1
-                              ? "bg-slate-200 text-slate-700"
-                              : idx === 2
-                              ? "bg-amber-50 text-amber-900 border border-amber-200"
-                              : "text-slate-400"
+                                ? "bg-slate-200 text-slate-700"
+                                : idx === 2
+                                  ? "bg-amber-50 text-amber-900 border border-amber-200"
+                                  : "text-slate-400"
                           }`}
                         >
                           #{idx + 1}
@@ -119,7 +117,11 @@ export default function ScorePredictionLeaderboardModal({
 
                         <div className="w-7 h-7 rounded-full overflow-hidden bg-slate-100 border border-slate-200 shrink-0 flex items-center justify-center text-[10px] font-semibold text-slate-600">
                           {profileImg ? (
-                            <img src={profileImg} alt={name} className="w-full h-full object-cover" />
+                            <img
+                              src={profileImg}
+                              alt={name}
+                              className="w-full h-full object-cover"
+                            />
                           ) : (
                             name.slice(0, 2).toUpperCase()
                           )}
@@ -137,11 +139,12 @@ export default function ScorePredictionLeaderboardModal({
 
                       <div className="flex items-center gap-3">
                         <span className="text-xs text-slate-600 font-medium">
-                          {pred.totalExactMatches || 0} exact ? {pred.totalOutcomeMatches || 0} outcome
+                          {pred.totalExactMatches || 0} exact ? {pred.totalOutcomeMatches || 0}{" "}
+                          outcome
                         </span>
                         <span className="inline-flex items-center gap-1 text-xs font-bold text-amber-700 bg-amber-50 border border-amber-200 px-2.5 py-0.5 rounded font-mono">
-                          <Coins className="w-3.5 h-3.5 text-amber-600" />
-                          +{pred.totalCoinsEarned || 0}
+                          <Coins className="w-3.5 h-3.5 text-amber-600" />+
+                          {pred.totalCoinsEarned || 0}
                         </span>
                       </div>
                     </div>
@@ -159,17 +162,20 @@ export default function ScorePredictionLeaderboardModal({
                               isExact
                                 ? "bg-emerald-50 text-emerald-800 border-emerald-300 font-bold"
                                 : isOutcome
-                                ? "bg-amber-50 text-amber-800 border-amber-200"
-                                : "bg-slate-50 text-slate-600 border-slate-200"
+                                  ? "bg-amber-50 text-amber-800 border-amber-200"
+                                  : "bg-slate-50 text-slate-600 border-slate-200"
                             }`}
                           >
                             <span>Match {pIdx + 1}:</span>
-                            <span>{pItem.predictedHomeScore}-{pItem.predictedAwayScore}</span>
-                            {pItem.actualHomeScore !== null && pItem.actualHomeScore !== undefined && (
-                              <span className="text-[9px] text-slate-400">
-                                (Act: {pItem.actualHomeScore}-{pItem.actualAwayScore})
-                              </span>
-                            )}
+                            <span>
+                              {pItem.predictedHomeScore}-{pItem.predictedAwayScore}
+                            </span>
+                            {pItem.actualHomeScore !== null &&
+                              pItem.actualHomeScore !== undefined && (
+                                <span className="text-[9px] text-slate-400">
+                                  (Act: {pItem.actualHomeScore}-{pItem.actualAwayScore})
+                                </span>
+                              )}
                           </div>
                         );
                       })}

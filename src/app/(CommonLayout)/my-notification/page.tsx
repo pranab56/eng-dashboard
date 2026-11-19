@@ -75,15 +75,11 @@ export default function MyNotificationPage() {
 
   // Stats calculation
   const unreadCount = useMemo(() => {
-    return notificationsList.filter(
-      (item) => item.isRead === false || item.read === false
-    ).length;
+    return notificationsList.filter((item) => item.isRead === false || item.read === false).length;
   }, [notificationsList]);
 
   const readCount = useMemo(() => {
-    return notificationsList.filter(
-      (item) => item.isRead === true || item.read === true
-    ).length;
+    return notificationsList.filter((item) => item.isRead === true || item.read === true).length;
   }, [notificationsList]);
 
   // Client-side filtering by Tab & Search
@@ -157,10 +153,20 @@ export default function MyNotificationPage() {
     if (title.includes("transfer") || type.includes("transfer")) {
       return <ArrowLeftRight className="w-4 h-4 text-slate-700" />;
     }
-    if (title.includes("match") || title.includes("tournament") || title.includes("league") || type.includes("match")) {
+    if (
+      title.includes("match") ||
+      title.includes("tournament") ||
+      title.includes("league") ||
+      type.includes("match")
+    ) {
       return <Trophy className="w-4 h-4 text-slate-700" />;
     }
-    if (title.includes("player") || title.includes("profile") || title.includes("user") || type.includes("user")) {
+    if (
+      title.includes("player") ||
+      title.includes("profile") ||
+      title.includes("user") ||
+      type.includes("user")
+    ) {
       return <User className="w-4 h-4 text-slate-700" />;
     }
     if (title.includes("alert") || title.includes("warning") || title.includes("error")) {
@@ -211,7 +217,9 @@ export default function MyNotificationPage() {
             className="inline-flex items-center gap-1.5 h-8 px-2.5 bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 rounded-md text-xs font-medium transition-colors disabled:opacity-50 cursor-pointer"
             title="Refresh feed"
           >
-            <RefreshCw className={`w-3.5 h-3.5 ${isFetching ? "animate-spin text-slate-500" : ""}`} />
+            <RefreshCw
+              className={`w-3.5 h-3.5 ${isFetching ? "animate-spin text-slate-500" : ""}`}
+            />
             <span className="hidden sm:inline">Refresh</span>
           </button>
 

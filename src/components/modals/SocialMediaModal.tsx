@@ -152,7 +152,8 @@ export default function SocialMediaModal({
           {/* Icon URL Field (Optional) */}
           <div className="space-y-1.5">
             <label className="block text-xs font-semibold text-slate-700">
-              Custom Icon URL <span className="text-[11px] text-slate-400 font-normal">(Optional)</span>
+              Custom Icon URL{" "}
+              <span className="text-[11px] text-slate-400 font-normal">(Optional)</span>
             </label>
             <input
               type="text"

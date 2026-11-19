@@ -1,21 +1,10 @@
 "use client";
 
 import React, { useState } from "react";
-import {
-  Dialog,
-  DialogContent,
-  DialogTitle,
-} from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { useAdjustPlayerCoinsMutation } from "@/features/player/playerApi";
 import { toast } from "sonner";
-import {
-  Coins,
-  Plus,
-  Minus,
-  Loader2,
-  X,
-  ArrowRight,
-} from "lucide-react";
+import { Coins, Plus, Minus, Loader2, X, ArrowRight } from "lucide-react";
 
 interface AdjustCoinModalProps {
   isOpen: boolean;
@@ -39,7 +28,9 @@ export const AdjustCoinModal: React.FC<AdjustCoinModalProps> = ({
   const [adjustCoins, { isLoading }] = useAdjustPlayerCoinsMutation();
 
   const playerId = player?._id || player?.id;
-  const fullName = player ? `${player.firstName || ""} ${player.lastName || ""}`.trim() || player.userName : "Player";
+  const fullName = player
+    ? `${player.firstName || ""} ${player.lastName || ""}`.trim() || player.userName
+    : "Player";
 
   const numAmount = Math.max(0, parseInt(amount) || 0);
   const netDelta = operation === "ADD" ? numAmount : -numAmount;
@@ -97,7 +88,8 @@ export const AdjustCoinModal: React.FC<AdjustCoinModalProps> = ({
               </span>
             </div>
             <p className="text-xs text-slate-500 mt-1">
-              Credit or debit coins for <span className="font-semibold text-slate-800">{fullName}</span>
+              Credit or debit coins for{" "}
+              <span className="font-semibold text-slate-800">{fullName}</span>
             </p>
           </div>
 
@@ -151,8 +143,11 @@ export const AdjustCoinModal: React.FC<AdjustCoinModalProps> = ({
             </div>
             <div>
               <span className="text-[11px] text-slate-500 font-medium block">Change</span>
-              <span className={`font-semibold ${operation === "ADD" ? "text-emerald-600" : "text-rose-600"}`}>
-                {operation === "ADD" ? "+" : "-"}{numAmount.toLocaleString()}
+              <span
+                className={`font-semibold ${operation === "ADD" ? "text-emerald-600" : "text-rose-600"}`}
+              >
+                {operation === "ADD" ? "+" : "-"}
+                {numAmount.toLocaleString()}
               </span>
             </div>
             <div className="flex items-center gap-1 text-slate-400">

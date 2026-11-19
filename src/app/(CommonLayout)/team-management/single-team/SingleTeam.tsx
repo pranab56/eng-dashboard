@@ -1,30 +1,27 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-"use client"
+"use client";
 
-
-import CustomTable from '@/components/table/CustomTable'
-import { useHeaders } from '@/hooks/useHeaders';
-import { useEffect } from 'react';
-import TableHeader from '@/components/cui/TableHeader';
-import CustomPagination from '@/components/cui/CustomPagination';
-import GeneralStateCard from '@/components/cui/GeneralStateCard';
-import { singleTeamColumns } from '@/tableColumns/singleTeamColumns';
-
-
+import CustomTable from "@/components/table/CustomTable";
+import { useHeaders } from "@/hooks/useHeaders";
+import { useEffect } from "react";
+import TableHeader from "@/components/cui/TableHeader";
+import CustomPagination from "@/components/cui/CustomPagination";
+import GeneralStateCard from "@/components/cui/GeneralStateCard";
+import { singleTeamColumns } from "@/tableColumns/singleTeamColumns";
 
 const items = [
   {
     title: "Total Teams",
     value: 1482,
     id: "table1",
-    description: "Total registered teams in system"
+    description: "Total registered teams in system",
   },
   {
     title: "Avg Player Count",
     value: 22.2,
     id: "table2",
-    description: "Per managed squad"
-  }
+    description: "Per managed squad",
+  },
 ];
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -118,32 +115,31 @@ const tableDatas: any[] = [
     position: "Winger",
     status: "Amateur",
     goals: 11,
-  }
+  },
 ];
 
 const SingleTeam = () => {
-
   const { setHeaders } = useHeaders();
   useEffect(() => {
     setHeaders({
       title: "Players",
-      des: "Manage live broadcasts, schedules, and historical match data."
-    })
-  }, [])
+      des: "Manage live broadcasts, schedules, and historical match data.",
+    });
+  }, []);
 
   const tableHeaderPayload = {
     title: "Squad Roster",
     des: "24 registered athletes across all classifications",
-    url: "https://example.com/export-users"
-  }
+    url: "https://example.com/export-users",
+  };
 
   return (
     <div className="w-full p-4 sm:p-6 lg:p-8 space-y-6 pb-16">
       <>
-        <GeneralStateCard items={items} className='grid-cols-4' />
+        <GeneralStateCard items={items} className="grid-cols-4" />
       </>
       <div className=" bg-white rounded-md py-4 flex flex-col">
-        <div className='flex-1'>
+        <div className="flex-1">
           <>
             <TableHeader payload={tableHeaderPayload} />
           </>
@@ -151,12 +147,12 @@ const SingleTeam = () => {
             <CustomTable columns={singleTeamColumns} data={tableDatas} />
           </div>
         </div>
-        <div className='pt-8 px-4'>
+        <div className="pt-8 px-4">
           <CustomPagination TOTAL_PAGES={15} qryName="userPage" />
         </div>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default SingleTeam
+export default SingleTeam;

@@ -1,26 +1,26 @@
-'use server';
+"use server";
 
-import { cookies } from 'next/headers';
+import { cookies } from "next/headers";
 
 export async function setAuthCookie(token: string, refreshToken?: string) {
-  if (!token || typeof token !== 'string') return;
+  if (!token || typeof token !== "string") return;
   const cookieStore = await cookies();
-  const isProduction = process.env.NODE_ENV === 'production';
+  const isProduction = process.env.NODE_ENV === "production";
 
-  cookieStore.set('alexandertel-admin-token', token, {
+  cookieStore.set("alexandertel-admin-token", token, {
     httpOnly: true,
     secure: isProduction,
-    sameSite: 'lax',
-    path: '/',
+    sameSite: "lax",
+    path: "/",
     maxAge: 60 * 60 * 24 * 7, // 1 week
   });
 
   if (refreshToken) {
-    cookieStore.set('alexandertel-admin-refresh-token', refreshToken, {
+    cookieStore.set("alexandertel-admin-refresh-token", refreshToken, {
       httpOnly: true,
       secure: isProduction,
-      sameSite: 'lax',
-      path: '/',
+      sameSite: "lax",
+      path: "/",
       maxAge: 60 * 60 * 24 * 30, // 30 days
     });
   }
@@ -28,16 +28,16 @@ export async function setAuthCookie(token: string, refreshToken?: string) {
 
 export async function removeAuthCookie() {
   const cookieStore = await cookies();
-  cookieStore.delete('alexandertel-admin-token');
-  cookieStore.delete('alexandertel-admin-refresh-token');
+  cookieStore.delete("alexandertel-admin-token");
+  cookieStore.delete("alexandertel-admin-refresh-token");
 }
 
 export async function getAuthToken() {
   const cookieStore = await cookies();
-  return cookieStore.get('alexandertel-admin-token')?.value;
+  return cookieStore.get("alexandertel-admin-token")?.value;
 }
 
 export async function getRefreshToken() {
   const cookieStore = await cookies();
-  return cookieStore.get('alexandertel-admin-refresh-token')?.value;
+  return cookieStore.get("alexandertel-admin-refresh-token")?.value;
 }

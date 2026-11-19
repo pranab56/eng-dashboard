@@ -4,9 +4,7 @@
 import React, { useEffect } from "react";
 import BackButton from "@/components/buttons/BackButton";
 import SubmitButton from "@/components/buttons/SubmitButton";
-import ImageUploadField, {
-  ImageChildrenComponent,
-} from "@/components/form/ImageUploadField";
+import ImageUploadField, { ImageChildrenComponent } from "@/components/form/ImageUploadField";
 import { useHeaders } from "@/hooks/useHeaders";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm, Controller } from "react-hook-form";
@@ -19,13 +17,7 @@ import {
 import { baseURL } from "@/utils/BaseURL";
 import { useRouter, useSearchParams } from "next/navigation";
 import { toast } from "sonner";
-import {
-  Coffee,
-  Package,
-  QrCode,
-  Truck,
-  Loader2,
-} from "lucide-react";
+import { Coffee, Package, QrCode, Truck, Loader2 } from "lucide-react";
 
 // Form Validation Schema
 const rewardsSchema = z.object({
@@ -120,9 +112,7 @@ const CreateReward = () => {
         }
       }
     } catch (error: any) {
-      toast.error(
-        error?.data?.message || `Failed to ${isEditMode ? "update" : "create"} reward`
-      );
+      toast.error(error?.data?.message || `Failed to ${isEditMode ? "update" : "create"} reward`);
     }
   };
 
@@ -179,9 +169,7 @@ const CreateReward = () => {
                 }`}
               />
               {errors.brand && (
-                <p className="text-[11px] font-medium text-rose-500">
-                  {errors.brand.message}
-                </p>
+                <p className="text-[11px] font-medium text-rose-500">{errors.brand.message}</p>
               )}
             </div>
 
@@ -209,9 +197,7 @@ const CreateReward = () => {
                         <Coffee className="w-4 h-4" />
                       </div>
                       <div className="min-w-0 flex-1">
-                        <p className="text-xs font-semibold text-slate-900">
-                          Coffee / Instant QR
-                        </p>
+                        <p className="text-xs font-semibold text-slate-900">Coffee / Instant QR</p>
                         <p className="text-[11px] text-slate-500 mt-0.5 flex items-center gap-1">
                           <QrCode className="w-3 h-3 text-amber-700 shrink-0" />
                           <span>Scannable in-app QR code</span>
@@ -233,9 +219,7 @@ const CreateReward = () => {
                         <Package className="w-4 h-4" />
                       </div>
                       <div className="min-w-0 flex-1">
-                        <p className="text-xs font-semibold text-slate-900">
-                          Physical Merchandise
-                        </p>
+                        <p className="text-xs font-semibold text-slate-900">Physical Merchandise</p>
                         <p className="text-[11px] text-slate-500 mt-0.5 flex items-center gap-1">
                           <Truck className="w-3 h-3 text-slate-500 shrink-0" />
                           <span>Order dispatch and fulfillment</span>
@@ -272,9 +256,7 @@ const CreateReward = () => {
                 }`}
               />
               {errors.point && (
-                <p className="text-[11px] font-medium text-rose-500">
-                  {errors.point.message}
-                </p>
+                <p className="text-[11px] font-medium text-rose-500">{errors.point.message}</p>
               )}
             </div>
           </div>

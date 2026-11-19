@@ -1,11 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import {
-  Dialog,
-  DialogContent,
-  DialogTitle,
-} from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import {
   Select,
@@ -23,14 +19,7 @@ import { useGetSingleTeamQuery } from "@/features/teamManagement/teamApi";
 import { formatImagePath } from "@/utils/formatImagePath";
 import { toast } from "sonner";
 import Image from "next/image";
-import {
-  Shield,
-  Plus,
-  X,
-  Loader2,
-  CheckCircle2,
-  AlertCircle,
-} from "lucide-react";
+import { Shield, Plus, X, Loader2, CheckCircle2, AlertCircle } from "lucide-react";
 
 interface CleanSheetModalProps {
   isOpen: boolean;
@@ -38,11 +27,7 @@ interface CleanSheetModalProps {
   match: any;
 }
 
-export const CleanSheetModal: React.FC<CleanSheetModalProps> = ({
-  isOpen,
-  onClose,
-  match,
-}) => {
+export const CleanSheetModal: React.FC<CleanSheetModalProps> = ({ isOpen, onClose, match }) => {
   const matchId = match?._id || match?.id;
 
   const {
@@ -174,7 +159,8 @@ export const CleanSheetModal: React.FC<CleanSheetModalProps> = ({
               </span>
             </div>
             <p className="text-xs text-slate-500 mt-1">
-              {homeName} ({match.homeScore ?? 0}) vs {awayName} ({match.awayScore ?? 0}) • 0 goals conceded automatically awards GK & DF clean sheets
+              {homeName} ({match.homeScore ?? 0}) vs {awayName} ({match.awayScore ?? 0}) • 0 goals
+              conceded automatically awards GK & DF clean sheets
             </p>
           </div>
 
@@ -240,11 +226,13 @@ export const CleanSheetModal: React.FC<CleanSheetModalProps> = ({
                   {/* Recipients List */}
                   <div className="space-y-1.5">
                     <span className="text-[11px] font-medium text-slate-400 block">
-                      Recipients ({teamAInfo?.eligiblePlayers?.filter((p: any) => p.hasCleanSheet)?.length || 0})
+                      Recipients (
+                      {teamAInfo?.eligiblePlayers?.filter((p: any) => p.hasCleanSheet)?.length || 0}
+                      )
                     </span>
 
-                    {(!teamAInfo?.eligiblePlayers ||
-                      teamAInfo.eligiblePlayers.filter((p: any) => p.hasCleanSheet).length === 0) ? (
+                    {!teamAInfo?.eligiblePlayers ||
+                    teamAInfo.eligiblePlayers.filter((p: any) => p.hasCleanSheet).length === 0 ? (
                       <p className="text-xs text-slate-400 italic py-2">
                         No recipients recorded for this match.
                       </p>
@@ -255,7 +243,9 @@ export const CleanSheetModal: React.FC<CleanSheetModalProps> = ({
                           .map((ep: any, idx: number) => {
                             const p = ep.player;
                             const playerId = String(p?._id || p?.id || p);
-                            const fullName = p ? `${p.firstName || ""} ${p.lastName || ""}`.trim() : "Player";
+                            const fullName = p
+                              ? `${p.firstName || ""} ${p.lastName || ""}`.trim()
+                              : "Player";
                             const pos = ep.position || "DF";
 
                             return (
@@ -265,7 +255,11 @@ export const CleanSheetModal: React.FC<CleanSheetModalProps> = ({
                               >
                                 <div className="flex items-center gap-2">
                                   <span className="w-5 h-5 rounded bg-slate-200 text-slate-700 font-semibold text-[10px] flex items-center justify-center shrink-0">
-                                    {pos === "Goalkeeper" ? "GK" : pos === "Defender" ? "DF" : pos.substring(0, 2).toUpperCase()}
+                                    {pos === "Goalkeeper"
+                                      ? "GK"
+                                      : pos === "Defender"
+                                        ? "DF"
+                                        : pos.substring(0, 2).toUpperCase()}
                                   </span>
                                   <span className="font-medium text-slate-800">{fullName}</span>
                                   {ep.isManual ? (
@@ -338,11 +332,13 @@ export const CleanSheetModal: React.FC<CleanSheetModalProps> = ({
                   {/* Recipients List */}
                   <div className="space-y-1.5">
                     <span className="text-[11px] font-medium text-slate-400 block">
-                      Recipients ({teamBInfo?.eligiblePlayers?.filter((p: any) => p.hasCleanSheet)?.length || 0})
+                      Recipients (
+                      {teamBInfo?.eligiblePlayers?.filter((p: any) => p.hasCleanSheet)?.length || 0}
+                      )
                     </span>
 
-                    {(!teamBInfo?.eligiblePlayers ||
-                      teamBInfo.eligiblePlayers.filter((p: any) => p.hasCleanSheet).length === 0) ? (
+                    {!teamBInfo?.eligiblePlayers ||
+                    teamBInfo.eligiblePlayers.filter((p: any) => p.hasCleanSheet).length === 0 ? (
                       <p className="text-xs text-slate-400 italic py-2">
                         No recipients recorded for this match.
                       </p>
@@ -353,7 +349,9 @@ export const CleanSheetModal: React.FC<CleanSheetModalProps> = ({
                           .map((ep: any, idx: number) => {
                             const p = ep.player;
                             const playerId = String(p?._id || p?.id || p);
-                            const fullName = p ? `${p.firstName || ""} ${p.lastName || ""}`.trim() : "Player";
+                            const fullName = p
+                              ? `${p.firstName || ""} ${p.lastName || ""}`.trim()
+                              : "Player";
                             const pos = ep.position || "DF";
 
                             return (
@@ -363,7 +361,11 @@ export const CleanSheetModal: React.FC<CleanSheetModalProps> = ({
                               >
                                 <div className="flex items-center gap-2">
                                   <span className="w-5 h-5 rounded bg-slate-200 text-slate-700 font-semibold text-[10px] flex items-center justify-center shrink-0">
-                                    {pos === "Goalkeeper" ? "GK" : pos === "Defender" ? "DF" : pos.substring(0, 2).toUpperCase()}
+                                    {pos === "Goalkeeper"
+                                      ? "GK"
+                                      : pos === "Defender"
+                                        ? "DF"
+                                        : pos.substring(0, 2).toUpperCase()}
                                   </span>
                                   <span className="font-medium text-slate-800">{fullName}</span>
                                   {ep.isManual ? (
@@ -481,13 +483,18 @@ export const CleanSheetModal: React.FC<CleanSheetModalProps> = ({
                 </div>
 
                 <form onSubmit={handleAward} className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
-                  <Select value={selectedPlayerId} onValueChange={(val) => setSelectedPlayerId(val)}>
+                  <Select
+                    value={selectedPlayerId}
+                    onValueChange={(val) => setSelectedPlayerId(val)}
+                  >
                     <SelectTrigger className="w-full bg-white border border-slate-200 rounded-lg h-9 text-xs">
                       <SelectValue placeholder="Select player..." />
                     </SelectTrigger>
                     <SelectContent className="bg-white max-h-48">
                       {eligibleCandidatePlayers.length === 0 ? (
-                        <div className="p-2 text-xs text-slate-400">All players already awarded</div>
+                        <div className="p-2 text-xs text-slate-400">
+                          All players already awarded
+                        </div>
                       ) : (
                         eligibleCandidatePlayers.map((m: any) => (
                           <SelectItem key={String(m._id || m.id)} value={String(m._id || m.id)}>
@@ -511,7 +518,11 @@ export const CleanSheetModal: React.FC<CleanSheetModalProps> = ({
                     disabled={isAwarding || !selectedPlayerId || !awardReason.trim()}
                     className="w-full h-9 bg-slate-900 hover:bg-slate-800 text-white font-medium text-xs rounded-lg transition-colors cursor-pointer flex items-center justify-center gap-1.5 shadow-xs"
                   >
-                    {isAwarding ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Plus className="w-3.5 h-3.5" />}
+                    {isAwarding ? (
+                      <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                    ) : (
+                      <Plus className="w-3.5 h-3.5" />
+                    )}
                     Award Clean Sheet
                   </Button>
                 </form>

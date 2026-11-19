@@ -112,13 +112,9 @@ export const getSponsorshipColumns = (
             )}
           </div>
           <div className="flex flex-col min-w-0">
-            <span className="font-medium text-slate-900 text-xs leading-snug truncate">
-              {name}
-            </span>
+            <span className="font-medium text-slate-900 text-xs leading-snug truncate">{name}</span>
             {title ? (
-              <span className="text-[11px] text-slate-500 leading-snug truncate">
-                {title}
-              </span>
+              <span className="text-[11px] text-slate-500 leading-snug truncate">{title}</span>
             ) : null}
           </div>
         </div>
@@ -208,9 +204,7 @@ export const getSponsorshipColumns = (
           title="Toggle status"
         >
           <span
-            className={`w-1.5 h-1.5 rounded-full ${
-              isActive ? "bg-emerald-500" : "bg-slate-300"
-            }`}
+            className={`w-1.5 h-1.5 rounded-full ${isActive ? "bg-emerald-500" : "bg-slate-300"}`}
           />
           <span className={isActive ? "text-slate-800" : "text-slate-500"}>
             {isActive ? "Active" : "Inactive"}
@@ -221,7 +215,9 @@ export const getSponsorshipColumns = (
   },
   {
     id: "actions",
-    header: () => <span className="font-semibold text-xs text-slate-600 text-right block pr-2">Actions</span>,
+    header: () => (
+      <span className="font-semibold text-xs text-slate-600 text-right block pr-2">Actions</span>
+    ),
     cell: ({ row }) => {
       const item = row.original;
       return (

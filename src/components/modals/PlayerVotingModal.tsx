@@ -13,7 +13,10 @@ import {
 } from "@/components/ui/select";
 import CustomDatePicker from "@/components/ui/CustomDatePicker";
 import { NomineePlayerSelectDropdown } from "@/components/dropdowns/NomineePlayerSelectDropdown";
-import { useGetAllLeagueQuery, useGetLeagueAgeGroupsQuery } from "@/features/leagueManagement/leagueApi";
+import {
+  useGetAllLeagueQuery,
+  useGetLeagueAgeGroupsQuery,
+} from "@/features/leagueManagement/leagueApi";
 import { useGetAllAgeGroupQuery } from "@/features/categoryManagement/categoryApi";
 import { useGetAllPlayerQuery } from "@/features/player/playerApi";
 import { TPlayerVoting } from "@/types/columnTypes";
@@ -44,9 +47,7 @@ const getInitialLeagueId = (item: TPlayerVoting | null): string => {
   return String(item.league);
 };
 
-const getInitialStatus = (
-  item: TPlayerVoting | null
-): "upcoming" | "active" | "completed" => {
+const getInitialStatus = (item: TPlayerVoting | null): "upcoming" | "active" | "completed" => {
   const raw = String(item?.status || "upcoming").toLowerCase();
   if (raw === "active" || raw === "completed" || raw === "upcoming") {
     return raw;
@@ -83,15 +84,9 @@ export default function PlayerVotingModal({
   const [votingType, setVotingType] = useState<"WEEK" | "MONTH" | "OVERALL">(() =>
     getInitialVotingType(editingItem)
   );
-  const [league, setLeague] = useState<string>(() =>
-    getInitialLeagueId(editingItem)
-  );
-  const [ageGroup, setAgeGroup] = useState<string>(
-    () => editingItem?.ageGroup || ""
-  );
-  const [weekNumber, setWeekNumber] = useState<number>(
-    () => editingItem?.weekNumber || 1
-  );
+  const [league, setLeague] = useState<string>(() => getInitialLeagueId(editingItem));
+  const [ageGroup, setAgeGroup] = useState<string>(() => editingItem?.ageGroup || "");
+  const [weekNumber, setWeekNumber] = useState<number>(() => editingItem?.weekNumber || 1);
   const [month, setMonth] = useState(() => editingItem?.month || "");
   const [startDate, setStartDate] = useState(() =>
     editingItem?.startDate ? String(editingItem.startDate).split("T")[0] : ""
@@ -99,16 +94,14 @@ export default function PlayerVotingModal({
   const [endDate, setEndDate] = useState(() =>
     editingItem?.endDate ? String(editingItem.endDate).split("T")[0] : ""
   );
-  const [status, setStatus] = useState<"upcoming" | "active" | "completed">(
-    () => getInitialStatus(editingItem)
+  const [status, setStatus] = useState<"upcoming" | "active" | "completed">(() =>
+    getInitialStatus(editingItem)
   );
-  const [description, setDescription] = useState(
-    () => editingItem?.description || ""
-  );
+  const [description, setDescription] = useState(() => editingItem?.description || "");
 
-  const [nominees, setNominees] = useState<
-    { player: string; statsHighlight: string }[]
-  >(() => getInitialNominees(editingItem));
+  const [nominees, setNominees] = useState<{ player: string; statsHighlight: string }[]>(() =>
+    getInitialNominees(editingItem)
+  );
 
   const [bannerFile, setBannerFile] = useState<File | null>(null);
   const [bannerPreview, setBannerPreview] = useState<string | null>(() =>
@@ -122,8 +115,8 @@ export default function PlayerVotingModal({
     const rawList: any[] = Array.isArray(leaguesData?.data)
       ? leaguesData.data
       : Array.isArray(leaguesData?.data?.result)
-      ? leaguesData.data.result
-      : [];
+        ? leaguesData.data.result
+        : [];
 
     const editLeague = editingItem?.league;
     if (
@@ -208,10 +201,10 @@ export default function PlayerVotingModal({
     const fetched: any[] = Array.isArray(playersData?.data?.players)
       ? playersData.data.players
       : Array.isArray(playersData?.data?.result)
-      ? playersData.data.result
-      : Array.isArray(playersData?.data)
-      ? playersData.data
-      : [];
+        ? playersData.data.result
+        : Array.isArray(playersData?.data)
+          ? playersData.data
+          : [];
 
     // Ensure currently selected nominees from editingItem always exist in the dropdown list
     const mergedMap = new Map<string, any>();
@@ -242,26 +235,18 @@ export default function PlayerVotingModal({
 
       const rawAge = editingItem.ageGroup || "";
       const matchedAge = rawAge
-        ? dynamicAgeGroups.find(
-            (ag) => ag.toLowerCase() === rawAge.toLowerCase()
-          ) || rawAge
+        ? dynamicAgeGroups.find((ag) => ag.toLowerCase() === rawAge.toLowerCase()) || rawAge
         : dynamicAgeGroups[0] || "";
       setAgeGroup(matchedAge);
 
       setWeekNumber(editingItem.weekNumber || 1);
       setMonth(editingItem.month || "");
-      setStartDate(
-        editingItem.startDate ? String(editingItem.startDate).split("T")[0] : ""
-      );
-      setEndDate(
-        editingItem.endDate ? String(editingItem.endDate).split("T")[0] : ""
-      );
+      setStartDate(editingItem.startDate ? String(editingItem.startDate).split("T")[0] : "");
+      setEndDate(editingItem.endDate ? String(editingItem.endDate).split("T")[0] : "");
       setStatus(getInitialStatus(editingItem));
       setDescription(editingItem.description || "");
       setNominees(getInitialNominees(editingItem));
-      setBannerPreview(
-        editingItem.banner ? formatImagePath(editingItem.banner) : null
-      );
+      setBannerPreview(editingItem.banner ? formatImagePath(editingItem.banner) : null);
       setBannerFile(null);
     } else {
       setTitle("");
@@ -271,9 +256,7 @@ export default function PlayerVotingModal({
       setWeekNumber(1);
       setMonth("");
       const today = new Date().toISOString().split("T")[0];
-      const nextWeek = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
-        .toISOString()
-        .split("T")[0];
+      const nextWeek = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().split("T")[0];
       setStartDate(today);
       setEndDate(nextWeek);
       setStatus("upcoming");
@@ -294,7 +277,12 @@ export default function PlayerVotingModal({
       const exactMatch = dynamicAgeGroups.find(
         (ag) => ag.toLowerCase() === editingItem.ageGroup.toLowerCase()
       );
-      if (exactMatch && ageGroup && exactMatch !== ageGroup && exactMatch.toLowerCase() === ageGroup.toLowerCase()) {
+      if (
+        exactMatch &&
+        ageGroup &&
+        exactMatch !== ageGroup &&
+        exactMatch.toLowerCase() === ageGroup.toLowerCase()
+      ) {
         setAgeGroup(exactMatch);
       }
     }
@@ -338,11 +326,7 @@ export default function PlayerVotingModal({
     setNominees(updated);
   };
 
-  const handleNomineeChange = (
-    index: number,
-    field: "player" | "statsHighlight",
-    val: string
-  ) => {
+  const handleNomineeChange = (index: number, field: "player" | "statsHighlight", val: string) => {
     const updated = [...nominees];
     updated[index][field] = val;
     setNominees(updated);
@@ -368,9 +352,7 @@ export default function PlayerVotingModal({
       votingType === "OVERALL" || !league || league === "all" || league === "overall";
 
     // Validate nominees: ensure at least 2 valid unique players
-    const selectedPlayerIds = nominees
-      .map((n) => (n.player || "").trim())
-      .filter(Boolean);
+    const selectedPlayerIds = nominees.map((n) => (n.player || "").trim()).filter(Boolean);
     if (selectedPlayerIds.length < 2) {
       setErrorMsg("Please select at least 2 valid nominee players.");
       return;
@@ -465,9 +447,7 @@ export default function PlayerVotingModal({
             </div>
 
             <div>
-              <label className="block text-xs font-medium text-slate-700 mb-1">
-                Campaign Type
-              </label>
+              <label className="block text-xs font-medium text-slate-700 mb-1">Campaign Type</label>
               <Select
                 value={votingType}
                 onValueChange={(val: any) => {
@@ -478,9 +458,21 @@ export default function PlayerVotingModal({
                       if (!editingItem && (!title || title.startsWith("Player of the"))) {
                         setTitle("Overall Player of the Season");
                       }
-                    } else if (val === "WEEK" && !editingItem && (!title || title.startsWith("Overall") || title.startsWith("Player of the Month"))) {
+                    } else if (
+                      val === "WEEK" &&
+                      !editingItem &&
+                      (!title ||
+                        title.startsWith("Overall") ||
+                        title.startsWith("Player of the Month"))
+                    ) {
                       setTitle(`Player of the Week - Week ${weekNumber}`);
-                    } else if (val === "MONTH" && !editingItem && (!title || title.startsWith("Overall") || title.startsWith("Player of the Week"))) {
+                    } else if (
+                      val === "MONTH" &&
+                      !editingItem &&
+                      (!title ||
+                        title.startsWith("Overall") ||
+                        title.startsWith("Player of the Week"))
+                    ) {
                       setTitle(`Player of the Month${month ? ` - ${month}` : ""}`);
                     }
                   }
@@ -499,9 +491,7 @@ export default function PlayerVotingModal({
 
             {votingType === "WEEK" ? (
               <div>
-                <label className="block text-xs font-medium text-slate-700 mb-1">
-                  Week Number
-                </label>
+                <label className="block text-xs font-medium text-slate-700 mb-1">Week Number</label>
                 <input
                   type="number"
                   min={1}
@@ -513,9 +503,7 @@ export default function PlayerVotingModal({
               </div>
             ) : votingType === "MONTH" ? (
               <div>
-                <label className="block text-xs font-medium text-slate-700 mb-1">
-                  Month
-                </label>
+                <label className="block text-xs font-medium text-slate-700 mb-1">Month</label>
                 <input
                   type="text"
                   placeholder="e.g. October 2026"
@@ -530,10 +518,7 @@ export default function PlayerVotingModal({
               <label className="block text-xs font-medium text-slate-700 mb-1">
                 Competition League
               </label>
-              <Select
-                value={league || "all"}
-                onValueChange={handleLeagueSelect}
-              >
+              <Select value={league || "all"} onValueChange={handleLeagueSelect}>
                 <SelectTrigger className="w-full h-8 px-2.5 rounded-md border border-slate-200 text-xs text-slate-900 bg-white">
                   <SelectValue placeholder="All Leagues (Overall)" />
                 </SelectTrigger>
@@ -661,9 +646,7 @@ export default function PlayerVotingModal({
                       type="text"
                       placeholder="e.g. 4 Goals, 1 Assist"
                       value={nom.statsHighlight}
-                      onChange={(e) =>
-                        handleNomineeChange(idx, "statsHighlight", e.target.value)
-                      }
+                      onChange={(e) => handleNomineeChange(idx, "statsHighlight", e.target.value)}
                       className="w-full h-8 px-2.5 rounded-md border border-slate-200 text-xs text-slate-800 placeholder:text-slate-400 focus:outline-none focus:border-slate-400 bg-white"
                     />
                   </div>
@@ -705,11 +688,7 @@ export default function PlayerVotingModal({
             <div className="border border-dashed border-slate-300 rounded-md p-3 flex items-center gap-3 bg-slate-50/50">
               <div className="w-16 h-10 rounded border border-slate-200 bg-white flex items-center justify-center overflow-hidden shrink-0">
                 {bannerPreview ? (
-                  <img
-                    src={bannerPreview}
-                    alt="Preview"
-                    className="w-full h-full object-cover"
-                  />
+                  <img src={bannerPreview} alt="Preview" className="w-full h-full object-cover" />
                 ) : (
                   <span className="text-[10px] text-slate-400">None</span>
                 )}

@@ -60,7 +60,11 @@ export default function BookAScoutManagement() {
     });
   }, [setHeaders]);
 
-  const { data: apiResponse, isLoading, refetch } = useGetAllBookAScoutQuery(
+  const {
+    data: apiResponse,
+    isLoading,
+    refetch,
+  } = useGetAllBookAScoutQuery(
     {
       pageNumber: Number(page) || 1,
       limit: 10,
@@ -193,7 +197,8 @@ export default function BookAScoutManagement() {
             Book A Scout Section
           </h1>
           <p className="text-xs sm:text-sm text-slate-500 mt-1">
-            Configure the mobile app Book A Scout banner card, overlay badge, internal status, and redirect URL.
+            Configure the mobile app Book A Scout banner card, overlay badge, internal status, and
+            redirect URL.
           </p>
         </div>
 
@@ -217,9 +222,7 @@ export default function BookAScoutManagement() {
             <Compass className="w-4 h-4 text-slate-400" />
           </div>
           <div className="mt-2 flex items-baseline gap-2">
-            <span className="text-xl font-bold font-mono text-slate-900">
-              {metrics.total}
-            </span>
+            <span className="text-xl font-bold font-mono text-slate-900">{metrics.total}</span>
             <span className="text-xs text-slate-500">configured</span>
           </div>
           <p className="text-[11px] text-slate-400 mt-1">Book A Scout banners</p>
@@ -331,18 +334,10 @@ export default function BookAScoutManagement() {
 
         <div className="p-4 border-t border-slate-200 bg-slate-50/50 flex items-center justify-between">
           <p className="text-xs text-slate-500">
-            Showing{" "}
-            <span className="font-semibold text-slate-700">{rawItems.length}</span>{" "}
-            of{" "}
-            <span className="font-semibold text-slate-700">
-              {paginationMeta.total}
-            </span>{" "}
-            cards
+            Showing <span className="font-semibold text-slate-700">{rawItems.length}</span> of{" "}
+            <span className="font-semibold text-slate-700">{paginationMeta.total}</span> cards
           </p>
-          <CustomPagination
-            TOTAL_PAGES={paginationMeta.totalPage}
-            showPageInfo={false}
-          />
+          <CustomPagination TOTAL_PAGES={paginationMeta.totalPage} showPageInfo={false} />
         </div>
       </div>
 
@@ -371,4 +366,3 @@ export default function BookAScoutManagement() {
     </div>
   );
 }
-

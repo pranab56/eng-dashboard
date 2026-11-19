@@ -2,12 +2,7 @@
 "use client";
 
 import React, { useState, useMemo } from "react";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 import Image from "next/image";
@@ -123,7 +118,8 @@ const RewardRedeemedHistoryModal: React.FC<RewardRedeemedHistoryModalProps> = ({
               </div>
               <p className="text-xs font-semibold text-slate-800">No redemptions yet</p>
               <p className="text-[11px] text-slate-400 max-w-xs mx-auto mt-0.5">
-                When players scan the QR code to claim this item, their claim records will appear here.
+                When players scan the QR code to claim this item, their claim records will appear
+                here.
               </p>
             </div>
           ) : filteredUsers.length === 0 ? (
@@ -154,7 +150,8 @@ const RewardRedeemedHistoryModal: React.FC<RewardRedeemedHistoryModalProps> = ({
                     getValidEmail(parentObj?.emergencyEmail)
                   : "";
 
-                const playerPic = isPopulated && userObj.profile ? formatImagePath(userObj.profile) : null;
+                const playerPic =
+                  isPopulated && userObj.profile ? formatImagePath(userObj.profile) : null;
                 const initials = playerName.substring(0, 2).toUpperCase();
 
                 return (
@@ -165,12 +162,7 @@ const RewardRedeemedHistoryModal: React.FC<RewardRedeemedHistoryModalProps> = ({
                     <div className="flex items-center gap-3 min-w-0">
                       <div className="relative w-8 h-8 rounded-md border border-slate-200 bg-slate-100 overflow-hidden flex items-center justify-center shrink-0 text-[11px] font-semibold text-slate-600">
                         {playerPic ? (
-                          <Image
-                            src={playerPic}
-                            alt={playerName}
-                            fill
-                            className="object-cover"
-                          />
+                          <Image src={playerPic} alt={playerName} fill className="object-cover" />
                         ) : (
                           <span>{initials}</span>
                         )}

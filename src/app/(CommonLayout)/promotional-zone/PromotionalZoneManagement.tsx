@@ -70,7 +70,11 @@ export default function PromotionalZoneManagement() {
   }, []);
 
   // Fetch promotions
-  const { data: apiResponse, isLoading, refetch } = useGetAllPromotionsQuery(
+  const {
+    data: apiResponse,
+    isLoading,
+    refetch,
+  } = useGetAllPromotionsQuery(
     {
       pageNumber: Number(page) || 1,
       limit: 10,
@@ -463,17 +467,14 @@ export default function PromotionalZoneManagement() {
         </div>
 
         {/* Custom Data Table */}
-        <CustomTable
-          columns={columns}
-          data={rawPromotions}
-          isLoading={isLoading}
-        />
+        <CustomTable columns={columns} data={rawPromotions} isLoading={isLoading} />
 
         {/* Pagination Bar */}
         <div className="p-3 border-t border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-3 bg-white">
           <div className="text-xs text-slate-500">
             Showing <span className="font-semibold text-slate-800">{rawPromotions.length}</span> of{" "}
-            <span className="font-semibold text-slate-800">{paginationMeta.total}</span> total promotions
+            <span className="font-semibold text-slate-800">{paginationMeta.total}</span> total
+            promotions
           </div>
           <CustomPagination TOTAL_PAGES={paginationMeta.totalPage} />
         </div>

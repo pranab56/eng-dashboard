@@ -3,9 +3,7 @@ import Image from "next/image";
 import { formatImagePath } from "../utils/formatImagePath";
 import { Pencil } from "lucide-react";
 
-export const getTableColumns = (
-  onEdit?: (standing: any) => void
-): ColumnDef<any>[] => [
+export const getTableColumns = (onEdit?: (standing: any) => void): ColumnDef<any>[] => [
   {
     id: "rank",
     header: () => (
@@ -72,9 +70,7 @@ export const getTableColumns = (
               )}
             </div>
             {team?.shortName && (
-              <span className="text-[11px] font-mono text-slate-400">
-                {team.shortName}
-              </span>
+              <span className="text-[11px] font-mono text-slate-400">{team.shortName}</span>
             )}
           </div>
         </div>
@@ -194,13 +190,11 @@ export const getTableColumns = (
         gd > 0
           ? "text-emerald-700 font-semibold"
           : gd < 0
-          ? "text-rose-600 font-semibold"
-          : "text-slate-400 font-normal";
+            ? "text-rose-600 font-semibold"
+            : "text-slate-400 font-normal";
 
       return (
-        <div className={`text-center font-mono text-xs tabular-nums ${colorClass}`}>
-          {sign}
-        </div>
+        <div className={`text-center font-mono text-xs tabular-nums ${colorClass}`}>{sign}</div>
       );
     },
   },

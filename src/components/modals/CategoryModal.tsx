@@ -1,20 +1,8 @@
 "use client";
 
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { TCategory } from "@/types/columnTypes";
-import {
-  X,
-  FolderPlus,
-  Loader2,
-  GitBranch,
-  Check,
-  ChevronsUpDown,
-  Search,
-} from "lucide-react";
+import { X, FolderPlus, Loader2, GitBranch, Check, ChevronsUpDown, Search } from "lucide-react";
 import React, { useEffect, useState } from "react";
 
 interface CategoryModalProps {
@@ -194,10 +182,11 @@ export default function CategoryModal({
                     setIsSubcategory(false);
                     setParentCategory("");
                   }}
-                  className={`py-2 px-3 rounded-lg text-xs font-semibold transition-all cursor-pointer ${!isSubcategory
-                    ? "bg-white text-gray-900 shadow-sm"
-                    : "text-gray-500 hover:text-gray-900"
-                    }`}
+                  className={`py-2 px-3 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
+                    !isSubcategory
+                      ? "bg-white text-gray-900 shadow-sm"
+                      : "text-gray-500 hover:text-gray-900"
+                  }`}
                 >
                   Parent Category
                 </button>
@@ -206,15 +195,14 @@ export default function CategoryModal({
                   onClick={() => {
                     setIsSubcategory(true);
                     if (!parentCategory) {
-                      setParentCategory(
-                        categories[0]?._id || categories[0]?.id || ""
-                      );
+                      setParentCategory(categories[0]?._id || categories[0]?.id || "");
                     }
                   }}
-                  className={`py-2 px-3 rounded-lg text-xs font-semibold transition-all cursor-pointer ${isSubcategory
-                    ? "bg-white text-gray-900 shadow-sm"
-                    : "text-gray-500 hover:text-gray-900"
-                    }`}
+                  className={`py-2 px-3 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
+                    isSubcategory
+                      ? "bg-white text-gray-900 shadow-sm"
+                      : "text-gray-500 hover:text-gray-900"
+                  }`}
                 >
                   Subcategory
                 </button>
@@ -237,9 +225,7 @@ export default function CategoryModal({
                     className="w-full h-11 px-3.5 bg-gray-50 border border-gray-200 rounded-lg text-sm flex items-center justify-between font-medium text-gray-800 hover:bg-gray-100/70 focus:outline-none focus:border-blue-500 transition-all cursor-pointer disabled:opacity-50"
                   >
                     <span className="truncate">
-                      {selectedParentObj
-                        ? selectedParentObj.name
-                        : "Select parent category..."}
+                      {selectedParentObj ? selectedParentObj.name : "Select parent category..."}
                     </span>
                     <ChevronsUpDown className="w-4 h-4 text-gray-400 shrink-0 ml-2" />
                   </button>
@@ -280,15 +266,14 @@ export default function CategoryModal({
                           type="button"
                           onPointerDown={handleSelectCategory}
                           onClick={handleSelectCategory}
-                          className={`w-full px-3 py-2 text-xs rounded-md flex items-center justify-between transition-colors cursor-pointer text-left ${isSelected
-                            ? "bg-blue-50 text-blue-600 font-semibold"
-                            : "text-gray-700 hover:bg-gray-50"
-                            }`}
+                          className={`w-full px-3 py-2 text-xs rounded-md flex items-center justify-between transition-colors cursor-pointer text-left ${
+                            isSelected
+                              ? "bg-blue-50 text-blue-600 font-semibold"
+                              : "text-gray-700 hover:bg-gray-50"
+                          }`}
                         >
                           <span>{cat.name}</span>
-                          {isSelected && (
-                            <Check className="w-3.5 h-3.5 text-blue-600" />
-                          )}
+                          {isSelected && <Check className="w-3.5 h-3.5 text-blue-600" />}
                         </button>
                       );
                     })}
@@ -311,9 +296,7 @@ export default function CategoryModal({
             </label>
             <input
               type="text"
-              placeholder={
-                isSubcategory ? "e.g. Premier League" : "e.g. Cricket"
-              }
+              placeholder={isSubcategory ? "e.g. Premier League" : "e.g. Cricket"}
               value={name}
               onChange={(e) => setName(e.target.value)}
               disabled={isLoading}
@@ -325,7 +308,8 @@ export default function CategoryModal({
           {!isSubcategory && (
             <div className="space-y-2">
               <label className="block text-sm font-semibold text-gray-800">
-                Order Number <span className="text-xs font-normal text-gray-400">(e.g. 1, 2, 3)</span>
+                Order Number{" "}
+                <span className="text-xs font-normal text-gray-400">(e.g. 1, 2, 3)</span>
               </label>
               <input
                 type="number"
@@ -343,7 +327,9 @@ export default function CategoryModal({
             <div className="flex items-center justify-between p-3 bg-gray-50 border border-gray-200 rounded-lg">
               <div>
                 <p className="text-sm font-semibold text-gray-800">Landscape Layout</p>
-                <p className="text-xs text-gray-500 mt-0.5">Display this category in landscape (wide) format</p>
+                <p className="text-xs text-gray-500 mt-0.5">
+                  Display this category in landscape (wide) format
+                </p>
               </div>
               <button
                 type="button"

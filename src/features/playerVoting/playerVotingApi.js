@@ -36,7 +36,8 @@ export const playerVotingApi = baseApi.injectEndpoints({
         if (limit) params.push(`limit=${limit}`);
         if (searchValue) params.push(`searchValue=${encodeURIComponent(searchValue)}`);
         if (status && status !== "all") params.push(`status=${encodeURIComponent(status)}`);
-        if (votingType && votingType !== "all") params.push(`votingType=${encodeURIComponent(votingType)}`);
+        if (votingType && votingType !== "all")
+          params.push(`votingType=${encodeURIComponent(votingType)}`);
         if (league && league !== "all") params.push(`league=${encodeURIComponent(league)}`);
         if (ageGroup && ageGroup !== "all") params.push(`ageGroup=${encodeURIComponent(ageGroup)}`);
 

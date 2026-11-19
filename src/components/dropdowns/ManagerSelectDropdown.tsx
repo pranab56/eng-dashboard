@@ -1,9 +1,9 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-"use client"
-import React, { useState, useRef, useEffect } from 'react';
-import { UserCheck, Search, Check, ChevronDown, X } from 'lucide-react';
-import { formatImagePath } from '@/utils/formatImagePath';
-import Image from 'next/image';
+"use client";
+import React, { useState, useRef, useEffect } from "react";
+import { UserCheck, Search, Check, ChevronDown, X } from "lucide-react";
+import { formatImagePath } from "@/utils/formatImagePath";
+import Image from "next/image";
 
 interface ManagerSelectDropdownProps {
   managers: any[];
@@ -21,7 +21,7 @@ export const ManagerSelectDropdown: React.FC<ManagerSelectDropdownProps> = ({
   disabled = false,
 }) => {
   const [isOpen, setIsOpen] = useState(false);
-  const [searchTerm, setSearchTerm] = useState('');
+  const [searchTerm, setSearchTerm] = useState("");
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   // Close dropdown on click outside
@@ -31,24 +31,22 @@ export const ManagerSelectDropdown: React.FC<ManagerSelectDropdownProps> = ({
         setIsOpen(false);
       }
     };
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  const selectedManager = managers.find(
-    (m) => (m._id || m.id) === selectedManagerId
-  );
+  const selectedManager = managers.find((m) => (m._id || m.id) === selectedManagerId);
 
   const getManagerName = (m: any) => {
-    if (!m) return '';
-    return m.firstName ? `${m.firstName} ${m.lastName || ''}`.trim() : (m.userName || 'Manager');
+    if (!m) return "";
+    return m.firstName ? `${m.firstName} ${m.lastName || ""}`.trim() : m.userName || "Manager";
   };
 
   const filteredManagers = managers.filter((m) => {
     if (!searchTerm.trim()) return true;
     const q = searchTerm.toLowerCase().trim();
     const name = getManagerName(m).toLowerCase();
-    const email = (m.email || '').toLowerCase();
+    const email = (m.email || "").toLowerCase();
     return name.includes(q) || email.includes(q);
   });
 
@@ -67,8 +65,8 @@ export const ManagerSelectDropdown: React.FC<ManagerSelectDropdownProps> = ({
             {selectedManagerId === "ALL" || !selectedManager
               ? placeholder
               : selectedManagerId === "UNASSIGNED"
-              ? "Unassigned Manager"
-              : getManagerName(selectedManager)}
+                ? "Unassigned Manager"
+                : getManagerName(selectedManager)}
           </span>
         </div>
 
@@ -87,7 +85,7 @@ export const ManagerSelectDropdown: React.FC<ManagerSelectDropdownProps> = ({
           )}
           <ChevronDown
             className={`w-3.5 h-3.5 text-gray-400 transition-transform duration-200 ${
-              isOpen ? 'rotate-180 text-indigo-600' : ''
+              isOpen ? "rotate-180 text-indigo-600" : ""
             }`}
           />
         </div>
@@ -111,7 +109,7 @@ export const ManagerSelectDropdown: React.FC<ManagerSelectDropdownProps> = ({
               {searchTerm && (
                 <button
                   type="button"
-                  onClick={() => setSearchTerm('')}
+                  onClick={() => setSearchTerm("")}
                   className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 p-0.5"
                 >
                   <X className="w-3 h-3" />
@@ -131,8 +129,8 @@ export const ManagerSelectDropdown: React.FC<ManagerSelectDropdownProps> = ({
               }}
               className={`w-full flex items-center justify-between p-2 rounded-xl text-left text-xs transition-colors cursor-pointer ${
                 selectedManagerId === "ALL"
-                  ? 'bg-indigo-50 text-indigo-950 font-bold'
-                  : 'text-gray-700 hover:bg-gray-100 font-medium'
+                  ? "bg-indigo-50 text-indigo-950 font-bold"
+                  : "text-gray-700 hover:bg-gray-100 font-medium"
               }`}
             >
               <span className="flex items-center gap-2">
@@ -151,15 +149,17 @@ export const ManagerSelectDropdown: React.FC<ManagerSelectDropdownProps> = ({
               }}
               className={`w-full flex items-center justify-between p-2 rounded-xl text-left text-xs transition-colors cursor-pointer ${
                 selectedManagerId === "UNASSIGNED"
-                  ? 'bg-amber-50 text-amber-950 font-bold'
-                  : 'text-gray-700 hover:bg-gray-100 font-medium'
+                  ? "bg-amber-50 text-amber-950 font-bold"
+                  : "text-gray-700 hover:bg-gray-100 font-medium"
               }`}
             >
               <span className="flex items-center gap-2 text-amber-700">
                 <span className="w-2 h-2 rounded-full bg-amber-500" />
                 Unassigned (No Manager)
               </span>
-              {selectedManagerId === "UNASSIGNED" && <Check className="w-3.5 h-3.5 text-amber-600" />}
+              {selectedManagerId === "UNASSIGNED" && (
+                <Check className="w-3.5 h-3.5 text-amber-600" />
+              )}
             </button>
 
             {filteredManagers.length === 0 ? (
@@ -183,8 +183,8 @@ export const ManagerSelectDropdown: React.FC<ManagerSelectDropdownProps> = ({
                     }}
                     className={`w-full flex items-center justify-between p-2 rounded-xl text-left text-xs transition-colors cursor-pointer ${
                       isSelected
-                        ? 'bg-indigo-50 text-indigo-950 font-bold'
-                        : 'text-gray-800 hover:bg-gray-50 hover:text-indigo-700 font-medium'
+                        ? "bg-indigo-50 text-indigo-950 font-bold"
+                        : "text-gray-800 hover:bg-gray-50 hover:text-indigo-700 font-medium"
                     }`}
                   >
                     <div className="flex items-center gap-2.5 truncate">
@@ -192,12 +192,18 @@ export const ManagerSelectDropdown: React.FC<ManagerSelectDropdownProps> = ({
                         {profileImg ? (
                           <Image src={profileImg} alt={name} fill className="object-cover" />
                         ) : (
-                          <span className="text-[10px] font-bold text-indigo-700">{name.charAt(0)}</span>
+                          <span className="text-[10px] font-bold text-indigo-700">
+                            {name.charAt(0)}
+                          </span>
                         )}
                       </div>
                       <div className="truncate">
                         <span className="block truncate font-bold text-gray-900">{name}</span>
-                        {m.email && <span className="block text-[10px] text-gray-400 truncate">{m.email}</span>}
+                        {m.email && (
+                          <span className="block text-[10px] text-gray-400 truncate">
+                            {m.email}
+                          </span>
+                        )}
                       </div>
                     </div>
 

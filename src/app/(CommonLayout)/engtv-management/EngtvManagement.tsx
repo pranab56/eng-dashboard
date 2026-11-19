@@ -4,16 +4,7 @@
 import React, { useEffect, useState, useMemo } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import {
-  Tv,
-  Plus,
-  Search,
-  X,
-  CheckCircle2,
-  Clock,
-  Star,
-  GripVertical,
-} from "lucide-react";
+import { Tv, Plus, Search, X, CheckCircle2, Clock, Star, GripVertical } from "lucide-react";
 import { toast } from "sonner";
 
 import CustomPagination from "@/components/cui/CustomPagination";
@@ -101,8 +92,8 @@ const EngtvManagement = () => {
           typeof catVal === "object" && catVal
             ? catVal.name
             : typeof catVal === "string"
-            ? catVal
-            : "";
+              ? catVal
+              : "";
         const catMatch = catName.toLowerCase().includes(q);
         return titleMatch || catMatch;
       }

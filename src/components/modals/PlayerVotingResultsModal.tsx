@@ -29,9 +29,7 @@ export default function PlayerVotingResultsModal({
   );
 
   const winnerId =
-    voting.winner && typeof voting.winner === "object"
-      ? voting.winner._id
-      : voting.winner || null;
+    voting.winner && typeof voting.winner === "object" ? voting.winner._id : voting.winner || null;
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-[2px] p-4 overflow-y-auto">
@@ -53,9 +51,7 @@ export default function PlayerVotingResultsModal({
                 {voting.league?.leagueName || "League"} • {voting.ageGroup}
               </span>
             </div>
-            <h3 className="font-semibold text-slate-900 text-sm mt-0.5">
-              {voting.title}
-            </h3>
+            <h3 className="font-semibold text-slate-900 text-sm mt-0.5">{voting.title}</h3>
           </div>
           <button
             type="button"
@@ -127,21 +123,19 @@ export default function PlayerVotingResultsModal({
           {/* Leaderboard Standings */}
           <div className="space-y-2">
             <div className="flex items-center justify-between text-xs text-slate-500 px-0.5 pb-1 border-b border-slate-100">
-              <span className="font-medium text-slate-700">
-                Nominees & Vote Distribution
-              </span>
+              <span className="font-medium text-slate-700">Nominees & Vote Distribution</span>
               <span>{sortedNominees.length} Nominees</span>
             </div>
 
             {sortedNominees.map((nominee, idx) => {
               const count = nominee.votesCount || 0;
-              const percentage =
-                totalVotes > 0 ? Math.round((count / totalVotes) * 100) : 0;
+              const percentage = totalVotes > 0 ? Math.round((count / totalVotes) * 100) : 0;
               const isWinner = winnerId && winnerId === nominee.player?._id;
               const isLead = idx === 0 && count > 0 && !winnerId;
               const profileImg = formatImagePath(nominee.player?.profile);
               const playerName = nominee.player
-                ? `${nominee.player.firstName || ""} ${nominee.player.lastName || ""}`.trim() || "Player"
+                ? `${nominee.player.firstName || ""} ${nominee.player.lastName || ""}`.trim() ||
+                  "Player"
                 : "Player";
 
               return (
@@ -151,8 +145,8 @@ export default function PlayerVotingResultsModal({
                     isWinner
                       ? "border-amber-300 bg-amber-50/20"
                       : isLead
-                      ? "border-slate-300 bg-slate-50/40"
-                      : "border-slate-200 bg-white"
+                        ? "border-slate-300 bg-slate-50/40"
+                        : "border-slate-200 bg-white"
                   }`}
                 >
                   <div className="flex items-center justify-between mb-1.5">
@@ -175,9 +169,7 @@ export default function PlayerVotingResultsModal({
 
                       <div>
                         <div className="flex items-center gap-1.5">
-                          <span className="text-xs font-semibold text-slate-900">
-                            {playerName}
-                          </span>
+                          <span className="text-xs font-semibold text-slate-900">{playerName}</span>
                           {isWinner && (
                             <span className="text-[9px] bg-amber-100 text-amber-800 font-semibold px-1 py-0.2 rounded">
                               WINNER
@@ -187,9 +179,7 @@ export default function PlayerVotingResultsModal({
                         <div className="text-[11px] text-slate-500">
                           {nominee.team?.teamName || "Club"}
                           {nominee.player?.position && (
-                            <span className="ml-1 text-slate-400">
-                              • {nominee.player.position}
-                            </span>
+                            <span className="ml-1 text-slate-400">• {nominee.player.position}</span>
                           )}
                         </div>
                       </div>
@@ -198,13 +188,9 @@ export default function PlayerVotingResultsModal({
                     <div className="text-right">
                       <div className="text-xs font-semibold text-slate-900 tabular-nums">
                         {count.toLocaleString()}{" "}
-                        <span className="text-[10px] font-normal text-slate-500">
-                          votes
-                        </span>
+                        <span className="text-[10px] font-normal text-slate-500">votes</span>
                       </div>
-                      <div className="text-[11px] font-mono text-slate-600">
-                        {percentage}%
-                      </div>
+                      <div className="text-[11px] font-mono text-slate-600">{percentage}%</div>
                     </div>
                   </div>
 
@@ -212,11 +198,7 @@ export default function PlayerVotingResultsModal({
                   <div className="w-full bg-slate-100 rounded-full h-1.5 overflow-hidden mb-1.5">
                     <div
                       className={`h-full rounded-full transition-all duration-300 ${
-                        isWinner
-                          ? "bg-amber-600"
-                          : isLead
-                          ? "bg-slate-900"
-                          : "bg-slate-400"
+                        isWinner ? "bg-amber-600" : isLead ? "bg-slate-900" : "bg-slate-400"
                       }`}
                       style={{ width: `${percentage}%` }}
                     />

@@ -5,7 +5,9 @@ import { removeAuthCookie, setAuthCookie } from "../app/actions/auth";
 
 const getCookieValue = (name) => {
   if (typeof window === "undefined" || !document.cookie) return null;
-  const match = document.cookie.match(new RegExp("(?:^|; )" + name.replace(/([\.$?*|{}\(\)\[\]\\\/\+^])/g, "\\$1") + "=([^;]*)"));
+  const match = document.cookie.match(
+    new RegExp("(?:^|; )" + name.replace(/([\.$?*|{}\(\)\[\]\\\/\+^])/g, "\\$1") + "=([^;]*)")
+  );
   return match ? decodeURIComponent(match[1]) : null;
 };
 
@@ -16,7 +18,10 @@ const rawBaseQuery = fetchBaseQuery({
     const state = getState();
     let token = state.auth ? state.auth.token : null;
     if (!token && typeof window !== "undefined") {
-      token = getCookieValue("alexandertel-admin-token") || localStorage.getItem("accessToken") || localStorage.getItem("token");
+      token =
+        getCookieValue("alexandertel-admin-token") ||
+        localStorage.getItem("accessToken") ||
+        localStorage.getItem("token");
     }
     if (token) {
       headers.set("Authorization", `Bearer ${token}`);
@@ -43,7 +48,10 @@ const baseQueryWithReauth = async (args, api, extraOptions) => {
   // Check for 401 Unauthorized (Token invalid/expired)
   if (result.error && result.error.status === 401) {
     // Avoid infinite loop if the refresh-token request itself returns 401
-    const isRefreshReq = typeof args === "string" ? args.includes("refresh-token") : args?.url?.includes("refresh-token");
+    const isRefreshReq =
+      typeof args === "string"
+        ? args.includes("refresh-token")
+        : args?.url?.includes("refresh-token");
     if (isRefreshReq) {
       return result;
     }
@@ -51,7 +59,8 @@ const baseQueryWithReauth = async (args, api, extraOptions) => {
     const state = api.getState();
     let refreshToken = state.auth ? state.auth.refreshToken : null;
     if (!refreshToken && typeof window !== "undefined") {
-      refreshToken = getCookieValue("alexandertel-admin-refresh-token") || localStorage.getItem("refreshToken");
+      refreshToken =
+        getCookieValue("alexandertel-admin-refresh-token") || localStorage.getItem("refreshToken");
     }
 
     if (!refreshToken) {
@@ -94,9 +103,7 @@ const baseQueryWithReauth = async (args, api, extraOptions) => {
             responseData?.token;
 
           const newRefreshToken =
-            responseData?.data?.refreshToken ||
-            responseData?.refreshToken ||
-            refreshToken;
+            responseData?.data?.refreshToken || responseData?.refreshToken || refreshToken;
 
           if (newAccessToken) {
             api.dispatch(

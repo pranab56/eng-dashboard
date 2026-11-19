@@ -1,16 +1,14 @@
 import { baseApi } from "../../utils/apiBaseQuery";
 
-
 export const privacyApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
-
     createPrivacy: builder.mutation({
       query: (data) => ({
         url: "/privacy-policy",
         method: "POST",
         body: data,
       }),
-      invalidatesTags: ["privacy"]
+      invalidatesTags: ["privacy"],
     }),
 
     getPrivacy: builder.query({
@@ -18,14 +16,10 @@ export const privacyApi = baseApi.injectEndpoints({
         url: "/privacy-policy",
         method: "GET",
       }),
-      providesTags: ["privacy"]
+      providesTags: ["privacy"],
     }),
-
   }),
 });
 
 // Export hooks
-export const {
-  useCreatePrivacyMutation,
-  useGetPrivacyQuery,
-} = privacyApi;
+export const { useCreatePrivacyMutation, useGetPrivacyQuery } = privacyApi;

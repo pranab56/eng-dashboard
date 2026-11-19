@@ -62,9 +62,7 @@ const GeneralStateCard = ({
               </span>
               <div
                 className={`w-8 h-8 rounded-md flex items-center justify-center shrink-0 transition-colors ${
-                  active
-                    ? "bg-slate-900 text-white"
-                    : "bg-slate-100 text-slate-600"
+                  active ? "bg-slate-900 text-white" : "bg-slate-100 text-slate-600"
                 }`}
               >
                 {item.icon ? (
@@ -82,9 +80,7 @@ const GeneralStateCard = ({
             {/* Value & Subtext */}
             <div className="mt-2 flex items-baseline gap-2">
               <span className="text-2xl font-bold tracking-tight text-slate-900 tabular-nums">
-                {typeof item.value === "number"
-                  ? item.value.toLocaleString()
-                  : item.value}
+                {typeof item.value === "number" ? item.value.toLocaleString() : item.value}
               </span>
               {item.description && (
                 <span className="text-xs text-slate-400 truncate font-normal">

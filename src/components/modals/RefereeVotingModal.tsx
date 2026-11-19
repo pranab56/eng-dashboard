@@ -41,9 +41,7 @@ const getInitialRefLeagueId = (item: TRefereeVoting | null): string => {
   return String(item.league);
 };
 
-const getInitialRefStatus = (
-  item: TRefereeVoting | null
-): "upcoming" | "active" | "completed" => {
+const getInitialRefStatus = (item: TRefereeVoting | null): "upcoming" | "active" | "completed" => {
   const raw = String(item?.status || "upcoming").toLowerCase();
   if (raw === "active" || raw === "completed" || raw === "upcoming") {
     return raw;
@@ -80,12 +78,8 @@ export default function RefereeVotingModal({
   const [votingType, setVotingType] = useState<"WEEK" | "MONTH">(() =>
     getInitialRefVotingType(editingItem)
   );
-  const [league, setLeague] = useState<string>(() =>
-    getInitialRefLeagueId(editingItem)
-  );
-  const [weekNumber, setWeekNumber] = useState<number>(
-    () => editingItem?.weekNumber || 1
-  );
+  const [league, setLeague] = useState<string>(() => getInitialRefLeagueId(editingItem));
+  const [weekNumber, setWeekNumber] = useState<number>(() => editingItem?.weekNumber || 1);
   const [month, setMonth] = useState(() => editingItem?.month || "");
   const [startDate, setStartDate] = useState(() =>
     editingItem?.startDate ? String(editingItem.startDate).substring(0, 10) : ""
@@ -93,16 +87,14 @@ export default function RefereeVotingModal({
   const [endDate, setEndDate] = useState(() =>
     editingItem?.endDate ? String(editingItem.endDate).substring(0, 10) : ""
   );
-  const [status, setStatus] = useState<"upcoming" | "active" | "completed">(
-    () => getInitialRefStatus(editingItem)
+  const [status, setStatus] = useState<"upcoming" | "active" | "completed">(() =>
+    getInitialRefStatus(editingItem)
   );
-  const [description, setDescription] = useState(
-    () => editingItem?.description || ""
-  );
+  const [description, setDescription] = useState(() => editingItem?.description || "");
 
-  const [nominees, setNominees] = useState<
-    { referee: string; statsHighlight: string }[]
-  >(() => getInitialRefNominees(editingItem));
+  const [nominees, setNominees] = useState<{ referee: string; statsHighlight: string }[]>(() =>
+    getInitialRefNominees(editingItem)
+  );
 
   const [bannerFile, setBannerFile] = useState<File | null>(null);
   const [bannerPreview, setBannerPreview] = useState<string | null>(() =>
@@ -116,8 +108,8 @@ export default function RefereeVotingModal({
     const rawList: any[] = Array.isArray(leaguesData?.data)
       ? leaguesData.data
       : Array.isArray(leaguesData?.data?.result)
-      ? leaguesData.data.result
-      : [];
+        ? leaguesData.data.result
+        : [];
 
     const editLeague = editingItem?.league;
     if (
@@ -139,15 +131,15 @@ export default function RefereeVotingModal({
     const list1 = Array.isArray(eligibleRes?.data)
       ? eligibleRes.data
       : Array.isArray(eligibleRes?.data?.result)
-      ? eligibleRes.data.result
-      : [];
+        ? eligibleRes.data.result
+        : [];
     const list2 = Array.isArray(userRefRes?.data)
       ? userRefRes.data
       : Array.isArray(userRefRes?.data?.result)
-      ? userRefRes.data.result
-      : Array.isArray(userRefRes)
-      ? userRefRes
-      : [];
+        ? userRefRes.data.result
+        : Array.isArray(userRefRes)
+          ? userRefRes
+          : [];
     const baseList = list1.length > 0 ? list1 : list2;
 
     const mergedMap = new Map<string, any>();
@@ -179,18 +171,12 @@ export default function RefereeVotingModal({
       setLeague(getInitialRefLeagueId(editingItem));
       setWeekNumber(editingItem.weekNumber || 1);
       setMonth(editingItem.month || "");
-      setStartDate(
-        editingItem.startDate ? String(editingItem.startDate).substring(0, 10) : ""
-      );
-      setEndDate(
-        editingItem.endDate ? String(editingItem.endDate).substring(0, 10) : ""
-      );
+      setStartDate(editingItem.startDate ? String(editingItem.startDate).substring(0, 10) : "");
+      setEndDate(editingItem.endDate ? String(editingItem.endDate).substring(0, 10) : "");
       setStatus(getInitialRefStatus(editingItem));
       setDescription(editingItem.description || "");
       setNominees(getInitialRefNominees(editingItem));
-      setBannerPreview(
-        editingItem.banner ? formatImagePath(editingItem.banner) : null
-      );
+      setBannerPreview(editingItem.banner ? formatImagePath(editingItem.banner) : null);
       setBannerFile(null);
     } else {
       const now = new Date();
@@ -201,9 +187,7 @@ export default function RefereeVotingModal({
       setVotingType("WEEK");
       setLeague("all");
       setWeekNumber(Math.ceil(now.getDate() / 7));
-      setMonth(
-        `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`
-      );
+      setMonth(`${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`);
       setStartDate(now.toISOString().substring(0, 10));
       setEndDate(end.toISOString().substring(0, 10));
       setStatus("active");
@@ -218,11 +202,7 @@ export default function RefereeVotingModal({
     setErrorMsg("");
   }, [isOpen, editingItem]);
 
-  const handleNomineeChange = (
-    index: number,
-    field: "referee" | "statsHighlight",
-    val: string
-  ) => {
+  const handleNomineeChange = (index: number, field: "referee" | "statsHighlight", val: string) => {
     setNominees((prev) => {
       const updated = [...prev];
       updated[index] = { ...updated[index], [field]: val };
@@ -334,7 +314,8 @@ export default function RefereeVotingModal({
               {editingItem ? "Edit Referee Voting Campaign" : "New Referee Voting Campaign"}
             </h3>
             <p className="text-xs text-slate-500 mt-0.5">
-              Configure official referee nomination ballots and schedule for Referee of the Week or Month.
+              Configure official referee nomination ballots and schedule for Referee of the Week or
+              Month.
             </p>
           </div>
           <button
@@ -372,9 +353,7 @@ export default function RefereeVotingModal({
             </div>
 
             <div>
-              <label className="block text-xs font-medium text-slate-700 mb-1">
-                Campaign Type
-              </label>
+              <label className="block text-xs font-medium text-slate-700 mb-1">Campaign Type</label>
               <Select
                 value={votingType || undefined}
                 onValueChange={(val: any) => {
@@ -552,9 +531,7 @@ export default function RefereeVotingModal({
                         type="text"
                         placeholder="e.g. 4 Matches, 0 Red Cards"
                         value={nom.statsHighlight}
-                        onChange={(e) =>
-                          handleNomineeChange(idx, "statsHighlight", e.target.value)
-                        }
+                        onChange={(e) => handleNomineeChange(idx, "statsHighlight", e.target.value)}
                         className="w-full h-8 px-2.5 rounded-md border border-slate-200 text-xs text-slate-800 placeholder:text-slate-400 focus:outline-none focus:border-slate-400 bg-white"
                       />
                     </div>
@@ -597,11 +574,7 @@ export default function RefereeVotingModal({
             <div className="border border-dashed border-slate-300 rounded-md p-3 flex items-center gap-3 bg-slate-50/50">
               <div className="w-16 h-10 rounded border border-slate-200 bg-white flex items-center justify-center overflow-hidden shrink-0">
                 {bannerPreview ? (
-                  <img
-                    src={bannerPreview}
-                    alt="Preview"
-                    className="w-full h-full object-cover"
-                  />
+                  <img src={bannerPreview} alt="Preview" className="w-full h-full object-cover" />
                 ) : (
                   <span className="text-[10px] text-slate-400">None</span>
                 )}

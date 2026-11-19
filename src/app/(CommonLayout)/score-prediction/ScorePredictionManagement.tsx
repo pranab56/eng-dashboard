@@ -29,11 +29,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import {
-  useReactTable,
-  getCoreRowModel,
-  flexRender,
-} from "@tanstack/react-table";
+import { useReactTable, getCoreRowModel, flexRender } from "@tanstack/react-table";
 import { toast } from "react-hot-toast";
 
 export default function ScorePredictionManagement() {
@@ -181,7 +177,8 @@ export default function ScorePredictionManagement() {
             </span>
           </div>
           <p className="text-xs text-slate-500 mt-1">
-            Create prediction rounds for 5 selected fixtures, award coins for exact score and correct outcome predictions.
+            Create prediction rounds for 5 selected fixtures, award coins for exact score and
+            correct outcome predictions.
           </p>
         </div>
 
@@ -203,9 +200,7 @@ export default function ScorePredictionManagement() {
           </div>
           <div>
             <span className="text-xs text-slate-500 block">Total Rounds</span>
-            <span className="text-lg font-bold text-slate-900 font-mono">
-              {stats.totalRounds}
-            </span>
+            <span className="text-lg font-bold text-slate-900 font-mono">{stats.totalRounds}</span>
           </div>
         </div>
 
@@ -268,11 +263,21 @@ export default function ScorePredictionManagement() {
                 <SelectValue placeholder="Status" />
               </SelectTrigger>
               <SelectContent className="bg-white border-slate-200">
-                <SelectItem value="all" className="text-xs">All Statuses</SelectItem>
-                <SelectItem value="active" className="text-xs">Active</SelectItem>
-                <SelectItem value="upcoming" className="text-xs">Upcoming</SelectItem>
-                <SelectItem value="locked" className="text-xs">Locked</SelectItem>
-                <SelectItem value="settled" className="text-xs">Settled</SelectItem>
+                <SelectItem value="all" className="text-xs">
+                  All Statuses
+                </SelectItem>
+                <SelectItem value="active" className="text-xs">
+                  Active
+                </SelectItem>
+                <SelectItem value="upcoming" className="text-xs">
+                  Upcoming
+                </SelectItem>
+                <SelectItem value="locked" className="text-xs">
+                  Locked
+                </SelectItem>
+                <SelectItem value="settled" className="text-xs">
+                  Settled
+                </SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -284,9 +289,7 @@ export default function ScorePredictionManagement() {
           className="p-1.5 text-slate-500 hover:text-slate-700 hover:bg-slate-100 rounded-md transition-colors cursor-pointer shrink-0"
           title="Refresh table"
         >
-          <RefreshCw
-            className={`w-4 h-4 ${isFetching ? "animate-spin text-slate-900" : ""}`}
-          />
+          <RefreshCw className={`w-4 h-4 ${isFetching ? "animate-spin text-slate-900" : ""}`} />
         </button>
       </div>
 
@@ -296,18 +299,12 @@ export default function ScorePredictionManagement() {
           <table className="w-full text-left border-collapse">
             <thead>
               {table.getHeaderGroups().map((headerGroup) => (
-                <tr
-                  key={headerGroup.id}
-                  className="bg-slate-50/75 border-b border-slate-200"
-                >
+                <tr key={headerGroup.id} className="bg-slate-50/75 border-b border-slate-200">
                   {headerGroup.headers.map((header) => (
                     <th key={header.id} className="px-4 py-3 text-xs">
                       {header.isPlaceholder
                         ? null
-                        : flexRender(
-                            header.column.columnDef.header,
-                            header.getContext()
-                          )}
+                        : flexRender(header.column.columnDef.header, header.getContext())}
                     </th>
                   ))}
                 </tr>
@@ -334,16 +331,10 @@ export default function ScorePredictionManagement() {
                 </tr>
               ) : (
                 table.getRowModel().rows.map((row) => (
-                  <tr
-                    key={row.id}
-                    className="hover:bg-slate-50/70 transition-colors"
-                  >
+                  <tr key={row.id} className="hover:bg-slate-50/70 transition-colors">
                     {row.getVisibleCells().map((cell) => (
                       <td key={cell.id} className="px-4 py-3 text-xs">
-                        {flexRender(
-                          cell.column.columnDef.cell,
-                          cell.getContext()
-                        )}
+                        {flexRender(cell.column.columnDef.cell, cell.getContext())}
                       </td>
                     ))}
                   </tr>
@@ -411,7 +402,10 @@ export default function ScorePredictionManagement() {
               <span>Settle Predictions & Distribute Coins</span>
             </div>
             <p className="text-xs text-slate-600 leading-relaxed">
-              Are you sure you want to settle <strong>{settlingRound.title}</strong>? The system will check the actual scores of the {settlingRound.matches?.length || 5} fixtures, calculate each user's exact/outcome matches, and automatically credit coins to winning user wallets.
+              Are you sure you want to settle <strong>{settlingRound.title}</strong>? The system
+              will check the actual scores of the {settlingRound.matches?.length || 5} fixtures,
+              calculate each user's exact/outcome matches, and automatically credit coins to winning
+              user wallets.
             </p>
             <div className="flex items-center justify-end gap-2 pt-2">
               <button
@@ -443,7 +437,8 @@ export default function ScorePredictionManagement() {
               <span>Delete Prediction Round</span>
             </div>
             <p className="text-xs text-slate-600 leading-relaxed">
-              Are you sure you want to permanently delete this score prediction round and its user submissions?
+              Are you sure you want to permanently delete this score prediction round and its user
+              submissions?
             </p>
             <div className="flex items-center justify-end gap-2 pt-2">
               <button

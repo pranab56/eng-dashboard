@@ -144,7 +144,7 @@ const LeagueManagement = () => {
   }, [leagueData]);
 
   // True system stats calculated on the backend
-        // Fetch all unique age groups across categories and leagues (deduplicated strictly)
+  // Fetch all unique age groups across categories and leagues (deduplicated strictly)
   const dynamicAgeGroups = useMemo(() => {
     const seen = new Set<string>();
     const uniqueList: string[] = [];
@@ -172,8 +172,8 @@ const LeagueManagement = () => {
           if (
             name &&
             (/^(u|under\s*)\d+/i.test(name) ||
-             /^(senior|junior|open|adult|veteran)/i.test(name) ||
-             /\d+\s*(year|yr)/i.test(name))
+              /^(senior|junior|open|adult|veteran)/i.test(name) ||
+              /\d+\s*(year|yr)/i.test(name))
           ) {
             addUnique(name);
           }
@@ -234,10 +234,10 @@ const LeagueManagement = () => {
     statusFilter === "all"
       ? stats.total
       : statusFilter === "running"
-      ? stats.running
-      : statusFilter === "upcoming"
-      ? stats.upcoming
-      : stats.finished;
+        ? stats.running
+        : statusFilter === "upcoming"
+          ? stats.upcoming
+          : stats.finished;
 
   return (
     <div className="w-full p-4 sm:p-6 lg:p-8 space-y-6 pb-16">
@@ -502,9 +502,7 @@ const LeagueManagement = () => {
             <div className="w-10 h-10 rounded-full bg-slate-100 text-slate-400 flex items-center justify-center mx-auto mb-3">
               <Trophy className="w-5 h-5" />
             </div>
-            <h3 className="text-sm font-semibold text-slate-900">
-              No league seasons found
-            </h3>
+            <h3 className="text-sm font-semibold text-slate-900">No league seasons found</h3>
             <p className="text-xs text-slate-500 mt-1 max-w-sm mx-auto">
               {hasActiveFilters
                 ? "No leagues match your selected search or status criteria. Try resetting the filters."
@@ -534,8 +532,8 @@ const LeagueManagement = () => {
         {/* Integrated Pagination Footer */}
         <div className="px-5 py-3.5 border-t border-slate-200/80 flex flex-col sm:flex-row items-center justify-between gap-4 bg-slate-50/40">
           <div className="text-xs text-slate-500 font-medium">
-            Showing <span className="font-semibold text-slate-800">{rawLeagues.length}</span>{" "}
-            on this page of{" "}
+            Showing <span className="font-semibold text-slate-800">{rawLeagues.length}</span> on
+            this page of{" "}
             <span className="font-semibold text-slate-800">
               {leagueData?.pagination?.total ?? totalCountForCurrentView}
             </span>{" "}

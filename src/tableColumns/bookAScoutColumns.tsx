@@ -83,9 +83,7 @@ export const getBookAScoutColumns = (
                 {item.badgeText || "Professional scouting"}
               </span>
               {item.sectionTitle && (
-                <span className="text-[10px] text-slate-400 truncate">
-                  {item.sectionTitle}
-                </span>
+                <span className="text-[10px] text-slate-400 truncate">{item.sectionTitle}</span>
               )}
             </div>
             <p className="text-xs font-semibold text-slate-900 truncate mt-0.5" title={item.title}>
@@ -156,7 +154,9 @@ export const getBookAScoutColumns = (
                   : "bg-white text-slate-400 border-slate-200 hover:text-slate-600"
               }`}
             >
-              <Star className={`w-2.5 h-2.5 ${item.isFeatured ? "fill-amber-500 text-amber-500" : ""}`} />
+              <Star
+                className={`w-2.5 h-2.5 ${item.isFeatured ? "fill-amber-500 text-amber-500" : ""}`}
+              />
               {item.isFeatured ? "Featured" : "Standard"}
             </button>
           </div>
@@ -248,4 +248,3 @@ export const getBookAScoutColumns = (
     },
   },
 ];
-

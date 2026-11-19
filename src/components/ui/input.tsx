@@ -1,14 +1,14 @@
-import * as React from "react"
+import * as React from "react";
 
-import { cn } from "@/lib/utils"
+import { cn } from "@/lib/utils";
 
 const variantClasses: Record<string, string> = {
   borderblack: "border border-gray-400 focus-visible:ring-gray-200",
-}
+};
 
 type InputProps = React.ComponentProps<"input"> & {
-  variant?: keyof typeof variantClasses
-}
+  variant?: keyof typeof variantClasses;
+};
 
 function Input({ className, type, variant, ...props }: InputProps) {
   return (
@@ -24,7 +24,7 @@ function Input({ className, type, variant, ...props }: InputProps) {
       )}
       {...props}
     />
-  )
+  );
 }
 
-export { Input }
+export { Input };

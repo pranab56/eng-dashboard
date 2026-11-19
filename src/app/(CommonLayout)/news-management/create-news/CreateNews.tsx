@@ -9,21 +9,10 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import dayjs from "dayjs";
 import dynamic from "next/dynamic";
-import {
-  ArrowLeft,
-  Clock,
-  Globe,
-  Loader2,
-  Newspaper,
-  Save,
-  BookOpen,
-  Info,
-} from "lucide-react";
+import { ArrowLeft, Clock, Globe, Loader2, Newspaper, Save, BookOpen, Info } from "lucide-react";
 import { toast } from "sonner";
 
-import ImageUploadField, {
-  ImageChildrenComponent,
-} from "@/components/form/ImageUploadField";
+import ImageUploadField, { ImageChildrenComponent } from "@/components/form/ImageUploadField";
 import InputField from "@/components/form/InputField";
 import SelectField from "@/components/form/SelectField";
 import CustomDatePicker from "@/components/ui/CustomDatePicker";
@@ -176,9 +165,7 @@ const CreateNews = () => {
   }, [formValues.description]);
 
   const selectedCategoryLabel = useMemo(() => {
-    const found = dynamicNewsCategoryOptions.find(
-      (opt: any) => opt.value === formValues.category
-    );
+    const found = dynamicNewsCategoryOptions.find((opt: any) => opt.value === formValues.category);
     return found ? found.label : "General";
   }, [formValues.category, dynamicNewsCategoryOptions]);
 
@@ -216,10 +203,7 @@ const CreateNews = () => {
       }
     } catch (error: any) {
       toast.error(
-        getErrorMessage(
-          error,
-          `Failed to ${isEditMode ? "update" : "create"} news article`
-        )
+        getErrorMessage(error, `Failed to ${isEditMode ? "update" : "create"} news article`)
       );
     }
   };
@@ -289,8 +273,8 @@ const CreateNews = () => {
                 formValues.status === "publish"
                   ? "bg-emerald-50 text-emerald-700 border-emerald-200"
                   : formValues.status === "schedule"
-                  ? "bg-blue-50 text-blue-700 border-blue-200"
-                  : "bg-slate-100 text-slate-700 border-slate-200"
+                    ? "bg-blue-50 text-blue-700 border-blue-200"
+                    : "bg-slate-100 text-slate-700 border-slate-200"
               }`}
             >
               <span
@@ -298,8 +282,8 @@ const CreateNews = () => {
                   formValues.status === "publish"
                     ? "bg-emerald-500"
                     : formValues.status === "schedule"
-                    ? "bg-blue-500"
-                    : "bg-slate-400"
+                      ? "bg-blue-500"
+                      : "bg-slate-400"
                 }`}
               />
               {formValues.status ? formValues.status.toUpperCase() : "DRAFT"}
@@ -334,11 +318,7 @@ const CreateNews = () => {
               <Save className="w-3.5 h-3.5 text-slate-300" />
             )}
             <span>
-              {isSaving
-                ? "Saving..."
-                : isEditMode
-                ? "Update Article"
-                : "Publish Article"}
+              {isSaving ? "Saving..." : isEditMode ? "Update Article" : "Publish Article"}
             </span>
           </button>
         </div>
@@ -353,9 +333,7 @@ const CreateNews = () => {
             <div className="bg-white rounded-lg border border-slate-200/80 shadow-2xs">
               <div className="p-4 sm:p-5 border-b border-slate-100 flex items-center justify-between">
                 <div>
-                  <h2 className="text-sm font-semibold text-slate-900">
-                    Editorial Content
-                  </h2>
+                  <h2 className="text-sm font-semibold text-slate-900">Editorial Content</h2>
                   <p className="text-xs text-slate-500 mt-0.5">
                     Write headline, select category, and author the article text.
                   </p>
@@ -424,9 +402,7 @@ const CreateNews = () => {
             <div className="bg-white rounded-lg border border-slate-200/80 shadow-2xs">
               <div className="p-4 sm:p-5 border-b border-slate-100 flex items-center justify-between">
                 <div>
-                  <h2 className="text-sm font-semibold text-slate-900">
-                    Cover Media Asset
-                  </h2>
+                  <h2 className="text-sm font-semibold text-slate-900">Cover Media Asset</h2>
                   <p className="text-xs text-slate-500 mt-0.5">
                     Upload a high-resolution cover image for public feeds (PNG, JPG, WebP max 5MB).
                   </p>
@@ -455,9 +431,7 @@ const CreateNews = () => {
             <div className="bg-white rounded-lg border border-slate-200/80 shadow-2xs relative z-20">
               <div className="p-4 sm:p-5 border-b border-slate-100 flex items-center justify-between">
                 <div>
-                  <h2 className="text-sm font-semibold text-slate-900">
-                    Publication Schedule
-                  </h2>
+                  <h2 className="text-sm font-semibold text-slate-900">Publication Schedule</h2>
                   <p className="text-xs text-slate-500 mt-0.5">
                     Define publishing status and release timeline.
                   </p>
@@ -518,9 +492,7 @@ const CreateNews = () => {
 
               <div className="space-y-2.5 text-xs">
                 <div>
-                  <span className="block text-[11px] font-medium text-slate-400">
-                    Headline
-                  </span>
+                  <span className="block text-[11px] font-medium text-slate-400">Headline</span>
                   <span className="font-semibold text-slate-900 mt-0.5 block truncate">
                     {formValues.title || "—"}
                   </span>
@@ -528,9 +500,7 @@ const CreateNews = () => {
 
                 <div className="grid grid-cols-2 gap-2 pt-2 border-t border-slate-100">
                   <div>
-                    <span className="block text-[11px] font-medium text-slate-400">
-                      Category
-                    </span>
+                    <span className="block text-[11px] font-medium text-slate-400">Category</span>
                     <span className="font-semibold text-slate-800 mt-0.5 block">
                       {selectedCategoryLabel}
                     </span>
@@ -564,9 +534,9 @@ const CreateNews = () => {
                 <span>Editorial Guidelines</span>
               </div>
               <p className="text-[11px] leading-relaxed text-slate-500">
-                Published articles immediately sync across the public mobile
-                application and fan web portals. Use the &apos;Schedule&apos; status to
-                stage embargoed announcements ahead of match kickoff.
+                Published articles immediately sync across the public mobile application and fan web
+                portals. Use the &apos;Schedule&apos; status to stage embargoed announcements ahead
+                of match kickoff.
               </p>
             </div>
           </div>
@@ -592,11 +562,7 @@ const CreateNews = () => {
               <Save className="w-3.5 h-3.5 text-slate-300" />
             )}
             <span>
-              {isSaving
-                ? "Saving Article..."
-                : isEditMode
-                ? "Update Article"
-                : "Publish Article"}
+              {isSaving ? "Saving Article..." : isEditMode ? "Update Article" : "Publish Article"}
             </span>
           </button>
         </div>

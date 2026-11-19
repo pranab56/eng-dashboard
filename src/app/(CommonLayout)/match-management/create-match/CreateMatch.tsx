@@ -59,11 +59,9 @@ const createMatchSchema = z
     venue: z.string().min(1, "Venue is required"),
     subVenue: z.string().optional(),
     pitch: z.string().optional(),
-    matchType: z
-      .enum(["", "league", "cup", "friendly"])
-      .refine((val) => val !== "", {
-        message: "Match type is required",
-      }),
+    matchType: z.enum(["", "league", "cup", "friendly"]).refine((val) => val !== "", {
+      message: "Match type is required",
+    }),
     league: z.string().optional(),
     ageGroupCategory: z.string().optional(),
     ageGroup: z.string().optional(),
@@ -87,10 +85,7 @@ const createMatchSchema = z
   )
   .refine(
     (data) => {
-      if (
-        (data.matchType === "cup" || data.matchType === "friendly") &&
-        !data.ageGroupCategory
-      ) {
+      if ((data.matchType === "cup" || data.matchType === "friendly") && !data.ageGroupCategory) {
         return false;
       }
       return true;
@@ -102,10 +97,7 @@ const createMatchSchema = z
   )
   .refine(
     (data) => {
-      if (
-        (data.matchType === "cup" || data.matchType === "friendly") &&
-        !data.ageGroup
-      ) {
+      if ((data.matchType === "cup" || data.matchType === "friendly") && !data.ageGroup) {
         return false;
       }
       return true;
@@ -213,24 +205,16 @@ const CreateMatch = () => {
             const lastMatch = parsed[parsed.length - 1];
             if (lastMatch?.display && !isEditMode) {
               reset({
-                venue:
-                  lastMatch.payload.venueName || lastMatch.display.venue || "",
-                subVenue:
-                  lastMatch.payload.subVenue ||
-                  lastMatch.payload.pitch ||
-                  "",
+                venue: lastMatch.payload.venueName || lastMatch.display.venue || "",
+                subVenue: lastMatch.payload.subVenue || lastMatch.payload.pitch || "",
                 pitch: lastMatch.payload.pitch || "",
                 league: lastMatch.payload.league || "",
                 matchType: (lastMatch.payload.matchType || "") as any,
                 ageGroupCategory: lastMatch.payload.ageGroupCategory || "",
                 ageGroup: lastMatch.payload.ageGroup || "",
                 referee: lastMatch.payload.referee || "",
-                durationMinutes:
-                  lastMatch.payload.durationMinutes?.toString() || "",
-                formation:
-                  lastMatch.payload.formation ||
-                  lastMatch.display.formation ||
-                  "",
+                durationMinutes: lastMatch.payload.durationMinutes?.toString() || "",
+                formation: lastMatch.payload.formation || lastMatch.display.formation || "",
                 date: lastMatch.display.date || "",
                 time: lastMatch.display.time || "",
               });
@@ -264,26 +248,14 @@ const CreateMatch = () => {
   const { data: playTimeData } = useGetAllPlayTimeQuery({});
   const { data: ageGroupRes } = useGetAllAgeGroupQuery({});
 
-  const leagueTeamList: any[] = useMemo(
-    () => leagueTeamData?.data || [],
-    [leagueTeamData]
-  );
-  const venueCategories: any[] = useMemo(
-    () => venueCategoryData?.data || [],
-    [venueCategoryData]
-  );
-  const playTimeList: any[] = useMemo(
-    () => playTimeData?.data || [],
-    [playTimeData]
-  );
+  const leagueTeamList: any[] = useMemo(() => leagueTeamData?.data || [], [leagueTeamData]);
+  const venueCategories: any[] = useMemo(() => venueCategoryData?.data || [], [venueCategoryData]);
+  const playTimeList: any[] = useMemo(() => playTimeData?.data || [], [playTimeData]);
 
   // Flatten all age groups & subcategories into a single comprehensive list
   const allAgeGroupOptions = useMemo(() => {
     const apiCats = ageGroupRes?.data?.result || ageGroupRes?.data || [];
-    const optionsMap = new Map<
-      string,
-      { label: string; value: string; categoryId?: string }
-    >();
+    const optionsMap = new Map<string, { label: string; value: string; categoryId?: string }>();
 
     apiCats.forEach((cat: any) => {
       if (Array.isArray(cat.subCategories) && cat.subCategories.length > 0) {
@@ -359,9 +331,7 @@ const CreateMatch = () => {
   // Automatically sync parent ageGroupCategory in the background if needed
   useEffect(() => {
     if (selectedAgeGroup) {
-      const matchOpt = allAgeGroupOptions.find(
-        (opt) => opt.value === selectedAgeGroup
-      );
+      const matchOpt = allAgeGroupOptions.find((opt) => opt.value === selectedAgeGroup);
       if (matchOpt?.categoryId) {
         setValue("ageGroupCategory", matchOpt.categoryId);
       }
@@ -370,17 +340,14 @@ const CreateMatch = () => {
 
   // Query all teams of selected ageGroup from team collection
   const { data: allTeamsRes } = useGetAllTeamQuery(
-    selectedAgeGroup
-      ? { ageGroup: selectedAgeGroup, limit: 1000 }
-      : { limit: 1000 },
+    selectedAgeGroup ? { ageGroup: selectedAgeGroup, limit: 1000 } : { limit: 1000 },
     { skip: watchMatchType !== "cup" && watchMatchType !== "friendly" }
   );
 
   // Derive venue object and subcategories if present
   const selectedVenueObj = useMemo(() => {
     return venueCategories.find(
-      (v: any) =>
-        (v._id || v.id) === selectedVenueId || v.name === selectedVenueId
+      (v: any) => (v._id || v.id) === selectedVenueId || v.name === selectedVenueId
     );
   }, [venueCategories, selectedVenueId]);
 
@@ -421,10 +388,7 @@ const CreateMatch = () => {
   const selectedLeagueEntry = leagueTeamList.find(
     (item: any) => item.league._id === selectedLeagueId
   );
-  const rawTeamsList = useMemo(
-    () => selectedLeagueEntry?.teams || [],
-    [selectedLeagueEntry]
-  );
+  const rawTeamsList = useMemo(() => selectedLeagueEntry?.teams || [], [selectedLeagueEntry]);
 
   const teamsList: Team[] = useMemo(() => {
     let baseList: Team[] = [];
@@ -436,8 +400,7 @@ const CreateMatch = () => {
         logo: t.teamLogo || null,
       }));
     } else if (watchMatchType === "cup" || watchMatchType === "friendly") {
-      const fetchedTeams =
-        allTeamsRes?.data?.result || allTeamsRes?.data || [];
+      const fetchedTeams = allTeamsRes?.data?.result || allTeamsRes?.data || [];
       if (Array.isArray(fetchedTeams)) {
         baseList = fetchedTeams.map((t: any) => ({
           value: (t._id || t.id).toString(),
@@ -487,16 +450,10 @@ const CreateMatch = () => {
         (typeof match.venueCategory === "object"
           ? match.venueCategory?._id || match.venueCategory?.id
           : match.venueCategory) ||
-        (typeof match.venueName === "object"
-          ? match.venueName?._id
-          : match.venueName) ||
+        (typeof match.venueName === "object" ? match.venueName?._id : match.venueName) ||
         "";
 
-      if (
-        venueVal &&
-        !/^[0-9a-fA-F]{24}$/.test(venueVal) &&
-        venueCategories.length > 0
-      ) {
+      if (venueVal && !/^[0-9a-fA-F]{24}$/.test(venueVal) && venueCategories.length > 0) {
         const found = venueCategories.find(
           (v: any) => v.name?.toLowerCase() === venueVal.toLowerCase()
         );
@@ -514,22 +471,12 @@ const CreateMatch = () => {
         (typeof match.venueSubCategory === "object"
           ? match.venueSubCategory?._id || match.venueSubCategory?.id
           : match.venueSubCategory) ||
-        (typeof match.subVenue === "object"
-          ? match.subVenue?._id
-          : match.subVenue) ||
-        (typeof match.pitch === "object"
-          ? match.pitch?._id
-          : match.pitch) ||
+        (typeof match.subVenue === "object" ? match.subVenue?._id : match.subVenue) ||
+        (typeof match.pitch === "object" ? match.pitch?._id : match.pitch) ||
         "";
 
-      if (
-        subVal &&
-        !/^[0-9a-fA-F]{24}$/.test(subVal) &&
-        subCatsLocal.length > 0
-      ) {
-        const found = subCatsLocal.find(
-          (s: any) => s.name?.toLowerCase() === subVal.toLowerCase()
-        );
+      if (subVal && !/^[0-9a-fA-F]{24}$/.test(subVal) && subCatsLocal.length > 0) {
+        const found = subCatsLocal.find((s: any) => s.name?.toLowerCase() === subVal.toLowerCase());
         if (found) {
           subVal = found._id || found.id;
         }
@@ -542,9 +489,7 @@ const CreateMatch = () => {
       const durMatch = String(durVal).match(/\d+/);
       if (durMatch && playTimeList.length > 0) {
         const durNumber = durMatch[0];
-        const foundOpt = playTimeList.find((p: any) =>
-          p.name?.startsWith(durNumber)
-        );
+        const foundOpt = playTimeList.find((p: any) => p.name?.startsWith(durNumber));
         if (foundOpt) {
           durVal = foundOpt.name;
         }
@@ -571,8 +516,7 @@ const CreateMatch = () => {
         if (Array.isArray(apiCats)) {
           const foundParent = apiCats.find((parent: any) =>
             parent.subCategories?.some(
-              (sub: any) =>
-                sub.name?.toLowerCase() === match.ageGroup.toLowerCase()
+              (sub: any) => sub.name?.toLowerCase() === match.ageGroup.toLowerCase()
             )
           );
           if (foundParent) {
@@ -591,10 +535,7 @@ const CreateMatch = () => {
             : match.league || "",
         ageGroupCategory: ageGroupCategoryVal,
         ageGroup: match.ageGroup || "",
-        matchType: (match.matchType || "league") as
-          | "league"
-          | "cup"
-          | "friendly",
+        matchType: (match.matchType || "league") as "league" | "cup" | "friendly",
         referee:
           typeof match.referee === "object"
             ? match.referee?._id || match.referee?.id
@@ -641,12 +582,8 @@ const CreateMatch = () => {
         (typeof match.venueSubCategory === "object"
           ? match.venueSubCategory?._id || match.venueSubCategory?.id
           : match.venueSubCategory) ||
-        (typeof match.subVenue === "object"
-          ? match.subVenue?._id
-          : match.subVenue) ||
-        (typeof match.pitch === "object"
-          ? match.pitch?._id
-          : match.pitch) ||
+        (typeof match.subVenue === "object" ? match.subVenue?._id : match.subVenue) ||
+        (typeof match.pitch === "object" ? match.pitch?._id : match.pitch) ||
         "";
 
       if (subVal && !/^[0-9a-fA-F]{24}$/.test(subVal)) {
@@ -710,13 +647,9 @@ const CreateMatch = () => {
       league: match.payload.league,
       ageGroupCategory: match.payload.ageGroupCategory || "",
       ageGroup: match.payload.ageGroup || "",
-      matchType: (match.payload.matchType || "league") as
-        | "league"
-        | "cup"
-        | "friendly",
+      matchType: (match.payload.matchType || "league") as "league" | "cup" | "friendly",
       referee: match.payload.referee || "",
-      durationMinutes:
-        match.payload.durationMinutes || match.display.durationMinutes,
+      durationMinutes: match.payload.durationMinutes || match.display.durationMinutes,
       formation: match.payload.formation || match.display.formation || "",
       date: match.display.date,
       time: match.display.time,
@@ -800,18 +733,13 @@ const CreateMatch = () => {
         .utc()
         .toISOString();
 
-      const selectedSubCategoryVal =
-        formData.subVenue || formData.pitch || "";
+      const selectedSubCategoryVal = formData.subVenue || formData.pitch || "";
 
-      const selectedVenueLabel =
-        selectedVenueObj?.name || formData.venue;
+      const selectedVenueLabel = selectedVenueObj?.name || formData.venue;
       const selectedSubVenueObj = subCategoriesList.find(
-        (s: any) =>
-          (s._id || s.id) === selectedSubCategoryVal ||
-          s.name === selectedSubCategoryVal
+        (s: any) => (s._id || s.id) === selectedSubCategoryVal || s.name === selectedSubCategoryVal
       );
-      const selectedSubVenueLabel =
-        selectedSubVenueObj?.name || selectedSubCategoryVal || "";
+      const selectedSubVenueLabel = selectedSubVenueObj?.name || selectedSubCategoryVal || "";
 
       const payload: any = {
         league: formData.matchType === "league" ? formData.league || undefined : undefined,
@@ -844,20 +772,13 @@ const CreateMatch = () => {
           router.push("/match-management");
         }
       } else {
-        const selectedLeagueObj = leagueOptions.find(
-          (opt: any) => opt.value === formData.league
-        );
-        const leagueLabel = selectedLeagueObj
-          ? selectedLeagueObj.label
-          : "Friendly Match";
+        const selectedLeagueObj = leagueOptions.find((opt: any) => opt.value === formData.league);
+        const leagueLabel = selectedLeagueObj ? selectedLeagueObj.label : "Friendly Match";
         const refereeLabel =
-          refereeOptions.find((opt: any) => opt.value === formData.referee)
-            ?.label || "Unassigned";
+          refereeOptions.find((opt: any) => opt.value === formData.referee)?.label || "Unassigned";
 
         const display = {
-          leagueName: formData.ageGroup
-            ? `${leagueLabel} (${formData.ageGroup})`
-            : leagueLabel,
+          leagueName: formData.ageGroup ? `${leagueLabel} (${formData.ageGroup})` : leagueLabel,
           homeTeamName: homeTeam.name,
           homeTeamLogo: formatImagePath(homeTeam.logo),
           awayTeamName: awayTeam.name,
@@ -931,10 +852,7 @@ const CreateMatch = () => {
   const awayTeamOptions = teamsList.filter((t) => t.value !== homeTeam?.value);
 
   return (
-    <form
-      onSubmit={handleSubmit(onSubmit, onError)}
-      className="space-y-6 max-w-7xl mx-auto pb-12"
-    >
+    <form onSubmit={handleSubmit(onSubmit, onError)} className="space-y-6 max-w-7xl mx-auto pb-12">
       {/* Header Bar */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-200">
         <div className="flex items-center gap-3">
@@ -956,7 +874,9 @@ const CreateMatch = () => {
           <div className="flex items-center gap-2.5">
             <span className="text-xs font-medium text-slate-600 bg-slate-100 px-3 py-1.5 rounded-md border border-slate-200 flex items-center gap-1.5">
               <ListOrdered className="w-3.5 h-3.5 text-slate-500" />
-              <span>{tempMatches.length} fixture{tempMatches.length > 1 ? "s" : ""} in queue</span>
+              <span>
+                {tempMatches.length} fixture{tempMatches.length > 1 ? "s" : ""} in queue
+              </span>
             </span>
             <button
               type="button"
@@ -981,7 +901,8 @@ const CreateMatch = () => {
           <div className="flex items-center gap-2">
             <Pencil className="w-4 h-4 text-amber-600 shrink-0" />
             <span>
-              <strong>Editing Queued Fixture:</strong> Make your changes below and click <strong>&quot;Save Queued Match&quot;</strong> to apply.
+              <strong>Editing Queued Fixture:</strong> Make your changes below and click{" "}
+              <strong>&quot;Save Queued Match&quot;</strong> to apply.
             </span>
           </div>
           <button
@@ -1001,13 +922,9 @@ const CreateMatch = () => {
           <div className="flex items-center justify-between pb-3 border-b border-slate-100">
             <div className="flex items-center gap-2">
               <Trophy className="w-4 h-4 text-slate-600" />
-              <h2 className="text-sm font-semibold text-slate-900">
-                Competition & Match Settings
-              </h2>
+              <h2 className="text-sm font-semibold text-slate-900">Competition & Match Settings</h2>
             </div>
-            <span className="text-[11px] font-medium text-slate-400">
-              Required parameters
-            </span>
+            <span className="text-[11px] font-medium text-slate-400">Required parameters</span>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -1080,9 +997,7 @@ const CreateMatch = () => {
           <div className="flex items-center justify-between pb-3 border-b border-slate-100">
             <div className="flex items-center gap-2">
               <Calendar className="w-4 h-4 text-slate-600" />
-              <h2 className="text-sm font-semibold text-slate-900">
-                Schedule & Venue
-              </h2>
+              <h2 className="text-sm font-semibold text-slate-900">Schedule & Venue</h2>
             </div>
             <span className="text-[10px] font-semibold text-slate-500 bg-slate-100 px-2 py-0.5 rounded border border-slate-200">
               Europe/London
@@ -1166,9 +1081,7 @@ const CreateMatch = () => {
           <div className="flex items-center gap-2">
             <Shield className="w-4 h-4 text-slate-600" />
             <div>
-              <h2 className="text-sm font-semibold text-slate-900">
-                Team Matchup Selection
-              </h2>
+              <h2 className="text-sm font-semibold text-slate-900">Team Matchup Selection</h2>
               <p className="text-[11px] text-slate-500">
                 Select home and away clubs. Both teams must be distinct.
               </p>
@@ -1229,7 +1142,8 @@ const CreateMatch = () => {
             <div>
               <p className="font-semibold">Insufficient teams available</p>
               <p className="text-amber-700 mt-0.5">
-                This league or age group has {teamsList.length === 0 ? "no" : "only 1"} team registered. Add at least two teams to schedule fixtures.
+                This league or age group has {teamsList.length === 0 ? "no" : "only 1"} team
+                registered. Add at least two teams to schedule fixtures.
               </p>
             </div>
           </div>

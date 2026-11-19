@@ -93,23 +93,48 @@ function Football3D() {
       {/* Surrounding Seams & Partial Pentagons */}
       {/* Top Seam & Top Pentagon */}
       <line x1="70" y1="48" x2="70" y2="34" stroke="#475569" strokeWidth="1.4" />
-      <polygon points="62,24 78,24 70,34" fill="url(#pentagonGrad)" stroke="#475569" strokeWidth="1.2" />
+      <polygon
+        points="62,24 78,24 70,34"
+        fill="url(#pentagonGrad)"
+        stroke="#475569"
+        strokeWidth="1.2"
+      />
 
       {/* Top-Right Seam & Pentagon */}
       <line x1="83" y1="57" x2="96" y2="52" stroke="#475569" strokeWidth="1.4" />
-      <polygon points="96,52 108,60 102,74 92,68" fill="url(#pentagonGrad)" stroke="#475569" strokeWidth="1.2" />
+      <polygon
+        points="96,52 108,60 102,74 92,68"
+        fill="url(#pentagonGrad)"
+        stroke="#475569"
+        strokeWidth="1.2"
+      />
 
       {/* Bottom-Right Seam & Pentagon */}
       <line x1="78" y1="72" x2="88" y2="84" stroke="#475569" strokeWidth="1.4" />
-      <polygon points="88,84 82,98 68,98 72,86" fill="url(#pentagonGrad)" stroke="#475569" strokeWidth="1.2" />
+      <polygon
+        points="88,84 82,98 68,98 72,86"
+        fill="url(#pentagonGrad)"
+        stroke="#475569"
+        strokeWidth="1.2"
+      />
 
       {/* Bottom-Left Seam & Pentagon */}
       <line x1="62" y1="72" x2="52" y2="84" stroke="#475569" strokeWidth="1.4" />
-      <polygon points="52,84 38,80 42,66 52,70" fill="url(#pentagonGrad)" stroke="#475569" strokeWidth="1.2" />
+      <polygon
+        points="52,84 38,80 42,66 52,70"
+        fill="url(#pentagonGrad)"
+        stroke="#475569"
+        strokeWidth="1.2"
+      />
 
       {/* Top-Left Seam & Pentagon */}
       <line x1="57" y1="57" x2="44" y2="52" stroke="#475569" strokeWidth="1.4" />
-      <polygon points="44,52 48,36 60,36 54,48" fill="url(#pentagonGrad)" stroke="#475569" strokeWidth="1.2" />
+      <polygon
+        points="44,52 48,36 60,36 54,48"
+        fill="url(#pentagonGrad)"
+        stroke="#475569"
+        strokeWidth="1.2"
+      />
 
       {/* Specular curved highlight */}
       <path
@@ -122,7 +147,6 @@ function Football3D() {
     </svg>
   );
 }
-
 
 /**
  * Fully Animated Interactive Panda Mascot
@@ -183,28 +207,11 @@ function InteractivePanda({
         <ellipse cx="115" cy="80" rx="6" ry="3.5" fill="#f43f5e" opacity="0.25" />
 
         {/* 5. Classic Black Panda Eye Patches */}
-        <ellipse
-          cx="58"
-          cy="65"
-          rx="13"
-          ry="16"
-          fill="#0f172a"
-          transform="rotate(-14 58 65)"
-        />
-        <ellipse
-          cx="102"
-          cy="65"
-          rx="13"
-          ry="16"
-          fill="#0f172a"
-          transform="rotate(14 102 65)"
-        />
+        <ellipse cx="58" cy="65" rx="13" ry="16" fill="#0f172a" transform="rotate(-14 58 65)" />
+        <ellipse cx="102" cy="65" rx="13" ry="16" fill="#0f172a" transform="rotate(14 102 65)" />
 
         {/* 6. Eyes (Inside Patches) - Fade out when covered */}
-        <g
-          className="transition-opacity duration-200"
-          style={{ opacity: isCoveringEyes ? 0 : 1 }}
-        >
+        <g className="transition-opacity duration-200" style={{ opacity: isCoveringEyes ? 0 : 1 }}>
           <ellipse cx="58" cy="65" rx="6.5" ry="8" fill="#ffffff" />
           <ellipse cx="102" cy="65" rx="6.5" ry="8" fill="#ffffff" />
 
@@ -215,8 +222,8 @@ function InteractivePanda({
               transform: isEmailFocused
                 ? "translate(0px, 4.5px)"
                 : isPeeking
-                ? "translate(2.5px, 0px)"
-                : "translate(0px, 0px)",
+                  ? "translate(2.5px, 0px)"
+                  : "translate(0px, 0px)",
             }}
           >
             <circle cx="58" cy="65" r="4.2" fill="#0f172a" />
@@ -248,8 +255,8 @@ function InteractivePanda({
             transform: isCoveringEyes
               ? "translate(22px, -37px)"
               : isPeeking
-              ? "translate(10px, -14px)"
-              : "translate(0px, 0px)",
+                ? "translate(10px, -14px)"
+                : "translate(0px, 0px)",
           }}
         >
           <path d="M 20 135 C 16 112 28 102 36 96 C 44 102 52 115 52 135 Z" fill="#0f172a" />
@@ -275,8 +282,8 @@ function InteractivePanda({
             transform: isCoveringEyes
               ? "translate(-22px, -37px)"
               : isPeeking
-              ? "translate(-22px, -37px)"
-              : "translate(0px, 0px)",
+                ? "translate(-22px, -37px)"
+                : "translate(0px, 0px)",
           }}
         >
           <path d="M 140 135 C 144 112 132 102 124 96 C 116 102 108 115 108 135 Z" fill="#0f172a" />
@@ -373,13 +380,8 @@ const Login = () => {
     try {
       const res = await login(payload).unwrap();
       const accessToken =
-        res?.data?.accessToken ||
-        res?.data?.token ||
-        res?.accessToken ||
-        res?.token;
-      const refreshToken =
-        res?.data?.refreshToken ||
-        res?.refreshToken;
+        res?.data?.accessToken || res?.data?.token || res?.accessToken || res?.token;
+      const refreshToken = res?.data?.refreshToken || res?.refreshToken;
 
       if (!accessToken) {
         toast.error(res?.message || "Login failed: Token not received from server");
@@ -388,10 +390,11 @@ const Login = () => {
 
       // Role check: strictly allow ADMIN & SUPER_ADMIN only
       const userRole =
-        decodeRoleFromToken(accessToken) ||
-        (res?.data?.role || res?.role || "").toUpperCase();
+        decodeRoleFromToken(accessToken) || (res?.data?.role || res?.role || "").toUpperCase();
       if (userRole && userRole !== "ADMIN" && userRole !== "SUPER_ADMIN") {
-        toast.error("Access Denied: Only Administrator and Super Admin accounts can access the dashboard.");
+        toast.error(
+          "Access Denied: Only Administrator and Super Admin accounts can access the dashboard."
+        );
         return;
       }
 
@@ -513,7 +516,15 @@ const Login = () => {
                 preserveAspectRatio="none"
               >
                 {/* Touchline & Goal-line perimeter */}
-                <rect x="15" y="15" width="390" height="190" fill="none" stroke="#ffffff" strokeWidth="2" />
+                <rect
+                  x="15"
+                  y="15"
+                  width="390"
+                  height="190"
+                  fill="none"
+                  stroke="#ffffff"
+                  strokeWidth="2"
+                />
 
                 {/* Halfway Line & Center Circle */}
                 <line x1="210" y1="15" x2="210" y2="205" stroke="#ffffff" strokeWidth="2" />
@@ -521,22 +532,84 @@ const Login = () => {
                 <circle cx="210" cy="110" r="3" fill="#ffffff" />
 
                 {/* Left Penalty Area (18-yard box) */}
-                <rect x="15" y="55" width="65" height="110" fill="none" stroke="#ffffff" strokeWidth="2" />
-                <rect x="15" y="80" width="25" height="60" fill="none" stroke="#ffffff" strokeWidth="1.5" />
+                <rect
+                  x="15"
+                  y="55"
+                  width="65"
+                  height="110"
+                  fill="none"
+                  stroke="#ffffff"
+                  strokeWidth="2"
+                />
+                <rect
+                  x="15"
+                  y="80"
+                  width="25"
+                  height="60"
+                  fill="none"
+                  stroke="#ffffff"
+                  strokeWidth="1.5"
+                />
                 <circle cx="60" cy="110" r="2.5" fill="#ffffff" />
-                <path d="M 80 88 A 30 30 0 0 1 80 132" fill="none" stroke="#ffffff" strokeWidth="1.5" />
+                <path
+                  d="M 80 88 A 30 30 0 0 1 80 132"
+                  fill="none"
+                  stroke="#ffffff"
+                  strokeWidth="1.5"
+                />
 
                 {/* Right Penalty Area (18-yard box) */}
-                <rect x="340" y="55" width="65" height="110" fill="none" stroke="#ffffff" strokeWidth="2" />
-                <rect x="380" y="80" width="25" height="60" fill="none" stroke="#ffffff" strokeWidth="1.5" />
+                <rect
+                  x="340"
+                  y="55"
+                  width="65"
+                  height="110"
+                  fill="none"
+                  stroke="#ffffff"
+                  strokeWidth="2"
+                />
+                <rect
+                  x="380"
+                  y="80"
+                  width="25"
+                  height="60"
+                  fill="none"
+                  stroke="#ffffff"
+                  strokeWidth="1.5"
+                />
                 <circle cx="360" cy="110" r="2.5" fill="#ffffff" />
-                <path d="M 340 88 A 30 30 0 0 0 340 132" fill="none" stroke="#ffffff" strokeWidth="1.5" />
+                <path
+                  d="M 340 88 A 30 30 0 0 0 340 132"
+                  fill="none"
+                  stroke="#ffffff"
+                  strokeWidth="1.5"
+                />
 
                 {/* Corner Arcs */}
-                <path d="M 15 25 A 10 10 0 0 0 25 15" fill="none" stroke="#ffffff" strokeWidth="1.5" />
-                <path d="M 15 195 A 10 10 0 0 1 25 205" fill="none" stroke="#ffffff" strokeWidth="1.5" />
-                <path d="M 405 25 A 10 10 0 0 1 395 15" fill="none" stroke="#ffffff" strokeWidth="1.5" />
-                <path d="M 405 195 A 10 10 0 0 0 395 205" fill="none" stroke="#ffffff" strokeWidth="1.5" />
+                <path
+                  d="M 15 25 A 10 10 0 0 0 25 15"
+                  fill="none"
+                  stroke="#ffffff"
+                  strokeWidth="1.5"
+                />
+                <path
+                  d="M 15 195 A 10 10 0 0 1 25 205"
+                  fill="none"
+                  stroke="#ffffff"
+                  strokeWidth="1.5"
+                />
+                <path
+                  d="M 405 25 A 10 10 0 0 1 395 15"
+                  fill="none"
+                  stroke="#ffffff"
+                  strokeWidth="1.5"
+                />
+                <path
+                  d="M 405 195 A 10 10 0 0 0 395 205"
+                  fill="none"
+                  stroke="#ffffff"
+                  strokeWidth="1.5"
+                />
               </svg>
 
               {/* Pitch Gloss Lighting */}
@@ -607,7 +680,8 @@ const Login = () => {
               <span className="text-slate-400 font-medium">Build Every Victory.</span>
             </h2>
             <p className="text-xs sm:text-sm text-slate-400 mt-2 leading-relaxed">
-              The high-performance operating system for professional football tournament fixtures, referee assignments, squad telemetry, and official league operations.
+              The high-performance operating system for professional football tournament fixtures,
+              referee assignments, squad telemetry, and official league operations.
             </p>
           </div>
 
@@ -646,7 +720,9 @@ const Login = () => {
                 priority
               />
             ) : (
-              <span className="font-extrabold tracking-wider text-sm text-slate-900">ENG SPORTS</span>
+              <span className="font-extrabold tracking-wider text-sm text-slate-900">
+                ENG SPORTS
+              </span>
             )}
           </div>
 
@@ -762,7 +838,11 @@ const Login = () => {
                           className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-700 transition-colors cursor-pointer p-0.5"
                           aria-label={showPassword ? "Hide password" : "Show password"}
                         >
-                          {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                          {showPassword ? (
+                            <EyeOff className="w-4 h-4" />
+                          ) : (
+                            <Eye className="w-4 h-4" />
+                          )}
                         </button>
                       </div>
                     </FormControl>

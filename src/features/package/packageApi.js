@@ -6,18 +6,18 @@ export const packageApi = baseApi.injectEndpoints({
       query: (data) => ({
         url: "/package",
         method: "POST",
-        body: data
+        body: data,
       }),
-      invalidatesTags: ["package"]
+      invalidatesTags: ["package"],
     }),
 
     updatePackage: builder.mutation({
       query: ({ id, data }) => ({
         url: `/package/${id}`,
         method: "PATCH",
-        body: data
+        body: data,
       }),
-      invalidatesTags: ["package"]
+      invalidatesTags: ["package"],
     }),
 
     getAllPackage: builder.query({
@@ -25,7 +25,7 @@ export const packageApi = baseApi.injectEndpoints({
         url: `/package/all?userType=${userType}&status=${status}`,
         method: "GET",
       }),
-      providesTags: ["package"]
+      providesTags: ["package"],
     }),
 
     getPackageOverview: builder.query({
@@ -39,7 +39,7 @@ export const packageApi = baseApi.injectEndpoints({
           method: "GET",
         };
       },
-      providesTags: ["package"]
+      providesTags: ["package"],
     }),
 
     togglePackageStatus: builder.mutation({
@@ -47,7 +47,7 @@ export const packageApi = baseApi.injectEndpoints({
         url: `/package/toggle/${id}`,
         method: "PATCH",
       }),
-      invalidatesTags: ["package"]
+      invalidatesTags: ["package"],
     }),
   }),
 });
@@ -58,5 +58,5 @@ export const {
   useUpdatePackageMutation,
   useGetAllPackageQuery,
   useGetPackageOverviewQuery,
-  useTogglePackageStatusMutation
+  useTogglePackageStatusMutation,
 } = packageApi;

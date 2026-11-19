@@ -3,16 +3,7 @@
 "use client";
 
 import React, { useState, useEffect, useMemo, useRef } from "react";
-import {
-  X,
-  Upload,
-  Coins,
-  AlertCircle,
-  CheckCircle2,
-  Search,
-  Loader2,
-  Filter,
-} from "lucide-react";
+import { X, Upload, Coins, AlertCircle, CheckCircle2, Search, Loader2, Filter } from "lucide-react";
 import {
   Select,
   SelectContent,
@@ -76,10 +67,7 @@ export default function ScorePredictionModal({
   }, [matchSearchInput]);
 
   // Fetch leagues for the filter dropdown
-  const { data: leaguesData } = useGetAllLeagueQuery(
-    { limit: 100 },
-    { skip: !isOpen }
-  );
+  const { data: leaguesData } = useGetAllLeagueQuery({ limit: 100 }, { skip: !isOpen });
 
   const leaguesList = useMemo(() => {
     if (Array.isArray(leaguesData?.data)) return leaguesData.data;
@@ -142,9 +130,7 @@ export default function ScorePredictionModal({
     if (editingItem) {
       setTitle(editingItem.title || "");
       setDescription(editingItem.description || "");
-      setLockTime(
-        editingItem.lockTime ? editingItem.lockTime.split("T")[0] : ""
-      );
+      setLockTime(editingItem.lockTime ? editingItem.lockTime.split("T")[0] : "");
       setStatus(editingItem.status || "active");
       setCoinsPerExactScore(editingItem.coinsPerExactScore ?? 50);
       setCoinsPerCorrectOutcome(editingItem.coinsPerCorrectOutcome ?? 10);
@@ -255,10 +241,13 @@ export default function ScorePredictionModal({
         <div className="flex items-center justify-between px-6 py-4 border-b border-slate-200 bg-slate-50/50 shrink-0">
           <div>
             <span className="text-sm font-semibold text-slate-900 block">
-              {editingItem ? "Edit Score Prediction Round" : "Create 5-Match Score Prediction Round"}
+              {editingItem
+                ? "Edit Score Prediction Round"
+                : "Create 5-Match Score Prediction Round"}
             </span>
             <span className="text-xs text-slate-500">
-              Select 5 fixtures from upcoming matches and set coin rewards for exact score predictions.
+              Select 5 fixtures from upcoming matches and set coin rewards for exact score
+              predictions.
             </span>
           </div>
           <button
@@ -296,17 +285,21 @@ export default function ScorePredictionModal({
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-slate-700 mb-1">
-                Status
-              </label>
+              <label className="block text-xs font-semibold text-slate-700 mb-1">Status</label>
               <Select value={status} onValueChange={(val: any) => setStatus(val)}>
                 <SelectTrigger className="w-full h-8 px-2.5 rounded-md border border-slate-200 text-xs text-slate-900 bg-white shadow-2xs cursor-pointer">
                   <SelectValue placeholder="Select Status" />
                 </SelectTrigger>
                 <SelectContent className="bg-white border-slate-200">
-                  <SelectItem value="active" className="text-xs">Active (Open for Predictions)</SelectItem>
-                  <SelectItem value="upcoming" className="text-xs">Upcoming (Scheduled)</SelectItem>
-                  <SelectItem value="locked" className="text-xs">Locked (Deadline Passed)</SelectItem>
+                  <SelectItem value="active" className="text-xs">
+                    Active (Open for Predictions)
+                  </SelectItem>
+                  <SelectItem value="upcoming" className="text-xs">
+                    Upcoming (Scheduled)
+                  </SelectItem>
+                  <SelectItem value="locked" className="text-xs">
+                    Locked (Deadline Passed)
+                  </SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -410,11 +403,7 @@ export default function ScorePredictionModal({
                 </label>
                 {bannerPreview && (
                   <div className="relative inline-block border border-slate-200 rounded overflow-hidden h-9 w-20 bg-slate-100">
-                    <img
-                      src={bannerPreview}
-                      alt="Preview"
-                      className="w-full h-full object-cover"
-                    />
+                    <img src={bannerPreview} alt="Preview" className="w-full h-full object-cover" />
                     <button
                       type="button"
                       onClick={() => {
@@ -477,9 +466,7 @@ export default function ScorePredictionModal({
                     accumulatedMatches.find((m: any) => String(m._id) === mId);
                   const hName = mObj?.homeTeam?.teamName || "Home";
                   const aName = mObj?.awayTeam?.teamName || "Away";
-                  const dateStr = mObj?.matchDate
-                    ? dayjs(mObj.matchDate).format("DD MMM")
-                    : "";
+                  const dateStr = mObj?.matchDate ? dayjs(mObj.matchDate).format("DD MMM") : "";
 
                   return (
                     <div
@@ -518,20 +505,25 @@ export default function ScorePredictionModal({
                     <SelectValue placeholder="Status" />
                   </SelectTrigger>
                   <SelectContent className="bg-white border-slate-200">
-                    <SelectItem value="upcoming" className="text-xs">Upcoming Matches</SelectItem>
-                    <SelectItem value="ALL" className="text-xs">All Statuses</SelectItem>
-                    <SelectItem value="live" className="text-xs">Live Matches</SelectItem>
-                    <SelectItem value="finished" className="text-xs">Finished Matches</SelectItem>
+                    <SelectItem value="upcoming" className="text-xs">
+                      Upcoming Matches
+                    </SelectItem>
+                    <SelectItem value="ALL" className="text-xs">
+                      All Statuses
+                    </SelectItem>
+                    <SelectItem value="live" className="text-xs">
+                      Live Matches
+                    </SelectItem>
+                    <SelectItem value="finished" className="text-xs">
+                      Finished Matches
+                    </SelectItem>
                   </SelectContent>
                 </Select>
               </div>
 
               {/* League Filter */}
               <div className="sm:col-span-4">
-                <Select
-                  value={leagueFilter}
-                  onValueChange={(val) => setLeagueFilter(val)}
-                >
+                <Select value={leagueFilter} onValueChange={(val) => setLeagueFilter(val)}>
                   <SelectTrigger className="w-full h-8 px-2.5 rounded border border-slate-200 text-xs text-slate-900 bg-white cursor-pointer shadow-2xs truncate">
                     <div className="flex items-center gap-1.5 truncate">
                       <Filter className="w-3 h-3 text-slate-400 shrink-0" />
@@ -642,7 +634,11 @@ export default function ScorePredictionModal({
                             <div className="flex items-center gap-1.5 min-w-[110px] max-w-[150px]">
                               <div className="w-5 h-5 rounded-full overflow-hidden bg-slate-100 border border-slate-200 shrink-0 flex items-center justify-center text-[9px] font-semibold">
                                 {hLogo ? (
-                                  <img src={hLogo} alt="Home" className="w-full h-full object-cover" />
+                                  <img
+                                    src={hLogo}
+                                    alt="Home"
+                                    className="w-full h-full object-cover"
+                                  />
                                 ) : (
                                   (hTeam?.shortName || "H").slice(0, 1)
                                 )}
@@ -658,7 +654,11 @@ export default function ScorePredictionModal({
                             <div className="flex items-center gap-1.5 min-w-[110px] max-w-[150px]">
                               <div className="w-5 h-5 rounded-full overflow-hidden bg-slate-100 border border-slate-200 shrink-0 flex items-center justify-center text-[9px] font-semibold">
                                 {aLogo ? (
-                                  <img src={aLogo} alt="Away" className="w-full h-full object-cover" />
+                                  <img
+                                    src={aLogo}
+                                    alt="Away"
+                                    className="w-full h-full object-cover"
+                                  />
                                 ) : (
                                   (aTeam?.shortName || "A").slice(0, 1)
                                 )}

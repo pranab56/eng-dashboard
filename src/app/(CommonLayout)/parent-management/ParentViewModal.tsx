@@ -2,26 +2,11 @@
 "use client";
 
 import React, { useState } from "react";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import Image from "next/image";
 import { TUserManagement } from "@/types/columnTypes";
 import { formatImagePath } from "@/utils/formatImagePath";
-import {
-  Mail,
-  User,
-  ShieldCheck,
-  Phone,
-  X,
-  Users,
-  Check,
-  Copy,
-  Coins,
-} from "lucide-react";
+import { Mail, User, ShieldCheck, Phone, X, Users, Check, Copy, Coins } from "lucide-react";
 import dayjs from "dayjs";
 import { toast } from "sonner";
 
@@ -31,11 +16,7 @@ interface ParentViewModalProps {
   onClose: () => void;
 }
 
-const ParentViewModal: React.FC<ParentViewModalProps> = ({
-  parent,
-  isOpen,
-  onClose,
-}) => {
+const ParentViewModal: React.FC<ParentViewModalProps> = ({ parent, isOpen, onClose }) => {
   const [copiedField, setCopiedField] = useState<string | null>(null);
 
   if (!parent) return null;
@@ -43,7 +24,7 @@ const ParentViewModal: React.FC<ParentViewModalProps> = ({
   const profileUrl = formatImagePath(parent.profile || (parent as any).profilePic);
   const fullName = parent.firstName
     ? `${parent.firstName} ${parent.lastName || ""}`.trim()
-    : ((parent as any).userName || (parent as any).name || "Parent Account Owner");
+    : (parent as any).userName || (parent as any).name || "Parent Account Owner";
 
   const initials = fullName.charAt(0).toUpperCase();
   const children = parent.myPlayers || (parent as any).children || [];
@@ -51,7 +32,11 @@ const ParentViewModal: React.FC<ParentViewModalProps> = ({
   const handleCopyText = async (text: string, label: string) => {
     if (!text) return;
     try {
-      if (typeof navigator !== "undefined" && navigator.clipboard && navigator.clipboard.writeText) {
+      if (
+        typeof navigator !== "undefined" &&
+        navigator.clipboard &&
+        navigator.clipboard.writeText
+      ) {
         await navigator.clipboard.writeText(text);
       }
       setCopiedField(label);
@@ -82,12 +67,7 @@ const ParentViewModal: React.FC<ParentViewModalProps> = ({
           <div className="flex items-center gap-3.5 pr-8">
             <div className="relative h-12 w-12 rounded-full bg-slate-100 border border-slate-200 overflow-hidden flex items-center justify-center shrink-0">
               {profileUrl ? (
-                <Image
-                  src={profileUrl}
-                  alt={fullName}
-                  fill
-                  className="object-cover"
-                />
+                <Image src={profileUrl} alt={fullName} fill className="object-cover" />
               ) : (
                 <span className="text-base font-semibold text-slate-600 uppercase select-none">
                   {initials}
@@ -99,7 +79,9 @@ const ParentViewModal: React.FC<ParentViewModalProps> = ({
               <DialogTitle className="text-base font-bold text-slate-900 flex items-center gap-1.5 truncate">
                 {fullName}
                 {parent.verified && (
-                  <span title="Verified Account"><ShieldCheck className="w-4 h-4 text-emerald-600 shrink-0" /></span>
+                  <span title="Verified Account">
+                    <ShieldCheck className="w-4 h-4 text-emerald-600 shrink-0" />
+                  </span>
                 )}
               </DialogTitle>
               <div className="flex flex-wrap items-center gap-2 mt-0.5 text-xs text-slate-500">
@@ -137,7 +119,9 @@ const ParentViewModal: React.FC<ParentViewModalProps> = ({
                 <span className="text-[11px] text-slate-400 block">Email Address</span>
                 <div className="flex items-center gap-1 mt-0.5">
                   <Mail className="w-3.5 h-3.5 text-slate-400 shrink-0" />
-                  <span className="font-medium text-slate-800 truncate">{parent.email || "N/A"}</span>
+                  <span className="font-medium text-slate-800 truncate">
+                    {parent.email || "N/A"}
+                  </span>
                   {parent.email && (
                     <button
                       type="button"
@@ -191,7 +175,8 @@ const ParentViewModal: React.FC<ParentViewModalProps> = ({
                 </h3>
               </div>
               <span className="text-[11px] text-slate-500">
-                {children.filter((c: any) => Boolean(c.subscription || c.isPaid)).length} with active subscription
+                {children.filter((c: any) => Boolean(c.subscription || c.isPaid)).length} with
+                active subscription
               </span>
             </div>
 
@@ -208,7 +193,7 @@ const ParentViewModal: React.FC<ParentViewModalProps> = ({
                 {children.map((child: any, idx: number) => {
                   const childName = child.firstName
                     ? `${child.firstName} ${child.lastName || ""}`.trim()
-                    : (child.userName || `Child Player ${idx + 1}`);
+                    : child.userName || `Child Player ${idx + 1}`;
                   const childProfile = formatImagePath(child.profile || child.profilePic);
                   const childSub = child.subscription || child.activeSubscription;
                   const isPaid = Boolean(childSub || child.isPaid);

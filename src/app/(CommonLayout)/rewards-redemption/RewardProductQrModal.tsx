@@ -2,12 +2,7 @@
 "use client";
 
 import React from "react";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { X, QrCode, Download, Coffee, AlertCircle, Loader2 } from "lucide-react";
 import { useGetRewardProductQrCodeQuery } from "@/features/rewordProduct/rewordApi";
 import { toast } from "sonner";
@@ -18,17 +13,12 @@ interface RewardProductQrModalProps {
   onClose: () => void;
 }
 
-const RewardProductQrModal: React.FC<RewardProductQrModalProps> = ({
-  reward,
-  isOpen,
-  onClose,
-}) => {
+const RewardProductQrModal: React.FC<RewardProductQrModalProps> = ({ reward, isOpen, onClose }) => {
   const isCoffee = reward?.productType === "Coffee";
 
-  const { data: qrResponse, isLoading } = useGetRewardProductQrCodeQuery(
-    reward?._id,
-    { skip: !reward?._id || !isOpen || !isCoffee }
-  );
+  const { data: qrResponse, isLoading } = useGetRewardProductQrCodeQuery(reward?._id, {
+    skip: !reward?._id || !isOpen || !isCoffee,
+  });
 
   if (!reward) return null;
 
@@ -125,7 +115,8 @@ const RewardProductQrModal: React.FC<RewardProductQrModalProps> = ({
                     <span>Redemption QR Code</span>
                   </span>
                   <p className="text-[11px] text-slate-500 max-w-xs leading-normal">
-                    Display or print this QR code at partner facilities. Players scan using the ENG mobile app to deduct {Number(reward.point).toLocaleString()} points.
+                    Display or print this QR code at partner facilities. Players scan using the ENG
+                    mobile app to deduct {Number(reward.point).toLocaleString()} points.
                   </p>
                 </div>
               </div>
@@ -159,7 +150,8 @@ const RewardProductQrModal: React.FC<RewardProductQrModalProps> = ({
               <div>
                 <p className="text-xs font-semibold text-slate-900">QR Code Unavailable</p>
                 <p className="text-[11px] text-slate-500 max-w-xs mx-auto mt-0.5">
-                  Instant QR code generation is exclusively supported for Coffee products. Physical merchandise items are managed through the order dispatch system.
+                  Instant QR code generation is exclusively supported for Coffee products. Physical
+                  merchandise items are managed through the order dispatch system.
                 </p>
               </div>
               <button

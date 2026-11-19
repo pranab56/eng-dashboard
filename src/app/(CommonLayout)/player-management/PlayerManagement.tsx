@@ -5,16 +5,7 @@
 import React, { useEffect, useState, useMemo } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import {
-  Search,
-  X,
-  RotateCcw,
-  RefreshCw,
-  Coins,
-  Users,
-  Shield,
-  CreditCard,
-} from "lucide-react";
+import { Search, X, RotateCcw, RefreshCw, Coins, Users, Shield, CreditCard } from "lucide-react";
 import CustomPagination from "@/components/cui/CustomPagination";
 import CustomTable from "@/components/table/CustomTable";
 import { useHeaders } from "@/hooks/useHeaders";
@@ -62,12 +53,7 @@ const PlayerManagement = () => {
     [pageNumber, searchTerm, selectedAgeGroup, selectedPosition, selectedTeamId, sortBy]
   );
 
-  const {
-    data: playerData,
-    isLoading,
-    isFetching,
-    refetch,
-  } = useGetAllPlayerQuery(queryParams);
+  const { data: playerData, isLoading, isFetching, refetch } = useGetAllPlayerQuery(queryParams);
 
   // Dedicated Backend Overview API (100% pagination-independent MongoDB Aggregation)
   const { data: overviewRes, refetch: refetchOverview } = useGetPlayerOverviewQuery(undefined);
@@ -86,7 +72,20 @@ const PlayerManagement = () => {
 
   // Dynamically compute unique age groups
   const dynamicAgeGroups = useMemo(() => {
-    const defaultGroups = ["U7", "U8", "U9", "U10", "U11", "U12", "U13", "U14", "U15", "U16", "U17", "U18"];
+    const defaultGroups = [
+      "U7",
+      "U8",
+      "U9",
+      "U10",
+      "U11",
+      "U12",
+      "U13",
+      "U14",
+      "U15",
+      "U16",
+      "U17",
+      "U18",
+    ];
     const groupsSet = new Set<string>(defaultGroups);
 
     const apiCats = ageGroupRes?.data?.result || ageGroupRes?.data || [];
@@ -118,7 +117,14 @@ const PlayerManagement = () => {
 
   // Dynamically compute unique positions
   const dynamicPositions = useMemo(() => {
-    const defaultPositions = ["Goalkeeper", "Defender", "Midfielder", "Forward", "Striker", "Winger"];
+    const defaultPositions = [
+      "Goalkeeper",
+      "Defender",
+      "Midfielder",
+      "Forward",
+      "Striker",
+      "Winger",
+    ];
     const posSet = new Set<string>(defaultPositions);
 
     allPlayersList.forEach((p: any) => {
@@ -241,7 +247,8 @@ const PlayerManagement = () => {
             </span>
           </div>
           <p className="text-xs text-slate-500 mt-1">
-            Review registered rosters, position assignments, subscription plans, and token economics.
+            Review registered rosters, position assignments, subscription plans, and token
+            economics.
           </p>
         </div>
 
@@ -257,7 +264,9 @@ const PlayerManagement = () => {
             className="inline-flex items-center gap-1.5 h-8 px-2.5 bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 rounded-md text-xs font-medium transition-colors disabled:opacity-50 cursor-pointer"
             title="Refresh player directory"
           >
-            <RefreshCw className={`w-3.5 h-3.5 ${isFetching ? "animate-spin text-slate-500" : ""}`} />
+            <RefreshCw
+              className={`w-3.5 h-3.5 ${isFetching ? "animate-spin text-slate-500" : ""}`}
+            />
             <span className="hidden sm:inline">Refresh</span>
           </button>
 
@@ -388,10 +397,7 @@ const PlayerManagement = () => {
             </div>
 
             <div className="w-auto">
-              <SortSelectDropdown
-                sortBy={sortBy}
-                onChange={(sort) => setSortBy(sort)}
-              />
+              <SortSelectDropdown sortBy={sortBy} onChange={(sort) => setSortBy(sort)} />
             </div>
 
             {/* Reset Filters */}

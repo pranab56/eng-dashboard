@@ -50,10 +50,7 @@ export default function NotificationDropdown() {
     isLoading,
     isFetching,
     refetch,
-  } = useGetAllNotificationsQuery(
-    { page: 1, limit: 15 },
-    { skip: !isOpen }
-  );
+  } = useGetAllNotificationsQuery({ page: 1, limit: 15 }, { skip: !isOpen });
 
   // Real-time socket notification listener with auth
   useEffect(() => {
@@ -87,9 +84,7 @@ export default function NotificationDropdown() {
 
   const filteredNotifications = useMemo(() => {
     if (activeTab === "UNREAD") {
-      return notificationsList.filter(
-        (item) => item.isRead === false || item.read === false
-      );
+      return notificationsList.filter((item) => item.isRead === false || item.read === false);
     }
     return notificationsList;
   }, [notificationsList, activeTab]);
@@ -117,10 +112,7 @@ export default function NotificationDropdown() {
     const title = (item.title || "").toLowerCase();
     const type = (item.type || "").toLowerCase();
 
-    if (
-      title.includes("transfer") ||
-      type.includes("transfer")
-    ) {
+    if (title.includes("transfer") || type.includes("transfer")) {
       return <ArrowLeftRight className="w-3.5 h-3.5 text-slate-600" />;
     }
     if (
@@ -139,11 +131,7 @@ export default function NotificationDropdown() {
     ) {
       return <User className="w-3.5 h-3.5 text-slate-600" />;
     }
-    if (
-      title.includes("alert") ||
-      title.includes("warning") ||
-      title.includes("error")
-    ) {
+    if (title.includes("alert") || title.includes("warning") || title.includes("error")) {
       return <AlertCircle className="w-3.5 h-3.5 text-amber-600" />;
     }
     return <Bell className="w-3.5 h-3.5 text-slate-600" />;

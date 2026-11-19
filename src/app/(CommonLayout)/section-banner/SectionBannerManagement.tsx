@@ -184,17 +184,14 @@ export default function SectionBannerManagement() {
     []
   );
 
-  const hasActiveFilters =
-    searchTerm !== "" || sectionFilter !== "all" || statusFilter !== "all";
+  const hasActiveFilters = searchTerm !== "" || sectionFilter !== "all" || statusFilter !== "all";
 
   return (
     <div className="w-full p-4 sm:p-6 lg:p-8 space-y-6 pb-16">
       {/* Top Header & Action Controls */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-2 border-b border-slate-200">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-slate-900">
-            Section Banners
-          </h1>
+          <h1 className="text-2xl font-bold tracking-tight text-slate-900">Section Banners</h1>
           <p className="text-xs text-slate-500 mt-0.5">
             Manage top banner images for mobile app sections (Fixtures, Tables, Stats, TV, etc.).
           </p>
@@ -270,9 +267,7 @@ export default function SectionBannerManagement() {
             <Layers className="w-4 h-4 text-slate-400" />
           </div>
           <div className="mt-2 flex items-baseline gap-2">
-            <span className="text-xl font-bold font-mono text-slate-900">
-              {stats.total}
-            </span>
+            <span className="text-xl font-bold font-mono text-slate-900">{stats.total}</span>
             <span className="text-xs text-slate-500">banners</span>
           </div>
           <div className="text-[11px] text-slate-400 mt-1">Across all app sections</div>
@@ -286,9 +281,7 @@ export default function SectionBannerManagement() {
             <CheckCircle2 className="w-4 h-4 text-emerald-500" />
           </div>
           <div className="mt-2 flex items-baseline gap-2">
-            <span className="text-xl font-bold font-mono text-emerald-700">
-              {stats.active}
-            </span>
+            <span className="text-xl font-bold font-mono text-emerald-700">{stats.active}</span>
             <span className="text-xs text-slate-500">live</span>
           </div>
           <div className="text-[11px] text-slate-400 mt-1">Currently shown in mobile app</div>
@@ -302,9 +295,7 @@ export default function SectionBannerManagement() {
             <ImageIcon className="w-4 h-4 text-slate-400" />
           </div>
           <div className="mt-2 flex items-baseline gap-2">
-            <span className="text-xl font-bold font-mono text-slate-900">
-              {stats.inactive}
-            </span>
+            <span className="text-xl font-bold font-mono text-slate-900">{stats.inactive}</span>
             <span className="text-xs text-slate-500">hidden</span>
           </div>
           <div className="text-[11px] text-slate-400 mt-1">Draft or hidden banners</div>
@@ -331,9 +322,7 @@ export default function SectionBannerManagement() {
       <div className="bg-white border border-slate-200 rounded-xl shadow-2xs p-4 space-y-3">
         {/* Section Segmented Pill Tabs */}
         <div className="flex items-center gap-1.5 flex-wrap overflow-x-auto pb-1">
-          <span className="text-xs font-semibold text-slate-500 mr-1 shrink-0">
-            Section:
-          </span>
+          <span className="text-xs font-semibold text-slate-500 mr-1 shrink-0">Section:</span>
           {SECTION_OPTIONS.map((opt) => (
             <button
               key={opt.value}
@@ -424,18 +413,14 @@ export default function SectionBannerManagement() {
         {isLoading ? (
           <div className="flex flex-col items-center justify-center py-24 bg-white border border-slate-200 rounded-xl">
             <div className="w-7 h-7 border-2 border-slate-300 border-t-slate-800 rounded-full animate-spin"></div>
-            <p className="text-xs font-medium text-slate-500 mt-3">
-              Loading section banners...
-            </p>
+            <p className="text-xs font-medium text-slate-500 mt-3">Loading section banners...</p>
           </div>
         ) : rawBanners.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-20 bg-white border border-slate-200 rounded-xl text-center px-4">
             <div className="w-12 h-12 rounded-full bg-slate-100 flex items-center justify-center text-slate-400 mb-3">
               <ImageIcon className="w-6 h-6" />
             </div>
-            <h3 className="text-sm font-bold text-slate-900">
-              No Section Banners Found
-            </h3>
+            <h3 className="text-sm font-bold text-slate-900">No Section Banners Found</h3>
             <p className="text-xs text-slate-500 mt-1 max-w-sm">
               {hasActiveFilters
                 ? "No banners matched your active filters. Try resetting the filters or search term."
@@ -582,29 +567,19 @@ export default function SectionBannerManagement() {
                 Showing <span className="font-semibold text-slate-700">{rawBanners.length}</span> of{" "}
                 <span className="font-semibold text-slate-700">{paginationMeta.total}</span> banners
               </p>
-              <CustomPagination
-                TOTAL_PAGES={paginationMeta.totalPage}
-                showPageInfo={false}
-              />
+              <CustomPagination TOTAL_PAGES={paginationMeta.totalPage} showPageInfo={false} />
             </div>
           </div>
         ) : (
           /* Table View */
           <div className="bg-white rounded-xl border border-slate-200 shadow-2xs overflow-hidden">
-            <CustomTable
-              columns={columns}
-              data={rawBanners}
-              isLoading={isLoading}
-            />
+            <CustomTable columns={columns} data={rawBanners} isLoading={isLoading} />
             <div className="p-4 border-t border-slate-200 bg-slate-50/50 flex items-center justify-between">
               <p className="text-xs text-slate-500">
                 Showing <span className="font-semibold text-slate-700">{rawBanners.length}</span> of{" "}
                 <span className="font-semibold text-slate-700">{paginationMeta.total}</span> banners
               </p>
-              <CustomPagination
-                TOTAL_PAGES={paginationMeta.totalPage}
-                showPageInfo={false}
-              />
+              <CustomPagination TOTAL_PAGES={paginationMeta.totalPage} showPageInfo={false} />
             </div>
           </div>
         )}

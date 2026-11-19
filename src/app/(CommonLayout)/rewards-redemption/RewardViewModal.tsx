@@ -2,12 +2,7 @@
 "use client";
 
 import React from "react";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 import Image from "next/image";
@@ -31,9 +26,7 @@ const RewardViewModal = ({ reward, isOpen, onClose }: RewardViewModalProps) => {
     (reward.status || "").toLowerCase() === "publish" ||
     (reward.status || "").toLowerCase() === "active";
   const isCoffee = reward.productType === "Coffee";
-  const totalRedemptions = Array.isArray(reward.redeemedUsers)
-    ? reward.redeemedUsers.length
-    : 0;
+  const totalRedemptions = Array.isArray(reward.redeemedUsers) ? reward.redeemedUsers.length : 0;
 
   const pointsCost = reward.point ?? reward.pointsRequired ?? 0;
   const approxValue = (pointsCost * 0.01).toFixed(2);
@@ -170,9 +163,7 @@ const RewardViewModal = ({ reward, isOpen, onClose }: RewardViewModalProps) => {
               {isCoffee && (
                 <div className="px-3.5 py-2.5 flex items-center justify-between">
                   <span className="text-slate-500 font-medium">Claim Limits</span>
-                  <span className="text-slate-800 font-medium">
-                    Unlimited player scans allowed
-                  </span>
+                  <span className="text-slate-800 font-medium">Unlimited player scans allowed</span>
                 </div>
               )}
             </div>
@@ -185,7 +176,8 @@ const RewardViewModal = ({ reward, isOpen, onClose }: RewardViewModalProps) => {
               <div>
                 <p className="font-semibold text-slate-900">QR Code Scan Active</p>
                 <p className="text-[11px] text-slate-500 mt-0.5">
-                  Players can scan the dedicated QR code directly through the mobile app to redeem this item using ENG Coins.
+                  Players can scan the dedicated QR code directly through the mobile app to redeem
+                  this item using ENG Coins.
                 </p>
               </div>
             </div>

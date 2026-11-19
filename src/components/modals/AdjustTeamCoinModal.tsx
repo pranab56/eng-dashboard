@@ -1,22 +1,10 @@
 "use client";
 
 import React, { useState } from "react";
-import {
-  Dialog,
-  DialogContent,
-  DialogTitle,
-} from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { useAdjustTeamCoinsMutation } from "@/features/teamManagement/teamApi";
 import { toast } from "sonner";
-import {
-  Coins,
-  Plus,
-  Minus,
-  FileText,
-  Loader2,
-  X,
-  ArrowRight,
-} from "lucide-react";
+import { Coins, Plus, Minus, FileText, Loader2, X, ArrowRight } from "lucide-react";
 
 interface AdjustTeamCoinModalProps {
   isOpen: boolean;
@@ -98,7 +86,8 @@ export const AdjustTeamCoinModal: React.FC<AdjustTeamCoinModalProps> = ({
               </span>
             </div>
             <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-              Record manual financial adjustment for <span className="font-semibold text-slate-700 dark:text-slate-300">{teamName}</span>
+              Record manual financial adjustment for{" "}
+              <span className="font-semibold text-slate-700 dark:text-slate-300">{teamName}</span>
             </p>
           </div>
           <button
@@ -169,14 +158,18 @@ export const AdjustTeamCoinModal: React.FC<AdjustTeamCoinModalProps> = ({
           {/* Projected Balance Card */}
           <div className="bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700/80 rounded-lg p-3 text-xs flex items-center justify-between">
             <div>
-              <span className="text-slate-500 dark:text-slate-400 block text-[11px]">Current Balance</span>
+              <span className="text-slate-500 dark:text-slate-400 block text-[11px]">
+                Current Balance
+              </span>
               <span className="font-semibold text-slate-800 dark:text-slate-200">
                 {currentCoins.toLocaleString()} Coins
               </span>
             </div>
             <ArrowRight className="w-4 h-4 text-slate-400" />
             <div className="text-right">
-              <span className="text-slate-500 dark:text-slate-400 block text-[11px]">After Adjustment</span>
+              <span className="text-slate-500 dark:text-slate-400 block text-[11px]">
+                After Adjustment
+              </span>
               <span
                 className={`font-bold ${
                   operation === "ADD"

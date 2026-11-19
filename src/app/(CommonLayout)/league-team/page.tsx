@@ -1,11 +1,15 @@
-import React, { Suspense } from 'react';
-import LeagueTeamManagement from './LeagueTeamManagement';
+import React, { Suspense } from "react";
+import LeagueTeamManagement from "./LeagueTeamManagement";
 
-export const dynamic = 'force-dynamic';
+export const dynamic = "force-dynamic";
 
 const LeagueTeamPage = () => {
   return (
-    <Suspense fallback={<div className="flex items-center justify-center p-10 text-gray-500 font-medium"></div>}>
+    <Suspense
+      fallback={
+        <div className="flex items-center justify-center p-10 text-gray-500 font-medium"></div>
+      }
+    >
       <LeagueTeamManagement />
     </Suspense>
   );

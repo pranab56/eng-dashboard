@@ -2,12 +2,7 @@
 "use client";
 
 import React, { useState } from "react";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { formatImagePath } from "@/utils/formatImagePath";
 import Image from "next/image";
 import dayjs from "dayjs";
@@ -52,33 +47,69 @@ interface TeamViewModalProps {
 const formatTransactionCategory = (cat: string) => {
   switch (cat) {
     case "WIN_MATCH":
-      return { label: "Match Win", icon: "🏆", bg: "bg-emerald-50 text-emerald-800 border-emerald-200 dark:bg-emerald-950/40 dark:text-emerald-300 dark:border-emerald-800" };
+      return {
+        label: "Match Win",
+        icon: "🏆",
+        bg: "bg-emerald-50 text-emerald-800 border-emerald-200 dark:bg-emerald-950/40 dark:text-emerald-300 dark:border-emerald-800",
+      };
     case "DRAW_MATCH":
-      return { label: "Match Draw", icon: "🤝", bg: "bg-blue-50 text-blue-800 border-blue-200 dark:bg-blue-950/40 dark:text-blue-300 dark:border-blue-800" };
+      return {
+        label: "Match Draw",
+        icon: "🤝",
+        bg: "bg-blue-50 text-blue-800 border-blue-200 dark:bg-blue-950/40 dark:text-blue-300 dark:border-blue-800",
+      };
     case "ATTEND_MATCH":
-      return { label: "Match Appearance", icon: "🏟️", bg: "bg-sky-50 text-sky-800 border-sky-200 dark:bg-sky-950/40 dark:text-sky-300 dark:border-sky-800" };
+      return {
+        label: "Match Appearance",
+        icon: "🏟️",
+        bg: "bg-sky-50 text-sky-800 border-sky-200 dark:bg-sky-950/40 dark:text-sky-300 dark:border-sky-800",
+      };
     case "CONDUCT_RATING":
-      return { label: "Conduct Rating", icon: "⭐", bg: "bg-purple-50 text-purple-800 border-purple-200 dark:bg-purple-950/40 dark:text-purple-300 dark:border-purple-800" };
+      return {
+        label: "Conduct Rating",
+        icon: "⭐",
+        bg: "bg-purple-50 text-purple-800 border-purple-200 dark:bg-purple-950/40 dark:text-purple-300 dark:border-purple-800",
+      };
     case "PLAYER_TRANSFER_BUY":
-      return { label: "Player Bought", icon: "🔄", bg: "bg-rose-50 text-rose-800 border-rose-200 dark:bg-rose-950/40 dark:text-rose-300 dark:border-rose-800" };
+      return {
+        label: "Player Bought",
+        icon: "🔄",
+        bg: "bg-rose-50 text-rose-800 border-rose-200 dark:bg-rose-950/40 dark:text-rose-300 dark:border-rose-800",
+      };
     case "PLAYER_TRANSFER_SELL":
-      return { label: "Player Sold", icon: "💰", bg: "bg-teal-50 text-teal-800 border-teal-200 dark:bg-teal-950/40 dark:text-teal-300 dark:border-teal-800" };
+      return {
+        label: "Player Sold",
+        icon: "💰",
+        bg: "bg-teal-50 text-teal-800 border-teal-200 dark:bg-teal-950/40 dark:text-teal-300 dark:border-teal-800",
+      };
     case "ADMIN_ADJUSTMENT":
-      return { label: "Admin Adjustment", icon: "⚖️", bg: "bg-amber-50 text-amber-800 border-amber-200 dark:bg-amber-950/40 dark:text-amber-300 dark:border-amber-800" };
+      return {
+        label: "Admin Adjustment",
+        icon: "⚖️",
+        bg: "bg-amber-50 text-amber-800 border-amber-200 dark:bg-amber-950/40 dark:text-amber-300 dark:border-amber-800",
+      };
     case "TOURNAMENT_PRIZE":
-      return { label: "Tournament Prize", icon: "🎖️", bg: "bg-indigo-50 text-indigo-800 border-indigo-200 dark:bg-indigo-950/40 dark:text-indigo-300 dark:border-indigo-800" };
+      return {
+        label: "Tournament Prize",
+        icon: "🎖️",
+        bg: "bg-indigo-50 text-indigo-800 border-indigo-200 dark:bg-indigo-950/40 dark:text-indigo-300 dark:border-indigo-800",
+      };
     case "ROLLBACK":
-      return { label: "Score Rollback", icon: "↩️", bg: "bg-slate-100 text-slate-800 border-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:border-slate-700" };
+      return {
+        label: "Score Rollback",
+        icon: "↩️",
+        bg: "bg-slate-100 text-slate-800 border-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:border-slate-700",
+      };
     default:
-      return { label: cat || "Transaction", icon: "🪙", bg: "bg-slate-100 text-slate-700 border-slate-200" };
+      return {
+        label: cat || "Transaction",
+        icon: "🪙",
+        bg: "bg-slate-100 text-slate-700 border-slate-200",
+      };
   }
 };
 
-const TeamViewModal: React.FC<TeamViewModalProps> = ({
-  team,
-  isOpen,
-  onClose,
-}) => {
+const TeamViewModal: React.FC<TeamViewModalProps> = ({ team, isOpen, onClose }) => {
   const [activeTab, setActiveTab] = useState<"overview" | "ledger">("overview");
   const [memberSearch, setMemberSearch] = useState("");
   const [removingPlayerId, setRemovingPlayerId] = useState<string | null>(null);
@@ -96,8 +127,7 @@ const TeamViewModal: React.FC<TeamViewModalProps> = ({
   const [coinTypeFilter, setCoinTypeFilter] = useState("ALL");
 
   const [assignTeamToUser] = useAssignTeamToUserMutation();
-  const [updateJerseyNumber, { isLoading: isSavingJersey }] =
-    useUpdateJerseyNumberMutation();
+  const [updateJerseyNumber, { isLoading: isSavingJersey }] = useUpdateJerseyNumberMutation();
 
   const teamId = team?._id || team?.id;
 
@@ -126,9 +156,7 @@ const TeamViewModal: React.FC<TeamViewModalProps> = ({
     }
   );
 
-  const coinTransactions: any[] = Array.isArray(coinHistoryData?.data)
-    ? coinHistoryData.data
-    : [];
+  const coinTransactions: any[] = Array.isArray(coinHistoryData?.data) ? coinHistoryData.data : [];
   const coinMeta = coinHistoryData?.pagination || { page: 1, limit: 10, total: 0, totalPage: 1 };
 
   if (!team) return null;
@@ -178,10 +206,14 @@ const TeamViewModal: React.FC<TeamViewModalProps> = ({
   const managersList = Array.isArray(currentTeam.managers)
     ? currentTeam.managers.map((m: any) => m.manager || m).filter(Boolean)
     : currentTeam.managers
-    ? [currentTeam.managers.manager || currentTeam.managers]
-    : [];
+      ? [currentTeam.managers.manager || currentTeam.managers]
+      : [];
 
-  const rawMembers = Array.isArray(currentTeam.members) ? currentTeam.members : Array.isArray(team.members) ? team.members : [];
+  const rawMembers = Array.isArray(currentTeam.members)
+    ? currentTeam.members
+    : Array.isArray(team.members)
+      ? team.members
+      : [];
   const filteredMembers = rawMembers.filter((member: any) => {
     if (!memberSearch.trim()) return true;
     const q = memberSearch.toLowerCase();
@@ -191,8 +223,9 @@ const TeamViewModal: React.FC<TeamViewModalProps> = ({
     return name.includes(q) || uName.includes(q) || jNo.includes(q);
   });
 
-  const currentCoins = typeof currentTeam.coin === "number" ? currentTeam.coin : (team.coin || 0);
-  const marketValue = typeof currentTeam.marketValue === "number" ? currentTeam.marketValue : (team.marketValue || 0);
+  const currentCoins = typeof currentTeam.coin === "number" ? currentTeam.coin : team.coin || 0;
+  const marketValue =
+    typeof currentTeam.marketValue === "number" ? currentTeam.marketValue : team.marketValue || 0;
 
   const handleRemoveMemberFromTeam = async (playerId: string) => {
     try {
@@ -362,8 +395,6 @@ const TeamViewModal: React.FC<TeamViewModalProps> = ({
                   £{marketValue.toLocaleString()}
                 </p>
               </div>
-
-              
             </div>
 
             {/* TAB 1: OVERVIEW & SQUAD */}
@@ -385,8 +416,8 @@ const TeamViewModal: React.FC<TeamViewModalProps> = ({
                                 res === "W"
                                   ? "bg-emerald-500 text-white"
                                   : res === "D"
-                                  ? "bg-amber-500 text-white"
-                                  : "bg-rose-500 text-white";
+                                    ? "bg-amber-500 text-white"
+                                    : "bg-rose-500 text-white";
                               return (
                                 <span
                                   key={idx}
@@ -401,7 +432,9 @@ const TeamViewModal: React.FC<TeamViewModalProps> = ({
                             </span>
                           </div>
                         ) : (
-                          <span className="text-xs text-slate-400 italic">No finished matches yet</span>
+                          <span className="text-xs text-slate-400 italic">
+                            No finished matches yet
+                          </span>
                         )}
                       </div>
                     </div>
@@ -419,12 +452,16 @@ const TeamViewModal: React.FC<TeamViewModalProps> = ({
                           </span>
                           <span className="text-[11px] text-slate-400 block mt-0.5">
                             {currentTeam.upcomingFixture.matchDate
-                              ? dayjs(currentTeam.upcomingFixture.matchDate).format("MMM DD, YYYY • h:mm A")
+                              ? dayjs(currentTeam.upcomingFixture.matchDate).format(
+                                  "MMM DD, YYYY • h:mm A"
+                                )
                               : "Date TBD"}
                           </span>
                         </div>
                       ) : (
-                        <span className="text-xs text-slate-400 italic">No upcoming fixture scheduled</span>
+                        <span className="text-xs text-slate-400 italic">
+                          No upcoming fixture scheduled
+                        </span>
                       )}
                     </div>
                   </div>
@@ -437,7 +474,10 @@ const TeamViewModal: React.FC<TeamViewModalProps> = ({
                       <Trophy className="w-3.5 h-3.5 text-amber-500" /> Associated League
                     </span>
                     <p className="font-medium text-slate-900 dark:text-slate-100 text-sm">
-                      {league?.leagueName || league?.name || currentTeam.leagueName || "Independent / Unassigned"}
+                      {league?.leagueName ||
+                        league?.name ||
+                        currentTeam.leagueName ||
+                        "Independent / Unassigned"}
                     </p>
                     <p className="text-slate-400 text-[11px]">
                       Ground: {currentTeam.stadiumName || "N/A"}
@@ -474,7 +514,8 @@ const TeamViewModal: React.FC<TeamViewModalProps> = ({
                 <div className="border border-slate-200 dark:border-slate-800 rounded-md bg-white dark:bg-slate-900 overflow-hidden">
                   <div className="px-4 py-3 border-b border-slate-100 dark:border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
                     <h3 className="text-xs font-semibold text-slate-800 dark:text-slate-200 uppercase tracking-wider flex items-center gap-1.5">
-                      <Users className="w-3.5 h-3.5 text-slate-500" /> Squad Members ({filteredMembers.length})
+                      <Users className="w-3.5 h-3.5 text-slate-500" /> Squad Members (
+                      {filteredMembers.length})
                     </h3>
 
                     {rawMembers.length > 0 && (
@@ -589,7 +630,8 @@ const TeamViewModal: React.FC<TeamViewModalProps> = ({
                         Club Coin Reserve & Audit Ledger
                       </p>
                       <p className="text-xs text-amber-700/80 dark:text-amber-400 mt-0.5">
-                        Immutable record of match prizes, conduct evaluations, transfers, and adjustments.
+                        Immutable record of match prizes, conduct evaluations, transfers, and
+                        adjustments.
                       </p>
                     </div>
                   </div>
@@ -808,9 +850,7 @@ const TeamViewModal: React.FC<TeamViewModalProps> = ({
 
           {/* Modal Footer */}
           <div className="px-5 py-3.5 bg-slate-50 dark:bg-slate-800/50 border-t border-slate-200 dark:border-slate-800 flex items-center justify-between">
-            <span className="text-xs text-slate-400 font-mono text-[11px]">
-              ID: {teamId}
-            </span>
+            <span className="text-xs text-slate-400 font-mono text-[11px]">ID: {teamId}</span>
             <button
               type="button"
               onClick={onClose}

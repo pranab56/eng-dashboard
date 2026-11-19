@@ -1,11 +1,7 @@
 "use client";
 
 import React, { useEffect, useState, useMemo } from "react";
-import {
-  Dialog,
-  DialogContent,
-  DialogTitle,
-} from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import {
   Select,
   SelectContent,
@@ -58,10 +54,9 @@ export const AdjustMatchConductModal: React.FC<AdjustMatchConductModalProps> = (
   const homeTeamId = match?.homeTeam?._id || match?.homeTeam?.id || match?.homeTeam;
   const awayTeamId = match?.awayTeam?._id || match?.awayTeam?.id || match?.awayTeam;
 
-  const { data: evalData, isLoading: isFetchingEval } = useGetMatchEvaluationQuery(
-    matchId,
-    { skip: !isOpen || !matchId }
-  );
+  const { data: evalData, isLoading: isFetchingEval } = useGetMatchEvaluationQuery(matchId, {
+    skip: !isOpen || !matchId,
+  });
 
   const { data: homeTeamData } = useGetSingleTeamQuery(homeTeamId, {
     skip: !homeTeamId || !isOpen,
@@ -86,8 +81,12 @@ export const AdjustMatchConductModal: React.FC<AdjustMatchConductModalProps> = (
     if (isOpen && existingEval) {
       const hRate = Number(existingEval.homeTeamRating);
       const aRate = Number(existingEval.awayTeamRating);
-      setHomeRating(!isNaN(hRate) && hRate >= 1 ? (hRate > 10 ? Math.round(hRate / 10) : hRate) : 10);
-      setAwayRating(!isNaN(aRate) && aRate >= 1 ? (aRate > 10 ? Math.round(aRate / 10) : aRate) : 10);
+      setHomeRating(
+        !isNaN(hRate) && hRate >= 1 ? (hRate > 10 ? Math.round(hRate / 10) : hRate) : 10
+      );
+      setAwayRating(
+        !isNaN(aRate) && aRate >= 1 ? (aRate > 10 ? Math.round(aRate / 10) : aRate) : 10
+      );
       setMotm(existingEval.manOfTheMatch?._id || existingEval.manOfTheMatch || "");
       setNotes(existingEval.notes || "");
     } else if (isOpen) {
@@ -352,7 +351,8 @@ export const AdjustMatchConductModal: React.FC<AdjustMatchConductModalProps> = (
                     if (!pId) return null;
                     return (
                       <SelectItem key={pId} value={pId}>
-                        {pName} ({player.teamName}) {player.jerseyNumber ? `#${player.jerseyNumber}` : ""}
+                        {pName} ({player.teamName}){" "}
+                        {player.jerseyNumber ? `#${player.jerseyNumber}` : ""}
                       </SelectItem>
                     );
                   })}

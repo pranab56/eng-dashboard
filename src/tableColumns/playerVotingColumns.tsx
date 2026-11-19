@@ -67,30 +67,22 @@ export const getPlayerVotingColumns = (
                 votingType === "WEEK"
                   ? "bg-slate-100 text-slate-700 border border-slate-200"
                   : votingType === "MONTH"
-                  ? "bg-indigo-50 text-indigo-700 border border-indigo-200"
-                  : "bg-amber-50 text-amber-700 border border-amber-200"
+                    ? "bg-indigo-50 text-indigo-700 border border-indigo-200"
+                    : "bg-amber-50 text-amber-700 border border-amber-200"
               }`}
             >
               {votingType === "WEEK"
                 ? "Player of the Week"
                 : votingType === "MONTH"
-                ? "Player of the Month"
-                : "Overall Player"}
+                  ? "Player of the Month"
+                  : "Overall Player"}
             </span>
             {weekNumber ? (
-              <span className="text-[10px] font-mono text-slate-500">
-                Wk {weekNumber}
-              </span>
+              <span className="text-[10px] font-mono text-slate-500">Wk {weekNumber}</span>
             ) : null}
-            {month ? (
-              <span className="text-[10px] font-mono text-slate-500">
-                {month}
-              </span>
-            ) : null}
+            {month ? <span className="text-[10px] font-mono text-slate-500">{month}</span> : null}
           </div>
-          <span className="font-medium text-slate-900 text-xs mt-1 leading-snug">
-            {title}
-          </span>
+          <span className="font-medium text-slate-900 text-xs mt-1 leading-snug">{title}</span>
         </div>
       );
     },
@@ -122,9 +114,7 @@ export const getPlayerVotingColumns = (
               {ageGroup}
             </span>
             {league?.season && !isOverallRound && (
-              <span className="text-[10px] text-slate-400 font-mono">
-                {league.season}
-              </span>
+              <span className="text-[10px] text-slate-400 font-mono">{league.season}</span>
             )}
             {isOverallRound && (
               <span className="text-[10px] text-blue-600 bg-blue-50 px-1.5 py-0.2 rounded font-medium border border-blue-100">
@@ -160,11 +150,7 @@ export const getPlayerVotingColumns = (
                   className="w-6 h-6 rounded-full border border-white bg-slate-100 overflow-hidden shrink-0 flex items-center justify-center text-[9px] font-semibold text-slate-600"
                 >
                   {profileImg ? (
-                    <img
-                      src={profileImg}
-                      alt={name}
-                      className="w-full h-full object-cover"
-                    />
+                    <img src={profileImg} alt={name} className="w-full h-full object-cover" />
                   ) : (
                     name.slice(0, 2).toUpperCase()
                   )}
@@ -212,15 +198,14 @@ export const getPlayerVotingColumns = (
       let isWinner = false;
 
       if (winner) {
-        const wName = typeof winner === "object"
-          ? `${winner.firstName || ""} ${winner.lastName || ""}`.trim()
-          : "Winner";
+        const wName =
+          typeof winner === "object"
+            ? `${winner.firstName || ""} ${winner.lastName || ""}`.trim()
+            : "Winner";
         leaderInfo = `Winner: ${wName}`;
         isWinner = true;
       } else if (nominees && nominees.length > 0) {
-        const sorted = [...nominees].sort(
-          (a, b) => (b.votesCount || 0) - (a.votesCount || 0)
-        );
+        const sorted = [...nominees].sort((a, b) => (b.votesCount || 0) - (a.votesCount || 0));
         if (sorted[0]?.votesCount > 0) {
           const topP = sorted[0].player;
           const pName = `${topP?.firstName || ""} ${topP?.lastName || ""}`.trim();
@@ -251,9 +236,7 @@ export const getPlayerVotingColumns = (
   {
     accessorKey: "status",
     header: () => (
-      <span className="font-semibold text-xs text-slate-600 uppercase tracking-wider">
-        Status
-      </span>
+      <span className="font-semibold text-xs text-slate-600 uppercase tracking-wider">Status</span>
     ),
     cell: ({ row }) => getStatusBadge(row.original.status),
   },

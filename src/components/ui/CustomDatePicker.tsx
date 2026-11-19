@@ -3,12 +3,7 @@
 
 import React, { useState, useRef, useEffect } from "react";
 import dayjs from "dayjs";
-import {
-  Calendar as CalendarIcon,
-  ChevronLeft,
-  ChevronRight,
-  X,
-} from "lucide-react";
+import { Calendar as CalendarIcon, ChevronLeft, ChevronRight, X } from "lucide-react";
 
 interface CustomDatePickerProps {
   value: string; // YYYY-MM-DD
@@ -51,10 +46,7 @@ const CustomDatePicker: React.FC<CustomDatePickerProps> = ({
   // Close popup on click outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (
-        containerRef.current &&
-        !containerRef.current.contains(event.target as Node)
-      ) {
+      if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
         setIsOpen(false);
       }
     };
@@ -100,20 +92,11 @@ const CustomDatePicker: React.FC<CustomDatePickerProps> = ({
   };
 
   const displayDate =
-    value && dayjs(value).isValid()
-      ? dayjs(value).format("ddd, DD MMM YYYY")
-      : "";
+    value && dayjs(value).isValid() ? dayjs(value).format("ddd, DD MMM YYYY") : "";
 
   return (
-    <div
-      className={`space-y-1.5 relative ${isOpen ? "z-50" : "z-10"}`}
-      ref={containerRef}
-    >
-      {label && (
-        <label className="block text-xs font-semibold text-slate-700">
-          {label}
-        </label>
-      )}
+    <div className={`space-y-1.5 relative ${isOpen ? "z-50" : "z-10"}`} ref={containerRef}>
+      {label && <label className="block text-xs font-semibold text-slate-700">{label}</label>}
 
       {/* Input Trigger Button (Matches h-10 standard enterprise inputs) */}
       <button
@@ -123,17 +106,15 @@ const CustomDatePicker: React.FC<CustomDatePickerProps> = ({
           error
             ? "border-rose-400 focus:ring-rose-500/10 bg-rose-50/20"
             : isOpen
-            ? "border-slate-500 ring-2 ring-slate-900/5 bg-white"
-            : "border-slate-200 hover:border-slate-300"
+              ? "border-slate-500 ring-2 ring-slate-900/5 bg-white"
+              : "border-slate-200 hover:border-slate-300"
         }`}
       >
         <div className="flex items-center gap-2.5 truncate">
           <CalendarIcon className="w-4 h-4 text-slate-500 shrink-0" />
           <span
             className={`truncate ${
-              displayDate
-                ? "text-slate-900 font-medium"
-                : "text-slate-400 font-normal"
+              displayDate ? "text-slate-900 font-medium" : "text-slate-400 font-normal"
             }`}
           >
             {displayDate || placeholder || (label ? `Select ${label}` : "Select Date")}
@@ -226,8 +207,8 @@ const CustomDatePicker: React.FC<CustomDatePickerProps> = ({
                         ? "bg-amber-600 text-white font-semibold shadow-2xs"
                         : "bg-slate-900 text-white font-semibold shadow-2xs"
                       : isToday
-                      ? "border border-slate-300 text-slate-900 font-semibold hover:bg-slate-100"
-                      : "text-slate-700 hover:bg-slate-100"
+                        ? "border border-slate-300 text-slate-900 font-semibold hover:bg-slate-100"
+                        : "text-slate-700 hover:bg-slate-100"
                   }`}
                 >
                   {dayNum}

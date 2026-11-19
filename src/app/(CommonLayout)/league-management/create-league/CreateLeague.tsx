@@ -8,17 +8,7 @@ import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import dayjs from "dayjs";
-import {
-  ArrowLeft,
-  Calendar,
-  Check,
-  Clock,
-  Copy,
-  Info,
-  Loader2,
-  Trophy,
-  Save,
-} from "lucide-react";
+import { ArrowLeft, Calendar, Check, Clock, Copy, Info, Loader2, Trophy, Save } from "lucide-react";
 import { toast } from "sonner";
 
 import CustomDatePicker from "@/components/ui/CustomDatePicker";
@@ -40,14 +30,8 @@ import { useGetAllAgeGroupQuery } from "@/features/categoryManagement/categoryAp
 
 const leagueSchema = z
   .object({
-    leagueName: z
-      .string()
-      .trim()
-      .min(2, "League Name must be at least 2 characters"),
-    season: z
-      .string()
-      .trim()
-      .min(2, "Season is required (e.g. 2025/2026 or 2026)"),
+    leagueName: z.string().trim().min(2, "League Name must be at least 2 characters"),
+    season: z.string().trim().min(2, "Season is required (e.g. 2025/2026 or 2026)"),
     ageGroup: z.string().trim().min(1, "Age Group is required (e.g. u7, u8, u10)"),
     startDate: z.string().min(1, "Start Date is required"),
     endDate: z.string().min(1, "End Date is required"),
@@ -55,8 +39,10 @@ const leagueSchema = z
   .refine(
     (data) => {
       if (data.startDate && data.endDate) {
-        return dayjs(data.endDate).isAfter(dayjs(data.startDate)) ||
-          dayjs(data.endDate).isSame(dayjs(data.startDate));
+        return (
+          dayjs(data.endDate).isAfter(dayjs(data.startDate)) ||
+          dayjs(data.endDate).isSame(dayjs(data.startDate))
+        );
       }
       return true;
     },
@@ -67,7 +53,6 @@ const leagueSchema = z
   );
 
 type LeagueFormValues = z.infer<typeof leagueSchema>;
-
 
 const CreateLeague = () => {
   const { setHeaders } = useHeaders();
@@ -146,8 +131,8 @@ const CreateLeague = () => {
           if (
             name &&
             (/^(u|under\s*)\d+/i.test(name) ||
-             /^(senior|junior|open|adult|veteran)/i.test(name) ||
-             /\d+\s*(year|yr)/i.test(name))
+              /^(senior|junior|open|adult|veteran)/i.test(name) ||
+              /\d+\s*(year|yr)/i.test(name))
           ) {
             addUnique(name);
           }
@@ -290,7 +275,6 @@ const CreateLeague = () => {
   };
 
   const onSubmit = async (data: LeagueFormValues) => {
-    
     try {
       if (isEditMode) {
         const res = await updateLeague({ id: leagueId, data }).unwrap();
@@ -306,10 +290,7 @@ const CreateLeague = () => {
         }
       }
     } catch (error: any) {
-      toast.error(
-        error?.data?.message ||
-          `Failed to ${isEditMode ? "update" : "create"} league`
-      );
+      toast.error(error?.data?.message || `Failed to ${isEditMode ? "update" : "create"} league`);
     }
   };
 
@@ -386,9 +367,7 @@ const CreateLeague = () => {
               <span
                 className={`inline-flex items-center gap-1.5 text-xs font-semibold px-2.5 py-0.5 rounded-full border ${timelineAnalysis.statusTheme}`}
               >
-                <span
-                  className={`w-1.5 h-1.5 rounded-full ${timelineAnalysis.dotColor}`}
-                />
+                <span className={`w-1.5 h-1.5 rounded-full ${timelineAnalysis.dotColor}`} />
                 {timelineAnalysis.projectedStatus.toUpperCase()}
               </span>
             )}
@@ -420,13 +399,7 @@ const CreateLeague = () => {
             ) : (
               <Save className="w-3.5 h-3.5 text-slate-300" />
             )}
-            <span>
-              {isSaving
-                ? "Saving..."
-                : isEditMode
-                ? "Save Changes"
-                : "Create League"}
-            </span>
+            <span>{isSaving ? "Saving..." : isEditMode ? "Save Changes" : "Create League"}</span>
           </button>
         </div>
       </div>
@@ -440,9 +413,7 @@ const CreateLeague = () => {
             <div className="bg-white rounded-lg border border-slate-200/80 shadow-2xs">
               <div className="p-4 sm:p-5 border-b border-slate-100 flex items-center justify-between">
                 <div>
-                  <h2 className="text-sm font-semibold text-slate-900">
-                    Competition Identity
-                  </h2>
+                  <h2 className="text-sm font-semibold text-slate-900">Competition Identity</h2>
                   <p className="text-xs text-slate-500 mt-0.5">
                     Official tournament title and season year classification.
                   </p>
@@ -460,8 +431,7 @@ const CreateLeague = () => {
                       htmlFor="leagueName"
                       className="block text-xs font-semibold text-slate-700"
                     >
-                      League / Tournament Name{" "}
-                      <span className="text-rose-500">*</span>
+                      League / Tournament Name <span className="text-rose-500">*</span>
                     </label>
                     <span className="text-[11px] text-slate-400">Required</span>
                   </div>
@@ -494,9 +464,7 @@ const CreateLeague = () => {
                       >
                         Season Identifier <span className="text-rose-500">*</span>
                       </label>
-                      <span className="text-[11px] text-slate-400">
-                        e.g. 2025/2026 or 2026
-                      </span>
+                      <span className="text-[11px] text-slate-400">e.g. 2025/2026 or 2026</span>
                     </div>
                     <input
                       id="season"
@@ -519,7 +487,12 @@ const CreateLeague = () => {
                   {/* Age Group Field */}
                   <div className="space-y-1.5">
                     <div className="flex items-center justify-between">
-                      <label htmlFor="ageGroup" className="block text-xs font-semibold text-slate-700">Age Group <span className="text-rose-500">*</span></label>
+                      <label
+                        htmlFor="ageGroup"
+                        className="block text-xs font-semibold text-slate-700"
+                      >
+                        Age Group <span className="text-rose-500">*</span>
+                      </label>
                       <button
                         type="button"
                         onClick={() => {
@@ -631,12 +604,10 @@ const CreateLeague = () => {
             <div className="bg-white rounded-lg border border-slate-200/80 shadow-2xs relative z-20">
               <div className="p-4 sm:p-5 border-b border-slate-100 flex items-center justify-between">
                 <div>
-                  <h2 className="text-sm font-semibold text-slate-900">
-                    Competition Schedule
-                  </h2>
+                  <h2 className="text-sm font-semibold text-slate-900">Competition Schedule</h2>
                   <p className="text-xs text-slate-500 mt-0.5">
-                    Start and completion dates define tournament active status
-                    and fixture scheduling.
+                    Start and completion dates define tournament active status and fixture
+                    scheduling.
                   </p>
                 </div>
                 <div className="w-7 h-7 rounded-md bg-slate-100 text-slate-600 flex items-center justify-center">
@@ -697,15 +668,11 @@ const CreateLeague = () => {
                     </div>
 
                     <div className="flex items-center gap-1.5 self-start sm:self-auto">
-                      <span className="text-[11px] text-slate-500">
-                        Status:
-                      </span>
+                      <span className="text-[11px] text-slate-500">Status:</span>
                       <span
                         className={`inline-flex items-center gap-1 text-[11px] font-semibold px-2 py-0.5 rounded ${timelineAnalysis.statusTheme}`}
                       >
-                        <span
-                          className={`w-1.5 h-1.5 rounded-full ${timelineAnalysis.dotColor}`}
-                        />
+                        <span className={`w-1.5 h-1.5 rounded-full ${timelineAnalysis.dotColor}`} />
                         {timelineAnalysis.statusLabel}
                       </span>
                     </div>
@@ -730,9 +697,7 @@ const CreateLeague = () => {
 
               <div className="space-y-3 text-xs">
                 <div>
-                  <span className="block text-[11px] font-medium text-slate-400">
-                    League Name
-                  </span>
+                  <span className="block text-[11px] font-medium text-slate-400">League Name</span>
                   <span className="font-semibold text-slate-900 mt-0.5 block truncate">
                     {formValues.leagueName || "—"}
                   </span>
@@ -740,12 +705,25 @@ const CreateLeague = () => {
 
                 <div className="grid grid-cols-2 gap-2">
                   <div>
-                    <span className="block text-[11px] font-medium text-slate-400">Season</span><span className="font-semibold text-slate-900 mt-0.5 block">{formValues.season || "—"}</span></div><div><span className="block text-[11px] font-medium text-slate-400">Age Group</span><span className="font-semibold text-slate-900 mt-0.5 block truncate">{formValues.ageGroup ? <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-semibold bg-violet-50 text-violet-700 border border-violet-200">{formValues.ageGroup}</span> : "All Ages"}</span>
+                    <span className="block text-[11px] font-medium text-slate-400">Season</span>
+                    <span className="font-semibold text-slate-900 mt-0.5 block">
+                      {formValues.season || "—"}
+                    </span>
                   </div>
                   <div>
-                    <span className="block text-[11px] font-medium text-slate-400">
-                      Duration
+                    <span className="block text-[11px] font-medium text-slate-400">Age Group</span>
+                    <span className="font-semibold text-slate-900 mt-0.5 block truncate">
+                      {formValues.ageGroup ? (
+                        <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-semibold bg-violet-50 text-violet-700 border border-violet-200">
+                          {formValues.ageGroup}
+                        </span>
+                      ) : (
+                        "All Ages"
+                      )}
                     </span>
+                  </div>
+                  <div>
+                    <span className="block text-[11px] font-medium text-slate-400">Duration</span>
                     <span className="font-semibold text-slate-900 mt-0.5 block">
                       {timelineAnalysis && !timelineAnalysis.isInvalidRange
                         ? `${timelineAnalysis.durationDays} days`
@@ -810,10 +788,9 @@ const CreateLeague = () => {
                 <span>Operational Note</span>
               </div>
               <p className="text-[11px] leading-relaxed text-slate-500">
-                Updating league dates automatically recalculates tournament
-                status across match fixtures, team registrations, and point
-                tables. Ensure start and end dates accommodate all scheduled match
-                rounds and playoff brackets.
+                Updating league dates automatically recalculates tournament status across match
+                fixtures, team registrations, and point tables. Ensure start and end dates
+                accommodate all scheduled match rounds and playoff brackets.
               </p>
             </div>
           </div>
@@ -842,8 +819,8 @@ const CreateLeague = () => {
               {isSaving
                 ? "Saving Changes..."
                 : isEditMode
-                ? "Update League Season"
-                : "Create League Season"}
+                  ? "Update League Season"
+                  : "Create League Season"}
             </span>
           </button>
         </div>

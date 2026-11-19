@@ -16,15 +16,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import {
-  X,
-  Upload,
-  Loader2,
-  ExternalLink,
-  Smartphone,
-  ImageIcon,
-  AlertCircle,
-} from "lucide-react";
+import { X, Upload, Loader2, ExternalLink, Smartphone, ImageIcon, AlertCircle } from "lucide-react";
 import dayjs from "dayjs";
 
 interface AppPopupModalProps {
@@ -46,7 +38,9 @@ export default function AppPopupModal({
   const [subtitle, setSubtitle] = useState("");
   const [description, setDescription] = useState("");
   const [ctaText, setCtaText] = useState("ENTER NOW");
-  const [actionType, setActionType] = useState<"screen" | "external_url" | "dismiss_only">("screen");
+  const [actionType, setActionType] = useState<"screen" | "external_url" | "dismiss_only">(
+    "screen"
+  );
   const [targetScreen, setTargetScreen] = useState("");
   const [screenName, setScreenName] = useState("");
   const [screenConstant, setScreenConstant] = useState("");
@@ -98,7 +92,9 @@ export default function AppPopupModal({
     } else {
       setTitle("");
       setSubtitle("Powered by Passion.");
-      setDescription("Win exclusive rewards and discover new features across competitions and matches.");
+      setDescription(
+        "Win exclusive rewards and discover new features across competitions and matches."
+      );
       setCtaText("ENTER NOW");
       setActionType("screen");
       setTargetScreen("/promotional_zone_screen");
@@ -279,7 +275,9 @@ export default function AppPopupModal({
                 <label className="flex-1 cursor-pointer border border-dashed border-slate-300 hover:border-slate-400 bg-slate-50 hover:bg-slate-100/60 rounded-md p-3.5 transition-colors text-center flex flex-col items-center justify-center">
                   <Upload className="w-5 h-5 text-slate-400 mb-1" />
                   <span className="text-xs font-medium text-slate-700">Choose banner asset</span>
-                  <span className="text-[11px] text-slate-400 mt-0.5">PNG, JPG, WebP recommended</span>
+                  <span className="text-[11px] text-slate-400 mt-0.5">
+                    PNG, JPG, WebP recommended
+                  </span>
                   <input
                     type="file"
                     accept="image/*"
@@ -289,11 +287,7 @@ export default function AppPopupModal({
                 </label>
                 {imagePreview && (
                   <div className="w-24 h-18 rounded border border-slate-200 bg-slate-100 shrink-0 relative overflow-hidden group">
-                    <img
-                      src={imagePreview}
-                      alt="Preview"
-                      className="w-full h-full object-cover"
-                    />
+                    <img src={imagePreview} alt="Preview" className="w-full h-full object-cover" />
                     <button
                       type="button"
                       onClick={() => {
@@ -329,10 +323,7 @@ export default function AppPopupModal({
                 <label className="block text-xs font-medium text-slate-700 mb-1">
                   Destination Type
                 </label>
-                <Select
-                  value={actionType}
-                  onValueChange={(val: any) => setActionType(val)}
-                >
+                <Select value={actionType} onValueChange={(val: any) => setActionType(val)}>
                   <SelectTrigger className="w-full h-9 px-3 rounded-md border border-slate-200 text-xs text-slate-900 bg-white hover:border-slate-300 focus:ring-1 focus:ring-slate-900">
                     <SelectValue placeholder="Select destination type" />
                   </SelectTrigger>
@@ -419,13 +410,8 @@ export default function AppPopupModal({
             {/* Delivery Rules (Custom Selects) */}
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
               <div>
-                <label className="block text-xs font-medium text-slate-700 mb-1">
-                  Frequency
-                </label>
-                <Select
-                  value={showFrequency}
-                  onValueChange={(val: any) => setShowFrequency(val)}
-                >
+                <label className="block text-xs font-medium text-slate-700 mb-1">Frequency</label>
+                <Select value={showFrequency} onValueChange={(val: any) => setShowFrequency(val)}>
                   <SelectTrigger className="w-full h-9 px-3 rounded-md border border-slate-200 text-xs text-slate-900 bg-white hover:border-slate-300 focus:ring-1 focus:ring-slate-900">
                     <SelectValue placeholder="Select frequency" />
                   </SelectTrigger>
@@ -444,13 +430,8 @@ export default function AppPopupModal({
               </div>
 
               <div>
-                <label className="block text-xs font-medium text-slate-700 mb-1">
-                  Status
-                </label>
-                <Select
-                  value={status}
-                  onValueChange={(val: any) => setStatus(val)}
-                >
+                <label className="block text-xs font-medium text-slate-700 mb-1">Status</label>
+                <Select value={status} onValueChange={(val: any) => setStatus(val)}>
                   <SelectTrigger className="w-full h-9 px-3 rounded-md border border-slate-200 text-xs text-slate-900 bg-white hover:border-slate-300 focus:ring-1 focus:ring-slate-900">
                     <SelectValue placeholder="Select status" />
                   </SelectTrigger>
@@ -466,9 +447,7 @@ export default function AppPopupModal({
               </div>
 
               <div>
-                <label className="block text-xs font-medium text-slate-700 mb-1">
-                  Priority
-                </label>
+                <label className="block text-xs font-medium text-slate-700 mb-1">Priority</label>
                 <input
                   type="number"
                   value={priority}
@@ -482,23 +461,13 @@ export default function AppPopupModal({
             {/* Schedule Dates */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
               <div>
-                <label className="block text-xs font-medium text-slate-700 mb-1">
-                  Start Date
-                </label>
-                <CustomDatePicker
-                  value={startDate}
-                  onChange={(d) => setStartDate(d)}
-                />
+                <label className="block text-xs font-medium text-slate-700 mb-1">Start Date</label>
+                <CustomDatePicker value={startDate} onChange={(d) => setStartDate(d)} />
               </div>
 
               <div>
-                <label className="block text-xs font-medium text-slate-700 mb-1">
-                  End Date
-                </label>
-                <CustomDatePicker
-                  value={endDate}
-                  onChange={(d) => setEndDate(d)}
-                />
+                <label className="block text-xs font-medium text-slate-700 mb-1">End Date</label>
+                <CustomDatePicker value={endDate} onChange={(d) => setEndDate(d)} />
               </div>
             </div>
 
@@ -578,7 +547,8 @@ export default function AppPopupModal({
                       {title || "CAMPAIGN HEADLINE"}
                     </h3>
                     <p className="text-[9px] text-slate-500 mt-1 leading-normal line-clamp-3">
-                      {description || "Promotional description text will appear here for mobile users."}
+                      {description ||
+                        "Promotional description text will appear here for mobile users."}
                     </p>
 
                     {/* CTA Button */}

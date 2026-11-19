@@ -48,9 +48,7 @@ function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
         <header className="h-16 flex-shrink-0 bg-white border-b border-slate-200 z-20 shadow-2xs">
           <Header />
         </header>
-        <main className="flex-1 bg-slate-100 overflow-y-auto custom-page-scroll">
-          {children}
-        </main>
+        <main className="flex-1 bg-slate-100 overflow-y-auto custom-page-scroll">{children}</main>
         <HotToaster position="top-right" reverseOrder={false} />
         <SonnerToaster position="top-right" richColors />
       </div>

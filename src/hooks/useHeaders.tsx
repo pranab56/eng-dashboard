@@ -25,9 +25,7 @@ export const HeadersProvider = ({ children }: { children: ReactNode }) => {
   const [headers, setHeaders] = useState<HeadersType>(initialHeaders);
 
   return (
-    <HeadersContext.Provider value={{ headers, setHeaders }}>
-      {children}
-    </HeadersContext.Provider>
+    <HeadersContext.Provider value={{ headers, setHeaders }}>{children}</HeadersContext.Provider>
   );
 };
 

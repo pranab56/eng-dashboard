@@ -21,12 +21,7 @@ export const scorePredictionApi = baseApi.injectEndpoints({
     }),
 
     getAllPredictionRounds: builder.query({
-      query: ({
-        page = 1,
-        limit = 10,
-        searchTerm = "",
-        status = "",
-      } = {}) => {
+      query: ({ page = 1, limit = 10, searchTerm = "", status = "" } = {}) => {
         let url = "/score-prediction";
         const params = [];
         if (page) params.push(`page=${page}`);

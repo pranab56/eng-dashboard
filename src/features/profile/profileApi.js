@@ -1,6 +1,5 @@
 import { baseApi } from "../../utils/apiBaseQuery";
 
-
 export const profileApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
     getProfile: builder.query({
@@ -8,7 +7,7 @@ export const profileApi = baseApi.injectEndpoints({
         url: "/user/profile",
         method: "GET",
       }),
-      providesTags: ["profile"]
+      providesTags: ["profile"],
     }),
 
     updateProfile: builder.mutation({
@@ -17,7 +16,7 @@ export const profileApi = baseApi.injectEndpoints({
         method: "PATCH",
         body: data,
       }),
-      invalidatesTags: ["profile"]
+      invalidatesTags: ["profile"],
     }),
 
     changePassword: builder.mutation({
@@ -26,19 +25,15 @@ export const profileApi = baseApi.injectEndpoints({
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "Authorization": `Bearer ${localStorage.getItem("token")}`,
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
         body: data,
       }),
-      invalidatesTags: ["profile"]
+      invalidatesTags: ["profile"],
     }),
-
   }),
 });
 
 // Export hooks
-export const {
-  useGetProfileQuery,
-  useUpdateProfileMutation,
-  useChangePasswordMutation,
-} = profileApi;
+export const { useGetProfileQuery, useUpdateProfileMutation, useChangePasswordMutation } =
+  profileApi;

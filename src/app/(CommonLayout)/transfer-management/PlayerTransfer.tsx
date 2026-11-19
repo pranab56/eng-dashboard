@@ -1,9 +1,9 @@
-import React from 'react';
-import Image from 'next/image';
-import CancelButton from '@/components/buttons/CancelButton';
-import CustomButton from '@/components/buttons/CustomButton';
-import { closeCustomModal } from '@/components/modals/CustomModal';
-import { toast } from 'sonner';
+import React from "react";
+import Image from "next/image";
+import CancelButton from "@/components/buttons/CancelButton";
+import CustomButton from "@/components/buttons/CustomButton";
+import { closeCustomModal } from "@/components/modals/CustomModal";
+import { toast } from "sonner";
 
 interface PlayerDetailProps {
   name: string;
@@ -18,10 +18,10 @@ interface PlayerDetailProps {
 }
 
 const PlayerTransferDetail = () => {
-
   const playerData: PlayerDetailProps = {
     name: "Elias Thorne",
-    avatarUrl: "https://res.cloudinary.com/dbq7y6byo/image/upload/v1775630362/ENG/player1_m3knp4.png",
+    avatarUrl:
+      "https://res.cloudinary.com/dbq7y6byo/image/upload/v1775630362/ENG/player1_m3knp4.png",
     age: 12,
     position: "Forward",
     currentClub: "Manchester City FC",
@@ -42,18 +42,12 @@ const PlayerTransferDetail = () => {
     closeCustomModal();
   };
 
-
   return (
     <div className="max-w-3xl p-6 bg-white rounded-xl">
       {/* Header Section */}
       <div className="flex items-center gap-4 mb-8">
         <div className="relative w-20 h-20 overflow-hidden rounded-full border-2 border-gray-100">
-          <Image
-            src={playerData?.avatarUrl}
-            alt={playerData?.name}
-            fill
-            className="object-cover"
-          />
+          <Image src={playerData?.avatarUrl} alt={playerData?.name} fill className="object-cover" />
         </div>
         <div>
           <h2 className="text-2xl font-medium text-gray-900">{playerData?.name}</h2>

@@ -36,12 +36,9 @@ const SocialMediaManagement = () => {
     pageNumber: page,
   });
 
-  const [createSocialMedia, { isLoading: isCreating }] =
-    useCreateSocialMediaMutation();
-  const [updateSocialMedia, { isLoading: isUpdating }] =
-    useUpdateSocialMediaMutation();
-  const [deleteSocialMedia, { isLoading: isDeleting }] =
-    useDeleteSocialMediaMutation();
+  const [createSocialMedia, { isLoading: isCreating }] = useCreateSocialMediaMutation();
+  const [updateSocialMedia, { isLoading: isUpdating }] = useUpdateSocialMediaMutation();
+  const [deleteSocialMedia, { isLoading: isDeleting }] = useDeleteSocialMediaMutation();
 
   const links: TSocialMedia[] = socialData?.data || [];
   const pagination = socialData?.pagination || { total: 0, totalPage: 1 };
@@ -84,9 +81,7 @@ const SocialMediaManagement = () => {
           data,
         }).unwrap();
         if (res.success !== false) {
-          toast.success(
-            res.message || "Social media link updated successfully"
-          );
+          toast.success(res.message || "Social media link updated successfully");
           setIsModalOpen(false);
           setEditingItem(null);
         } else {
@@ -95,9 +90,7 @@ const SocialMediaManagement = () => {
       } else {
         const res = await createSocialMedia(data).unwrap();
         if (res.success !== false) {
-          toast.success(
-            res.message || "Social media link created successfully"
-          );
+          toast.success(res.message || "Social media link created successfully");
           setIsModalOpen(false);
           setEditingItem(null);
         } else {
@@ -230,11 +223,7 @@ const SocialMediaManagement = () => {
 
         {/* Table Content */}
         <div className="overflow-x-auto">
-          <CustomTable<TSocialMedia>
-            columns={columns}
-            data={links}
-            isLoading={isLoading}
-          />
+          <CustomTable<TSocialMedia> columns={columns} data={links} isLoading={isLoading} />
         </div>
 
         {/* Pagination */}

@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-"use client"
+"use client";
 
-import { Suspense } from 'react';
+import { Suspense } from "react";
 import {
   XAxis,
   YAxis,
@@ -11,9 +11,9 @@ import {
   Area,
   ResponsiveContainer,
 } from "recharts";
-import { useSearchParams } from 'next/navigation';
-import { selectOptionsRevenue } from '@/types/optionTypes';
-import CustomSelectOption from './CustomSelectOption';
+import { useSearchParams } from "next/navigation";
+import { selectOptionsRevenue } from "@/types/optionTypes";
+import CustomSelectOption from "./CustomSelectOption";
 
 interface TData {
   duration: string;
@@ -23,61 +23,58 @@ interface TData {
 const data: TData[] = [
   {
     duration: "January",
-    revenue: 120
+    revenue: 120,
   },
   {
     duration: "February",
-    revenue: 2000
+    revenue: 2000,
   },
   {
     duration: "March",
-    revenue: 500
+    revenue: 500,
   },
   {
     duration: "April",
-    revenue: 1000
+    revenue: 1000,
   },
   {
     duration: "May",
-    revenue: 100
+    revenue: 100,
   },
   {
     duration: "June",
-    revenue: 2100
+    revenue: 2100,
   },
   {
     duration: "July",
-    revenue: 1000
+    revenue: 1000,
   },
   {
     duration: "August",
-    revenue: 2300
+    revenue: 2300,
   },
   {
     duration: "September",
-    revenue: 100
+    revenue: 100,
   },
   {
     duration: "October",
-    revenue: 1000
+    revenue: 1000,
   },
   {
     duration: "November",
-    revenue: 600
+    revenue: 600,
   },
   {
     duration: "December",
-    revenue: 800
+    revenue: 800,
   },
-]
-
-
+];
 
 function SubscriptionGraphSuspense() {
   const searchParams = useSearchParams();
   const revenueDuration = searchParams.get("revenueDuration") ?? "2025";
   console.log(revenueDuration);
-
 
   // Custom Tooltip Function
   const renderCustomTooltip = ({ active, payload }: any) => {
@@ -95,8 +92,14 @@ function SubscriptionGraphSuspense() {
             boxShadow: "0px 4px 6px rgba(0, 0, 0, 0.1)", // Optional: Adds a subtle shadow
           }}
         >
-          <p><strong>$ {revenue}</strong> Revenue</p>
-          <p><strong>{duration}, {revenueDuration}</strong></p>
+          <p>
+            <strong>$ {revenue}</strong> Revenue
+          </p>
+          <p>
+            <strong>
+              {duration}, {revenueDuration}
+            </strong>
+          </p>
         </div>
       );
     }
@@ -107,8 +110,12 @@ function SubscriptionGraphSuspense() {
     <div className="w-full  rounded-2xl p-3 bg-white py-10">
       <div className="flex items-center justify-between mb-1 px-8 pb-8">
         <h2 className="text-2xl font-medium text-gray-700">Total Revenue</h2>
-        <div className='w-30'>
-          <CustomSelectOption selectOptions={selectOptionsRevenue} placeHolderValue="Select Year" queryKey="revenueDuration" />
+        <div className="w-30">
+          <CustomSelectOption
+            selectOptions={selectOptionsRevenue}
+            placeHolderValue="Select Year"
+            queryKey="revenueDuration"
+          />
         </div>
       </div>
       <ResponsiveContainer width="100%" height={500}>
@@ -123,7 +130,13 @@ function SubscriptionGraphSuspense() {
           }}
         >
           <CartesianGrid strokeDasharray="0 4" />
-          <XAxis dataKey="duration" tick={{ fontSize: 14 }} tickLine={false} axisLine={false} tickMargin={20} />
+          <XAxis
+            dataKey="duration"
+            tick={{ fontSize: 14 }}
+            tickLine={false}
+            axisLine={false}
+            tickMargin={20}
+          />
           <YAxis tickLine={false} axisLine={false} tickMargin={20} />
           <Tooltip content={renderCustomTooltip} />
 
@@ -157,8 +170,8 @@ function SubscriptionGraphSuspense() {
 
 export default function RevenueGraph() {
   return (
-    <Suspense fallback={<div></div>} >
+    <Suspense fallback={<div></div>}>
       <SubscriptionGraphSuspense />
     </Suspense>
-  )
+  );
 }

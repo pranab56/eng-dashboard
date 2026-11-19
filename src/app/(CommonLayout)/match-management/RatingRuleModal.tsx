@@ -1,12 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import {
   useGetMatchFeedbackSettingQuery,
   useUpdateMatchFeedbackSettingMutation,
@@ -27,8 +22,9 @@ const PRESET_HOURS = [
 ];
 
 const RatingRuleModal = ({ isOpen, onClose }: RatingRuleModalProps) => {
-  const { data: settingData, isLoading: isFetching } =
-    useGetMatchFeedbackSettingQuery(undefined, { skip: !isOpen });
+  const { data: settingData, isLoading: isFetching } = useGetMatchFeedbackSettingQuery(undefined, {
+    skip: !isOpen,
+  });
   const [updateMatchFeedbackSetting, { isLoading: isSaving }] =
     useUpdateMatchFeedbackSettingMutation();
 
@@ -38,8 +34,7 @@ const RatingRuleModal = ({ isOpen, onClose }: RatingRuleModalProps) => {
 
   useEffect(() => {
     if (settingData?.data) {
-      const { isFeedbackWindowRestricted, feedbackWindowHours, timezone } =
-        settingData.data;
+      const { isFeedbackWindowRestricted, feedbackWindowHours, timezone } = settingData.data;
       setIsRestricted(isFeedbackWindowRestricted !== false);
       setFeedbackHours(Number(feedbackWindowHours) || 24);
       if (timezone) setFeedbackTimezone(timezone);
@@ -120,7 +115,8 @@ const RatingRuleModal = ({ isOpen, onClose }: RatingRuleModalProps) => {
                 </span>
               </div>
               <p className="text-xs text-slate-500 dark:text-slate-400 leading-normal max-w-sm">
-                When enabled, ratings and feedback must be submitted within the specified time window after a match ends.
+                When enabled, ratings and feedback must be submitted within the specified time
+                window after a match ends.
               </p>
             </div>
 
@@ -194,7 +190,8 @@ const RatingRuleModal = ({ isOpen, onClose }: RatingRuleModalProps) => {
             </div>
           ) : (
             <div className="p-3.5 rounded-lg bg-slate-50 dark:bg-slate-800/50 border border-slate-200/80 dark:border-slate-800 text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
-              Time restriction is turned off. Evaluators can submit ratings and feedback at any point after the match without encountering an expiration block.
+              Time restriction is turned off. Evaluators can submit ratings and feedback at any
+              point after the match without encountering an expiration block.
             </div>
           )}
 

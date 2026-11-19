@@ -7,7 +7,9 @@
     "build": "next build",
     "postbuild": "node scripts/fix-manifest.js",
     "start": "node scripts/fix-manifest.js && next start -p 3010",
-    "lint": "next lint"
+    "lint": "next lint",
+    "format": "prettier --write .",
+    "format:check": "prettier --check ."
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.1",
@@ -50,6 +52,7 @@
     "@types/react-dom": "^19",
     "eslint": "^9",
     "eslint-config-next": "15.4.5",
+    "prettier": "^3.10.1",
     "tailwindcss": "^4",
     "tw-animate-css": "^1.3.6",
     "typescript": "^5"

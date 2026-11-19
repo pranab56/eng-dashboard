@@ -88,9 +88,7 @@ export default function QuizModal({
       setRewardPoints(editingItem.rewardPoints ?? 50);
       setPassingPercentage(editingItem.passingPercentage ?? 70);
       setTimeLimitSeconds(editingItem.timeLimitSeconds ?? 120);
-      setStartDate(
-        editingItem.startDate ? editingItem.startDate.split("T")[0] : ""
-      );
+      setStartDate(editingItem.startDate ? editingItem.startDate.split("T")[0] : "");
       setEndDate(editingItem.endDate ? editingItem.endDate.split("T")[0] : "");
       setStatus(editingItem.status || "active");
 
@@ -98,9 +96,8 @@ export default function QuizModal({
         setQuestions(
           editingItem.questions.map((q: any) => ({
             question: q.question || "",
-            options: Array.isArray(q.options) && q.options.length >= 2
-              ? q.options
-              : ["", "", "", ""],
+            options:
+              Array.isArray(q.options) && q.options.length >= 2 ? q.options : ["", "", "", ""],
             correctOptionIndex: Number(q.correctOptionIndex) || 0,
             explanation: q.explanation || "",
             points: Number(q.points) || 10,
@@ -167,21 +164,13 @@ export default function QuizModal({
     setQuestions(questions.filter((_, idx) => idx !== qIndex));
   };
 
-  const handleQuestionFieldChange = (
-    qIndex: number,
-    field: keyof QuestionItem,
-    val: any
-  ) => {
+  const handleQuestionFieldChange = (qIndex: number, field: keyof QuestionItem, val: any) => {
     const updated = [...questions];
     updated[qIndex] = { ...updated[qIndex], [field]: val };
     setQuestions(updated);
   };
 
-  const handleOptionChange = (
-    qIndex: number,
-    optIndex: number,
-    val: string
-  ) => {
+  const handleOptionChange = (qIndex: number, optIndex: number, val: string) => {
     const updated = [...questions];
     const newOptions = [...updated[qIndex].options];
     newOptions[optIndex] = val;
@@ -322,13 +311,8 @@ export default function QuizModal({
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-slate-700 mb-1">
-                Category
-              </label>
-              <Select
-                value={category}
-                onValueChange={(val) => setCategory(val)}
-              >
+              <label className="block text-xs font-semibold text-slate-700 mb-1">Category</label>
+              <Select value={category} onValueChange={(val) => setCategory(val)}>
                 <SelectTrigger className="w-full h-8 px-2.5 rounded-md border border-slate-200 text-xs text-slate-900 bg-white shadow-2xs">
                   <SelectValue placeholder="Select Category" />
                 </SelectTrigger>
@@ -343,20 +327,21 @@ export default function QuizModal({
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-slate-700 mb-1">
-                Status
-              </label>
-              <Select
-                value={status}
-                onValueChange={(val: any) => setStatus(val)}
-              >
+              <label className="block text-xs font-semibold text-slate-700 mb-1">Status</label>
+              <Select value={status} onValueChange={(val: any) => setStatus(val)}>
                 <SelectTrigger className="w-full h-8 px-2.5 rounded-md border border-slate-200 text-xs text-slate-900 bg-white shadow-2xs">
                   <SelectValue placeholder="Select Status" />
                 </SelectTrigger>
                 <SelectContent className="bg-white border-slate-200">
-                  <SelectItem value="active" className="text-xs">Active (Available for Playing)</SelectItem>
-                  <SelectItem value="draft" className="text-xs">Draft (Hidden)</SelectItem>
-                  <SelectItem value="completed" className="text-xs">Completed / Closed</SelectItem>
+                  <SelectItem value="active" className="text-xs">
+                    Active (Available for Playing)
+                  </SelectItem>
+                  <SelectItem value="draft" className="text-xs">
+                    Draft (Hidden)
+                  </SelectItem>
+                  <SelectItem value="completed" className="text-xs">
+                    Completed / Closed
+                  </SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -461,11 +446,7 @@ export default function QuizModal({
               </label>
               {bannerPreview && (
                 <div className="relative inline-block border border-slate-200 rounded overflow-hidden h-9 w-20 bg-slate-100">
-                  <img
-                    src={bannerPreview}
-                    alt="Preview"
-                    className="w-full h-full object-cover"
-                  />
+                  <img src={bannerPreview} alt="Preview" className="w-full h-full object-cover" />
                   <button
                     type="button"
                     onClick={handleRemoveBanner}
@@ -518,11 +499,7 @@ export default function QuizModal({
                           min={1}
                           value={q.points}
                           onChange={(e) =>
-                            handleQuestionFieldChange(
-                              qIdx,
-                              "points",
-                              Number(e.target.value) || 10
-                            )
+                            handleQuestionFieldChange(qIdx, "points", Number(e.target.value) || 10)
                           }
                           className="w-12 h-6 px-1 border border-slate-200 rounded text-center font-mono text-xs"
                         />
@@ -544,9 +521,7 @@ export default function QuizModal({
                     required
                     placeholder="Enter question text..."
                     value={q.question}
-                    onChange={(e) =>
-                      handleQuestionFieldChange(qIdx, "question", e.target.value)
-                    }
+                    onChange={(e) => handleQuestionFieldChange(qIdx, "question", e.target.value)}
                     className="w-full h-7 px-2 border border-slate-200 rounded text-xs text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-slate-400"
                   />
 
@@ -566,11 +541,7 @@ export default function QuizModal({
                           name={`correct-opt-${qIdx}`}
                           checked={q.correctOptionIndex === optIdx}
                           onChange={() =>
-                            handleQuestionFieldChange(
-                              qIdx,
-                              "correctOptionIndex",
-                              optIdx
-                            )
+                            handleQuestionFieldChange(qIdx, "correctOptionIndex", optIdx)
                           }
                           className="w-3.5 h-3.5 text-emerald-600 focus:ring-0 cursor-pointer ml-1"
                           title="Mark as correct answer"
@@ -583,9 +554,7 @@ export default function QuizModal({
                           required={optIdx < 2}
                           placeholder={`Option ${String.fromCharCode(65 + optIdx)}`}
                           value={opt}
-                          onChange={(e) =>
-                            handleOptionChange(qIdx, optIdx, e.target.value)
-                          }
+                          onChange={(e) => handleOptionChange(qIdx, optIdx, e.target.value)}
                           className="flex-1 h-6 px-1.5 text-xs text-slate-900 bg-transparent border-0 focus:outline-none placeholder:text-slate-300"
                         />
                       </div>
@@ -597,9 +566,7 @@ export default function QuizModal({
                     type="text"
                     placeholder="Optional explanation / answer context..."
                     value={q.explanation}
-                    onChange={(e) =>
-                      handleQuestionFieldChange(qIdx, "explanation", e.target.value)
-                    }
+                    onChange={(e) => handleQuestionFieldChange(qIdx, "explanation", e.target.value)}
                     className="w-full h-6 px-2 text-[11px] text-slate-600 bg-slate-50 border border-slate-200 rounded placeholder:text-slate-400 focus:outline-none"
                   />
                 </div>

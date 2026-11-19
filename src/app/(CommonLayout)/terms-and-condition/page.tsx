@@ -14,7 +14,8 @@ const JoditEditor = dynamic(() => import("jodit-react"), { ssr: false });
 const joditConfig = {
   height: 580,
   readonly: false,
-  placeholder: "Draft official terms and conditions, tournament liability disclaimers, player registration agreements, and refund policies...",
+  placeholder:
+    "Draft official terms and conditions, tournament liability disclaimers, player registration agreements, and refund policies...",
   toolbarSticky: false,
   buttons: [
     "bold",
@@ -135,7 +136,12 @@ const TermsCondition = () => {
             </div>
             <p className="text-xs text-slate-500 mt-1">
               {lastUpdated ? (
-                <>Last published: <strong className="text-slate-700 font-medium">{dayjs(lastUpdated).format("MMM DD, YYYY · hh:mm A")}</strong></>
+                <>
+                  Last published:{" "}
+                  <strong className="text-slate-700 font-medium">
+                    {dayjs(lastUpdated).format("MMM DD, YYYY · hh:mm A")}
+                  </strong>
+                </>
               ) : (
                 "Define club rules, tournament participation terms, payment regulations, and user code of conduct."
               )}

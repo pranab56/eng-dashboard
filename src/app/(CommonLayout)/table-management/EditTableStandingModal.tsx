@@ -2,24 +2,14 @@
 
 import React, { useEffect, useState } from "react";
 import Image from "next/image";
-import {
-  Dialog,
-  DialogContent,
-  DialogTitle,
-} from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import {
   useUpdateTableStandingMutation,
   useResetTableStandingMutation,
 } from "@/features/tableManagement/tableApi";
 import { formatImagePath } from "@/utils/formatImagePath";
 import { toast } from "sonner";
-import {
-  X,
-  Loader2,
-  RotateCcw,
-  Check,
-  Calculator,
-} from "lucide-react";
+import { X, Loader2, RotateCcw, Check, Calculator } from "lucide-react";
 
 interface EditTableStandingModalProps {
   isOpen: boolean;
@@ -49,10 +39,8 @@ export const EditTableStandingModal: React.FC<EditTableStandingModalProps> = ({
   const [goalDifference, setGoalDifference] = useState<number>(0);
   const [points, setPoints] = useState<number>(0);
 
-  const [updateTableStanding, { isLoading: isUpdating }] =
-    useUpdateTableStandingMutation();
-  const [resetTableStanding, { isLoading: isResetting }] =
-    useResetTableStandingMutation();
+  const [updateTableStanding, { isLoading: isUpdating }] = useUpdateTableStandingMutation();
+  const [resetTableStanding, { isLoading: isResetting }] = useResetTableStandingMutation();
 
   const team = standing?.team;
   const teamId = team?._id || team?.id;
@@ -65,12 +53,8 @@ export const EditTableStandingModal: React.FC<EditTableStandingModalProps> = ({
       const l = Number(standing.loss ?? 0);
       const gf = Number(standing.goalsFor ?? 0);
       const ga = Number(standing.goalsAgainst ?? 0);
-      const gd =
-        standing.goalDifference !== undefined
-          ? Number(standing.goalDifference)
-          : gf - ga;
-      const pts =
-        standing.points !== undefined ? Number(standing.points) : w * 3 + d;
+      const gd = standing.goalDifference !== undefined ? Number(standing.goalDifference) : gf - ga;
+      const pts = standing.points !== undefined ? Number(standing.points) : w * 3 + d;
 
       setPlayed(p);
       setWin(w);
@@ -222,9 +206,7 @@ export const EditTableStandingModal: React.FC<EditTableStandingModalProps> = ({
               </div>
 
               <div>
-                <label className="text-[11px] font-medium text-slate-500 block mb-1">
-                  Won (W)
-                </label>
+                <label className="text-[11px] font-medium text-slate-500 block mb-1">Won (W)</label>
                 <input
                   type="number"
                   min="0"

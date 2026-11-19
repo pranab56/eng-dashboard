@@ -2,17 +2,8 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { TTournament, TPositionReward } from "@/types/columnTypes";
 import dayjs from "dayjs";
 import {
@@ -65,8 +56,7 @@ export default function TournamentFormModal({
   const [status, setStatus] = useState("upcoming");
   const [statusPopoverOpen, setStatusPopoverOpen] = useState(false);
   const [prizeCoins, setPrizeCoins] = useState<number | undefined>(undefined);
-  const [positionRewards, setPositionRewards] =
-    useState<TPositionReward[]>(DEFAULT_REWARDS);
+  const [positionRewards, setPositionRewards] = useState<TPositionReward[]>(DEFAULT_REWARDS);
   const [errorMsg, setErrorMsg] = useState("");
 
   useEffect(() => {
@@ -74,20 +64,15 @@ export default function TournamentFormModal({
       setTitle(editingTournament.title || "");
       setDescription(editingTournament.description || "");
       setStartDate(
-        editingTournament.startDate
-          ? dayjs(editingTournament.startDate).format("YYYY-MM-DD")
-          : ""
+        editingTournament.startDate ? dayjs(editingTournament.startDate).format("YYYY-MM-DD") : ""
       );
       setEndDate(
-        editingTournament.endDate
-          ? dayjs(editingTournament.endDate).format("YYYY-MM-DD")
-          : ""
+        editingTournament.endDate ? dayjs(editingTournament.endDate).format("YYYY-MM-DD") : ""
       );
       setStatus(editingTournament.status || "upcoming");
       setPrizeCoins(editingTournament.prizeCoins);
       setPositionRewards(
-        editingTournament.positionRewards &&
-          editingTournament.positionRewards.length > 0
+        editingTournament.positionRewards && editingTournament.positionRewards.length > 0
           ? editingTournament.positionRewards
           : DEFAULT_REWARDS
       );
@@ -316,11 +301,7 @@ export default function TournamentFormModal({
                 min={0}
                 placeholder="e.g. 1750"
                 value={prizeCoins !== undefined ? prizeCoins : ""}
-                onChange={(e) =>
-                  setPrizeCoins(
-                    e.target.value ? Number(e.target.value) : undefined
-                  )
-                }
+                onChange={(e) => setPrizeCoins(e.target.value ? Number(e.target.value) : undefined)}
                 disabled={isLoading}
                 className="w-full h-10 px-3.5 bg-white border border-slate-200 rounded-md text-xs sm:text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-slate-500 focus:ring-1 focus:ring-slate-500 transition-colors"
               />
@@ -365,9 +346,7 @@ export default function TournamentFormModal({
                       type="number"
                       min={1}
                       value={reward.position}
-                      onChange={(e) =>
-                        handleRewardChange(index, "position", e.target.value)
-                      }
+                      onChange={(e) => handleRewardChange(index, "position", e.target.value)}
                       className="w-full h-8 px-2 bg-white border border-slate-200 rounded text-xs font-semibold text-center text-slate-900"
                     />
                   </div>
@@ -380,13 +359,7 @@ export default function TournamentFormModal({
                       type="text"
                       placeholder="e.g. Champion, Runner Up..."
                       value={reward.positionName}
-                      onChange={(e) =>
-                        handleRewardChange(
-                          index,
-                          "positionName",
-                          e.target.value
-                        )
-                      }
+                      onChange={(e) => handleRewardChange(index, "positionName", e.target.value)}
                       className="w-full h-8 px-2.5 bg-white border border-slate-200 rounded text-xs text-slate-900 font-medium"
                     />
                   </div>
@@ -399,9 +372,7 @@ export default function TournamentFormModal({
                       type="number"
                       placeholder="1000"
                       value={reward.points}
-                      onChange={(e) =>
-                        handleRewardChange(index, "points", e.target.value)
-                      }
+                      onChange={(e) => handleRewardChange(index, "points", e.target.value)}
                       className="w-full h-8 px-2 bg-white border border-slate-200 rounded text-xs font-bold text-slate-900"
                     />
                   </div>
@@ -444,9 +415,7 @@ export default function TournamentFormModal({
               className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-md bg-slate-900 text-white hover:bg-slate-800 text-xs font-semibold transition-colors shadow-2xs cursor-pointer disabled:opacity-50"
             >
               {isLoading && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
-              <span>
-                {editingTournament ? "Update Tournament" : "Create Tournament"}
-              </span>
+              <span>{editingTournament ? "Update Tournament" : "Create Tournament"}</span>
             </button>
           </div>
         </form>

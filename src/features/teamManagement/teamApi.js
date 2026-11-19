@@ -8,7 +8,7 @@ export const teamApi = baseApi.injectEndpoints({
         method: "POST",
         body: data,
       }),
-      invalidatesTags: ["team"]
+      invalidatesTags: ["team"],
     }),
 
     updateTeam: builder.mutation({
@@ -17,7 +17,7 @@ export const teamApi = baseApi.injectEndpoints({
         method: "PATCH",
         body: data,
       }),
-      invalidatesTags: ["team"]
+      invalidatesTags: ["team"],
     }),
 
     getAllTeam: builder.query({
@@ -26,7 +26,12 @@ export const teamApi = baseApi.injectEndpoints({
         if (typeof params === "object" && params !== null) {
           const queryParts = [];
           Object.keys(params).forEach((key) => {
-            if (params[key] !== undefined && params[key] !== null && params[key] !== "" && params[key] !== "ALL") {
+            if (
+              params[key] !== undefined &&
+              params[key] !== null &&
+              params[key] !== "" &&
+              params[key] !== "ALL"
+            ) {
               queryParts.push(`${key}=${encodeURIComponent(params[key])}`);
             }
           });
@@ -41,7 +46,7 @@ export const teamApi = baseApi.injectEndpoints({
           method: "GET",
         };
       },
-      providesTags: ["team"]
+      providesTags: ["team"],
     }),
 
     getTeamAnalytics: builder.query({
@@ -49,7 +54,7 @@ export const teamApi = baseApi.injectEndpoints({
         url: "/team/analytics",
         method: "GET",
       }),
-      providesTags: ["team"]
+      providesTags: ["team"],
     }),
 
     getSingleTeam: builder.query({
@@ -57,7 +62,7 @@ export const teamApi = baseApi.injectEndpoints({
         url: `/team/${id}`,
         method: "GET",
       }),
-      providesTags: ["team"]
+      providesTags: ["team"],
     }),
 
     deleteTeam: builder.mutation({
@@ -65,7 +70,7 @@ export const teamApi = baseApi.injectEndpoints({
         url: `/team/${id}`,
         method: "DELETE",
       }),
-      invalidatesTags: ["team"]
+      invalidatesTags: ["team"],
     }),
 
     updateBudgetAndEconomay: builder.mutation({
@@ -74,7 +79,7 @@ export const teamApi = baseApi.injectEndpoints({
         method: "POST",
         body: data,
       }),
-      invalidatesTags: ["team"]
+      invalidatesTags: ["team"],
     }),
 
     getBudgetAndEconomay: builder.query({
@@ -82,7 +87,7 @@ export const teamApi = baseApi.injectEndpoints({
         url: `/coin-budget/club-economy`,
         method: "GET",
       }),
-      providesTags: ["team"]
+      providesTags: ["team"],
     }),
 
     updateTeamCoinBudget: builder.mutation({
@@ -91,7 +96,7 @@ export const teamApi = baseApi.injectEndpoints({
         method: "PATCH",
         body: data,
       }),
-      invalidatesTags: ["team"]
+      invalidatesTags: ["team"],
     }),
 
     getTeamCoinHistory: builder.query({

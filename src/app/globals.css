@@ -4,7 +4,7 @@
 @custom-variant dark (&:is(.dark *));
 
 @theme {
-  --color-clr:oklch(71.09% 0.239 294.57);
+  --color-clr: oklch(71.09% 0.239 294.57);
 }
 
 @theme inline {
@@ -116,10 +116,9 @@
   --sidebar-ring: oklch(0.556 0 0);
 }
 
-
-
 @layer base {
-  html, body {
+  html,
+  body {
     height: 100%;
     width: 100%;
     margin: 0;
@@ -128,7 +127,8 @@
     scrollbar-width: none;
     -ms-overflow-style: none;
   }
-  html::-webkit-scrollbar, body::-webkit-scrollbar {
+  html::-webkit-scrollbar,
+  body::-webkit-scrollbar {
     display: none;
   }
   * {
@@ -165,7 +165,7 @@
   list-style-type: disc;
   padding-left: 40px;
 }
- 
+
 .jodit-wysiwyg ol {
   list-style-type: decimal;
   padding-left: 40px;

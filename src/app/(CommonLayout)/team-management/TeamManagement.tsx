@@ -4,17 +4,7 @@
 import React, { useEffect, useState, useMemo } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import {
-  Shield,
-  Plus,
-  Search,
-  X,
-  RotateCcw,
-  Trophy,
-  Users,
-  Coins,
-  Settings,
-} from "lucide-react";
+import { Shield, Plus, Search, X, RotateCcw, Trophy, Users, Coins, Settings } from "lucide-react";
 import { toast } from "sonner";
 
 import CustomPagination from "@/components/cui/CustomPagination";
@@ -73,8 +63,7 @@ const TeamManagement = () => {
   }, [managersData]);
 
   const [deleteTeam, { isLoading: isDeleting }] = useDeleteTeamMutation();
-  const [updateTeamCoinBudget, { isLoading: isUpdatingCoin }] =
-    useUpdateTeamCoinBudgetMutation();
+  const [updateTeamCoinBudget, { isLoading: isUpdatingCoin }] = useUpdateTeamCoinBudgetMutation();
 
   const [selectedTeam, setSelectedTeam] = useState<any>(null);
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
@@ -88,7 +77,6 @@ const TeamManagement = () => {
 
   const [coinTargetTeam, setCoinTargetTeam] = useState<any | null>(null);
   const [isCoinModalOpen, setIsCoinModalOpen] = useState(false);
-
 
   useEffect(() => {
     setHeaders({
@@ -111,7 +99,6 @@ const TeamManagement = () => {
     setCoinTargetTeam(team);
     setIsCoinModalOpen(true);
   };
-
 
   const handleConfirmUpdateCoin = async (coinValue: number) => {
     if (!coinTargetTeam?._id) {
@@ -169,12 +156,12 @@ const TeamManagement = () => {
   }, [teamData]);
 
   const displayedTeams = teamData?.data?.result || teamData?.data || [];
-  const totalPages =
-    teamData?.pagination?.totalPage || teamData?.meta?.totalPage || 1;
+  const totalPages = teamData?.pagination?.totalPage || teamData?.meta?.totalPage || 1;
 
   const teamAnalytics = analyticsData?.data;
   const totalCount =
-    teamAnalytics?.totalTeams ?? (teamData?.pagination?.total || teamData?.meta?.total || displayedTeams.length || 0);
+    teamAnalytics?.totalTeams ??
+    (teamData?.pagination?.total || teamData?.meta?.total || displayedTeams.length || 0);
   const totalLeaguesCount = teamAnalytics?.totalLeagues ?? allLeagues.length;
   const totalManagersCount = teamAnalytics?.totalManagers ?? allManagers.length;
   const totalEconomy = teamAnalytics?.totalCoins ?? 0;
@@ -418,8 +405,7 @@ const TeamManagement = () => {
         initialValue={coinTargetTeam?.coin ?? 0}
         isLoading={isUpdatingCoin}
       />
-
-          </div>
+    </div>
   );
 };
 

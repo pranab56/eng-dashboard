@@ -39,7 +39,11 @@ export const getLeagueColumns = (
 ): ColumnDef<any>[] => [
   {
     accessorKey: "leagueName",
-    header: () => <span className="font-semibold text-xs text-slate-600 uppercase tracking-wider">League & Season</span>,
+    header: () => (
+      <span className="font-semibold text-xs text-slate-600 uppercase tracking-wider">
+        League & Season
+      </span>
+    ),
     cell: ({ row }) => {
       const name = row.original.leagueName || row.original.title || "Unnamed League";
       const season = row.original.season || "1";
@@ -51,9 +55,13 @@ export const getLeagueColumns = (
       );
     },
   },
-    {
+  {
     accessorKey: "ageGroup",
-    header: () => <span className="font-semibold text-xs text-slate-600 uppercase tracking-wider">Age Group</span>,
+    header: () => (
+      <span className="font-semibold text-xs text-slate-600 uppercase tracking-wider">
+        Age Group
+      </span>
+    ),
     cell: ({ row }) => {
       const age = row.original.ageGroup;
       if (!age) {
@@ -68,7 +76,11 @@ export const getLeagueColumns = (
   },
   {
     accessorKey: "startDate",
-    header: () => <span className="font-semibold text-xs text-slate-600 uppercase tracking-wider">Start Date</span>,
+    header: () => (
+      <span className="font-semibold text-xs text-slate-600 uppercase tracking-wider">
+        Start Date
+      </span>
+    ),
     cell: ({ row }) => {
       const date = row.original.startDate;
       return (
@@ -80,7 +92,11 @@ export const getLeagueColumns = (
   },
   {
     accessorKey: "endDate",
-    header: () => <span className="font-semibold text-xs text-slate-600 uppercase tracking-wider">End Date</span>,
+    header: () => (
+      <span className="font-semibold text-xs text-slate-600 uppercase tracking-wider">
+        End Date
+      </span>
+    ),
     cell: ({ row }) => {
       const date = row.original.endDate;
       return (
@@ -92,7 +108,11 @@ export const getLeagueColumns = (
   },
   {
     id: "duration",
-    header: () => <span className="font-semibold text-xs text-slate-600 uppercase tracking-wider">Duration</span>,
+    header: () => (
+      <span className="font-semibold text-xs text-slate-600 uppercase tracking-wider">
+        Duration
+      </span>
+    ),
     cell: ({ row }) => {
       const start = row.original.startDate;
       const end = row.original.endDate;
@@ -107,7 +127,9 @@ export const getLeagueColumns = (
   },
   {
     accessorKey: "status",
-    header: () => <span className="font-semibold text-xs text-slate-600 uppercase tracking-wider">Status</span>,
+    header: () => (
+      <span className="font-semibold text-xs text-slate-600 uppercase tracking-wider">Status</span>
+    ),
     cell: ({ row }) => {
       const { label, dotColor, badgeStyle } = getStatusBadge(row.original.status);
       return (
@@ -122,7 +144,11 @@ export const getLeagueColumns = (
   },
   {
     id: "action",
-    header: () => <div className="text-right font-semibold text-xs text-slate-600 uppercase tracking-wider">Actions</div>,
+    header: () => (
+      <div className="text-right font-semibold text-xs text-slate-600 uppercase tracking-wider">
+        Actions
+      </div>
+    ),
     cell: ({ row }) => (
       <div className="flex items-center justify-end gap-1.5">
         <button

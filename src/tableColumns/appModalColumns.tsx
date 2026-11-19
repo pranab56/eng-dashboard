@@ -118,7 +118,10 @@ export const getAppModalColumns = (
               <Smartphone className="w-3 h-3" />
               App Screen
             </span>
-            <p className="text-xs font-medium text-slate-800 mt-1 truncate" title={item.screenName || item.targetScreen}>
+            <p
+              className="text-xs font-medium text-slate-800 mt-1 truncate"
+              title={item.screenName || item.targetScreen}
+            >
               {item.screenName || "Screen"}
             </p>
             <p className="text-[11px] text-slate-400 font-mono truncate" title={item.targetScreen}>
@@ -181,12 +184,16 @@ export const getAppModalColumns = (
         <div className="text-xs space-y-1">
           <div className="flex items-center gap-1.5 text-slate-600">
             <Eye className="w-3.5 h-3.5 text-slate-400" />
-            <span className="font-medium text-slate-900">{(item.viewsCount || 0).toLocaleString()}</span>
+            <span className="font-medium text-slate-900">
+              {(item.viewsCount || 0).toLocaleString()}
+            </span>
             <span className="text-slate-400 text-[11px]">views</span>
           </div>
           <div className="flex items-center gap-1.5 text-slate-600">
             <MousePointerClick className="w-3.5 h-3.5 text-emerald-600" />
-            <span className="font-medium text-emerald-700">{(item.clicksCount || 0).toLocaleString()}</span>
+            <span className="font-medium text-emerald-700">
+              {(item.clicksCount || 0).toLocaleString()}
+            </span>
             <span className="text-slate-400 text-[11px]">clicks</span>
           </div>
         </div>
@@ -240,9 +247,7 @@ export const getAppModalColumns = (
           title="Click to toggle active status"
         >
           <span
-            className={`w-1.5 h-1.5 rounded-full ${
-              isActive ? "bg-emerald-600" : "bg-slate-400"
-            }`}
+            className={`w-1.5 h-1.5 rounded-full ${isActive ? "bg-emerald-600" : "bg-slate-400"}`}
           />
           {isActive ? "Active" : "Inactive"}
         </button>

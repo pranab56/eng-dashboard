@@ -12,9 +12,7 @@ export const getLeagueTeamColumns = (
   {
     accessorKey: "leagueName",
     header: () => (
-      <span className="text-xs font-semibold text-slate-600 uppercase tracking-wider">
-        League
-      </span>
+      <span className="text-xs font-semibold text-slate-600 uppercase tracking-wider">League</span>
     ),
     cell: ({ row }) => {
       const league = row.original.league;
@@ -74,9 +72,7 @@ export const getLeagueTeamColumns = (
                     />
                   ) : (
                     <div className="w-full h-full bg-slate-200 flex items-center justify-center text-[10px] font-bold text-slate-600">
-                      {team?.shortName?.slice(0, 2) ||
-                        team?.teamName?.slice(0, 2) ||
-                        "T"}
+                      {team?.shortName?.slice(0, 2) || team?.teamName?.slice(0, 2) || "T"}
                     </div>
                   )}
                 </div>
@@ -112,12 +108,8 @@ export const getLeagueTeamColumns = (
     ),
     cell: ({ row }) => {
       const league = row.original.league;
-      const start = league?.startDate
-        ? dayjs(league.startDate).format("DD MMM YYYY")
-        : "—";
-      const end = league?.endDate
-        ? dayjs(league.endDate).format("DD MMM YYYY")
-        : "—";
+      const start = league?.startDate ? dayjs(league.startDate).format("DD MMM YYYY") : "—";
+      const end = league?.endDate ? dayjs(league.endDate).format("DD MMM YYYY") : "—";
 
       return (
         <div className="flex items-center gap-1.5 text-xs text-slate-600 font-medium whitespace-nowrap">

@@ -1,4 +1,4 @@
-import React from 'react';
+import React from "react";
 
 interface PlayerDetailsProps {
   fullName: string;
@@ -9,7 +9,6 @@ interface PlayerDetailsProps {
 }
 
 const PlayerDetails = () => {
-
   const playerInfo: PlayerDetailsProps = {
     fullName: "Julian Alvarez",
     position: "Forward",
@@ -20,9 +19,10 @@ const PlayerDetails = () => {
 
   return (
     <div className=" bg-white rounded-lg">
-      <p className="text-sm font-semibold text-gray-500 pb-8">Complete the details below to register a new athlete to the Apex Vanguard squad.</p>
+      <p className="text-sm font-semibold text-gray-500 pb-8">
+        Complete the details below to register a new athlete to the Apex Vanguard squad.
+      </p>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-y-6 gap-x-8">
-
         {/* Full Name - Spans both columns */}
         <div className="space-y-2 md:col-span-2">
           <label className="block text-sm font-semibold text-gray-900">Full Name</label>
@@ -62,7 +62,6 @@ const PlayerDetails = () => {
             {playerInfo?.contactStatus}
           </div>
         </div>
-
       </div>
     </div>
   );

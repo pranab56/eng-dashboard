@@ -30,11 +30,7 @@ const ImageUploadField = ({
 
   return (
     <div className="space-y-3">
-      {label && (
-        <label className="block text-[15px] font-semibold text-gray-800">
-          {label}
-        </label>
-      )}
+      {label && <label className="block text-[15px] font-semibold text-gray-800">{label}</label>}
 
       <Controller
         name={name}
@@ -43,8 +39,7 @@ const ImageUploadField = ({
           const currentValue = field.value;
 
           const currentPreview =
-            preview ||
-            (typeof currentValue === "string" ? currentValue : null);
+            preview || (typeof currentValue === "string" ? currentValue : null);
 
           return (
             <>
@@ -94,14 +89,8 @@ const ImageUploadField = ({
                       return;
                     }
 
-                    if (
-                      maxSizeMB &&
-                      maxSizeMB > 0 &&
-                      file.size > maxSizeMB * 1024 * 1024
-                    ) {
-                      toast.error(
-                        `File size must be less than ${maxSizeMB}MB`
-                      );
+                    if (maxSizeMB && maxSizeMB > 0 && file.size > maxSizeMB * 1024 * 1024) {
+                      toast.error(`File size must be less than ${maxSizeMB}MB`);
 
                       e.target.value = "";
                       return;
@@ -125,9 +114,7 @@ const ImageUploadField = ({
               </div>
 
               {error && (
-                <p className="text-sm font-medium text-red-500 mt-2 px-1">
-                  {error.message}
-                </p>
+                <p className="text-sm font-medium text-red-500 mt-2 px-1">{error.message}</p>
               )}
             </>
           );
@@ -137,11 +124,7 @@ const ImageUploadField = ({
   );
 };
 
-export const ImageChildrenComponent = ({
-  maxSizeMB,
-}: {
-  maxSizeMB?: number | string;
-}) => {
+export const ImageChildrenComponent = ({ maxSizeMB }: { maxSizeMB?: number | string }) => {
   return (
     <div className="flex flex-col items-center justify-center space-y-5">
       <div className="bg-[#0f0f0f] p-4 rounded-lg shadow-lg ring-4 ring-black/5 group-hover:scale-110 transition-transform duration-300">
@@ -149,9 +132,7 @@ export const ImageChildrenComponent = ({
       </div>
 
       <div className="text-center space-y-1">
-        <p className="text-[17px] font-medium text-gray-900">
-          Upload Image Here
-        </p>
+        <p className="text-[17px] font-medium text-gray-900">Upload Image Here</p>
 
         <p className="text-[13px] font-medium text-gray-400">
           {maxSizeMB

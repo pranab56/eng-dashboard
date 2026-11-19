@@ -1,6 +1,6 @@
-"use client"
+"use client";
 
-import React, { Suspense } from 'react'
+import React, { Suspense } from "react";
 import {
   Select,
   SelectContent,
@@ -8,23 +8,30 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select"
-import { useRouter, useSearchParams } from 'next/navigation';
+} from "@/components/ui/select";
+import { useRouter, useSearchParams } from "next/navigation";
 
 type TSelectOptions = {
   value: string;
   label: string;
-}
+};
 
-
-const CustomSelectOptionSuspense = ({ selectOptions, placeHolderValue, queryKey }: { selectOptions: TSelectOptions[], placeHolderValue: string, queryKey: string }) => {
+const CustomSelectOptionSuspense = ({
+  selectOptions,
+  placeHolderValue,
+  queryKey,
+}: {
+  selectOptions: TSelectOptions[];
+  placeHolderValue: string;
+  queryKey: string;
+}) => {
   const router = useRouter();
   const searchParams = useSearchParams();
   const selectedValue = searchParams.get(queryKey);
 
   return (
     <Select
-      onValueChange={value => {
+      onValueChange={(value) => {
         const params = new URLSearchParams(Array.from(searchParams.entries()));
         params.set(queryKey, value);
         router.replace(`?${params.toString()}`, { scroll: false });
@@ -36,20 +43,32 @@ const CustomSelectOptionSuspense = ({ selectOptions, placeHolderValue, queryKey 
       <SelectContent>
         <SelectGroup>
           {selectOptions.map((option) => (
-            <SelectItem key={option.value} value={option.value} className='cursor-pointer'>
+            <SelectItem key={option.value} value={option.value} className="cursor-pointer">
               {option.label}
             </SelectItem>
           ))}
         </SelectGroup>
       </SelectContent>
     </Select>
-  )
-}
+  );
+};
 
-export default function CustomSelectOption({ selectOptions, placeHolderValue, queryKey }: { selectOptions: TSelectOptions[], placeHolderValue: string, queryKey: string }) {
+export default function CustomSelectOption({
+  selectOptions,
+  placeHolderValue,
+  queryKey,
+}: {
+  selectOptions: TSelectOptions[];
+  placeHolderValue: string;
+  queryKey: string;
+}) {
   return (
-    <Suspense fallback={<div></div>} >
-      <CustomSelectOptionSuspense selectOptions={selectOptions} placeHolderValue={placeHolderValue} queryKey={queryKey} />
+    <Suspense fallback={<div></div>}>
+      <CustomSelectOptionSuspense
+        selectOptions={selectOptions}
+        placeHolderValue={placeHolderValue}
+        queryKey={queryKey}
+      />
     </Suspense>
-  )
+  );
 }

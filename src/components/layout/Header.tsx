@@ -98,7 +98,10 @@ const Header = () => {
 
           {/* Breadcrumb + Page Title Hierarchy */}
           <div className="min-w-0 flex flex-col justify-center">
-            <nav aria-label="Breadcrumb" className="hidden sm:flex items-center gap-1.5 text-[11px] text-slate-400 leading-none mb-1">
+            <nav
+              aria-label="Breadcrumb"
+              className="hidden sm:flex items-center gap-1.5 text-[11px] text-slate-400 leading-none mb-1"
+            >
               <Link
                 href="/"
                 className="hover:text-slate-700 transition-colors flex items-center gap-1"
@@ -173,9 +176,7 @@ const Header = () => {
                       className="w-full h-full object-cover"
                     />
                   ) : (
-                    <span className="font-bold text-[11px] text-slate-500">
-                      {userInitials}
-                    </span>
+                    <span className="font-bold text-[11px] text-slate-500">{userInitials}</span>
                   )}
                 </div>
 
@@ -193,12 +194,17 @@ const Header = () => {
               </button>
             </DropdownMenuTrigger>
 
-            <DropdownMenuContent align="end" className="w-56 p-1.5 bg-white border border-slate-200 rounded-lg shadow-lg">
+            <DropdownMenuContent
+              align="end"
+              className="w-56 p-1.5 bg-white border border-slate-200 rounded-lg shadow-lg"
+            >
               {/* Account Summary Header */}
               <DropdownMenuLabel className="p-2 font-normal">
                 <div className="flex flex-col space-y-1">
                   <p className="text-xs font-semibold text-slate-900 truncate">
-                    {user?.userName || `${user?.firstName || ""} ${user?.lastName || ""}`.trim() || "Admin Account"}
+                    {user?.userName ||
+                      `${user?.firstName || ""} ${user?.lastName || ""}`.trim() ||
+                      "Admin Account"}
                   </p>
                   <p className="text-[11px] text-slate-500 truncate">
                     {user?.email || "admin@engsports.co.uk"}

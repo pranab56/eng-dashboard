@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-"use client"
-import React, { useState, useRef, useEffect } from 'react';
-import { Trophy, Search, Check, ChevronDown, X } from 'lucide-react';
+"use client";
+import React, { useState, useRef, useEffect } from "react";
+import { Trophy, Search, Check, ChevronDown, X } from "lucide-react";
 
 interface LeagueSelectDropdownProps {
   leagues: any[];
@@ -19,7 +19,7 @@ export const LeagueSelectDropdown: React.FC<LeagueSelectDropdownProps> = ({
   disabled = false,
 }) => {
   const [isOpen, setIsOpen] = useState(false);
-  const [searchTerm, setSearchTerm] = useState('');
+  const [searchTerm, setSearchTerm] = useState("");
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   // Close dropdown on click outside
@@ -29,20 +29,18 @@ export const LeagueSelectDropdown: React.FC<LeagueSelectDropdownProps> = ({
         setIsOpen(false);
       }
     };
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  const selectedLeague = leagues.find(
-    (l) => (l._id || l.id) === selectedLeagueId
-  );
+  const selectedLeague = leagues.find((l) => (l._id || l.id) === selectedLeagueId);
 
   const [displayCount, setDisplayCount] = useState(40);
 
   const filteredLeagues = React.useMemo(() => {
     if (!searchTerm.trim()) return leagues;
     const q = searchTerm.toLowerCase().trim();
-    return leagues.filter((l) => (l.leagueName || l.name || '').toLowerCase().includes(q));
+    return leagues.filter((l) => (l.leagueName || l.name || "").toLowerCase().includes(q));
   }, [leagues, searchTerm]);
 
   useEffect(() => {
@@ -93,7 +91,7 @@ export const LeagueSelectDropdown: React.FC<LeagueSelectDropdownProps> = ({
           )}
           <ChevronDown
             className={`w-3.5 h-3.5 text-gray-400 transition-transform duration-200 ${
-              isOpen ? 'rotate-180 text-amber-600' : ''
+              isOpen ? "rotate-180 text-amber-600" : ""
             }`}
           />
         </div>
@@ -117,7 +115,7 @@ export const LeagueSelectDropdown: React.FC<LeagueSelectDropdownProps> = ({
               {searchTerm && (
                 <button
                   type="button"
-                  onClick={() => setSearchTerm('')}
+                  onClick={() => setSearchTerm("")}
                   className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 p-0.5 cursor-pointer"
                 >
                   <X className="w-3 h-3" />
@@ -144,8 +142,8 @@ export const LeagueSelectDropdown: React.FC<LeagueSelectDropdownProps> = ({
               }}
               className={`w-full flex items-center justify-between p-2 rounded-xl text-left text-xs transition-colors cursor-pointer ${
                 selectedLeagueId === "ALL"
-                  ? 'bg-amber-50 text-amber-950 font-bold'
-                  : 'text-gray-700 hover:bg-gray-100 font-medium'
+                  ? "bg-amber-50 text-amber-950 font-bold"
+                  : "text-gray-700 hover:bg-gray-100 font-medium"
               }`}
             >
               <span className="flex items-center gap-2">
@@ -175,8 +173,8 @@ export const LeagueSelectDropdown: React.FC<LeagueSelectDropdownProps> = ({
                       }}
                       className={`w-full flex items-center justify-between p-2 rounded-xl text-left text-xs transition-colors cursor-pointer ${
                         isSelected
-                          ? 'bg-amber-50 text-amber-950 font-bold'
-                          : 'text-gray-800 hover:bg-gray-50 hover:text-amber-700 font-medium'
+                          ? "bg-amber-50 text-amber-950 font-bold"
+                          : "text-gray-800 hover:bg-gray-50 hover:text-amber-700 font-medium"
                       }`}
                     >
                       <div className="flex items-center gap-2 truncate">

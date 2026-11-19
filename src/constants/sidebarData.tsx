@@ -42,13 +42,7 @@ import {
  * Supported User Roles in ENG System
  */
 export type TUserRole =
-  | "SUPER_ADMIN"
-  | "ADMIN"
-  | "MANAGER"
-  | "REFEREE"
-  | "OTHER_CLUBS"
-  | "PLAYER"
-  | "TOURNAMENT_PLAYER";
+  "SUPER_ADMIN" | "ADMIN" | "MANAGER" | "REFEREE" | "OTHER_CLUBS" | "PLAYER" | "TOURNAMENT_PLAYER";
 
 export type TSubMenuItem = {
   id: number | string;
@@ -138,12 +132,24 @@ export function getAuthorizedNavigation(
           // If item has children, check access to child items
           if (item.children && item.children.length > 0) {
             // First check parent permission/role
-            if (!hasRoleOrPermission(activeRole, userPermissions, item.allowedRoles, item.requiredPermission)) {
+            if (
+              !hasRoleOrPermission(
+                activeRole,
+                userPermissions,
+                item.allowedRoles,
+                item.requiredPermission
+              )
+            ) {
               return null;
             }
 
             const accessibleChildren = item.children.filter((child) =>
-              hasRoleOrPermission(activeRole, userPermissions, child.allowedRoles, child.requiredPermission)
+              hasRoleOrPermission(
+                activeRole,
+                userPermissions,
+                child.allowedRoles,
+                child.requiredPermission
+              )
             );
 
             if (accessibleChildren.length === 0) return null;
@@ -155,7 +161,14 @@ export function getAuthorizedNavigation(
           }
 
           // Single menu item
-          if (!hasRoleOrPermission(activeRole, userPermissions, item.allowedRoles, item.requiredPermission)) {
+          if (
+            !hasRoleOrPermission(
+              activeRole,
+              userPermissions,
+              item.allowedRoles,
+              item.requiredPermission
+            )
+          ) {
             return null;
           }
 

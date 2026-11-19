@@ -6,15 +6,7 @@ import React, { useEffect, useState } from "react";
 import CustomDatePicker from "@/components/ui/CustomDatePicker";
 import { TPromotionalZone } from "@/types/columnTypes";
 import { formatImagePath } from "@/utils/formatImagePath";
-import {
-  X,
-  Upload,
-  Loader2,
-  ExternalLink,
-  Globe,
-  Star,
-  AlertCircle,
-} from "lucide-react";
+import { X, Upload, Loader2, ExternalLink, Globe, Star, AlertCircle } from "lucide-react";
 import dayjs from "dayjs";
 
 interface PromotionalZoneModalProps {
@@ -238,8 +230,12 @@ export default function PromotionalZoneModal({
               )}
               <label className="flex-1 flex flex-col items-center justify-center p-3 border border-dashed border-slate-200 rounded-md hover:border-slate-300 bg-slate-50/50 cursor-pointer transition-colors">
                 <Upload className="w-4 h-4 text-slate-400 mb-1" />
-                <span className="text-xs font-medium text-slate-700">Click to upload ad banner</span>
-                <span className="text-[10px] text-slate-400">Recommended: 16:9 or 1200x630px (PNG, JPG, WEBP)</span>
+                <span className="text-xs font-medium text-slate-700">
+                  Click to upload ad banner
+                </span>
+                <span className="text-[10px] text-slate-400">
+                  Recommended: 16:9 or 1200x630px (PNG, JPG, WEBP)
+                </span>
                 <input
                   type="file"
                   accept="image/*"
@@ -253,7 +249,8 @@ export default function PromotionalZoneModal({
           {/* Description (Optional) */}
           <div>
             <label className="block text-xs font-medium text-slate-700 mb-1">
-              Sponsor Description / Note <span className="text-slate-400 font-normal">(Optional)</span>
+              Sponsor Description / Note{" "}
+              <span className="text-slate-400 font-normal">(Optional)</span>
             </label>
             <textarea
               rows={2}
@@ -270,19 +267,13 @@ export default function PromotionalZoneModal({
               <label className="block text-xs font-medium text-slate-700 mb-1">
                 Campaign Start Date <span className="text-rose-500">*</span>
               </label>
-              <CustomDatePicker
-                value={startDate}
-                onChange={(val) => setStartDate(val)}
-              />
+              <CustomDatePicker value={startDate} onChange={(val) => setStartDate(val)} />
             </div>
             <div>
               <label className="block text-xs font-medium text-slate-700 mb-1">
                 Campaign End Date <span className="text-rose-500">*</span>
               </label>
-              <CustomDatePicker
-                value={endDate}
-                onChange={(val) => setEndDate(val)}
-              />
+              <CustomDatePicker value={endDate} onChange={(val) => setEndDate(val)} />
             </div>
           </div>
 
@@ -326,7 +317,9 @@ export default function PromotionalZoneModal({
                 className="w-4 h-4 text-slate-900 rounded border-slate-300 focus:ring-0 cursor-pointer"
               />
               <span className="flex items-center gap-1">
-                <Star className={`w-3.5 h-3.5 ${isFeatured ? "fill-amber-500 text-amber-500" : "text-slate-400"}`} />
+                <Star
+                  className={`w-3.5 h-3.5 ${isFeatured ? "fill-amber-500 text-amber-500" : "text-slate-400"}`}
+                />
                 Featured (Top Home Banner)
               </span>
             </label>

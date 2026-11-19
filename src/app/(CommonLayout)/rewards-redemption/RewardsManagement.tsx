@@ -26,12 +26,7 @@ const RewardsManagement = () => {
   const searchParams = useSearchParams();
   const page = searchParams.get("rewardPage") || "1";
 
-  const {
-    data: rewardData,
-    isLoading,
-    isFetching,
-    refetch,
-  } = useGetAllRewordQuery(page);
+  const { data: rewardData, isLoading, isFetching, refetch } = useGetAllRewordQuery(page);
   const { data: overviewData, refetch: refetchOverview } = useGetRewardOverviewQuery(undefined);
   const [deleteReward, { isLoading: isDeleting }] = useDeleteRewordMutation();
 
@@ -143,12 +138,17 @@ const RewardsManagement = () => {
         <div className="flex items-center gap-2">
           <button
             type="button"
-            onClick={() => { refetch(); refetchOverview(); }}
+            onClick={() => {
+              refetch();
+              refetchOverview();
+            }}
             disabled={isFetching}
             className="inline-flex items-center gap-1.5 h-8 px-2.5 bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 rounded-md text-xs font-medium transition-colors disabled:opacity-50 cursor-pointer"
             title="Refresh items"
           >
-            <RefreshCw className={`w-3.5 h-3.5 ${isFetching ? "animate-spin text-slate-500" : ""}`} />
+            <RefreshCw
+              className={`w-3.5 h-3.5 ${isFetching ? "animate-spin text-slate-500" : ""}`}
+            />
             <span className="hidden sm:inline">Refresh</span>
           </button>
 
@@ -171,9 +171,7 @@ const RewardsManagement = () => {
             <span className="text-[11px] font-medium text-slate-500 uppercase tracking-wider block">
               Total Catalog Items
             </span>
-            <span className="text-xl font-bold text-slate-900 tabular-nums">
-              {totalCount}
-            </span>
+            <span className="text-xl font-bold text-slate-900 tabular-nums">{totalCount}</span>
           </div>
           <div className="w-8 h-8 rounded border border-slate-200 bg-slate-50 flex items-center justify-center text-slate-600">
             <Gift className="w-4 h-4" />
@@ -185,9 +183,7 @@ const RewardsManagement = () => {
             <span className="text-[11px] font-medium text-slate-500 uppercase tracking-wider block">
               Physical Merchandise
             </span>
-            <span className="text-xl font-bold text-slate-900 tabular-nums">
-              {merchCount}
-            </span>
+            <span className="text-xl font-bold text-slate-900 tabular-nums">{merchCount}</span>
           </div>
           <div className="w-8 h-8 rounded border border-slate-200 bg-slate-50 flex items-center justify-center text-slate-600">
             <Package className="w-4 h-4" />
@@ -199,9 +195,7 @@ const RewardsManagement = () => {
             <span className="text-[11px] font-medium text-slate-500 uppercase tracking-wider block">
               Instant QR / Coffee
             </span>
-            <span className="text-xl font-bold text-slate-900 tabular-nums">
-              {coffeeCount}
-            </span>
+            <span className="text-xl font-bold text-slate-900 tabular-nums">{coffeeCount}</span>
           </div>
           <div className="w-8 h-8 rounded border border-amber-200 bg-amber-50 flex items-center justify-center text-amber-700">
             <Coffee className="w-4 h-4" />
@@ -213,9 +207,7 @@ const RewardsManagement = () => {
             <span className="text-[11px] font-medium text-slate-500 uppercase tracking-wider block">
               Total QR Claims
             </span>
-            <span className="text-xl font-bold text-slate-900 tabular-nums">
-              {totalClaims}
-            </span>
+            <span className="text-xl font-bold text-slate-900 tabular-nums">{totalClaims}</span>
           </div>
           <div className="w-8 h-8 rounded border border-emerald-200 bg-emerald-50 flex items-center justify-center text-emerald-700">
             <QrCode className="w-4 h-4" />

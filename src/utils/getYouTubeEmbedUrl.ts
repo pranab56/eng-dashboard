@@ -3,10 +3,11 @@
  * Supports youtube.com, youtu.be, shorts, and embed links.
  */
 export const getYouTubeEmbedUrl = (url: string | null | undefined): string | null => {
-  if (!url || typeof url !== 'string') return null;
+  if (!url || typeof url !== "string") return null;
 
   const trimmed = url.trim();
-  const regExp = /(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?|shorts|live)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/;
+  const regExp =
+    /(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?|shorts|live)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/;
   const match = trimmed.match(regExp);
 
   if (match && match[1]) {

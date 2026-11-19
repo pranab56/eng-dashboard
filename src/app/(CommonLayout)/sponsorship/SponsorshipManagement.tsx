@@ -69,12 +69,9 @@ export default function SponsorshipManagement() {
 
   const { data: analyticsData } = useGetSponsorshipAnalyticsQuery({});
 
-  const [createSponsorship, { isLoading: isCreating }] =
-    useCreateSponsorshipMutation();
-  const [updateSponsorship, { isLoading: isUpdating }] =
-    useUpdateSponsorshipMutation();
-  const [deleteSponsorship, { isLoading: isDeleting }] =
-    useDeleteSponsorshipMutation();
+  const [createSponsorship, { isLoading: isCreating }] = useCreateSponsorshipMutation();
+  const [updateSponsorship, { isLoading: isUpdating }] = useUpdateSponsorshipMutation();
+  const [deleteSponsorship, { isLoading: isDeleting }] = useDeleteSponsorshipMutation();
   const [toggleStatus] = useToggleSponsorshipStatusMutation();
 
   const sponsors: TSponsorship[] = sponsorshipData?.data || [];
@@ -366,11 +363,7 @@ export default function SponsorshipManagement() {
         </div>
 
         {/* Data Table */}
-        <CustomTable
-          columns={columns}
-          data={sponsors}
-          isLoading={isLoading}
-        />
+        <CustomTable columns={columns} data={sponsors} isLoading={isLoading} />
 
         {/* Table Footer with Pagination */}
         <div className="px-4 py-3 border-t border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3">

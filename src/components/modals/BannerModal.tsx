@@ -23,12 +23,32 @@ interface BannerModalProps {
 }
 
 const PREDEFINED_SECTIONS = [
-  { label: "ENG FIXTURES", value: "ENG FIXTURES", defaultSubtitle: "CHECK WHO YOUR PLAYING EACH WEEK" },
-  { label: "ENG TABLES", value: "ENG TABLES", defaultSubtitle: "FIND OUT WHERE YOUR TEAM IS PLACE EACH WEEK" },
-  { label: "ENG STATS", value: "ENG STATS", defaultSubtitle: "CHECK YOUR PROGRESSION IN REAL TIME" },
-  { label: "ENG TV", value: "ENG TV", defaultSubtitle: "WATCH YOUR MATCHES FROM THE COMFORT OF YOUR HOME" },
+  {
+    label: "ENG FIXTURES",
+    value: "ENG FIXTURES",
+    defaultSubtitle: "CHECK WHO YOUR PLAYING EACH WEEK",
+  },
+  {
+    label: "ENG TABLES",
+    value: "ENG TABLES",
+    defaultSubtitle: "FIND OUT WHERE YOUR TEAM IS PLACE EACH WEEK",
+  },
+  {
+    label: "ENG STATS",
+    value: "ENG STATS",
+    defaultSubtitle: "CHECK YOUR PROGRESSION IN REAL TIME",
+  },
+  {
+    label: "ENG TV",
+    value: "ENG TV",
+    defaultSubtitle: "WATCH YOUR MATCHES FROM THE COMFORT OF YOUR HOME",
+  },
   { label: "ENG NEWS", value: "ENG NEWS", defaultSubtitle: "LATEST NEWS & UPDATES" },
-  { label: "MATCH CENTER", value: "MATCH CENTER", defaultSubtitle: "LIVE MATCHES, SCORES & UPDATES" },
+  {
+    label: "MATCH CENTER",
+    value: "MATCH CENTER",
+    defaultSubtitle: "LIVE MATCHES, SCORES & UPDATES",
+  },
   { label: "HOME BANNER", value: "HOME", defaultSubtitle: "WELCOME TO ENG SPORTS" },
 ];
 
@@ -192,10 +212,16 @@ export default function BannerModal({
               </SelectTrigger>
               <SelectContent>
                 {PREDEFINED_SECTIONS.map((sec) => (
-                  <SelectItem key={sec.value} value={sec.value} className="text-xs py-2 cursor-pointer">
+                  <SelectItem
+                    key={sec.value}
+                    value={sec.value}
+                    className="text-xs py-2 cursor-pointer"
+                  >
                     <span className="font-semibold text-slate-900">{sec.label}</span>
                     {sec.defaultSubtitle && (
-                      <span className="text-slate-400 block text-[10px] mt-0.5 font-normal">{sec.defaultSubtitle}</span>
+                      <span className="text-slate-400 block text-[10px] mt-0.5 font-normal">
+                        {sec.defaultSubtitle}
+                      </span>
                     )}
                   </SelectItem>
                 ))}
@@ -304,21 +330,22 @@ export default function BannerModal({
           {/* Row: Status & Priority */}
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-xs font-semibold text-slate-700 mb-1.5">
-                Status
-              </label>
-              <Select
-                value={status}
-                onValueChange={(val: "active" | "inactive") => setStatus(val)}
-              >
+              <label className="block text-xs font-semibold text-slate-700 mb-1.5">Status</label>
+              <Select value={status} onValueChange={(val: "active" | "inactive") => setStatus(val)}>
                 <SelectTrigger className="w-full h-11 px-3.5 py-2.5 bg-white border border-slate-300 rounded-lg text-xs font-semibold text-slate-800 shadow-xs hover:border-slate-400 focus:ring-2 focus:ring-slate-900 focus:outline-none flex items-center justify-between cursor-pointer">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="active" className="text-xs py-2 cursor-pointer font-medium text-emerald-700">
+                  <SelectItem
+                    value="active"
+                    className="text-xs py-2 cursor-pointer font-medium text-emerald-700"
+                  >
                     Active (Visible in app)
                   </SelectItem>
-                  <SelectItem value="inactive" className="text-xs py-2 cursor-pointer font-medium text-slate-600">
+                  <SelectItem
+                    value="inactive"
+                    className="text-xs py-2 cursor-pointer font-medium text-slate-600"
+                  >
                     Inactive (Hidden from app)
                   </SelectItem>
                 </SelectContent>

@@ -1,9 +1,9 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-"use client"
-import React, { useState, useRef, useEffect } from 'react';
-import Image from 'next/image';
-import { formatImagePath } from '@/utils/formatImagePath';
-import { Building2, Search, Check, ChevronDown, X, Shield } from 'lucide-react';
+"use client";
+import React, { useState, useRef, useEffect } from "react";
+import Image from "next/image";
+import { formatImagePath } from "@/utils/formatImagePath";
+import { Building2, Search, Check, ChevronDown, X, Shield } from "lucide-react";
 
 interface TeamSelectDropdownProps {
   teams: any[];
@@ -21,7 +21,7 @@ export const TeamSelectDropdown: React.FC<TeamSelectDropdownProps> = ({
   disabled = false,
 }) => {
   const [isOpen, setIsOpen] = useState(false);
-  const [searchTerm, setSearchTerm] = useState('');
+  const [searchTerm, setSearchTerm] = useState("");
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   // Close dropdown on click outside
@@ -31,8 +31,8 @@ export const TeamSelectDropdown: React.FC<TeamSelectDropdownProps> = ({
         setIsOpen(false);
       }
     };
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
   const selectedTeam = teams.find((t) => (t._id || t.id) === selectedTeamId);
@@ -42,11 +42,12 @@ export const TeamSelectDropdown: React.FC<TeamSelectDropdownProps> = ({
   const filteredTeams = React.useMemo(() => {
     if (!searchTerm.trim()) return teams;
     const q = searchTerm.toLowerCase().trim();
-    return teams.filter((t) => (
-      (t.teamName || '').toLowerCase().includes(q) ||
-      (t.shortName || '').toLowerCase().includes(q) ||
-      (t.location || '').toLowerCase().includes(q)
-    ));
+    return teams.filter(
+      (t) =>
+        (t.teamName || "").toLowerCase().includes(q) ||
+        (t.shortName || "").toLowerCase().includes(q) ||
+        (t.location || "").toLowerCase().includes(q)
+    );
   }, [teams, searchTerm]);
 
   useEffect(() => {
@@ -80,7 +81,7 @@ export const TeamSelectDropdown: React.FC<TeamSelectDropdownProps> = ({
                 {selectedTeam.teamLogo ? (
                   <Image
                     src={formatImagePath(selectedTeam.teamLogo)}
-                    alt={selectedTeam.teamName || 'logo'}
+                    alt={selectedTeam.teamName || "logo"}
                     fill
                     className="object-contain p-0.5"
                   />
@@ -89,7 +90,8 @@ export const TeamSelectDropdown: React.FC<TeamSelectDropdownProps> = ({
                 )}
               </div>
               <span className="truncate text-slate-900 font-bold">
-                {selectedTeam.teamName} {selectedTeam.shortName ? `(${selectedTeam.shortName})` : ''}
+                {selectedTeam.teamName}{" "}
+                {selectedTeam.shortName ? `(${selectedTeam.shortName})` : ""}
               </span>
             </>
           ) : (
@@ -100,7 +102,9 @@ export const TeamSelectDropdown: React.FC<TeamSelectDropdownProps> = ({
           )}
         </div>
 
-        <ChevronDown className={`w-3.5 h-3.5 text-slate-400 transition-transform duration-200 ${isOpen ? 'rotate-180 text-indigo-600' : ''}`} />
+        <ChevronDown
+          className={`w-3.5 h-3.5 text-slate-400 transition-transform duration-200 ${isOpen ? "rotate-180 text-indigo-600" : ""}`}
+        />
       </button>
 
       {/* Dropdown Menu Panel */}
@@ -121,7 +125,7 @@ export const TeamSelectDropdown: React.FC<TeamSelectDropdownProps> = ({
               {searchTerm && (
                 <button
                   type="button"
-                  onClick={() => setSearchTerm('')}
+                  onClick={() => setSearchTerm("")}
                   className="absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 p-0.5 cursor-pointer"
                 >
                   <X className="w-3 h-3" />
@@ -143,11 +147,13 @@ export const TeamSelectDropdown: React.FC<TeamSelectDropdownProps> = ({
             <button
               type="button"
               onClick={() => {
-                onChange('');
+                onChange("");
                 setIsOpen(false);
               }}
               className={`w-full flex items-center justify-between p-2 rounded-xl text-left text-xs font-semibold transition-colors cursor-pointer ${
-                !selectedTeamId ? 'bg-indigo-50 text-indigo-900 font-bold' : 'text-slate-600 hover:bg-slate-100'
+                !selectedTeamId
+                  ? "bg-indigo-50 text-indigo-900 font-bold"
+                  : "text-slate-600 hover:bg-slate-100"
               }`}
             >
               <span className="italic text-slate-500">-- No Team Assigned --</span>
@@ -174,8 +180,8 @@ export const TeamSelectDropdown: React.FC<TeamSelectDropdownProps> = ({
                       }}
                       className={`w-full flex items-center justify-between p-2 rounded-xl text-left text-xs transition-colors cursor-pointer ${
                         isSelected
-                          ? 'bg-indigo-50 text-indigo-950 font-bold'
-                          : 'text-slate-800 hover:bg-slate-50 hover:text-indigo-600 font-medium'
+                          ? "bg-indigo-50 text-indigo-950 font-bold"
+                          : "text-slate-800 hover:bg-slate-50 hover:text-indigo-600 font-medium"
                       }`}
                     >
                       <div className="flex items-center gap-2.5 min-w-0">
@@ -183,7 +189,7 @@ export const TeamSelectDropdown: React.FC<TeamSelectDropdownProps> = ({
                           {team.teamLogo ? (
                             <Image
                               src={formatImagePath(team.teamLogo)}
-                              alt={team.teamName || 'team'}
+                              alt={team.teamName || "team"}
                               fill
                               className="object-contain p-0.5"
                             />

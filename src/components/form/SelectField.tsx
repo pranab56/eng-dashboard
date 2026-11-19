@@ -1,6 +1,13 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Controller, Control, FieldError } from "react-hook-form";
-import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 type Option = {
   label: string;
@@ -30,11 +37,7 @@ const SelectField = ({
 }: SelectFieldProps) => {
   return (
     <div className="space-y-2">
-      {label && (
-        <label className="block text-xs font-bold text-gray-700">
-          {label}
-        </label>
-      )}
+      {label && <label className="block text-xs font-bold text-gray-700">{label}</label>}
 
       <div className="relative group">
         <Controller
@@ -53,13 +56,29 @@ const SelectField = ({
               ? options.find((opt) => normalizeStr(opt.value) === normalizeStr(field.value))?.value
               : undefined;
 
-            console.log(`[SelectField:${name}] value:`, field.value, "hasValidValue:", hasValidValue, "selectValue:", selectValue, "optionsCount:", options?.length);
+            console.log(
+              `[SelectField:${name}] value:`,
+              field.value,
+              "hasValidValue:",
+              hasValidValue,
+              "selectValue:",
+              selectValue,
+              "optionsCount:",
+              options?.length
+            );
 
             return (
-              <Select key={`${name}-${options?.length || 0}-${selectValue || 'empty'}`} onValueChange={field.onChange} value={selectValue} disabled={disabled}>
+              <Select
+                key={`${name}-${options?.length || 0}-${selectValue || "empty"}`}
+                onValueChange={field.onChange}
+                value={selectValue}
+                disabled={disabled}
+              >
                 <SelectTrigger
                   className={`w-full h-11 px-4 bg-[#f8fafc] border rounded-2xl text-xs font-semibold text-gray-800 hover:bg-white focus:outline-none focus:ring-4 transition-all duration-200 shadow-2xs ${
-                    disabled ? "opacity-70 bg-gray-100/90 cursor-not-allowed border-gray-200" : "cursor-pointer"
+                    disabled
+                      ? "opacity-70 bg-gray-100/90 cursor-not-allowed border-gray-200"
+                      : "cursor-pointer"
                   } ${
                     error
                       ? "border-red-400 focus:ring-red-100 bg-red-50/30"
@@ -69,7 +88,9 @@ const SelectField = ({
                   <SelectValue placeholder={placeholder} />
                 </SelectTrigger>
 
-                <SelectContent className={`bg-white rounded-2xl border border-gray-100 shadow-2xl p-1.5 z-50 ${scrollable ? "max-h-[280px] overflow-y-auto" : ""}`}>
+                <SelectContent
+                  className={`bg-white rounded-2xl border border-gray-100 shadow-2xl p-1.5 z-50 ${scrollable ? "max-h-[280px] overflow-y-auto" : ""}`}
+                >
                   <SelectGroup>
                     {options.map((option) => (
                       <SelectItem
@@ -87,11 +108,7 @@ const SelectField = ({
           }}
         />
 
-        {error && (
-          <p className="text-xs font-semibold text-red-500 mt-1 px-1">
-            {error.message}
-          </p>
-        )}
+        {error && <p className="text-xs font-semibold text-red-500 mt-1 px-1">{error.message}</p>}
       </div>
     </div>
   );

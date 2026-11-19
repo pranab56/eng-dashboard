@@ -21,7 +21,14 @@ export const sponsorshipApi = baseApi.injectEndpoints({
     }),
 
     getAllSponsorship: builder.query({
-      query: ({ pageNumber = 1, limit = 10, searchValue = "", type = "", tier = "", status = "" } = {}) => {
+      query: ({
+        pageNumber = 1,
+        limit = 10,
+        searchValue = "",
+        type = "",
+        tier = "",
+        status = "",
+      } = {}) => {
         let url = "/sponsorship";
         const params = [];
         if (pageNumber) params.push(`page=${pageNumber}`);

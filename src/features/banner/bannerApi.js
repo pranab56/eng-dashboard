@@ -26,13 +26,7 @@ export const bannerApi = baseApi.injectEndpoints({
     }),
 
     getAllBanners: builder.query({
-      query: ({
-        pageNumber = 1,
-        limit = 10,
-        searchValue = "",
-        section = "",
-        status = "",
-      } = {}) => {
+      query: ({ pageNumber = 1, limit = 10, searchValue = "", section = "", status = "" } = {}) => {
         let url = "/banner";
         const params = [];
         if (pageNumber) params.push(`page=${pageNumber}`);
@@ -67,10 +61,7 @@ export const bannerApi = baseApi.injectEndpoints({
         url: `/banner/${id}`,
         method: "GET",
       }),
-      providesTags: (result, error, id) => [
-        "banner",
-        { type: "banner", id },
-      ],
+      providesTags: (result, error, id) => ["banner", { type: "banner", id }],
     }),
 
     deleteBanner: builder.mutation({

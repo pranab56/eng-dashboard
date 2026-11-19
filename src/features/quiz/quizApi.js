@@ -21,13 +21,7 @@ export const quizApi = baseApi.injectEndpoints({
     }),
 
     getAllQuiz: builder.query({
-      query: ({
-        page = 1,
-        limit = 10,
-        searchTerm = "",
-        status = "",
-        category = "",
-      } = {}) => {
+      query: ({ page = 1, limit = 10, searchTerm = "", status = "", category = "" } = {}) => {
         let url = "/quiz";
         const params = [];
         if (page) params.push(`page=${page}`);

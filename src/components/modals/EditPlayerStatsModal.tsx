@@ -1,17 +1,10 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import {
-  Dialog,
-  DialogContent,
-  DialogTitle,
-} from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { useEditPlayerStatsMutation } from "@/features/player/playerApi";
 import { toast } from "sonner";
-import {
-  Loader2,
-  X,
-} from "lucide-react";
+import { Loader2, X } from "lucide-react";
 
 interface EditPlayerStatsModalProps {
   isOpen: boolean;
@@ -40,7 +33,9 @@ export const EditPlayerStatsModal: React.FC<EditPlayerStatsModalProps> = ({
   const [editPlayerStats, { isLoading }] = useEditPlayerStatsMutation();
 
   const playerId = player?._id || player?.id;
-  const fullName = player ? `${player.firstName || ""} ${player.lastName || ""}`.trim() || player.userName : "Player";
+  const fullName = player
+    ? `${player.firstName || ""} ${player.lastName || ""}`.trim() || player.userName
+    : "Player";
 
   useEffect(() => {
     if (isOpen) {
@@ -107,7 +102,8 @@ export const EditPlayerStatsModal: React.FC<EditPlayerStatsModalProps> = ({
               </span>
             </div>
             <p className="text-xs text-slate-500 mt-1">
-              Adjust official match metrics for <span className="font-semibold text-slate-800">{fullName}</span>
+              Adjust official match metrics for{" "}
+              <span className="font-semibold text-slate-800">{fullName}</span>
             </p>
           </div>
 

@@ -1,6 +1,5 @@
 import { baseApi } from "../../utils/apiBaseQuery";
 
-
 export const overviewApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
     getOverview: builder.query({
@@ -8,13 +7,10 @@ export const overviewApi = baseApi.injectEndpoints({
         url: "/overview",
         method: "GET",
       }),
-      providesTags: ["overview"]
+      providesTags: ["overview"],
     }),
-
   }),
 });
 
 // Export hooks
-export const {
-  useGetOverviewQuery,
-} = overviewApi;
+export const { useGetOverviewQuery } = overviewApi;

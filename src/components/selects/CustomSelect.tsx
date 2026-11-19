@@ -1,7 +1,14 @@
 "use client";
 
 import React from "react";
-import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { useQueryParam } from "@/hooks/useQueryParam";
 
 type TSelectProps = {

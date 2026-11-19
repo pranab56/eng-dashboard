@@ -87,7 +87,10 @@ export default function PromotionalInquiriesModal({
                     <div className="flex items-center gap-2 mt-0.5 text-[11px] text-slate-500">
                       {inq.age && <span>Age: {inq.age} yrs</span>}
                       {inq.playingPosition && (
-                        <span>Position: <strong className="text-slate-700">{inq.playingPosition}</strong></span>
+                        <span>
+                          Position:{" "}
+                          <strong className="text-slate-700">{inq.playingPosition}</strong>
+                        </span>
                       )}
                       <span>· {dayjs(inq.createdAt).format("MMM D, YYYY h:mm A")}</span>
                     </div>
@@ -99,10 +102,10 @@ export default function PromotionalInquiriesModal({
                         inq.status === "enrolled"
                           ? "bg-emerald-50 text-emerald-700 border border-emerald-200"
                           : inq.status === "contacted"
-                          ? "bg-blue-50 text-blue-700 border border-blue-200"
-                          : inq.status === "rejected"
-                          ? "bg-rose-50 text-rose-700 border border-rose-200"
-                          : "bg-amber-50 text-amber-700 border border-amber-200"
+                            ? "bg-blue-50 text-blue-700 border border-blue-200"
+                            : inq.status === "rejected"
+                              ? "bg-rose-50 text-rose-700 border border-rose-200"
+                              : "bg-amber-50 text-amber-700 border border-amber-200"
                       }`}
                     >
                       {inq.status || "pending"}

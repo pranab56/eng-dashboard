@@ -66,11 +66,7 @@ export const getEventColumns = (
           <span className="text-sm text-slate-800 dark:text-slate-200">
             {val ? dayjs(val).format("DD MMM YYYY") : "N/A"}
           </span>
-          {val && (
-            <span className="text-[11px] text-slate-400">
-              {dayjs(val).format("h:mm A")}
-            </span>
-          )}
+          {val && <span className="text-[11px] text-slate-400">{dayjs(val).format("h:mm A")}</span>}
         </div>
       );
     },
@@ -85,11 +81,7 @@ export const getEventColumns = (
           <span className="text-sm text-slate-800 dark:text-slate-200">
             {val ? dayjs(val).format("DD MMM YYYY") : "N/A"}
           </span>
-          {val && (
-            <span className="text-[11px] text-slate-400">
-              {dayjs(val).format("h:mm A")}
-            </span>
-          )}
+          {val && <span className="text-[11px] text-slate-400">{dayjs(val).format("h:mm A")}</span>}
         </div>
       );
     },

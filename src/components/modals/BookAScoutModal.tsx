@@ -13,15 +13,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import {
-  X,
-  Upload,
-  Loader2,
-  ExternalLink,
-  ImageIcon,
-  AlertCircle,
-  Compass,
-} from "lucide-react";
+import { X, Upload, Loader2, ExternalLink, ImageIcon, AlertCircle, Compass } from "lucide-react";
 import dayjs from "dayjs";
 
 interface BookAScoutModalProps {
@@ -32,9 +24,7 @@ interface BookAScoutModalProps {
   isLoading: boolean;
 }
 
-const getInitialStatus = (
-  item: TBookAScout | null
-): "active" | "inactive" | "archived" => {
+const getInitialStatus = (item: TBookAScout | null): "active" | "inactive" | "archived" => {
   const raw = String(item?.status || "active").toLowerCase();
   if (raw === "inactive" || raw === "archived" || raw === "active") {
     return raw;
@@ -63,21 +53,13 @@ export default function BookAScoutModal({
       editingItem?.description ||
       "Book a professional scout to watch you play and provide expert feedback. Take the next step in your football career today."
   );
-  const [buttonText, setButtonText] = useState(
-    () => editingItem?.buttonText || "Book Now"
-  );
-  const [redirectUrl, setRedirectUrl] = useState(
-    () => editingItem?.redirectUrl || ""
-  );
+  const [buttonText, setButtonText] = useState(() => editingItem?.buttonText || "Book Now");
+  const [redirectUrl, setRedirectUrl] = useState(() => editingItem?.redirectUrl || "");
   const [status, setStatus] = useState<"active" | "inactive" | "archived">(() =>
     getInitialStatus(editingItem)
   );
-  const [isFeatured, setIsFeatured] = useState<boolean>(
-    () => Boolean(editingItem?.isFeatured)
-  );
-  const [priority, setPriority] = useState<number>(
-    () => editingItem?.priority ?? 0
-  );
+  const [isFeatured, setIsFeatured] = useState<boolean>(() => Boolean(editingItem?.isFeatured));
+  const [priority, setPriority] = useState<number>(() => editingItem?.priority ?? 0);
   const [startDate, setStartDate] = useState(() =>
     editingItem?.startDate
       ? dayjs(editingItem.startDate).format("YYYY-MM-DD")
@@ -111,11 +93,7 @@ export default function BookAScoutModal({
           ? dayjs(editingItem.startDate).format("YYYY-MM-DD")
           : dayjs().format("YYYY-MM-DD")
       );
-      setEndDate(
-        editingItem.endDate
-          ? dayjs(editingItem.endDate).format("YYYY-MM-DD")
-          : ""
-      );
+      setEndDate(editingItem.endDate ? dayjs(editingItem.endDate).format("YYYY-MM-DD") : "");
       setImagePreview(editingItem.image ? formatImagePath(editingItem.image) : null);
       setImageFile(null);
     } else {
@@ -216,7 +194,8 @@ export default function BookAScoutModal({
                 {editingItem ? "Edit Book A Scout Card" : "New Book A Scout Card"}
               </h3>
               <p className="text-xs text-slate-500 mt-0.5">
-                Configure image overlay badge, headline, description, internal status, and redirect URL.
+                Configure image overlay badge, headline, description, internal status, and redirect
+                URL.
               </p>
             </div>
           </div>
@@ -285,9 +264,7 @@ export default function BookAScoutModal({
             </div>
 
             <div>
-              <label className="block text-xs font-medium text-slate-700 mb-1">
-                Description
-              </label>
+              <label className="block text-xs font-medium text-slate-700 mb-1">Description</label>
               <textarea
                 rows={3}
                 value={description}
@@ -378,9 +355,7 @@ export default function BookAScoutModal({
                     onChange={(e) => setIsFeatured(e.target.checked)}
                     className="rounded border-slate-300 text-slate-900 focus:ring-slate-900"
                   />
-                  <span className="text-xs font-medium text-slate-700">
-                    Pin Featured
-                  </span>
+                  <span className="text-xs font-medium text-slate-700">Pin Featured</span>
                 </label>
               </div>
             </div>
@@ -524,4 +499,3 @@ export default function BookAScoutModal({
     </div>
   );
 }
-

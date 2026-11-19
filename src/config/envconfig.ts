@@ -6,7 +6,7 @@ dotenv.config();
 export const config = {
   serverPort: process.env.SERVER_PORT,
   serverHost: process.env.SERVER_HOST,
-  serverURL: process.env.SERVER_URL ,
+  serverURL: process.env.SERVER_URL,
 };
 
 export const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;

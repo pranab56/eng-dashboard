@@ -69,10 +69,7 @@ export const bookAScoutApi = baseApi.injectEndpoints({
         url: `/book-a-scout/${id}`,
         method: "GET",
       }),
-      providesTags: (result, error, id) => [
-        "bookAScout",
-        { type: "bookAScout", id },
-      ],
+      providesTags: (result, error, id) => ["bookAScout", { type: "bookAScout", id }],
     }),
 
     deleteBookAScout: builder.mutation({
@@ -123,4 +120,3 @@ export const {
   useToggleBookAScoutStatusMutation,
   useToggleBookAScoutFeaturedMutation,
 } = bookAScoutApi;
-

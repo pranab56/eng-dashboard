@@ -1,6 +1,5 @@
 import { baseApi } from "../../utils/apiBaseQuery";
 
-
 export const refereeApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
     getReferee: builder.query({
@@ -8,11 +7,9 @@ export const refereeApi = baseApi.injectEndpoints({
         url: "/user-management/referees",
         method: "GET",
       }),
-      providesTags: ["referee"]
+      providesTags: ["referee"],
     }),
   }),
 });
 
-export const {
-  useGetRefereeQuery,
-} = refereeApi;
+export const { useGetRefereeQuery } = refereeApi;

@@ -46,8 +46,7 @@ interface ValidationErrors {
 
 export default function ProfilePage() {
   // Use {} to share the exact same cached query entry as Header and Sidebar
-  const { data: profileData, isLoading: isProfileLoading, refetch } =
-    useGetProfileQuery({});
+  const { data: profileData, isLoading: isProfileLoading, refetch } = useGetProfileQuery({});
   const [updateProfile] = useUpdateProfileMutation();
   const [changePassword] = useChangePasswordMutation();
 
@@ -78,9 +77,7 @@ export default function ProfilePage() {
       const resolvedName =
         user.userName ||
         user.name ||
-        (user.firstName && user.lastName
-          ? `${user.firstName} ${user.lastName}`
-          : user.firstName) ||
+        (user.firstName && user.lastName ? `${user.firstName} ${user.lastName}` : user.firstName) ||
         "";
       const resolvedEmail = user.email || "";
       const resolvedProfile = user.profile || user.avatar || user.image || "";
@@ -122,9 +119,7 @@ export default function ProfilePage() {
       const resolvedName =
         user.userName ||
         user.name ||
-        (user.firstName && user.lastName
-          ? `${user.firstName} ${user.lastName}`
-          : user.firstName) ||
+        (user.firstName && user.lastName ? `${user.firstName} ${user.lastName}` : user.firstName) ||
         "";
       const resolvedEmail = user.email || "";
       const resolvedProfile = user.profile || user.avatar || user.image || "";
@@ -159,8 +154,7 @@ export default function ProfilePage() {
     }
     if (formData.newPassword || formData.confirmPassword) {
       if (!formData.currentPassword)
-        newErrors.currentPassword =
-          "Current password is required to change password";
+        newErrors.currentPassword = "Current password is required to change password";
       if ((formData.newPassword?.length || 0) < 8)
         newErrors.newPassword = "Password must be at least 8 characters";
       if (formData.newPassword !== formData.confirmPassword)
@@ -178,9 +172,7 @@ export default function ProfilePage() {
     setIsSaving(true);
     const toastId = toast.loading("Saving changes...");
     try {
-      const isPasswordChanging = !!(
-        formData.currentPassword && formData.newPassword
-      );
+      const isPasswordChanging = !!(formData.currentPassword && formData.newPassword);
       const isProfileChanging =
         formData.userName !== (user?.userName || user?.firstName) || !!imageFile;
 
@@ -244,35 +236,31 @@ export default function ProfilePage() {
   }
 
   const role = user?.role?.replace(/_/g, " ") || "Admin";
-  const memberSince = user?.createdAt
-    ? dayjs(user.createdAt).format("MMM YYYY")
-    : "Recently";
+  const memberSince = user?.createdAt ? dayjs(user.createdAt).format("MMM YYYY") : "Recently";
 
   const displayName =
     formData.userName ||
     user?.userName ||
     user?.name ||
-    (user?.firstName && user?.lastName
-      ? `${user.firstName} ${user.lastName}`
-      : user?.firstName) ||
+    (user?.firstName && user?.lastName ? `${user.firstName} ${user.lastName}` : user?.firstName) ||
     "Admin User";
 
   const displayEmail = formData.email || user?.email || "admin@example.com";
 
-  const initials = displayName
-    .split(" ")
-    .map((n: string) => n[0])
-    .filter(Boolean)
-    .join("")
-    .toUpperCase()
-    .slice(0, 2) || "AD";
+  const initials =
+    displayName
+      .split(" ")
+      .map((n: string) => n[0])
+      .filter(Boolean)
+      .join("")
+      .toUpperCase()
+      .slice(0, 2) || "AD";
 
   const avatarSrc = imgPreview || (user?.profile ? formatImagePath(user.profile) : null);
 
   const passwordLengthMet = (formData.newPassword?.length || 0) >= 8;
   const passwordsMatch =
-    Boolean(formData.newPassword) &&
-    formData.newPassword === formData.confirmPassword;
+    Boolean(formData.newPassword) && formData.newPassword === formData.confirmPassword;
 
   return (
     <div className="p-4 sm:p-6 lg:p-8 space-y-6 w-full">
@@ -371,7 +359,9 @@ export default function ProfilePage() {
               <Camera className="w-3.5 h-3.5 text-slate-500" />
               Change Photo
             </button>
-            <span className="text-[11px] text-slate-400 hidden sm:inline">JPG, PNG or WEBP up to 5MB</span>
+            <span className="text-[11px] text-slate-400 hidden sm:inline">
+              JPG, PNG or WEBP up to 5MB
+            </span>
           </div>
         </div>
       </div>
@@ -387,9 +377,7 @@ export default function ProfilePage() {
                 <User className="w-4 h-4" />
               </div>
               <div>
-                <h3 className="text-sm font-semibold text-slate-900">
-                  Personal Information
-                </h3>
+                <h3 className="text-sm font-semibold text-slate-900">Personal Information</h3>
                 <p className="text-xs text-slate-500 mt-0.5">
                   Update your personal details and account display name.
                 </p>
@@ -469,9 +457,7 @@ export default function ProfilePage() {
                 <KeyRound className="w-4 h-4" />
               </div>
               <div>
-                <h3 className="text-sm font-semibold text-slate-900">
-                  Security & Password
-                </h3>
+                <h3 className="text-sm font-semibold text-slate-900">Security & Password</h3>
                 <p className="text-xs text-slate-500 mt-0.5">
                   Update your account password to ensure your admin credentials stay protected.
                 </p>
@@ -698,12 +684,8 @@ export default function ProfilePage() {
                 <BadgeCheck className="w-4 h-4" />
               </div>
               <div>
-                <h3 className="text-sm font-semibold text-slate-900">
-                  Account Details
-                </h3>
-                <p className="text-xs text-slate-500">
-                  Administrative metadata
-                </p>
+                <h3 className="text-sm font-semibold text-slate-900">Account Details</h3>
+                <p className="text-xs text-slate-500">Administrative metadata</p>
               </div>
             </div>
 
@@ -725,16 +707,12 @@ export default function ProfilePage() {
 
               <div className="flex items-center justify-between py-1 border-b border-slate-50">
                 <span className="text-slate-500">Member Since</span>
-                <span className="font-medium text-slate-800">
-                  {memberSince}
-                </span>
+                <span className="font-medium text-slate-800">{memberSince}</span>
               </div>
 
               <div className="flex items-center justify-between py-1 border-b border-slate-50">
                 <span className="text-slate-500">Access Level</span>
-                <span className="font-medium text-slate-800">
-                  Full System Access
-                </span>
+                <span className="font-medium text-slate-800">Full System Access</span>
               </div>
 
               <div className="flex items-center justify-between py-1">
@@ -754,12 +732,8 @@ export default function ProfilePage() {
                 <Info className="w-4 h-4" />
               </div>
               <div>
-                <h3 className="text-sm font-semibold text-slate-900">
-                  Profile Guidelines
-                </h3>
-                <p className="text-xs text-slate-500">
-                  Best practices for admin accounts
-                </p>
+                <h3 className="text-sm font-semibold text-slate-900">Profile Guidelines</h3>
+                <p className="text-xs text-slate-500">Best practices for admin accounts</p>
               </div>
             </div>
 
@@ -767,21 +741,26 @@ export default function ProfilePage() {
               <div className="flex items-start gap-2.5">
                 <div className="w-1.5 h-1.5 rounded-full bg-slate-400 mt-1.5 shrink-0" />
                 <p className="text-slate-600 leading-relaxed">
-                  <strong className="text-slate-800 font-medium">Avatar Visibility:</strong> Your profile photo is visible in league audit logs and match modification records.
+                  <strong className="text-slate-800 font-medium">Avatar Visibility:</strong> Your
+                  profile photo is visible in league audit logs and match modification records.
                 </p>
               </div>
 
               <div className="flex items-start gap-2.5">
                 <div className="w-1.5 h-1.5 rounded-full bg-slate-400 mt-1.5 shrink-0" />
                 <p className="text-slate-600 leading-relaxed">
-                  <strong className="text-slate-800 font-medium">Password Rotation:</strong> Periodically rotate your password to safeguard sensitive league financial and scoring data.
+                  <strong className="text-slate-800 font-medium">Password Rotation:</strong>{" "}
+                  Periodically rotate your password to safeguard sensitive league financial and
+                  scoring data.
                 </p>
               </div>
 
               <div className="flex items-start gap-2.5">
                 <div className="w-1.5 h-1.5 rounded-full bg-slate-400 mt-1.5 shrink-0" />
                 <p className="text-slate-600 leading-relaxed">
-                  <strong className="text-slate-800 font-medium">Email Modifications:</strong> Registered email addresses can only be changed by super-administrators for security compliance.
+                  <strong className="text-slate-800 font-medium">Email Modifications:</strong>{" "}
+                  Registered email addresses can only be changed by super-administrators for
+                  security compliance.
                 </p>
               </div>
             </div>

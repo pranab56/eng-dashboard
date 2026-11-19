@@ -103,7 +103,9 @@ const ResetPassword = () => {
             <ShieldCheck className="w-3.5 h-3.5 text-slate-600" />
             <span>Reset Password</span>
           </div>
-          <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-slate-900">Set New Password</h1>
+          <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-slate-900">
+            Set New Password
+          </h1>
           <p className="text-xs text-slate-500 mt-1.5 leading-relaxed">
             Create a secure password for your administrator account.
           </p>
@@ -136,7 +138,11 @@ const ResetPassword = () => {
                         className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-colors cursor-pointer p-0.5"
                         aria-label={showPassword ? "Hide password" : "Show password"}
                       >
-                        {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                        {showPassword ? (
+                          <EyeOff className="w-4 h-4" />
+                        ) : (
+                          <Eye className="w-4 h-4" />
+                        )}
                       </button>
                     </div>
                   </FormControl>
@@ -170,7 +176,11 @@ const ResetPassword = () => {
                         className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-colors cursor-pointer p-0.5"
                         aria-label={showConfirmPassword ? "Hide password" : "Show password"}
                       >
-                        {showConfirmPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                        {showConfirmPassword ? (
+                          <EyeOff className="w-4 h-4" />
+                        ) : (
+                          <Eye className="w-4 h-4" />
+                        )}
                       </button>
                     </div>
                   </FormControl>
@@ -208,7 +218,11 @@ const ResetPassword = () => {
 
 export default function ResetPasswordPage() {
   return (
-    <Suspense fallback={<div className="text-center p-6 text-slate-400 text-xs">Loading password reset...</div>}>
+    <Suspense
+      fallback={
+        <div className="text-center p-6 text-slate-400 text-xs">Loading password reset...</div>
+      }
+    >
       <ResetPassword />
     </Suspense>
   );

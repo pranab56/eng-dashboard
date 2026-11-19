@@ -67,8 +67,7 @@ const Settings = () => {
 
   const hasUnsavedChanges = useMemo(() => {
     return (
-      isRestricted !== initialState.isRestricted ||
-      feedbackHours !== initialState.feedbackHours
+      isRestricted !== initialState.isRestricted || feedbackHours !== initialState.feedbackHours
     );
   }, [isRestricted, feedbackHours, initialState]);
 
@@ -144,7 +143,8 @@ const Settings = () => {
                 Match Rating & Feedback Policy
               </h2>
               <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-                Control the allowable timeframe for coaches and referees to submit evaluations post-match.
+                Control the allowable timeframe for coaches and referees to submit evaluations
+                post-match.
               </p>
             </div>
             <span
@@ -171,7 +171,9 @@ const Settings = () => {
                 Enforce Feedback Time Limit
               </label>
               <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
-                When enabled, coaches and referees must submit their evaluations within the configured time window. When disabled, submissions are accepted indefinitely without expiration errors.
+                When enabled, coaches and referees must submit their evaluations within the
+                configured time window. When disabled, submissions are accepted indefinitely without
+                expiration errors.
               </p>
             </div>
 
@@ -246,7 +248,8 @@ const Settings = () => {
           ) : (
             <div className="p-5 sm:p-6 bg-slate-50/40 dark:bg-slate-800/20">
               <div className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
-                Time restrictions are currently <strong>disabled</strong>. Evaluators can rate players, teams, and referees at any time without submission deadlines.
+                Time restrictions are currently <strong>disabled</strong>. Evaluators can rate
+                players, teams, and referees at any time without submission deadlines.
               </div>
             </div>
           )}
@@ -258,7 +261,8 @@ const Settings = () => {
                 Evaluation Timezone Standard
               </span>
               <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
-                All match schedules, final whistles, and expiration cut-offs are synchronized using this timezone standard.
+                All match schedules, final whistles, and expiration cut-offs are synchronized using
+                this timezone standard.
               </p>
             </div>
 

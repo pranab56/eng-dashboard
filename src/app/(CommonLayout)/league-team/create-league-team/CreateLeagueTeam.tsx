@@ -30,8 +30,7 @@ export default function CreateLeagueTeam() {
   const [selectedTeams, setSelectedTeams] = useState<string[]>([]);
   const [teamSearchTerm, setTeamSearchTerm] = useState("");
 
-  const [createLeagueTeam, { isLoading: isCreating }] =
-    useCreateLeagueTeamMutation();
+  const [createLeagueTeam, { isLoading: isCreating }] = useCreateLeagueTeamMutation();
   const { data: leagueData } = useGetAllLeagueQuery({ page: 1, limit: 1000 });
   const { data: teamData } = useGetAllTeamQuery({ page: 1, limit: 1000 });
 
@@ -64,9 +63,7 @@ export default function CreateLeagueTeam() {
 
   const toggleTeamSelection = (teamId: string) => {
     setSelectedTeams((prev) =>
-      prev.includes(teamId)
-        ? prev.filter((id) => id !== teamId)
-        : [...prev, teamId]
+      prev.includes(teamId) ? prev.filter((id) => id !== teamId) : [...prev, teamId]
     );
   };
 
@@ -108,9 +105,7 @@ export default function CreateLeagueTeam() {
         router.push("/league-team");
       }
     } catch (error: any) {
-      toast.error(
-        error?.data?.message || "Failed to associate teams with league"
-      );
+      toast.error(error?.data?.message || "Failed to associate teams with league");
     }
   };
 
@@ -260,9 +255,7 @@ export default function CreateLeagueTeam() {
                       />
                     ) : (
                       <span className="text-xs font-bold text-slate-500 uppercase">
-                        {team.shortName?.slice(0, 2) ||
-                          team.teamName?.slice(0, 2) ||
-                          "T"}
+                        {team.shortName?.slice(0, 2) || team.teamName?.slice(0, 2) || "T"}
                       </span>
                     )}
                   </div>

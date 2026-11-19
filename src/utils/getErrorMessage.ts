@@ -1,4 +1,7 @@
-export const getErrorMessage = (error: any, defaultMsg: string = "Something went wrong"): string => {
+export const getErrorMessage = (
+  error: any,
+  defaultMsg: string = "Something went wrong"
+): string => {
   if (!error) return defaultMsg;
   if (typeof error === "string") return error;
   if (typeof error?.data === "string") return error.data;

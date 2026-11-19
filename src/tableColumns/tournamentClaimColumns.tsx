@@ -4,20 +4,8 @@ import Image from "next/image";
 import React, { useState } from "react";
 import { TTournamentClaim } from "@/types/columnTypes";
 import { formatImagePath } from "@/utils/formatImagePath";
-import {
-  Trophy,
-  FileText,
-  ChevronsUpDown,
-  Check,
-  X,
-  Eye,
-  Loader2,
-} from "lucide-react";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
+import { Trophy, FileText, ChevronsUpDown, Check, X, Eye, Loader2 } from "lucide-react";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 
 function StatusCell({
   claimId,
@@ -33,14 +21,11 @@ function StatusCell({
   const [open, setOpen] = useState(false);
   const status = (currentStatus || "pending").toLowerCase();
 
-  let badgeStyle =
-    "bg-amber-50 text-amber-700 border-amber-200 hover:bg-amber-100/80";
+  let badgeStyle = "bg-amber-50 text-amber-700 border-amber-200 hover:bg-amber-100/80";
   if (status === "approved") {
-    badgeStyle =
-      "bg-emerald-50 text-emerald-700 border-emerald-200 hover:bg-emerald-100/80";
+    badgeStyle = "bg-emerald-50 text-emerald-700 border-emerald-200 hover:bg-emerald-100/80";
   } else if (status === "rejected") {
-    badgeStyle =
-      "bg-rose-50 text-rose-700 border-rose-200 hover:bg-rose-100/80";
+    badgeStyle = "bg-rose-50 text-rose-700 border-rose-200 hover:bg-rose-100/80";
   }
 
   return (
@@ -81,9 +66,7 @@ function StatusCell({
                 : "text-slate-700 hover:bg-slate-100"
             }`}
           >
-            <span className={status === opt.value ? "text-white" : opt.color}>
-              {opt.label}
-            </span>
+            <span className={status === opt.value ? "text-white" : opt.color}>{opt.label}</span>
             {status === opt.value && <Check className="w-3.5 h-3.5 text-white" />}
           </button>
         ))}
@@ -99,13 +82,15 @@ export const getTournamentClaimColumns = (
 ): ColumnDef<TTournamentClaim>[] => [
   {
     accessorKey: "user",
-    header: () => <div className="text-xs font-semibold text-slate-600 uppercase tracking-wider">Participant</div>,
+    header: () => (
+      <div className="text-xs font-semibold text-slate-600 uppercase tracking-wider">
+        Participant
+      </div>
+    ),
     cell: ({ row }) => {
       const user = row.original.user;
       const profilePic = user?.profile ? formatImagePath(user.profile) : null;
-      const initials = (user?.userName || "U")
-        .substring(0, 2)
-        .toUpperCase();
+      const initials = (user?.userName || "U").substring(0, 2).toUpperCase();
 
       return (
         <div className="flex items-center gap-3 py-1">
@@ -144,7 +129,11 @@ export const getTournamentClaimColumns = (
   },
   {
     accessorKey: "tournament",
-    header: () => <div className="text-xs font-semibold text-slate-600 uppercase tracking-wider">Tournament</div>,
+    header: () => (
+      <div className="text-xs font-semibold text-slate-600 uppercase tracking-wider">
+        Tournament
+      </div>
+    ),
     cell: ({ row }) => {
       const tournament = row.original.tournament;
       return (
@@ -173,7 +162,11 @@ export const getTournamentClaimColumns = (
   },
   {
     accessorKey: "claimedPositionName",
-    header: () => <div className="text-xs font-semibold text-slate-600 uppercase tracking-wider">Claimed Placement</div>,
+    header: () => (
+      <div className="text-xs font-semibold text-slate-600 uppercase tracking-wider">
+        Claimed Placement
+      </div>
+    ),
     cell: ({ row }) => {
       const claim = row.original;
       const pos = claim.claimedPosition;
@@ -190,9 +183,7 @@ export const getTournamentClaimColumns = (
 
       return (
         <div className="flex items-center gap-2 font-medium text-xs">
-          <span
-            className={`px-2 py-0.5 rounded-md border text-[11px] font-mono ${badgeTheme}`}
-          >
+          <span className={`px-2 py-0.5 rounded-md border text-[11px] font-mono ${badgeTheme}`}>
             #{pos || "—"}
           </span>
           <span className="text-slate-800 font-medium">
@@ -204,7 +195,11 @@ export const getTournamentClaimColumns = (
   },
   {
     accessorKey: "proofNotes",
-    header: () => <div className="text-xs font-semibold text-slate-600 uppercase tracking-wider">Verification Notes</div>,
+    header: () => (
+      <div className="text-xs font-semibold text-slate-600 uppercase tracking-wider">
+        Verification Notes
+      </div>
+    ),
     cell: ({ row }) => {
       const notes = row.getValue("proofNotes") as string;
       return (
@@ -219,7 +214,9 @@ export const getTournamentClaimColumns = (
   },
   {
     accessorKey: "status",
-    header: () => <div className="text-xs font-semibold text-slate-600 uppercase tracking-wider">Status</div>,
+    header: () => (
+      <div className="text-xs font-semibold text-slate-600 uppercase tracking-wider">Status</div>
+    ),
     cell: ({ row }) => {
       const claim = row.original;
       const claimId = claim._id || claim.id || "";
@@ -237,7 +234,9 @@ export const getTournamentClaimColumns = (
   },
   {
     accessorKey: "createdAt",
-    header: () => <div className="text-xs font-semibold text-slate-600 uppercase tracking-wider">Submitted</div>,
+    header: () => (
+      <div className="text-xs font-semibold text-slate-600 uppercase tracking-wider">Submitted</div>
+    ),
     cell: ({ row }) => {
       const dateStr = row.getValue("createdAt") as string;
       return (
@@ -249,7 +248,11 @@ export const getTournamentClaimColumns = (
   },
   {
     id: "actions",
-    header: () => <div className="text-right pr-2 text-xs font-semibold text-slate-600 uppercase tracking-wider">Actions</div>,
+    header: () => (
+      <div className="text-right pr-2 text-xs font-semibold text-slate-600 uppercase tracking-wider">
+        Actions
+      </div>
+    ),
     cell: ({ row }) => {
       const claim = row.original;
       const claimId = claim._id || claim.id || "";

@@ -1,7 +1,7 @@
-'use client';
+"use client";
 
 import { persistor, store } from "@/utils/store";
-import type { ReactNode } from 'react';
+import type { ReactNode } from "react";
 import { Provider } from "react-redux";
 import { PersistGate } from "redux-persist/integration/react";
 
@@ -23,9 +23,7 @@ function AppSplashLoader() {
           <span className="text-xs font-semibold uppercase tracking-widest text-slate-300">
             ENG Sports Operations
           </span>
-          <span className="text-[11px] text-slate-500 animate-pulse">
-            Initializing console...
-          </span>
+          <span className="text-[11px] text-slate-500 animate-pulse">Initializing console...</span>
         </div>
       </div>
     </div>
